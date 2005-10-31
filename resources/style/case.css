@@ -1,0 +1,140 @@
+.casesTable td, th {
+	font-size: 10px;
+	empty-cells: show;
+}
+
+.casesTable tbody tr td {
+	padding: 3px;
+	white-space: nowrap;
+}
+
+.casesTable tbody tr td a {
+	font-size: 10px;
+	text-decoration: none;
+}
+
+.casesTable thead tr th {
+	text-align: left;
+	padding: 3px;
+	font-weight: bold;
+	color: #595A54;
+	border-top: 1px solid #D7D7D7;
+	border-bottom: 1px solid #D7D7D7;
+}
+
+.casesTable tfoot tr td {
+	text-align: left;
+	padding: 3px;
+	font-weight: bold;
+	color: #595A54;
+	border-top: 1px solid #D7D7D7;
+	border-bottom: 1px solid #D7D7D7;
+}
+
+.casesTable .casesTable_oddRow {
+	background-color: #EFEFEF;	
+}
+
+.casesTable .casesTable_evenRow {
+	background-color: #FFFFFF;	
+}
+
+form.casesForm input, select {
+	border: 1px #CCCCCC solid;
+	font-size: 9px;
+}
+
+form.casesForm p {
+	font-size: 10px;
+	margin-bottom: 16px;
+}
+
+form.casesForm h1 {
+	font-size: 12px;
+	margin-bottom: 16px;
+}
+
+form.casesForm div.personInfoItem {
+	float: left;
+	width: 200px;
+	height: 30px;
+        font-size:10px;
+}
+
+form.casesForm div.personInfoItem h1 {
+	font-size: 10px;
+	margin: 0;
+}
+
+div#personInfo {
+	border-bottom: 1px #cccccc solid;
+	padding: 10px;
+}
+
+div.personInfoItem {
+	float: left;
+	width: 200px;
+	height: 30px;
+        font-size:10px;
+}
+
+div.personInfoItem h1 {
+	font-size: 10px;
+	margin: 0;
+}
+
+div.elementsLayer {
+	padding: 10px;
+}
+
+div.elementsLayer h1 {
+	margin: 0 0 20px 0;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+div.formElement {
+	clear: left;
+}
+
+div.formElement label {
+	float: left;
+	width: 100px;
+	font-weight: bold;
+	padding-right: 10px;
+}
+
+div.formElement p {
+	width: 400px;
+	float: left;
+	margin: 0;
+	margin-bottom: 12px;
+}
+
+div.buttonLayer {
+	clear: both;	margin: 20px 12px 12px 0;	text-align: right;}
+
+div.boxElement {
+	clear: left;
+}
+
+div.boxElement label {
+	float: left;
+	font-weight: bold;
+	text-align: right;
+	padding-left: 8px;
+}
+
+div.boxElement input.checkbox {
+	float: left;
+}
+
+div.formElement input, div.formElement textarea, div.formElement select, div.formElement table {
+	float: left;
+	margin-bottom: 12px;
+}
+
+textarea.textarea {
+	width: 400px;
+	height: 50px;
+}
