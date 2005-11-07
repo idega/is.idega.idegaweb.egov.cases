@@ -91,9 +91,9 @@ public class CaseFinder extends CasesBlock {
 		
 		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
 		caseNumber.setStyleClass("textinput");
-		TextInput name = new TextInput(PARAMETER_CASE_NUMBER);
+		TextInput name = new TextInput(PARAMETER_NAME);
 		name.setStyleClass("textinput");
-		TextInput personalID = new TextInput(PARAMETER_CASE_NUMBER);
+		TextInput personalID = new TextInput(PARAMETER_PERSONAL_ID);
 		personalID.setStyleClass("textinput");
 		
 		caseNumber.setToDisableOnWhenNotEmpty(name);

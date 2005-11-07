@@ -141,12 +141,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			
 			cell = row.createCell();
 			cell.setStyleClass("lastColumn");
-			if (status.equals(getBusiness().getCaseStatusOpen())) {
-				cell.add(process);
-			}
-			else {
-				cell.add(Text.getNonBrakingSpace());
-			}
+			cell.add(process);
 			
 			if (iRow % 2 == 0) {
 				row.setStyleClass("evenRow");

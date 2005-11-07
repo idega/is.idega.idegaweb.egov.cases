@@ -220,6 +220,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public void takeCase(Object casePK, User performer) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
+		theCase.setHandledBy(performer);
 		
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, null);
 		

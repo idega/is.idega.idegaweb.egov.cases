@@ -104,7 +104,7 @@ public class CaseTypeEditor extends CasesBlock {
 		column.setSpan(2);
 		column.setWidth("12");
 
-		Collection categories = getBusiness().getCaseCategories();
+		Collection types = getBusiness().getCaseTypes();
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -122,7 +122,7 @@ public class CaseTypeEditor extends CasesBlock {
 		group = table.createBodyRowGroup();
 		int iRow = 1;
 		
-		Iterator iter = categories.iterator();
+		Iterator iter = types.iterator();
 		Commune commune;
 		while (iter.hasNext()) {
 			CaseType type = (CaseType) iter.next();
