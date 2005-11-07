@@ -77,7 +77,7 @@ public class OpenCases extends CasesProcessor {
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 		
 		Layer element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		Label label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("sender", "Sender"));
 		element.add(label);
@@ -85,7 +85,7 @@ public class OpenCases extends CasesProcessor {
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 		element.add(label);
@@ -93,7 +93,7 @@ public class OpenCases extends CasesProcessor {
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 		element.add(label);
@@ -101,7 +101,7 @@ public class OpenCases extends CasesProcessor {
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
@@ -109,7 +109,7 @@ public class OpenCases extends CasesProcessor {
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("message", "Message"));
 		element.add(label);

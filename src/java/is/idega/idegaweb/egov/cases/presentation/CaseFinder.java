@@ -104,21 +104,21 @@ public class CaseFinder extends CasesBlock {
 		personalID.setToDisableOnWhenNotEmpty(name);
 		
 		Layer element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		Label label = new Label(getResourceBundle().getLocalizedString("case_number", "Case number"), caseNumber);
 		element.add(label);
 		element.add(caseNumber);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		element.add(label);
 		element.add(name);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		element.setStyleClass("formElement");
 		label = new Label(getResourceBundle().getLocalizedString("personal_id", "Personal ID"), personalID);
 		element.add(label);
 		element.add(personalID);
