@@ -9,6 +9,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import java.rmi.RemoteException;
 import javax.ejb.CreateException;
@@ -25,7 +26,6 @@ import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
-import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.util.SelectorUtility;
 
 
@@ -33,8 +33,8 @@ public class CaseCreator extends CasesBlock {
 	
 	private static final String PARAMETER_ACTION = "cc_prm_action";
 	
-	private static final String PARAMETER_CASE_NUMBER = "prm_case_number";
 	private static final String PARAMETER_MESSAGE = "prm_message";
+	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	
 	private static final int ACTION_PHASE_1 = 1;
@@ -72,9 +72,9 @@ public class CaseCreator extends CasesBlock {
 	private void showPhaseOne(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
-		form.maintainParameter(PARAMETER_CASE_NUMBER);
 		form.maintainParameter(PARAMETER_MESSAGE);
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
+		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("infoLayer");
@@ -112,11 +112,11 @@ public class CaseCreator extends CasesBlock {
 		layer.add(heading);
 		
 		SelectorUtility util = new SelectorUtility();
+		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getBusiness().getCaseCategories(), "getName");
+		categories.keepStatusOnAction(true);
+		
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
-		
-		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
-		caseNumber.keepStatusOnAction(true);
 		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
@@ -130,10 +130,10 @@ public class CaseCreator extends CasesBlock {
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
-		label = new Label(getResourceBundle().getLocalizedString("case_number", "Case number"), caseNumber);
+		layer.setStyleClass("formElement");
+		label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
 		element.add(label);
-		element.add(caseNumber);
+		element.add(categories);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
@@ -164,18 +164,25 @@ public class CaseCreator extends CasesBlock {
 	private void showOverview(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
-		form.maintainParameter(PARAMETER_CASE_NUMBER);
 		form.maintainParameter(PARAMETER_MESSAGE);
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
+		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		
 		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
 		
-		String caseNumber = iwc.getParameter(PARAMETER_CASE_NUMBER);
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		if (message == null || message.length() == 0) {
 			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_creator.message_empty", "You must enter a message"));
 			showPhaseTwo(iwc);
 			return;
+		}
+		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
+		CaseCategory category = null;
+		try {
+			category = getBusiness().getCaseCategory(caseCategoryPK);
+		}
+		catch (FinderException fe) {
+			throw new IBORuntimeException(fe);
 		}
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		CaseType type = null;
@@ -185,12 +192,7 @@ public class CaseCreator extends CasesBlock {
 		catch (FinderException fe) {
 			throw new IBORuntimeException(fe);
 		}
-		if (type.requiresCaseNumber() && (caseNumber == null || caseNumber.length() == 0)) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_creator.missing_case_number", "You must enter a case number"));
-			showPhaseTwo(iwc);
-			return;
-		}
-		
+
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("elementsLayer");
 		form.add(layer);
@@ -201,8 +203,8 @@ public class CaseCreator extends CasesBlock {
 		Paragraph typeSpan = new Paragraph();
 		typeSpan.add(new Text(type.getName()));
 		
-		Paragraph caseNumberSpan = new Paragraph();
-		caseNumberSpan.add(new Text(caseNumber));
+		Paragraph categorySpan = new Paragraph();
+		categorySpan.add(new Text(category.getName()));
 		
 		Paragraph messageSpan = new Paragraph();
 		messageSpan.add(new Text(message));
@@ -216,11 +218,11 @@ public class CaseCreator extends CasesBlock {
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		layer.setStyleClass("formElement");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_number", "Case number"));
+		label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 		element.add(label);
-		element.add(caseNumberSpan);
+		element.add(categorySpan);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
@@ -250,12 +252,12 @@ public class CaseCreator extends CasesBlock {
 	}
 	
 	private void save(IWContext iwc) throws RemoteException {
-		String caseNumber = iwc.getParameter(PARAMETER_CASE_NUMBER);
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
+		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		
 		try {
-			getBusiness().storeGeneralCase(iwc.getCurrentUser(), caseTypePK, message, caseNumber);
+			getBusiness().storeGeneralCase(iwc.getCurrentUser(), caseCategoryPK, caseTypePK, message);
 
 			Layer layer = new Layer(Layer.DIV);
 			layer.setID("elementsLayer");

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Created on Oct 31, 2005
+ * Created on Nov 7, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  *
@@ -13,6 +13,7 @@ import java.util.Collection;
 import javax.ejb.FinderException;
 import com.idega.data.IDOException;
 import com.idega.data.IDOHome;
+import com.idega.user.data.User;
 
 
 /**
@@ -39,6 +40,21 @@ public interface GeneralCaseHome extends IDOHome {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#ejbFindAllByGroupAndStatuses
 	 */
 	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses) throws FinderException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#ejbFindAllByHandler
+	 */
+	public Collection findAllByHandler(User handler) throws FinderException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#ejbFindAllByHandlerAndStatuses
+	 */
+	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#ejbFindAllByUsers
+	 */
+	public Collection findAllByUsers(Collection users) throws FinderException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#ejbHomeGetCountByGroup

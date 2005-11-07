@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Created on Oct 31, 2005
+ * Created on Nov 7, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  *
@@ -11,6 +11,7 @@ package is.idega.idegaweb.egov.cases.data;
 
 import com.idega.block.process.data.Case;
 import com.idega.data.IDOEntity;
+import com.idega.user.data.User;
 
 
 /**
@@ -45,14 +46,19 @@ public interface GeneralCase extends IDOEntity, Case {
 	public String getReply();
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getCaseNumber
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getCaseCategory
 	 */
-	public String getCaseNumber();
+	public CaseCategory getCaseCategory();
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getCaseType
 	 */
 	public CaseType getCaseType();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getHandledBy
+	 */
+	public User getHandledBy();
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setMessage
@@ -65,12 +71,17 @@ public interface GeneralCase extends IDOEntity, Case {
 	public void setReply(String reply);
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setCaseNumber
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setCaseCategory
 	 */
-	public void setCaseNumber(String caseNumber);
+	public void setCaseCategory(CaseCategory category);
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setCaseType
 	 */
 	public void setCaseType(CaseType type);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setHandledBy
+	 */
+	public void setHandledBy(User handler);
 }

@@ -16,21 +16,21 @@ import com.idega.data.IDOHome;
 
 /**
  * <p>
- * TODO laddi Describe Type CaseTypeHome
+ * TODO laddi Describe Type CaseCategoryHome
  * </p>
  *  Last modified: $Date$ by $Author$
  * 
  * @author <a href="mailto:laddi@idega.com">laddi</a>
  * @version $Revision$
  */
-public interface CaseTypeHome extends IDOHome {
+public interface CaseCategoryHome extends IDOHome {
 
-	public CaseType create() throws javax.ejb.CreateException;
+	public CaseCategory create() throws javax.ejb.CreateException;
 
-	public CaseType findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
+	public CaseCategory findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.data.CaseTypeBMPBean#ejbFindAll
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#ejbFindAll
 	 */
 	public Collection findAll() throws FinderException;
 }

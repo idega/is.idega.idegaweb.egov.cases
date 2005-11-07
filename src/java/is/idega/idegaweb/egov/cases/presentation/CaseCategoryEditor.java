@@ -9,7 +9,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,15 +34,18 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
+import com.idega.user.data.Group;
+import com.idega.user.presentation.GroupChooser;
 
 
-public class CaseTypeEditor extends CasesBlock {
+public class CaseCategoryEditor extends CasesBlock {
 
-	private static final String PARAMETER_ACTION = "cte_prm_action";
+	private static final String PARAMETER_ACTION = "cce_prm_action";
 	
-	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
+	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_NAME = "prm_name";
 	private static final String PARAMETER_DESCRIPTION = "prm_description";
+	private static final String PARAMETER_GROUP = "prm_group";
 
 	private static final int ACTION_VIEW = 1;
 	private static final int ACTION_EDIT = 2;
@@ -57,7 +60,7 @@ public class CaseTypeEditor extends CasesBlock {
 				break;
 
 			case ACTION_EDIT:
-				showEditor(iwc, iwc.getParameter(PARAMETER_CASE_TYPE_PK));
+				showEditor(iwc, iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
 				break;
 
 			case ACTION_NEW:
@@ -65,16 +68,16 @@ public class CaseTypeEditor extends CasesBlock {
 				break;
 
 			case ACTION_SAVE:
-				if (saveType(iwc)) {
+				if (saveCategory(iwc)) {
 					showList(iwc);
 				}
 				else {
-					showEditor(iwc, iwc.getParameter(PARAMETER_CASE_TYPE_PK));
+					showEditor(iwc, iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
 				}
 				break;
 
 			case ACTION_DELETE:
-				removeType(iwc);
+				removeCategory(iwc);
 				showList(iwc);
 				break;
 		}
@@ -99,7 +102,7 @@ public class CaseTypeEditor extends CasesBlock {
 		
 		TableColumnGroup columnGroup = table.createColumnGroup();
 		TableColumn column = columnGroup.createColumn();
-		column.setSpan(2);
+		column.setSpan(3);
 		column = columnGroup.createColumn();
 		column.setSpan(2);
 		column.setWidth("12");
@@ -113,6 +116,7 @@ public class CaseTypeEditor extends CasesBlock {
 		cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
 		
 		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
+		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler_group", "Handler group")));
 
 		row.createHeaderCell().add(Text.getNonBrakingSpace());
 		cell = row.createHeaderCell();
@@ -125,7 +129,7 @@ public class CaseTypeEditor extends CasesBlock {
 		Iterator iter = categories.iterator();
 		Commune commune;
 		while (iter.hasNext()) {
-			CaseType type = (CaseType) iter.next();
+			CaseCategory category = (CaseCategory) iter.next();
 			row = group.createRow();
 			if (iRow == 1) {
 				row.setStyleClass("firstRow");
@@ -135,18 +139,19 @@ public class CaseTypeEditor extends CasesBlock {
 			}
 			
 			Link edit = new Link(getBundle().getImage("edit.gif", getResourceBundle().getLocalizedString("edit", "Edit")));
-			edit.addParameter(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
+			edit.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
 			edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
 			
 			Link delete = new Link(getBundle().getImage("delete.gif", getResourceBundle().getLocalizedString("delete", "Delete")));
-			delete.addParameter(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
+			delete.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
 			delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
 
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
-			cell.add(new Text(type.getName()));
+			cell.add(new Text(category.getName()));
 
-			row.createCell().add(new Text(type.getDescription() != null ? type.getDescription() : "-"));
+			row.createCell().add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
+			row.createCell().add(new Text(category.getHandlerGroup().getName()));
 
 			row.createCell().add(edit);
 			cell = row.createCell();
@@ -167,18 +172,18 @@ public class CaseTypeEditor extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 
-		SubmitButton newButton = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("new_type", "New type"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
+		SubmitButton newButton = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("new_category", "New category"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
 		newButton.setStyleClass("button");
 		layer.add(newButton);
 
 		add(form);
 	}
 	
-	private void showEditor(IWContext iwc, Object caseTypePK) throws RemoteException {
+	private void showEditor(IWContext iwc, Object caseCategoryPK) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("new_edit_case_type", "New/Edit case type"));
+		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("new_edit_case_category", "New/Edit case category"));
 		form.add(heading);
 		
 		TextInput name = new TextInput(PARAMETER_NAME);
@@ -188,16 +193,20 @@ public class CaseTypeEditor extends CasesBlock {
 		description.setStyleClass("textarea");
 		description.keepStatusOnAction(true);
 		
-		if (caseTypePK != null) {
+		GroupChooser chooser = new GroupChooser(PARAMETER_GROUP);
+		
+		if (caseCategoryPK != null) {
 			try {
-				CaseType type = getBusiness().getCaseType(caseTypePK);
+				CaseCategory category = getBusiness().getCaseCategory(caseCategoryPK);
+				Group group = category.getHandlerGroup();
 				
-				name.setContent(type.getName());
-				if (type.getDescription() != null) {
-					description.setContent(type.getDescription());
+				name.setContent(category.getName());
+				if (category.getDescription() != null) {
+					description.setContent(category.getDescription());
 				}
+				chooser.setSelectedGroup(group.getPrimaryKey().toString(), group.getName());
 				
-				form.add(new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString()));
+				form.add(new HiddenInput(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString()));
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();
@@ -218,6 +227,14 @@ public class CaseTypeEditor extends CasesBlock {
 		layer.add(description);
 		form.add(layer);
 
+		layer = new Layer(Layer.DIV);
+		layer.setStyleClass("formElement");
+		label = new Label();
+		label.setLabel(getResourceBundle().getLocalizedString("handler_group", "Handler group"));
+		layer.add(label);
+		layer.add(chooser);
+		form.add(layer);
+
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		form.add(clear);
@@ -236,18 +253,26 @@ public class CaseTypeEditor extends CasesBlock {
 		add(form);
 	}
 
-	private boolean saveType(IWContext iwc) throws RemoteException {
-		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
+	private boolean saveCategory(IWContext iwc) throws RemoteException {
+		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		String name = iwc.getParameter(PARAMETER_NAME);
 		String description = iwc.getParameter(PARAMETER_DESCRIPTION);
+		String groupPK = iwc.getParameter(PARAMETER_GROUP);
 		
 		if (name == null || name.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_type.name_not_empty", "You must provide a name for the case type."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.name_not_empty", "You must provide a name for the case category."));
 			return false;
+		}
+		if (groupPK == null || groupPK.length() == 0) {
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.group_not_empty", "You must select a handler group for the case category."));
+			return false;
+		}
+		if (groupPK.indexOf("_") != -1) {
+			groupPK = groupPK.substring(groupPK.indexOf("_") + 1);
 		}
 		
 		try {
-			getBusiness().storeCaseType(caseTypePK, name, description);
+			getBusiness().storeCaseCategory(caseCategoryPK, name, description, groupPK);
 			return true;
 		}
 		catch (FinderException e) {
@@ -259,13 +284,13 @@ public class CaseTypeEditor extends CasesBlock {
 		return false;
 	}
 	
-	private void removeType(IWContext iwc) throws RemoteException {
-		String caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
+	private void removeCategory(IWContext iwc) throws RemoteException {
+		String caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		try {
-			getBusiness().removeCaseType(caseTypePK);
+			getBusiness().removeCaseCategory(caseCategoryPK);
 		}
 		catch (RemoveException re) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_type_failed", "You can't remove a case type that already has cases connected to it."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_category_failed", "You can't remove a case category that already has cases connected to it."));
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

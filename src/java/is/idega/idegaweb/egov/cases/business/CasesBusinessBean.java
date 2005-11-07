@@ -9,6 +9,8 @@
  */
 package is.idega.idegaweb.egov.cases.business;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseCategoryHome;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -57,6 +59,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		}
 	}
 	
+	private CaseCategoryHome getCaseCategoryHome() {
+		try {
+			return (CaseCategoryHome) IDOLookup.getHome(CaseCategory.class);
+		}
+		catch (IDOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+	
 	private CaseTypeHome getCaseTypeHome() {
 		try {
 			return (CaseTypeHome) IDOLookup.getHome(CaseType.class);
@@ -69,7 +80,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) {
 		try {
 			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
-			CaseType type = genCase.getCaseType();
+			CaseCategory type = genCase.getCaseCategory();
 			Object[] arguments = { type.getName() };
 			
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
@@ -85,15 +96,65 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		return getGeneralCaseHome().findByPrimaryKey(new Integer(casePK.toString()));
 	}
 	
-	public Collection getCases(Collection groups) {
+	public Collection getOpenCases(Collection groups) {
 		try {
-			String[] statuses = { getCaseStatusOpen().getStatus(), getCaseStatusReady().getStatus() };
+			String[] statuses = { getCaseStatusOpen().getStatus(), getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus() };
 			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
 			return new ArrayList();
 		}
+	}
+	
+	public Collection getMyCases(User handler) {
+		try {
+			String[] statuses = { getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus(), getCaseStatusReady().getStatus() };
+			return getGeneralCaseHome().findAllByHandlerAndStatuses(handler, statuses);
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList();
+		}
+	}
+	
+	public Collection getClosedCases(Collection groups) {
+		try {
+			String[] statuses = { getCaseStatusInactive().getStatus(), getCaseStatusReady().getStatus() };
+			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses);
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList();
+		}
+	}
+	
+	public Collection getCasesByUsers(Collection users) {
+		try {
+			return getGeneralCaseHome().findAllByUsers(users);
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList();
+		}
+	}
+	
+	public CaseCategory getCaseCategory(Object caseCategoryPK) throws FinderException {
+		return getCaseCategoryHome().findByPrimaryKey(new Integer(caseCategoryPK.toString()));
+	}
+	
+	public Collection getCaseCategories() {
+		try {
+			return getCaseCategoryHome().findAll();
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList();
+		}
+	}
+	
+	public void removeCaseCategory(Object caseCategoryPK) throws FinderException, RemoveException {
+		getCaseCategory(caseCategoryPK).remove();
 	}
 	
 	public CaseType getCaseType(Object caseTypePK) throws FinderException {
@@ -114,32 +175,89 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		getCaseType(caseTypePK).remove();
 	}
 	
-	public void storeGeneralCase(User sender, Object caseTypePK, String message, String caseNumber) throws CreateException {
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message) throws CreateException {
 		GeneralCase theCase = getGeneralCaseHome().create();
+		CaseCategory category = null;
+		try {
+			category = getCaseCategory(caseCategoryPK);
+		}
+		catch (FinderException fe) {
+			throw new CreateException("Trying to store a case with case category that has no relation to a group");
+		}
 		CaseType type = null;
 		try {
 			type = getCaseType(caseTypePK);
 		}
 		catch (FinderException fe) {
-			throw new CreateException("Trying to store a case with case type that has no relation to a group");
+			throw new CreateException("Trying to store a case with case type that has does not exist");
 		}
 		
+		theCase.setCaseCategory(category);
 		theCase.setCaseType(type);
 		theCase.setOwner(sender);
-		theCase.setHandler(type.getHandlerGroup());
+		theCase.setHandler(category.getHandlerGroup());
 		theCase.setMessage(message);
-		theCase.setCaseNumber(caseNumber);
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, null);
 	}
 	
-	public void handleCase(Object casePK, User performer, String reply) throws FinderException {
+	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, Locale locale) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		theCase.setReply(reply);
 		
-		changeCaseStatus(theCase, getCaseStatusReady().getStatus(), performer, null);
+		CaseCategory category = getCaseCategory(caseCategoryPK);
+		theCase.setCaseCategory(category);
+		CaseType type = getCaseType(caseTypePK);
+		theCase.setCaseType(type);
+		
+		changeCaseStatus(theCase, status, performer, null);
+		
+		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(getCaseStatus(status), locale) };
+		String subject = getLocalizedString("case_handled_subject", "Your case has been handled");
+		String body = MessageFormat.format(getLocalizedString("case_handled_body", "Your case with category {0} and type {1} has been handled by {2}.  The reply was as follows:\n\n{3}"), arguments);
+		
+		sendMessage(theCase, theCase.getOwner(), performer, subject, body);
 	}
 	
-	public void storeCaseType(Object caseTypePK, String name, String description, boolean requiresCaseNumber, Object groupPK) throws FinderException, CreateException {
+	public void takeCase(Object casePK, User performer) throws FinderException {
+		GeneralCase theCase = getGeneralCase(casePK);
+		
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, null);
+		
+		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
+		String subject = getLocalizedString("case_taken_subject", "Your case has been taken");
+		String body = MessageFormat.format(getLocalizedString("case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
+		
+		sendMessage(theCase, theCase.getOwner(), performer, subject, body);
+	}
+	
+	public void reactivateCase(Object casePK, User performer) throws FinderException {
+		GeneralCase theCase = getGeneralCase(casePK);
+		
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, null);
+		
+		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
+		String subject = getLocalizedString("case_reactivated_subject", "Your case has been reactivated");
+		String body = MessageFormat.format(getLocalizedString("case_reactivated_body", "Your case with category {0} and type {1} has been reactivated by {2}"), arguments);
+		
+		sendMessage(theCase, theCase.getOwner(), performer, subject, body);
+	}
+	
+	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK) throws FinderException, CreateException {
+		CaseCategory category = null;
+		if (caseCategoryPK != null) {
+			category = getCaseCategory(caseCategoryPK);
+		}
+		else {
+			category = getCaseCategoryHome().create();
+		}
+		
+		category.setName(name);
+		category.setDescription(description);
+		category.setHandlerGroup(groupPK);
+		category.store();
+	}
+	
+	public void storeCaseType(Object caseTypePK, String name, String description) throws FinderException, CreateException {
 		CaseType type = null;
 		if (caseTypePK != null) {
 			type = getCaseType(caseTypePK);
@@ -150,14 +268,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		type.setName(name);
 		type.setDescription(description);
-		type.setRequiresCaseNumber(requiresCaseNumber);
-		type.setHandlerGroup(groupPK);
 		type.store();
 	}
 	
-	private void sendMessage(GeneralCase theCase, User receiver, String subject, String body) {
+	private void sendMessage(GeneralCase theCase, User receiver, User sender, String subject, String body) {
 		try {
-			getMessageBusiness().createUserMessage(theCase, receiver, subject, body, false);
+			getMessageBusiness().createUserMessage(theCase, receiver, sender, subject, body, false);
 		}
 		catch (RemoteException re) {
 			throw new IBORuntimeException(re);

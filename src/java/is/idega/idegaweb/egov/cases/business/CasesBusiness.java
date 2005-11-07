@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Created on Oct 31, 2005
+ * Created on Nov 7, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  *
@@ -9,6 +9,7 @@
  */
 package is.idega.idegaweb.egov.cases.business;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import java.util.Collection;
@@ -44,9 +45,40 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public GeneralCase getGeneralCase(Object casePK) throws FinderException, java.rmi.RemoteException;
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCases
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getOpenCases
 	 */
-	public Collection getCases(Collection groups) throws java.rmi.RemoteException;
+	public Collection getOpenCases(Collection groups) throws java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getMyCases
+	 */
+	public Collection getMyCases(User handler) throws java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getClosedCases
+	 */
+	public Collection getClosedCases(Collection groups) throws java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByUsers
+	 */
+	public Collection getCasesByUsers(Collection users) throws java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategory
+	 */
+	public CaseCategory getCaseCategory(Object caseCategoryPK) throws FinderException, java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategories
+	 */
+	public Collection getCaseCategories() throws java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#removeCaseCategory
+	 */
+	public void removeCaseCategory(Object caseCategoryPK) throws FinderException, RemoveException,
+			java.rmi.RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseType
@@ -66,19 +98,36 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
-	public void storeGeneralCase(User sender, Object caseTypePK, String message, String caseNumber)
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message)
 			throws CreateException, java.rmi.RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#handleCase
 	 */
-	public void handleCase(Object casePK, User performer, String reply) throws FinderException, java.rmi.RemoteException;
+	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer,
+			String reply, Locale locale) throws FinderException, java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
+	 */
+	public void takeCase(Object casePK, User performer) throws FinderException, java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reactivateCase
+	 */
+	public void reactivateCase(Object casePK, User performer) throws FinderException, java.rmi.RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseCategory
+	 */
+	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK)
+			throws FinderException, CreateException, java.rmi.RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseType
 	 */
-	public void storeCaseType(Object caseTypePK, String name, String description, boolean requiresCaseNumber,
-			Object groupPK) throws FinderException, CreateException, java.rmi.RemoteException;
+	public void storeCaseType(Object caseTypePK, String name, String description) throws FinderException,
+			CreateException, java.rmi.RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#canDeleteCase

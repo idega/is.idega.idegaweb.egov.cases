@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Created on Oct 31, 2005
+ * Created on Nov 7, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  *
@@ -13,6 +13,7 @@ import java.util.Collection;
 import javax.ejb.FinderException;
 import com.idega.data.IDOException;
 import com.idega.data.IDOFactory;
+import com.idega.user.data.User;
 
 
 /**
@@ -48,6 +49,27 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses) throws FinderException {
 		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
 		java.util.Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByGroupAndStatuses(groups, statuses);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
+	public Collection findAllByHandler(User handler) throws FinderException {
+		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
+		java.util.Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByHandler(handler);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
+	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException {
+		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
+		java.util.Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByHandlerAndStatuses(handler, statuses);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
+	public Collection findAllByUsers(Collection users) throws FinderException {
+		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
+		java.util.Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByUsers(users);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}

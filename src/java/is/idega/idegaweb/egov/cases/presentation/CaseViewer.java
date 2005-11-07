@@ -9,7 +9,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import javax.ejb.FinderException;
 import com.idega.business.IBORuntimeException;
@@ -41,7 +41,7 @@ public class CaseViewer extends CasesBlock {
 			fe.printStackTrace();
 			throw new IBORuntimeException(fe);
 		}
-		CaseType type = theCase.getCaseType();
+		CaseCategory category = theCase.getCaseCategory();
 		User user = getBusiness().getLastModifier(theCase);
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 		
@@ -53,7 +53,7 @@ public class CaseViewer extends CasesBlock {
 		layer.add(heading);
 		
 		Paragraph caseType = new Paragraph();
-		caseType.add(new Text(type.getName()));
+		caseType.add(new Text(category.getName()));
 		
 		Paragraph handler = new Paragraph();
 		handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));

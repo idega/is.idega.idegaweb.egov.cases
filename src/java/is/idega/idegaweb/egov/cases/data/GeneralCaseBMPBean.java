@@ -18,8 +18,10 @@ import com.idega.data.IDOException;
 import com.idega.data.IDORelationshipException;
 import com.idega.data.query.CountColumn;
 import com.idega.data.query.InCriteria;
+import com.idega.data.query.MatchCriteria;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
+import com.idega.user.data.User;
 
 
 public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , GeneralCase{
@@ -28,8 +30,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 	
 	private static final String COLUMN_MESSAGE = "message";
 	private static final String COLUMN_REPLY = "reply";
-	private static final String COLUMN_CASE_NUMBER = "case_number";
+	private static final String COLUMN_CASE_CATEGORY = "case_category";
 	private static final String COLUMN_CASE_TYPE = "case_type";
+	private static final String COLUMN_HANDLER = "handler";
 	
 	/* (non-Javadoc)
 	 * @see com.idega.block.process.data.AbstractCaseBMPBean#getCaseCodeKey()
@@ -54,9 +57,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		
 		addAttribute(COLUMN_MESSAGE, "Message", String.class, 4000);
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
-		addAttribute(COLUMN_CASE_NUMBER, "Case number", String.class, 25);
 		
+		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
+		addManyToOneRelationship(COLUMN_HANDLER, User.class);
 	}
 	
 	//Getters
@@ -68,12 +72,16 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		return getStringColumnValue(COLUMN_REPLY);
 	}
 	
-	public String getCaseNumber() {
-		return getStringColumnValue(COLUMN_CASE_NUMBER);
+	public CaseCategory getCaseCategory() {
+		return (CaseCategory) getColumnValue(COLUMN_CASE_CATEGORY);
 	}
 	
 	public CaseType getCaseType() {
 		return (CaseType) getColumnValue(COLUMN_CASE_TYPE);
+	}
+	
+	public User getHandledBy() {
+		return (User) getColumnValue(COLUMN_HANDLER);
 	}
 	
 	//Setters
@@ -85,12 +93,16 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		setColumn(COLUMN_REPLY, reply);
 	}
 	
-	public void setCaseNumber(String caseNumber) {
-		setColumn(COLUMN_CASE_NUMBER, caseNumber);
+	public void setCaseCategory(CaseCategory category) {
+		setColumn(COLUMN_CASE_CATEGORY, category);
 	}
-	
+
 	public void setCaseType(CaseType type) {
 		setColumn(COLUMN_CASE_TYPE, type);
+	}
+	
+	public void setHandledBy(User handler) {
+		setColumn(COLUMN_HANDLER, handler);
 	}
 
 	//Finders
@@ -115,6 +127,49 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		if (statuses != null) {
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}
+		
+		return idoFindPKsByQuery(query);
+	}
+	
+	public Collection ejbFindAllByHandler(User handler) throws FinderException {
+		return ejbFindAllByHandlerAndStatuses(handler, null);
+	}
+	
+	public Collection ejbFindAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException {
+		Table table = new Table(this);
+		Table process = new Table(Case.class);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName(), true);
+		try {
+			query.addJoin(table, process);
+		}
+		catch (IDORelationshipException e) {
+			e.printStackTrace();
+			throw new FinderException(e.getMessage());
+		}
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_HANDLER), MatchCriteria.EQUALS, handler));
+		if (statuses != null) {
+			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
+		}
+		
+		return idoFindPKsByQuery(query);
+	}
+	
+	public Collection ejbFindAllByUsers(Collection users) throws FinderException {
+		Table table = new Table(this);
+		Table process = new Table(Case.class);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName(), true);
+		try {
+			query.addJoin(table, process);
+		}
+		catch (IDORelationshipException e) {
+			e.printStackTrace();
+			throw new FinderException(e.getMessage());
+		}
+		query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseUserColumnName()), users));
 		
 		return idoFindPKsByQuery(query);
 	}

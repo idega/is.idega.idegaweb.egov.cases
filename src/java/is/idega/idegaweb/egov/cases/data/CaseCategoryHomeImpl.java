@@ -16,30 +16,30 @@ import com.idega.data.IDOFactory;
 
 /**
  * <p>
- * TODO laddi Describe Type CaseTypeHomeImpl
+ * TODO laddi Describe Type CaseCategoryHomeImpl
  * </p>
  *  Last modified: $Date$ by $Author$
  * 
  * @author <a href="mailto:laddi@idega.com">laddi</a>
  * @version $Revision$
  */
-public class CaseTypeHomeImpl extends IDOFactory implements CaseTypeHome {
+public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome {
 
 	protected Class getEntityInterfaceClass() {
-		return CaseType.class;
+		return CaseCategory.class;
 	}
 
-	public CaseType create() throws javax.ejb.CreateException {
-		return (CaseType) super.createIDO();
+	public CaseCategory create() throws javax.ejb.CreateException {
+		return (CaseCategory) super.createIDO();
 	}
 
-	public CaseType findByPrimaryKey(Object pk) throws javax.ejb.FinderException {
-		return (CaseType) super.findByPrimaryKeyIDO(pk);
+	public CaseCategory findByPrimaryKey(Object pk) throws javax.ejb.FinderException {
+		return (CaseCategory) super.findByPrimaryKeyIDO(pk);
 	}
 
 	public Collection findAll() throws FinderException {
 		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
-		java.util.Collection ids = ((CaseTypeBMPBean) entity).ejbFindAll();
+		java.util.Collection ids = ((CaseCategoryBMPBean) entity).ejbFindAll();
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}

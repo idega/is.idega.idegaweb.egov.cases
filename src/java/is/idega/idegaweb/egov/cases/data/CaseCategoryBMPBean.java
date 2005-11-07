@@ -14,14 +14,16 @@ import javax.ejb.FinderException;
 import com.idega.data.GenericEntity;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
+import com.idega.user.data.Group;
 
 
-public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
+public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 
-	private static final String ENTITY_NAME = "comm_case_type";
+	private static final String ENTITY_NAME = "comm_case_category";
 	
 	private static final String COLUMN_NAME = "name";
 	private static final String COLUMN_DESCRIPTION = "description";
+	private static final String COLUMN_HANDLER_GROUP = "handler_group";
 	
 	public String getEntityName() {
 		return ENTITY_NAME;
@@ -32,6 +34,9 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 
 		addAttribute(COLUMN_NAME, "Name", String.class);
 		addAttribute(COLUMN_DESCRIPTION, "Description", String.class);
+		
+		addManyToOneRelationship(COLUMN_HANDLER_GROUP, Group.class);
+		setNullable(COLUMN_HANDLER_GROUP, false);
 	}
 	
 	//Getters
@@ -43,6 +48,10 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 		return getStringColumnValue(COLUMN_DESCRIPTION);
 	}
 	
+	public Group getHandlerGroup() {
+		return (Group) getColumnValue(COLUMN_HANDLER_GROUP);
+	}
+	
 	//Setters
 	public void setName(String name) {
 		setColumn(COLUMN_NAME, name);
@@ -50,6 +59,14 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 	
 	public void setDescription(String description) {
 		setColumn(COLUMN_DESCRIPTION, description);
+	}
+	
+	public void setHandlerGroup(Group group) {
+		setColumn(COLUMN_HANDLER_GROUP, group);
+	}
+	
+	public void setHandlerGroup(Object groupPK) {
+		setColumn(COLUMN_HANDLER_GROUP, groupPK);
 	}
 	
 	//Finders
