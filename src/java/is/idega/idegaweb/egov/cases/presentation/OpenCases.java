@@ -124,12 +124,20 @@ public class OpenCases extends CasesProcessor {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
+		boolean showButton = true;
+		if (theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending())) {
+			if (iwc.getCurrentUser().equals(theCase.getHandledBy())) {
+				showButton = false;
+			}
+		}
 		SubmitButton next = (SubmitButton) new SubmitButton(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setStyleClass("button");
 		SubmitButton back = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setStyleClass("button");
 		layer.add(back);
-		layer.add(next);
+		if (showButton) {
+			layer.add(next);
+		}
 		
 		add(form);
 	}

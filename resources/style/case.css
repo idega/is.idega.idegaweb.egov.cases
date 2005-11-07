@@ -105,14 +105,16 @@ div.formElement label {
 }
 
 div.formElement p {
-	width: 400px;
-	float: left;
 	margin: 0;
 	margin-bottom: 12px;
+	margin-left: 110px;
 }
 
 div.buttonLayer {
-	clear: both;	margin: 20px 12px 12px 0;	text-align: right;}
+	clear: both;
+	margin: 20px 12px 12px 0;
+	text-align: right;
+}
 
 div.boxElement {
 	clear: left;
@@ -130,7 +132,6 @@ div.boxElement input.checkbox {
 }
 
 div.formElement input, div.formElement textarea, div.formElement select, div.formElement table {
-	float: left;
 	margin-bottom: 12px;
 }
 

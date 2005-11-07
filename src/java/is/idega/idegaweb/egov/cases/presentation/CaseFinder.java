@@ -241,12 +241,11 @@ public class CaseFinder extends CasesBlock {
 	
 				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale())));
 				
-				User handler = null;
-				if (status.equals(getBusiness().getCaseStatusReady())) {
-					handler = getBusiness().getLastModifier(theCase);
+				User handler = theCase.getHandledBy();
+				if (handler != null) {
 					row.createCell().add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));
 				}
-				if (handler == null) {
+				else {
 					row.createCell().add(new Text("-"));
 				}
 				
