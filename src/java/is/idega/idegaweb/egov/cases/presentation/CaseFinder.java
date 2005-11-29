@@ -128,7 +128,7 @@ public class CaseFinder extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton next = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_RESULTS));
+		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_RESULTS));
 		next.setStyleClass("button");
 		layer.add(next);
 
@@ -273,7 +273,7 @@ public class CaseFinder extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton back = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_SEARCH));
+		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_SEARCH));
 		back.setStyleClass("button");
 		layer.add(back);
 		

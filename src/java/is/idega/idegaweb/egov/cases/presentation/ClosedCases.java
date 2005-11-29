@@ -146,9 +146,9 @@ public class ClosedCases extends CasesProcessor {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton next = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("reactivate_case", "Reactivate case"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("reactivate_case", "Reactivate case"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setStyleClass("button");
-		SubmitButton back = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setStyleClass("button");
 		layer.add(back);
 		layer.add(next);

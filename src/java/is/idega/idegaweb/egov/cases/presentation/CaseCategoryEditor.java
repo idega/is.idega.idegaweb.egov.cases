@@ -172,7 +172,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 
-		SubmitButton newButton = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("new_category", "New category"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
+		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString("new_category", "New category"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
 		newButton.setStyleClass("button");
 		layer.add(newButton);
 
@@ -243,9 +243,9 @@ public class CaseCategoryEditor extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton save = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		SubmitButton save = new SubmitButton(getResourceBundle().getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		save.setStyleClass("button");
-		SubmitButton cancel = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("cancel", "Cancel"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		SubmitButton cancel = new SubmitButton(getResourceBundle().getLocalizedString("cancel", "Cancel"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		cancel.setStyleClass("button");
 		layer.add(cancel);
 		layer.add(save);

@@ -91,7 +91,7 @@ public class CaseCreator extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton next = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_2));
+		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_2));
 		next.setStyleClass("button");
 		layer.add(next);
 
@@ -151,9 +151,9 @@ public class CaseCreator extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton next = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
+		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
 		next.setStyleClass("button");
-		SubmitButton back = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
+		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
 		back.setStyleClass("button");
 		layer.add(back);
 		layer.add(next);
@@ -241,9 +241,9 @@ public class CaseCreator extends CasesBlock {
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton send = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("send", "Send"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		SubmitButton send = new SubmitButton(getResourceBundle().getLocalizedString("send", "Send"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		send.setStyleClass("button");
-		SubmitButton back = (SubmitButton) new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_2));
+		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_2));
 		back.setStyleClass("button");
 		layer.add(back);
 		layer.add(send);
