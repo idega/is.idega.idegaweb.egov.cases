@@ -16,7 +16,6 @@ import java.util.Iterator;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
-import com.idega.core.location.data.Commune;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -123,7 +122,6 @@ public class CaseTypeEditor extends CasesBlock {
 		int iRow = 1;
 		
 		Iterator iter = types.iterator();
-		Commune commune;
 		while (iter.hasNext()) {
 			CaseType type = (CaseType) iter.next();
 			row = group.createRow();

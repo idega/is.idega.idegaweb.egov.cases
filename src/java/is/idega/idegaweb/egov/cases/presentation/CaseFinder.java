@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import javax.ejb.FinderException;
 import com.idega.block.process.data.CaseStatus;
-import com.idega.core.location.data.Commune;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -211,7 +210,6 @@ public class CaseFinder extends CasesBlock {
 			int iRow = 1;
 			
 			Iterator iter = cases.iterator();
-			Commune commune;
 			while (iter.hasNext()) {
 				GeneralCase theCase = (GeneralCase) iter.next();
 				CaseStatus status = theCase.getCaseStatus();

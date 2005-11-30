@@ -15,7 +15,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import com.idega.block.process.data.CaseStatus;
-import com.idega.core.location.data.Commune;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table2;
 import com.idega.presentation.TableCell2;
@@ -100,7 +99,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		int iRow = 1;
 		
 		Iterator iter = cases.iterator();
-		Commune commune;
 		while (iter.hasNext()) {
 			GeneralCase theCase = (GeneralCase) iter.next();
 			CaseStatus status = theCase.getCaseStatus();
