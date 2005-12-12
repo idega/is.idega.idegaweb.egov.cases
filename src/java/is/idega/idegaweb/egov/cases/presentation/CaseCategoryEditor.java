@@ -136,11 +136,11 @@ public class CaseCategoryEditor extends CasesBlock {
 				row.setStyleClass("lastRow");
 			}
 			
-			Link edit = new Link(getBundle().getImage("edit.gif", getResourceBundle().getLocalizedString("edit", "Edit")));
+			Link edit = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit", "Edit")));
 			edit.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
 			edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
 			
-			Link delete = new Link(getBundle().getImage("delete.gif", getResourceBundle().getLocalizedString("delete", "Delete")));
+			Link delete = new Link(getBundle().getImage("delete.png", getResourceBundle().getLocalizedString("delete", "Delete")));
 			delete.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
 			delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
 

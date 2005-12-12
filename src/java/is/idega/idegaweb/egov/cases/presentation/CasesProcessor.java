@@ -114,7 +114,7 @@ public abstract class CasesProcessor extends CasesBlock {
 				row.setStyleClass("lastRow");
 			}
 			
-			Link process = new Link(getBundle().getImage("edit.gif", getResourceBundle().getLocalizedString("edit", "Edit")));
+			Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit", "Edit")));
 			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
 			
