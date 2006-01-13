@@ -44,6 +44,10 @@ form.casesForm input, select {
 	font-size: 9px;
 }
 
+form.casesForm textarea {
+	font-size: 11px;
+}
+
 form.casesForm p {
 	font-size: 10px;
 	margin-bottom: 16px;
