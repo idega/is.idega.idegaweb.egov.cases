@@ -77,7 +77,12 @@ public class ClosedCases extends CasesProcessor {
 		reply.add(new Text(theCase.getReply()));
 		
 		Paragraph handler = new Paragraph();
-		handler.add(new Text(theCase.getHandledBy().getName()));
+		if (theCase.getHandledBy() != null) {
+			handler.add(new Text(theCase.getHandledBy().getName()));
+		}
+		else {
+			handler.add(new Text("-"));
+		}
 		
 		Paragraph createdDate = new Paragraph();
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
