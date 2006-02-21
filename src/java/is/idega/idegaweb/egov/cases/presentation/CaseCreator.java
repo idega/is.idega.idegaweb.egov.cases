@@ -69,7 +69,7 @@ public class CaseCreator extends CasesBlock {
 		return ACTION_PHASE_1;
 	}
 
-	private void showPhaseOne(IWContext iwc) throws RemoteException {
+	private void showPhaseOne(IWContext iwc) {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
 		form.maintainParameter(PARAMETER_MESSAGE);
