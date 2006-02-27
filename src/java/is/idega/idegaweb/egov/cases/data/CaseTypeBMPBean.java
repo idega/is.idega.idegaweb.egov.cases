@@ -67,7 +67,7 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 		Table table = new Table(this);
 		
 		SelectQuery query = new SelectQuery(table);
-		query.addColumn(table, getIDColumnName(), true);
+		query.addColumn(table, getIDColumnName());
 		query.addOrder(table, COLUMN_ORDER, true);
 		
 		return idoFindPKsByQuery(query);
