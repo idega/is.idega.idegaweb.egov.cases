@@ -120,13 +120,13 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseCategory
 	 */
-	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK)
+	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK, int order)
 			throws FinderException, CreateException, java.rmi.RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseType
 	 */
-	public void storeCaseType(Object caseTypePK, String name, String description) throws FinderException,
+	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException,
 			CreateException, java.rmi.RemoteException;
 
 	/**

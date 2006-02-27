@@ -12,16 +12,22 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+
 import java.rmi.RemoteException;
 import java.util.Collection;
+
 import javax.ejb.FinderException;
+
 import com.idega.business.IBORuntimeException;
+import com.idega.core.builder.data.ICPage;
+import com.idega.event.IWPageEventListener;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
@@ -29,7 +35,27 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
 
 
-public class OpenCases extends CasesProcessor {
+public class OpenCases extends CasesProcessor implements IWPageEventListener {
+
+	private ICPage iMyCasesPage;
+	
+	public boolean actionPerformed(IWContext iwc) {
+		if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
+			Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
+			
+			try {
+				getCasesBusiness(iwc).takeCase(casePK, iwc.getCurrentUser());
+				return true;
+			}
+			catch (RemoteException re) {
+				throw new IBORuntimeException(re);
+			}
+			catch (FinderException fe) {
+				fe.printStackTrace();
+			}
+		}
+		return false;
+	}
 
 	protected Collection getCases(User user) throws RemoteException {
 		Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
@@ -39,6 +65,11 @@ public class OpenCases extends CasesProcessor {
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
+		form.setEventListener(this.getClass());
+		if (iMyCasesPage != null) {
+			form.setPageToSubmitTo(iMyCasesPage);
+			form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
+		}
 		form.maintainParameter(PARAMETER_CASE_PK);
 		
 		GeneralCase theCase = null;
@@ -130,9 +161,17 @@ public class OpenCases extends CasesProcessor {
 				showButton = false;
 			}
 		}
-		SubmitButton next = new SubmitButton(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		SubmitButton next = null;
+		if (iMyCasesPage != null) {
+			next = new SubmitButton(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"));
+		}
+		else {
+			next = new SubmitButton(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		}
 		next.setStyleClass("button");
-		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		GenericButton back = new GenericButton(getResourceBundle().getLocalizedString("back", "Back"));
+		back.setPageToOpen(getParentPageID());
+		back.addParameterToPage(PARAMETER_ACTION, ACTION_VIEW);
 		back.setStyleClass("button");
 		layer.add(back);
 		if (showButton) {
@@ -143,13 +182,10 @@ public class OpenCases extends CasesProcessor {
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
-		Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
-		
-		try {
-			getBusiness().takeCase(casePK, iwc.getCurrentUser());
-		}
-		catch (FinderException fe) {
-			fe.printStackTrace();
-		}
+	}
+
+	
+	public void setMyCasesPage(ICPage myCasesPage) {
+		iMyCasesPage = myCasesPage;
 	}
 }

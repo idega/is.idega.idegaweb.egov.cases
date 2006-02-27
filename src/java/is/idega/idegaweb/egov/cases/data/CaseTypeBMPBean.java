@@ -22,6 +22,7 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 	
 	private static final String COLUMN_NAME = "name";
 	private static final String COLUMN_DESCRIPTION = "description";
+	private static final String COLUMN_ORDER = "type_order";
 	
 	public String getEntityName() {
 		return ENTITY_NAME;
@@ -32,6 +33,7 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 
 		addAttribute(COLUMN_NAME, "Name", String.class);
 		addAttribute(COLUMN_DESCRIPTION, "Description", String.class);
+		addAttribute(COLUMN_ORDER, "Order", Integer.class);
 	}
 	
 	//Getters
@@ -43,6 +45,10 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 		return getStringColumnValue(COLUMN_DESCRIPTION);
 	}
 	
+	public int getOrder() {
+		return getIntColumnValue(COLUMN_ORDER);
+	}
+	
 	//Setters
 	public void setName(String name) {
 		setColumn(COLUMN_NAME, name);
@@ -52,12 +58,17 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 		setColumn(COLUMN_DESCRIPTION, description);
 	}
 	
+	public void setOrder(int order) {
+		setColumn(COLUMN_ORDER, order);
+	}
+	
 	//Finders
 	public Collection ejbFindAll() throws FinderException {
 		Table table = new Table(this);
 		
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName(), true);
+		query.addOrder(table, COLUMN_ORDER, true);
 		
 		return idoFindPKsByQuery(query);
 	}

@@ -24,6 +24,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	private static final String COLUMN_NAME = "name";
 	private static final String COLUMN_DESCRIPTION = "description";
 	private static final String COLUMN_HANDLER_GROUP = "handler_group";
+	private static final String COLUMN_ORDER = "category_order";
 	
 	public String getEntityName() {
 		return ENTITY_NAME;
@@ -34,6 +35,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 
 		addAttribute(COLUMN_NAME, "Name", String.class);
 		addAttribute(COLUMN_DESCRIPTION, "Description", String.class);
+		addAttribute(COLUMN_ORDER, "Order", Integer.class);
 		
 		addManyToOneRelationship(COLUMN_HANDLER_GROUP, Group.class);
 		setNullable(COLUMN_HANDLER_GROUP, false);
@@ -50,6 +52,10 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	
 	public Group getHandlerGroup() {
 		return (Group) getColumnValue(COLUMN_HANDLER_GROUP);
+	}
+	
+	public int getOrder() {
+		return getIntColumnValue(COLUMN_ORDER);
 	}
 	
 	//Setters
@@ -69,12 +75,17 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		setColumn(COLUMN_HANDLER_GROUP, groupPK);
 	}
 	
+	public void setOrder(int order) {
+		setColumn(COLUMN_ORDER, order);
+	}
+	
 	//Finders
 	public Collection ejbFindAll() throws FinderException {
 		Table table = new Table(this);
 		
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName(), true);
+		query.addOrder(table, COLUMN_ORDER, true);
 		
 		return idoFindPKsByQuery(query);
 	}

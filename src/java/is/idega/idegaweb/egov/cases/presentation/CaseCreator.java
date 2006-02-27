@@ -38,7 +38,6 @@ public class CaseCreator extends CasesBlock {
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	
 	private static final int ACTION_PHASE_1 = 1;
-	private static final int ACTION_PHASE_2 = 2;
 	private static final int ACTION_OVERVIEW = 3;
 	private static final int ACTION_SAVE = 4;
 
@@ -46,10 +45,6 @@ public class CaseCreator extends CasesBlock {
 		switch (parseAction(iwc)) {
 			case ACTION_PHASE_1:
 				showPhaseOne(iwc);
-				break;
-
-			case ACTION_PHASE_2:
-				showPhaseTwo(iwc);
 				break;
 
 			case ACTION_OVERVIEW:
@@ -69,12 +64,11 @@ public class CaseCreator extends CasesBlock {
 		return ACTION_PHASE_1;
 	}
 
-	private void showPhaseOne(IWContext iwc) {
+	private void showPhaseOne(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
-		form.maintainParameter(PARAMETER_MESSAGE);
-		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
-		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
+		
+		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
 		
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("infoLayer");
@@ -88,27 +82,10 @@ public class CaseCreator extends CasesBlock {
 		layer.add(paragraph);
 		
 		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("buttonLayer");
-		form.add(layer);
-		
-		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_2));
-		next.setStyleClass("button");
-		layer.add(next);
-
-		add(form);
-	}
-	
-	private void showPhaseTwo(IWContext iwc) throws RemoteException {
-		Form form = new Form();
-		form.setStyleClass("casesForm");
-		
-		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
-		
-		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("elementsLayer");
 		form.add(layer);
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_creator.enter_case", "New case"));
+		heading = new Heading1(getResourceBundle().getLocalizedString("case_creator.enter_case", "New case"));
 		layer.add(heading);
 		
 		SelectorUtility util = new SelectorUtility();
@@ -153,9 +130,6 @@ public class CaseCreator extends CasesBlock {
 		
 		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
 		next.setStyleClass("button");
-		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
-		back.setStyleClass("button");
-		layer.add(back);
 		layer.add(next);
 		
 		add(form);
@@ -173,7 +147,7 @@ public class CaseCreator extends CasesBlock {
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		if (message == null || message.length() == 0) {
 			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_creator.message_empty", "You must enter a message"));
-			showPhaseTwo(iwc);
+			showPhaseOne(iwc);
 			return;
 		}
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
@@ -243,7 +217,7 @@ public class CaseCreator extends CasesBlock {
 		
 		SubmitButton send = new SubmitButton(getResourceBundle().getLocalizedString("send", "Send"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		send.setStyleClass("button");
-		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_2));
+		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
 		back.setStyleClass("button");
 		layer.add(back);
 		layer.add(send);

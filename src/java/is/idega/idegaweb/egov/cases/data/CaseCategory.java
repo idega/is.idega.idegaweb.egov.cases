@@ -40,6 +40,11 @@ public interface CaseCategory extends IDOEntity {
 	public Group getHandlerGroup();
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getOrder
+	 */
+	public int getOrder();
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#setName
 	 */
 	public void setName(String name);
@@ -58,4 +63,9 @@ public interface CaseCategory extends IDOEntity {
 	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#setHandlerGroup
 	 */
 	public void setHandlerGroup(Object groupPK);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#setOrder
+	 */
+	public void setOrder(int order);
 }

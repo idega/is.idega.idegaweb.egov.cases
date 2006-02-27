@@ -36,7 +36,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final String PARAMETER_CASE_PK = "prm_case_pk";
 
 	protected static final int ACTION_VIEW = 1;
-	private static final int ACTION_PROCESS = 2;
+	protected static final int ACTION_PROCESS = 2;
 	protected static final int ACTION_SAVE = 3;
 	
 	protected void present(IWContext iwc) throws Exception {

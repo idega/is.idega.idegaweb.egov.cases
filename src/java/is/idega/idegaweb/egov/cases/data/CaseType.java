@@ -34,6 +34,11 @@ public interface CaseType extends IDOEntity {
 	public String getDescription();
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseTypeBMPBean#getOrder
+	 */
+	public int getOrder();
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.data.CaseTypeBMPBean#setName
 	 */
 	public void setName(String name);
@@ -42,4 +47,9 @@ public interface CaseType extends IDOEntity {
 	 * @see is.idega.idegaweb.egov.cases.data.CaseTypeBMPBean#setDescription
 	 */
 	public void setDescription(String description);
+	
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseTypeBMPBean#setOrder
+	 */
+	public void setOrder(int order);
 }

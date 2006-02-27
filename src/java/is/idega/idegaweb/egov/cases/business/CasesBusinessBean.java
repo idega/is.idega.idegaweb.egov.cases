@@ -243,7 +243,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		sendMessage(theCase, theCase.getOwner(), performer, subject, body);
 	}
 	
-	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK) throws FinderException, CreateException {
+	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK, int order) throws FinderException, CreateException {
 		CaseCategory category = null;
 		if (caseCategoryPK != null) {
 			category = getCaseCategory(caseCategoryPK);
@@ -255,10 +255,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		category.setName(name);
 		category.setDescription(description);
 		category.setHandlerGroup(groupPK);
+		if (order != -1) {
+			category.setOrder(order);
+		}
 		category.store();
 	}
 	
-	public void storeCaseType(Object caseTypePK, String name, String description) throws FinderException, CreateException {
+	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException {
 		CaseType type = null;
 		if (caseTypePK != null) {
 			type = getCaseType(caseTypePK);
@@ -269,6 +272,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		type.setName(name);
 		type.setDescription(description);
+		if (order != -1) {
+			type.setOrder(order);
+		}
 		type.store();
 	}
 	

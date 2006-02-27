@@ -42,6 +42,7 @@ public class CaseTypeEditor extends CasesBlock {
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	private static final String PARAMETER_NAME = "prm_name";
 	private static final String PARAMETER_DESCRIPTION = "prm_description";
+	private static final String PARAMETER_ORDER = "prm_order";
 
 	private static final int ACTION_VIEW = 1;
 	private static final int ACTION_EDIT = 2;
@@ -112,6 +113,7 @@ public class CaseTypeEditor extends CasesBlock {
 		cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
 		
 		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
+		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
 
 		row.createHeaderCell().add(Text.getNonBrakingSpace());
 		cell = row.createHeaderCell();
@@ -145,6 +147,7 @@ public class CaseTypeEditor extends CasesBlock {
 			cell.add(new Text(type.getName()));
 
 			row.createCell().add(new Text(type.getDescription() != null ? type.getDescription() : "-"));
+			row.createCell().add(new Text(type.getOrder() != -1 ? String.valueOf(type.getOrder()) : "-"));
 
 			row.createCell().add(edit);
 			cell = row.createCell();
@@ -186,6 +189,9 @@ public class CaseTypeEditor extends CasesBlock {
 		description.setStyleClass("textarea");
 		description.keepStatusOnAction(true);
 		
+		TextInput order = new TextInput(PARAMETER_ORDER);
+		order.keepStatusOnAction(true);
+
 		if (caseTypePK != null) {
 			try {
 				CaseType type = getBusiness().getCaseType(caseTypePK);
@@ -194,6 +200,7 @@ public class CaseTypeEditor extends CasesBlock {
 				if (type.getDescription() != null) {
 					description.setContent(type.getDescription());
 				}
+				order.setContent(type.getOrder() != -1 ? String.valueOf(type.getOrder()) : "");
 				
 				form.add(new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString()));
 			}
@@ -214,6 +221,13 @@ public class CaseTypeEditor extends CasesBlock {
 		label = new Label(getResourceBundle().getLocalizedString("description", "Description"), description);
 		layer.add(label);
 		layer.add(description);
+		form.add(layer);
+
+		layer = new Layer(Layer.DIV);
+		layer.setStyleClass("formElement");
+		label = new Label(getResourceBundle().getLocalizedString("order", "Order"), order);
+		layer.add(label);
+		layer.add(order);
 		form.add(layer);
 
 		Layer clear = new Layer(Layer.DIV);
@@ -238,6 +252,7 @@ public class CaseTypeEditor extends CasesBlock {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		String name = iwc.getParameter(PARAMETER_NAME);
 		String description = iwc.getParameter(PARAMETER_DESCRIPTION);
+		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
 			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_type.name_not_empty", "You must provide a name for the case type."));
@@ -245,7 +260,7 @@ public class CaseTypeEditor extends CasesBlock {
 		}
 		
 		try {
-			getBusiness().storeCaseType(caseTypePK, name, description);
+			getBusiness().storeCaseType(caseTypePK, name, description, order);
 			return true;
 		}
 		catch (FinderException e) {

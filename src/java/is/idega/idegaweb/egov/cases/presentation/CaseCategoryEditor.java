@@ -45,6 +45,7 @@ public class CaseCategoryEditor extends CasesBlock {
 	private static final String PARAMETER_NAME = "prm_name";
 	private static final String PARAMETER_DESCRIPTION = "prm_description";
 	private static final String PARAMETER_GROUP = "prm_group";
+	private static final String PARAMETER_ORDER = "prm_order";
 
 	private static final int ACTION_VIEW = 1;
 	private static final int ACTION_EDIT = 2;
@@ -116,6 +117,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		
 		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
 		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler_group", "Handler group")));
+		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
 
 		row.createHeaderCell().add(Text.getNonBrakingSpace());
 		cell = row.createHeaderCell();
@@ -150,6 +152,7 @@ public class CaseCategoryEditor extends CasesBlock {
 
 			row.createCell().add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
 			row.createCell().add(new Text(category.getHandlerGroup().getName()));
+			row.createCell().add(new Text(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "-"));
 
 			row.createCell().add(edit);
 			cell = row.createCell();
@@ -193,6 +196,9 @@ public class CaseCategoryEditor extends CasesBlock {
 		
 		GroupChooser chooser = new GroupChooser(PARAMETER_GROUP);
 		
+		TextInput order = new TextInput(PARAMETER_ORDER);
+		order.keepStatusOnAction(true);
+
 		if (caseCategoryPK != null) {
 			try {
 				CaseCategory category = getBusiness().getCaseCategory(caseCategoryPK);
@@ -203,6 +209,7 @@ public class CaseCategoryEditor extends CasesBlock {
 					description.setContent(category.getDescription());
 				}
 				chooser.setSelectedGroup(group.getPrimaryKey().toString(), group.getName());
+				order.setContent(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "");
 				
 				form.add(new HiddenInput(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString()));
 			}
@@ -233,6 +240,13 @@ public class CaseCategoryEditor extends CasesBlock {
 		layer.add(chooser);
 		form.add(layer);
 
+		layer = new Layer(Layer.DIV);
+		layer.setStyleClass("formElement");
+		label = new Label(getResourceBundle().getLocalizedString("order", "Order"), order);
+		layer.add(label);
+		layer.add(order);
+		form.add(layer);
+
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		form.add(clear);
@@ -256,6 +270,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		String name = iwc.getParameter(PARAMETER_NAME);
 		String description = iwc.getParameter(PARAMETER_DESCRIPTION);
 		String groupPK = iwc.getParameter(PARAMETER_GROUP);
+		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
 			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.name_not_empty", "You must provide a name for the case category."));
@@ -270,7 +285,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		}
 		
 		try {
-			getBusiness().storeCaseCategory(caseCategoryPK, name, description, groupPK);
+			getBusiness().storeCaseCategory(caseCategoryPK, name, description, groupPK, order);
 			return true;
 		}
 		catch (FinderException e) {
