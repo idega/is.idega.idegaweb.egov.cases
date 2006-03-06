@@ -32,6 +32,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 
 
@@ -197,7 +198,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		theCase.setOwner(sender);
 		theCase.setHandler(category.getHandlerGroup());
 		theCase.setMessage(message);
-		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, null);
+		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group)null);
 	}
 	
 	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, Locale locale) throws FinderException {
@@ -209,7 +210,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		CaseType type = getCaseType(caseTypePK);
 		theCase.setCaseType(type);
 		
-		changeCaseStatus(theCase, status, performer, null);
+		changeCaseStatus(theCase, status, performer, (Group)null);
 		
 		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(getCaseStatus(status), locale) };
 		String subject = getLocalizedString("case_handled_subject", "Your case has been handled");
@@ -222,7 +223,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		GeneralCase theCase = getGeneralCase(casePK);
 		theCase.setHandledBy(performer);
 		
-		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, null);
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group)null);
 		
 		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
 		String subject = getLocalizedString("case_taken_subject", "Your case has been taken");
@@ -234,7 +235,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	public void reactivateCase(Object casePK, User performer) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		
-		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, null);
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group)null);
 		
 		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
 		String subject = getLocalizedString("case_reactivated_subject", "Your case has been reactivated");
