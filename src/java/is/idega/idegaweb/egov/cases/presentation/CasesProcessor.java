@@ -11,11 +11,14 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import com.idega.block.process.data.CaseStatus;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Table2;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableColumn;
@@ -114,10 +117,6 @@ public abstract class CasesProcessor extends CasesBlock {
 				row.setStyleClass("lastRow");
 			}
 			
-			Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit", "Edit")));
-			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-			
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
 			cell.add(new Text(theCase.getPrimaryKey().toString()));
@@ -138,7 +137,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			
 			cell = row.createCell();
 			cell.setStyleClass("lastColumn");
-			cell.add(process);
+			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit", "Edit")), theCase));
 			
 			if (iRow % 2 == 0) {
 				row.setStyleClass("evenRow");
@@ -149,6 +148,14 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 
 		add(table);
+	}
+	
+	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {
+		Link process = new Link(object);
+		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+		
+		return process;
 	}
 	
 	protected abstract Collection getCases(User user) throws RemoteException;

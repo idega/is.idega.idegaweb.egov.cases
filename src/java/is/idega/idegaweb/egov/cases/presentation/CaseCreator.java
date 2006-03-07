@@ -9,27 +9,37 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.util.CaseConstants;
+
 import java.rmi.RemoteException;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
+
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.builder.data.ICPage;
+import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
-import com.idega.presentation.text.Paragraph;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
-import com.idega.presentation.ui.GenericButton;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
-import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 
 
-public class CaseCreator extends CasesBlock {
+public class CaseCreator extends ApplicationForm {
 	
 	private static final String PARAMETER_ACTION = "cc_prm_action";
 	
@@ -38,22 +48,39 @@ public class CaseCreator extends CasesBlock {
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	
 	private static final int ACTION_PHASE_1 = 1;
-	private static final int ACTION_OVERVIEW = 3;
-	private static final int ACTION_SAVE = 4;
+	private static final int ACTION_OVERVIEW = 2;
+	private static final int ACTION_SAVE = 3;
 
-	protected void present(IWContext iwc) throws Exception {
-		switch (parseAction(iwc)) {
-			case ACTION_PHASE_1:
-				showPhaseOne(iwc);
-				break;
+	private IWResourceBundle iwrb;
+	
+	public String getBundleIdentifier() {
+		return CaseConstants.IW_BUNDLE_IDENTIFIER;
+	}
+	
+	public String getCaseCode() {
+		return CaseConstants.CASE_CODE_KEY;
+	}
 
-			case ACTION_OVERVIEW:
-				showOverview(iwc);
-				break;
-
-			case ACTION_SAVE:
-				save(iwc);
-				break;
+	protected void present(IWContext iwc) {
+		iwrb = getResourceBundle(iwc);
+		
+		try {
+			switch (parseAction(iwc)) {
+				case ACTION_PHASE_1:
+					showPhaseOne(iwc);
+					break;
+	
+				case ACTION_OVERVIEW:
+					showOverview(iwc);
+					break;
+	
+				case ACTION_SAVE:
+					save(iwc);
+					break;
+			}
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
 		}
 	}
 	
@@ -67,93 +94,102 @@ public class CaseCreator extends CasesBlock {
 	private void showPhaseOne(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1)));
 		
+		form.add(getPhasesHeader(iwrb.getLocalizedString("application.enter_new_case", "Enter new case"), 1, 3));
+
 		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
 		
-		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("infoLayer");
-		form.add(layer);
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("case_creator.enter_case", "New case"));
+		heading.setStyleClass("subHeader");
+		heading.setStyleClass("topSubHeader");
+		form.add(heading);
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_creator.information_heading", "Information"));
-		layer.add(heading);
-		
-		Paragraph paragraph = new Paragraph();
-		paragraph.add(new Text(getResourceBundle().getLocalizedString("case_creator.information_text", "Information text here...")));
-		layer.add(paragraph);
-		
-		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("elementsLayer");
-		form.add(layer);
-		
-		heading = new Heading1(getResourceBundle().getLocalizedString("case_creator.enter_case", "New case"));
-		layer.add(heading);
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		form.add(section);
 		
 		SelectorUtility util = new SelectorUtility();
-		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getBusiness().getCaseCategories(), "getName");
+		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness(iwc).getCaseCategories(), "getName");
 		categories.keepStatusOnAction(true);
 		
-		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
+		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness(iwc).getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
 		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		message.keepStatusOnAction(true);
 		
-		Layer element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
-		Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
-		element.add(label);
-		element.add(types);
-		layer.add(element);
+		Layer helpLayer = new Layer(Layer.DIV);
+		helpLayer.setStyleClass("helperText");
+		helpLayer.add(new Text(iwrb.getLocalizedString("case_creator.information_text", "Information text here...")));
+		section.add(helpLayer);
+		
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label(iwrb.getLocalizedString("case_type", "Case type"), types);
+		formItem.add(label);
+		formItem.add(types);
+		section.add(formItem);
 
-		element = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
-		label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
-		element.add(label);
-		element.add(categories);
-		layer.add(element);
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		label = new Label(iwrb.getLocalizedString("case_category", "Case category"), categories);
+		formItem.add(label);
+		formItem.add(categories);
+		section.add(formItem);
 
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
-		label = new Label(getResourceBundle().getLocalizedString("message", "Message"), message);
-		element.add(label);
-		element.add(message);
-		layer.add(element);
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		label = new Label(iwrb.getLocalizedString("message", "Message"), message);
+		formItem.add(label);
+		formItem.add(message);
+		section.add(formItem);
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
-		layer.add(clear);
+		section.add(clear);
 
-		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("buttonLayer");
-		form.add(layer);
-		
-		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("next", "Next"), PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
-		next.setStyleClass("button");
-		layer.add(next);
-		
+		Layer bottom = new Layer(Layer.DIV);
+		bottom.setStyleClass("bottom");
+		form.add(bottom);
+
+		Link next = new Link(iwrb.getLocalizedString("next", "Next"));
+		next.setStyleClass("buttonNext");
+		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
+		next.setToFormSubmit(form);
+		bottom.add(next);
+
 		add(form);
 	}
 	
 	private void showOverview(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
+		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
 		form.maintainParameter(PARAMETER_MESSAGE);
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		
+		form.add(getPhasesHeader(iwrb.getLocalizedString("application.overview", "Overview"), 2, 3));
+
 		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
+		
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("case_creator.enter_case", "New case"));
+		heading.setStyleClass("subHeader");
+		heading.setStyleClass("topSubHeader");
+		form.add(heading);
 		
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		if (message == null || message.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_creator.message_empty", "You must enter a message"));
+			getParentPage().setAlertOnLoad(iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
 			showPhaseOne(iwc);
 			return;
 		}
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		CaseCategory category = null;
 		try {
-			category = getBusiness().getCaseCategory(caseCategoryPK);
+			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
 		}
 		catch (FinderException fe) {
 			throw new IBORuntimeException(fe);
@@ -161,67 +197,70 @@ public class CaseCreator extends CasesBlock {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		CaseType type = null;
 		try {
-			type = getBusiness().getCaseType(caseTypePK);
+			type = getCasesBusiness(iwc).getCaseType(caseTypePK);
 		}
 		catch (FinderException fe) {
 			throw new IBORuntimeException(fe);
 		}
 
-		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("elementsLayer");
-		form.add(layer);
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		form.add(section);
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_creator.enter_case", "New case"));
-		layer.add(heading);
-		
-		Paragraph typeSpan = new Paragraph();
+		Layer typeSpan = new Layer(Layer.SPAN);
 		typeSpan.add(new Text(type.getName()));
 		
-		Paragraph categorySpan = new Paragraph();
+		Layer categorySpan = new Layer(Layer.SPAN);
 		categorySpan.add(new Text(category.getName()));
 		
-		Paragraph messageSpan = new Paragraph();
+		Layer messageSpan = new Layer(Layer.SPAN);
 		messageSpan.add(new Text(message));
 		
-		Layer element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
-		element.add(label);
-		element.add(typeSpan);
-		layer.add(element);
+		label.setLabel(iwrb.getLocalizedString("case_type", "Case type"));
+		formItem.add(label);
+		formItem.add(typeSpan);
+		section.add(formItem);
 
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
-		element.add(label);
-		element.add(categorySpan);
-		layer.add(element);
+		label.setLabel(iwrb.getLocalizedString("case_category", "Case category"));
+		formItem.add(label);
+		formItem.add(categorySpan);
+		section.add(formItem);
 
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("message", "Message"));
-		element.add(label);
-		element.add(messageSpan);
-		layer.add(element);
+		label.setLabel(iwrb.getLocalizedString("message", "Message"));
+		formItem.add(label);
+		formItem.add(messageSpan);
+		section.add(formItem);
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
-		layer.add(clear);
+		section.add(clear);
 
-		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("buttonLayer");
-		form.add(layer);
-		
-		SubmitButton send = new SubmitButton(getResourceBundle().getLocalizedString("send", "Send"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-		send.setStyleClass("button");
-		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
-		back.setStyleClass("button");
-		layer.add(back);
-		layer.add(send);
-		
+		Layer bottom = new Layer(Layer.DIV);
+		bottom.setStyleClass("bottom");
+		form.add(bottom);
+
+		Link next = new Link(iwrb.getLocalizedString("next", "Next"));
+		next.setStyleClass("buttonNext");
+		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		next.setToFormSubmit(form);
+		bottom.add(next);
+
+		Link back = new Link(iwrb.getLocalizedString("previous", "Previous"));
+		back.setStyleClass("buttonBack");
+		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
+		back.setToFormSubmit(form);
+		bottom.add(back);
+
 		add(form);
 	}
 	
@@ -231,26 +270,27 @@ public class CaseCreator extends CasesBlock {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		
 		try {
-			getBusiness().storeGeneralCase(iwc.getCurrentUser(), caseCategoryPK, caseTypePK, message);
+			getCasesBusiness(iwc).storeGeneralCase(iwc.getCurrentUser(), caseCategoryPK, caseTypePK, message);
 
-			Layer layer = new Layer(Layer.DIV);
-			layer.setID("elementsLayer");
-			add(layer);
-			
-			layer.add(new Heading1(getResourceBundle().getLocalizedString("case_creator.save_completed", "Application sent")));
+			addPhasesReceipt(iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
-			Paragraph paragraph = new Paragraph();
-			paragraph.add(new Text(getResourceBundle().getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly.")));
-			layer.add(paragraph);
+			Layer clearLayer = new Layer(Layer.DIV);
+			clearLayer.setStyleClass("Clear");
+			add(clearLayer);
 			
-			if (getHomePage() != null) {
-				Layer buttonLayer = new Layer(Layer.DIV);
-				buttonLayer.setStyleClass("buttonLayer");
-				layer.add(buttonLayer);
-				
-				GenericButton home = new GenericButton(getResourceBundle().getLocalizedString("my_page", "My page"));
-				home.setStyleClass("button");
-				home.setPageToOpen(getHomePage());
+			Layer bottom = new Layer(Layer.DIV);
+			bottom.setStyleClass("bottom");
+			add(bottom);
+
+			try {
+				ICPage page = getUserBusiness(iwc).getHomePageForUser(iwc.getCurrentUser());
+				Link link = getButtonLink(iwrb.getLocalizedString("my_page", "My page"));
+				link.setStyleClass("homeButton");
+				link.setPage(page);
+				bottom.add(link);
+			}
+			catch (FinderException fe) {
+				fe.printStackTrace();
 			}
 		}
 		catch (CreateException ce) {
@@ -258,4 +298,13 @@ public class CaseCreator extends CasesBlock {
 			throw new IBORuntimeException(ce);
 		}
 	}
+
+	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
+		try {
+			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}	
 }
