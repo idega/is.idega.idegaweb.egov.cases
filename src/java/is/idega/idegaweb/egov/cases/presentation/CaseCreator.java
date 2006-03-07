@@ -175,7 +175,7 @@ public class CaseCreator extends ApplicationForm {
 
 		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
 		
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("case_creator.enter_case", "New case"));
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("case_creator.enter_case_overview", "New case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
