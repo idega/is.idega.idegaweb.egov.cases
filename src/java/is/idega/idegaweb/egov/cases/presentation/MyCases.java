@@ -121,6 +121,13 @@ public class MyCases extends CasesProcessor {
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formElement");
+		label = new Label(getResourceBundle().getLocalizedString("status", "status"), statuses);
+		element.add(label);
+		element.add(statuses);
+		layer.add(element);
+
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formElement");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
