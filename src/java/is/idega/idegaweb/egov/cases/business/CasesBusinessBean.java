@@ -289,9 +289,6 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	}
 
 	public boolean canDeleteCase(Case theCase) {
-		if (theCase.getCaseStatus().equals(getCaseStatusOpen())) {
-			return true;
-		}
 		return false;
 	}
 }
