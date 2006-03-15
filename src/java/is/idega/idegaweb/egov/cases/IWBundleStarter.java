@@ -45,10 +45,12 @@ public class IWBundleStarter implements IWBundleStartable {
 			//registering the event listener on when the schoolchoiceapplication gets status placed
 			//@TODO fix the codes
 			if (!sendToOneSystem.equals("false")) {
+				System.out.println("Adding one system listeners");
 				caseBusiness.addCaseChangeListener(new OneSystemEventListener(), CaseConstants.CASE_CODE_KEY);
 				caseBusiness.addCaseChangeListener(new OneSystemEventListener(), "MBANBOP");
 			}
 			if (!sendToBizTalk.equals("false")) {
+				System.out.println("Adding biz talk listener");
 				caseBusiness.addCaseChangeListener(new BizTalkEventListener(), CaseConstants.CASE_CODE_KEY);
 			}
 		}

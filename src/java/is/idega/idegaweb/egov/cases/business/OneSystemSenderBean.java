@@ -66,6 +66,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	private GeneralCase genCase = null;
 
 	public void run() {
+		System.out.println("running one system thread");
 		if (application != null) {
 			sendChildCareApplication();
 		} else if (genCase != null) {
@@ -85,13 +86,19 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		this.URL = URL;
 	}
 	private void sendChildCareApplication() {
+		System.out.println("one system childcare application");
 		String xml = createChildcareFile();
+		System.out.println("one system childcare file created");		
 		sendFile(xml);
+		System.out.println("one system childcare file sent");		
 	}
 	
 	private void sendGeneralCase() {
+		System.out.println("one system general case");
 		String xml = createGeneralCaseFile();
+		System.out.println("one system general file created");		
 		sendFile(xml);
+		System.out.println("one system general file sent");		
 	}
 	
 	private String createGeneralCaseFile() {

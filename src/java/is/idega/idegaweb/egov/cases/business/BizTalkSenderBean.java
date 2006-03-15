@@ -28,12 +28,14 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
-	protected String endpoint = "http://213.167.155.148/Case/Case_NewCase_SoapPort.asmx?op=NewCase";
+	protected String endpoint = "http://10.30.11.55/Case/Case_NewCase_SoapPort.asmx?op=NewCase";
 
 	private GeneralCase genCase = null;
 
 	public void run() {
-		if (genCase != null) {
+		System.out.println("Starting biz talk thread");
+		if (genCase != null) {			
+			System.out.println("biz talk sending file");
 			sendGeneralCase();
 		}
 	}
@@ -107,6 +109,7 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			request.setExternal_case_id(((Integer) genCase
 					.getPrimaryKey()).toString());
 			Commune defaultCommune = getCommuneBusiness().getDefaultCommune();
+			System.out.println("biz talk default commune = " + defaultCommune.getCommuneCode());
 			request.setSf_id(Integer.parseInt(defaultCommune.getCommuneCode()));// husavik = 6100, hveragerdi = 8716
 			request.setStatus(genCase.getStatus());
 			request.setSubject(genCase.getSubject());
