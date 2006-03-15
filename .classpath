@@ -9,11 +9,25 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.process">
   </classpathentry>
+  <classpathentry kind="src" path="/com.idega.block.process.webservice">
+  </classpathentry>
   <classpathentry kind="src" path="/com.idega.user">
   </classpathentry>
   <classpathentry kind="src" path="/is.idega.idegaweb.egov.application">
   </classpathentry>
   <classpathentry kind="src" path="/se.idega.idegaweb.commune">
+  </classpathentry>
+  <classpathentry kind="src" path="/se.idega.idegaweb.commune.care">
+  </classpathentry>
+  <classpathentry kind="src" path="/org.apache.axis">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/axis/jars/axis-1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/axis/jars/axis-jaxrpc-1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/commons-httpclient/jars/commons-httpclient-2.0.2.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/itextpdf/jars/itext-paulo-139.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4.jar">
   </classpathentry>
