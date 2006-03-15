@@ -36,7 +36,8 @@ import com.lowagie.text.Document;
 
 
 public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
-	protected String URL = "http://one.kerfisveita.is/datareceiver/saveapplication.aspx";
+	//protected String URL = "http://one.kerfisveita.is/datareceiver/saveapplication.aspx";
+	protected String URL = "http://172.29.199.102/datareceiver/saveapplication.aspx";
 
 	private static final String XML_CASE = "case";
 	private static final String XML_ID = "id";
