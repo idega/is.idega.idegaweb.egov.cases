@@ -119,7 +119,6 @@ public class CaseViewer extends CaseCreator {
 			
 				heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 				heading.setStyleClass("subHeader");
-				heading.setStyleClass("topSubHeader");
 				form.add(heading);
 				
 				section = new Layer(Layer.DIV);

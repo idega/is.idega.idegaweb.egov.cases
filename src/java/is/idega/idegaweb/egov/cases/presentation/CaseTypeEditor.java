@@ -89,20 +89,20 @@ public class CaseTypeEditor extends CasesBlock {
 
 	private void showList(IWContext iwc) throws RemoteException {
 		Form form = new Form();
-		form.setStyleClass("casesForm");
+		form.setStyleClass("adminForm");
 		
 		Table2 table = new Table2();
 		table.setWidth("100%");
 		table.setCellpadding(0);
 		table.setCellspacing(0);
-		table.setStyleClass("casesTable");
+		table.setStyleClass("adminTable");
+		table.setStyleClass("ruler");
 		
 		TableColumnGroup columnGroup = table.createColumnGroup();
 		TableColumn column = columnGroup.createColumn();
 		column.setSpan(2);
 		column = columnGroup.createColumn();
 		column.setSpan(2);
-		column.setWidth("12");
 
 		Collection types = getBusiness().getCaseTypes();
 
@@ -177,7 +177,7 @@ public class CaseTypeEditor extends CasesBlock {
 	
 	private void showEditor(IWContext iwc, Object caseTypePK) throws RemoteException {
 		Form form = new Form();
-		form.setStyleClass("casesForm");
+		form.setStyleClass("adminForm");
 		
 		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("new_edit_case_type", "New/Edit case type"));
 		form.add(heading);
@@ -209,40 +209,43 @@ public class CaseTypeEditor extends CasesBlock {
 			}
 		}
 		
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		form.add(section);
+		
 		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		Label label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		layer.add(label);
 		layer.add(name);
-		form.add(layer);
+		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("description", "Description"), description);
 		layer.add(label);
 		layer.add(description);
-		form.add(layer);
+		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("order", "Order"), order);
 		layer.add(label);
 		layer.add(order);
-		form.add(layer);
+		section.add(layer);
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
-		form.add(clear);
+		section.add(clear);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
 		
-		SubmitButton save = new SubmitButton(getResourceBundle().getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-		save.setStyleClass("button");
 		SubmitButton cancel = new SubmitButton(getResourceBundle().getLocalizedString("cancel", "Cancel"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-		cancel.setStyleClass("button");
 		layer.add(cancel);
+
+		SubmitButton save = new SubmitButton(getResourceBundle().getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		layer.add(save);
 
 		add(form);

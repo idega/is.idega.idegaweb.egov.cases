@@ -26,6 +26,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
@@ -53,6 +54,29 @@ public abstract class CasesBlock extends Block {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
+	protected Link getButtonLink(String text) {
+		Layer all = new Layer(Layer.SPAN);
+		all.setStyleClass("buttonSpan");
+		
+		Layer left = new Layer(Layer.SPAN);
+		left.setStyleClass("left");
+		all.add(left);
+		
+		Layer middle = new Layer(Layer.SPAN);
+		middle.setStyleClass("middle");
+		middle.add(new Text(text));
+		all.add(middle);
+		
+		Layer right = new Layer(Layer.SPAN);
+		right.setStyleClass("right");
+		all.add(right);
+		
+		Link link = new Link(all);
+		link.setStyleClass("button");
+		
+		return link;
+	}
+	
 	protected Layer getPersonInfo(IWContext iwc, User user) throws RemoteException {
 		Address address = getUserBusiness(iwc).getUsersMainAddress(user);
 		PostalCode postal = null;

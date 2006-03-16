@@ -78,14 +78,16 @@ public class CaseFinder extends CasesBlock {
 		form.setStyleClass("casesForm");
 		
 		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("infoLayer");
+		layer.setStyleClass("formSection");
 		form.add(layer);
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_finder.information_heading", "Information"));
-		layer.add(heading);
+		Layer helpLayer = new Layer(Layer.DIV);
+		helpLayer.setStyleClass("helperText");
+		helpLayer.add(new Text(getResourceBundle().getLocalizedString("case_finder.information_text", "Information text here...")));
+		layer.add(helpLayer);
 		
 		Paragraph paragraph = new Paragraph();
-		paragraph.add(new Text(getResourceBundle().getLocalizedString("case_finder.information_text", "Information text here...")));
+		paragraph.add(new Text());
 		layer.add(paragraph);
 		
 		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
@@ -103,25 +105,29 @@ public class CaseFinder extends CasesBlock {
 		personalID.setToDisableOnWhenNotEmpty(name);
 		
 		Layer element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		Label label = new Label(getResourceBundle().getLocalizedString("case_number", "Case number"), caseNumber);
 		element.add(label);
 		element.add(caseNumber);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		element.add(label);
 		element.add(name);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("personal_id", "Personal ID"), personalID);
 		element.add(label);
 		element.add(personalID);
 		layer.add(element);
+		
+		Layer clearLayer = new Layer(Layer.DIV);
+		clearLayer.setStyleClass("Clear");
+		layer.add(clearLayer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("buttonLayer");
@@ -136,7 +142,7 @@ public class CaseFinder extends CasesBlock {
 	
 	private void showResults(IWContext iwc) throws RemoteException {
 		Form form = new Form();
-		form.setStyleClass("casesForm");
+		form.setStyleClass("adminForm");
 		
 		Collection cases = new ArrayList();
 		if (iwc.isParameterSet(PARAMETER_CASE_NUMBER)) {
@@ -181,7 +187,8 @@ public class CaseFinder extends CasesBlock {
 			table.setWidth("100%");
 			table.setCellpadding(0);
 			table.setCellspacing(0);
-			table.setStyleClass("casesTable");
+			table.setStyleClass("adminTable");
+			table.setStyleClass("ruler");
 			
 			TableColumnGroup columnGroup = table.createColumnGroup();
 			TableColumn column = columnGroup.createColumn();

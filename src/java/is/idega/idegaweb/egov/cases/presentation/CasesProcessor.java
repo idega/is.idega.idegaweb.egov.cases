@@ -71,7 +71,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		table.setWidth("100%");
 		table.setCellpadding(0);
 		table.setCellspacing(0);
-		table.setStyleClass("casesTable");
+		table.setStyleClass("adminTable");
 		
 		TableColumnGroup columnGroup = table.createColumnGroup();
 		TableColumn column = columnGroup.createColumn();

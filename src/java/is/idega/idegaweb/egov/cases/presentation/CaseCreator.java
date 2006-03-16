@@ -154,8 +154,7 @@ public class CaseCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = new Link(iwrb.getLocalizedString("next", "Next"));
-		next.setStyleClass("buttonNext");
+		Link next = getButtonLink(iwrb.getLocalizedString("next", "Next"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
 		next.setToFormSubmit(form);
 		bottom.add(next);
@@ -249,14 +248,12 @@ public class CaseCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = new Link(iwrb.getLocalizedString("next", "Next"));
-		next.setStyleClass("buttonNext");
+		Link next = getButtonLink(iwrb.getLocalizedString("next", "Next"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
 
-		Link back = new Link(iwrb.getLocalizedString("previous", "Previous"));
-		back.setStyleClass("buttonBack");
+		Link back = getButtonLink(iwrb.getLocalizedString("previous", "Previous"));
 		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
 		back.setToFormSubmit(form);
 		bottom.add(back);
