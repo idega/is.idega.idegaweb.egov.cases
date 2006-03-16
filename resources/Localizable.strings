@@ -76,5 +76,7 @@ status=Status
 take_case=Take case
 take_over_case=Take over case
 true=true
+view=View
+view_case=View case
 zip_city=City
 zip_code=Postal code

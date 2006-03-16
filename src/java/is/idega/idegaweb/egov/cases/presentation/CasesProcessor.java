@@ -96,7 +96,7 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
-		cell.add(Text.getNonBrakingSpace());
+		cell.add(new Text(getResourceBundle().getLocalizedString("view", "View")));
 		
 		group = table.createBodyRowGroup();
 		int iRow = 1;
@@ -137,7 +137,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			
 			cell = row.createCell();
 			cell.setStyleClass("lastColumn");
-			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit", "Edit")), theCase));
+			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")), theCase));
 			
 			if (iRow % 2 == 0) {
 				row.setStyleClass("evenRow");

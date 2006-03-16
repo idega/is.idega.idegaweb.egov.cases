@@ -99,7 +99,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public Collection getOpenCases(Collection groups) {
 		try {
-			String[] statuses = { getCaseStatusOpen().getStatus(), getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus() };
+			String[] statuses = { getCaseStatusOpen().getStatus() };
 			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses);
 		}
 		catch (FinderException fe) {
@@ -110,7 +110,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public Collection getMyCases(User handler) {
 		try {
-			String[] statuses = { getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus(), getCaseStatusReady().getStatus() };
+			String[] statuses = { getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus() };
 			return getGeneralCaseHome().findAllByHandlerAndStatuses(handler, statuses);
 		}
 		catch (FinderException fe) {
