@@ -104,8 +104,7 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			request.setCreated(new IWTimestamp(genCase.getCreated()).getDateString(
 					"dd-MM-yyyy hh:mm:ss"));
 			request.setBody(genCase.getMessage());
-			request.setExternal_case_id(((Integer) genCase
-					.getPrimaryKey()).toString());
+			request.setExternal_case_id(genCase.getUniqueId());
 			Commune defaultCommune = getCommuneBusiness().getDefaultCommune();
 			request.setSf_id(Integer.parseInt(defaultCommune.getCommuneCode()));// husavik = 6100, hveragerdi = 8716
 			request.setStatus(genCase.getStatus());

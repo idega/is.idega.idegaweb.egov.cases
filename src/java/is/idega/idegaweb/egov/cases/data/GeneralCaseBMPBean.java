@@ -69,7 +69,16 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 	}
 	
 	public String getReply() {
-		return getStringColumnValue(COLUMN_REPLY);
+		String reply = getStringColumnValue(COLUMN_REPLY);
+		
+		if (reply == null || "".equals(reply)) {
+			reply = getBody();
+			if (reply == null) {
+				reply = "";
+			}
+		}
+		
+		return reply;
 	}
 	
 	public CaseCategory getCaseCategory() {
