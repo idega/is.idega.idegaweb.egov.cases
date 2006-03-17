@@ -131,6 +131,10 @@ public class ClosedCases extends CasesProcessor {
 		heading.setStyleClass("subHeader");
 		form.add(heading);
 		
+		layer = new Layer(Layer.DIV);
+		layer.setStyleClass("formSection");
+		form.add(layer);
+		
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
