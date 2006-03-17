@@ -9,12 +9,10 @@ import com.idega.block.process.business.CaseChangeResult;
 public class BizTalkEventListener implements CaseChangeListener {
 
 	public CaseChangeResult beforeCaseChange(CaseChangeEvent event) {
-		System.out.println("biz talk before change event");
 		return null;
 	}
 
 	public CaseChangeResult afterCaseChange(CaseChangeEvent event) {
-		System.out.println("Got biz talk after change event");
 		BizTalkSenderBean bean = new BizTalkSenderBean();
 
 		GeneralCase genCase = (GeneralCase) event.getCase();

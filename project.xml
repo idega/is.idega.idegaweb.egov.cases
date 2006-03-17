@@ -144,6 +144,13 @@
       <type>jar</type>
       <url>http://ws.apache.org/axis</url>
     </dependency>
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+      <url>http://ws.apache.org/axis</url>
+    </dependency>
   </dependencies>
 
   <build>

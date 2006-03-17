@@ -33,9 +33,7 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 	private GeneralCase genCase = null;
 
 	public void run() {
-		System.out.println("Starting biz talk thread");
 		if (genCase != null) {			
-			System.out.println("biz talk sending file");
 			sendGeneralCase();
 		}
 	}
@@ -105,14 +103,13 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			request.setCode("GENERAL");
 			request.setCreated(new IWTimestamp(genCase.getCreated()).getDateString(
 					"dd-MM-yyyy hh:mm:ss"));
-			request.setBody(genCase.getBody());
+			request.setBody(genCase.getMessage());
 			request.setExternal_case_id(((Integer) genCase
 					.getPrimaryKey()).toString());
 			Commune defaultCommune = getCommuneBusiness().getDefaultCommune();
-			System.out.println("biz talk default commune = " + defaultCommune.getCommuneCode());
 			request.setSf_id(Integer.parseInt(defaultCommune.getCommuneCode()));// husavik = 6100, hveragerdi = 8716
 			request.setStatus(genCase.getStatus());
-			request.setSubject(genCase.getSubject());
+			request.setSubject(genCase.getCaseType().getName());
 			Case_requestOwner owner = new Case_requestOwner();
 			owner.setAddress(address.getStreetAddress());
 			owner.setCase_role("owner");
