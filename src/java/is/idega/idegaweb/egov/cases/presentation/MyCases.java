@@ -143,7 +143,7 @@ public class MyCases extends CasesProcessor {
 
 		section.add(clear);
 		
-		heading = new Heading1(getResourceBundle().getLocalizedString("case_overview", "Case overview"));
+		heading = new Heading1(getResourceBundle().getLocalizedString("handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		form.add(heading);
 		
