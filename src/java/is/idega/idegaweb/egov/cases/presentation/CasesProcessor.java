@@ -139,24 +139,38 @@ public abstract class CasesProcessor extends CasesBlock {
 			
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
+			cell.setStyleClass("caseNumber");
 			cell.add(new Text(theCase.getPrimaryKey().toString()));
 
-			row.createCell().add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
-			row.createCell().add(new Text(type.getName()));
-			row.createCell().add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
+			cell = row.createCell();
+			cell.setStyleClass("sender");
+			cell.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
+			
+			cell = row.createCell();
+			cell.setStyleClass("caseType");
+			cell.add(new Text(type.getName()));
+			
+			cell = row.createCell();
+			cell.setStyleClass("createdDate");
+			cell.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
-			row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale())));
+			cell = row.createCell();
+			cell.setStyleClass("status");
+			cell.add(new Text(getBusiness().getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale())));
 			
 			User handler = theCase.getHandledBy();
+			cell = row.createCell();
+			cell.setStyleClass("handler");
 			if (handler != null) {
-				row.createCell().add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));
+				cell.add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));
 			}
 			else {
-				row.createCell().add(new Text("-"));
+				cell.add(new Text("-"));
 			}
 			
 			cell = row.createCell();
 			cell.setStyleClass("lastColumn");
+			cell.setStyleClass("view");
 			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")), theCase));
 			
 			if (iRow % 2 == 0) {
