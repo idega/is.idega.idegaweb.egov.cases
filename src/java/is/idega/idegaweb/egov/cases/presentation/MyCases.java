@@ -31,7 +31,6 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
-import com.idega.util.text.Name;
 import com.idega.util.text.TextSoap;
 
 
@@ -101,9 +100,6 @@ public class MyCases extends CasesProcessor {
 		statuses.setSelectedElement(theCase.getStatus());
 		statuses.setStyleClass("caseStatusDropdown");
 		
-		Layer sender = new Layer(Layer.SPAN);
-		sender.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
-		
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(TextSoap.formatText(theCase.getMessage())));
 		
@@ -116,15 +112,7 @@ public class MyCases extends CasesProcessor {
 		
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("sender", "Sender"));
-		element.add(label);
-		element.add(sender);
-		section.add(element);
-
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
+		Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
 		element.add(label);
 		element.add(categories);
 		section.add(element);

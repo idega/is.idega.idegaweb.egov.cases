@@ -30,7 +30,6 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
-import com.idega.util.text.Name;
 
 
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
@@ -104,9 +103,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer caseCategory = new Layer(Layer.SPAN);
 		caseCategory.add(new Text(category.getName()));
 		
-		Layer sender = new Layer(Layer.SPAN);
-		sender.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
-		
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(theCase.getMessage()));
 		
@@ -116,14 +112,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("sender", "Sender"));
-		element.add(label);
-		element.add(sender);
-		section.add(element);
-
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 		element.add(label);
 		element.add(caseType);
