@@ -231,7 +231,7 @@ public class CaseFinder extends CasesBlock {
 				}
 				
 				boolean addProcessLink = false;
-				Link process = new Link(getBundle().getImage("edit.gif", getResourceBundle().getLocalizedString("view_case", "View case")));
+				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 				if (openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
