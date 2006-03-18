@@ -34,7 +34,7 @@ import com.idega.util.text.Name;
 public class CaseViewer extends CaseCreator {
 	
 	private ICPage iHomePage;
-	private ICPage iBackLink;
+	private ICPage iBackPage;
 
 	protected void present(IWContext iwc) {
 		try {
@@ -150,9 +150,9 @@ public class CaseViewer extends CaseCreator {
 			bottom.setStyleClass("bottom");
 			form.add(bottom);
 
-			if (iBackLink != null) {
+			if (iBackPage != null) {
 				Link home = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-				home.setPage(iBackLink);
+				home.setPage(iBackPage);
 				bottom.add(home);
 			}
 			
@@ -179,7 +179,7 @@ public class CaseViewer extends CaseCreator {
 	}
 
 	
-	public void setBackLink(ICPage backLink) {
-		iBackLink = backLink;
+	public void setBackPage(ICPage backPage) {
+		iBackPage = backPage;
 	}
 }

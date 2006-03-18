@@ -91,10 +91,15 @@ public class CaseFinder extends CasesBlock {
 		
 		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
 		caseNumber.setStyleClass("textinput");
+		caseNumber.keepStatusOnAction(true);
+
 		TextInput name = new TextInput(PARAMETER_NAME);
 		name.setStyleClass("textinput");
+		name.keepStatusOnAction(true);
+
 		TextInput personalID = new TextInput(PARAMETER_PERSONAL_ID);
 		personalID.setStyleClass("textinput");
+		personalID.keepStatusOnAction(true);
 		
 		caseNumber.setToDisableOnWhenNotEmpty(name);
 		caseNumber.setToDisableOnWhenNotEmpty(personalID);
@@ -214,6 +219,7 @@ public class CaseFinder extends CasesBlock {
 				CaseStatus status = theCase.getCaseStatus();
 				CaseType type = theCase.getCaseType();
 				User owner = theCase.getOwner();
+				User handler = theCase.getHandledBy();
 				IWTimestamp created = new IWTimestamp(theCase.getCreated());
 				
 				row = group.createRow();
@@ -232,7 +238,7 @@ public class CaseFinder extends CasesBlock {
 					process.setPage(openCasesPage);
 					addProcessLink = true;
 				}
-				else if (myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) || theCase.getHandledBy().equals(iwc.getCurrentUser())) {
+				else if (myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) && (handler != null && handler.equals(iwc.getCurrentUser()))) {
 					process.setPage(myCasesPage);
 					addProcessLink = true;
 				}
@@ -252,7 +258,6 @@ public class CaseFinder extends CasesBlock {
 	
 				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale())));
 				
-				User handler = theCase.getHandledBy();
 				if (handler != null) {
 					row.createCell().add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));
 				}
