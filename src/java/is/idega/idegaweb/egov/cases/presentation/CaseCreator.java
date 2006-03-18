@@ -112,9 +112,11 @@ public class CaseCreator extends ApplicationForm {
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness(iwc).getCaseCategories(), "getName");
 		categories.keepStatusOnAction(true);
+		categories.setStyleClass("caseCategoryDropdown");
 		
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness(iwc).getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
+		types.setStyleClass("caseTypeDropdown");
 		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");

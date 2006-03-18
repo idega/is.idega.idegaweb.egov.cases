@@ -24,12 +24,10 @@ import com.idega.event.IWPageEventListener;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
-import com.idega.presentation.text.Paragraph;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
-import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.Label;
-import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
@@ -39,6 +37,10 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	private ICPage iMyCasesPage;
 	
+	protected String getBlockID() {
+		return "openCases";
+	}
+
 	public boolean actionPerformed(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
 			Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
@@ -64,12 +66,12 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		Form form = new Form();
-		form.setStyleClass("casesForm");
+		form.setStyleClass("adminForm");
 		form.setEventListener(this.getClass());
 		if (iMyCasesPage != null) {
 			form.setPageToSubmitTo(iMyCasesPage);
-			form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		}
+		form.addParameter(PARAMETER_ACTION, "");
 		form.maintainParameter(PARAMETER_CASE_PK);
 		
 		GeneralCase theCase = null;
@@ -85,99 +87,90 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 		
-		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("elementsLayer");
-		form.add(layer);
+		form.add(getPersonInfo(iwc, owner));
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_processor.handle_case", "Handle case"));
-		layer.add(heading);
+		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_overview", "Case overview"));
+		heading.setStyleClass("subHeader");
+		heading.setStyleClass("topSubHeader");
+		form.add(heading);
 		
-		Paragraph caseType = new Paragraph();
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		form.add(section);
+		
+		Layer caseType = new Layer(Layer.SPAN);
 		caseType.add(new Text(type.getName()));
 		
-		Paragraph caseCategory = new Paragraph();
+		Layer caseCategory = new Layer(Layer.SPAN);
 		caseCategory.add(new Text(category.getName()));
 		
-		Paragraph sender = new Paragraph();
+		Layer sender = new Layer(Layer.SPAN);
 		sender.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
 		
-		Paragraph message = new Paragraph();
+		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(theCase.getMessage()));
 		
-		Paragraph createdDate = new Paragraph();
+		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 		
 		Layer element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		Label label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("sender", "Sender"));
 		element.add(label);
 		element.add(sender);
-		layer.add(element);
+		section.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 		element.add(label);
 		element.add(caseType);
-		layer.add(element);
+		section.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 		element.add(label);
 		element.add(caseCategory);
-		layer.add(element);
+		section.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);
-		layer.add(element);
+		section.add(element);
 
 		element = new Layer(Layer.DIV);
-		element.setStyleClass("formElement");
+		element.setStyleClass("formItem");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("message", "Message"));
 		element.add(label);
 		element.add(message);
-		layer.add(element);
+		section.add(element);
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
-		layer.add(clear);
+		section.add(clear);
 
-		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("buttonLayer");
-		form.add(layer);
-		
-		boolean showButton = true;
-		if (theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending())) {
-			if (iwc.getCurrentUser().equals(theCase.getHandledBy())) {
-				showButton = false;
-			}
-		}
-		SubmitButton next = null;
-		if (iMyCasesPage != null) {
-			next = new SubmitButton(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"));
-		}
-		else {
-			next = new SubmitButton(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-		}
-		next.setStyleClass("button");
-		GenericButton back = new GenericButton(getResourceBundle().getLocalizedString("back", "Back"));
-		back.setPageToOpen(getParentPageID());
-		back.addParameterToPage(PARAMETER_ACTION, ACTION_VIEW);
-		back.setStyleClass("button");
-		layer.add(back);
-		if (showButton) {
-			layer.add(next);
-		}
-		
+		Layer bottom = new Layer(Layer.DIV);
+		bottom.setStyleClass("bottom");
+		form.add(bottom);
+
+		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"));
+		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
+		next.setToFormSubmit(form);
+		bottom.add(next);
+
+		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
+		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.setToFormSubmit(form);
+		bottom.add(back);
+
 		add(form);
 	}
 

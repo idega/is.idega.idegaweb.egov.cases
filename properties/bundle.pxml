@@ -101,10 +101,22 @@
             </value>
             <type>map</type>
           </key>
+          <key>
+            <name>is.idega.idegaweb.egov.cases.presentation.CaseFinder</name>
+            <value>
+              <map>
+                <key>
+                  <name>component_property_file</name>
+                  <type>java.lang.String</type>
+                  <value>is.idega.idegaweb.egov.cases.presentation.CaseFinder.pxml</value>
+                </key>
+              </map>
+            </value>
+            <type>map</type>
+          </key>
         </map>
       </value>
       <type>map</type>
     </key>
   </map>
 </pxml>
-

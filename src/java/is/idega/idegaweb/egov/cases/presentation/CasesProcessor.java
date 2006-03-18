@@ -34,13 +34,15 @@ import com.idega.util.text.Name;
 
 public abstract class CasesProcessor extends CasesBlock {
 
-	protected static final String PARAMETER_ACTION = "cp_prm_action";
+	public static final String PARAMETER_ACTION = "cp_prm_action";
 	
-	protected static final String PARAMETER_CASE_PK = "prm_case_pk";
+	public static final String PARAMETER_CASE_PK = "prm_case_pk";
 
 	protected static final int ACTION_VIEW = 1;
-	protected static final int ACTION_PROCESS = 2;
+	public static final int ACTION_PROCESS = 2;
 	protected static final int ACTION_SAVE = 3;
+	
+	protected abstract String getBlockID();
 	
 	protected void present(IWContext iwc) throws Exception {
 		switch (parseAction(iwc)) {
@@ -72,6 +74,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setStyleClass("adminTable");
+		table.setID(getBlockID());
 		
 		TableColumnGroup columnGroup = table.createColumnGroup();
 		TableColumn column = columnGroup.createColumn();
@@ -84,18 +87,35 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
+		
 		TableCell2 cell = row.createHeaderCell();
 		cell.setStyleClass("firstColumn");
+		cell.setStyleClass("caseNumber");
 		cell.add(new Text(getResourceBundle().getLocalizedString("case_nr", "Case nr.")));
 		
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
+		cell = row.createHeaderCell();
+		cell.setStyleClass("sender");
+		cell.add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("caseType");
+		cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("createdDate");
+		cell.add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("status");
+		cell.add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("handler");
+		cell.add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
+		cell.setStyleClass("view");
 		cell.add(new Text(getResourceBundle().getLocalizedString("view", "View")));
 		
 		group = table.createBodyRowGroup();

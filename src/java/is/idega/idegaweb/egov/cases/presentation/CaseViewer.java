@@ -34,13 +34,14 @@ import com.idega.util.text.Name;
 public class CaseViewer extends CaseCreator {
 	
 	private ICPage iHomePage;
+	private ICPage iBackLink;
 
 	protected void present(IWContext iwc) {
 		try {
 			IWResourceBundle iwrb = getResourceBundle(iwc);
 			
 			Form form = new Form();
-			form.setStyleClass("casesForm");
+			form.setStyleClass("adminForm");
 			
 			GeneralCase theCase = null;
 			try {
@@ -149,12 +150,18 @@ public class CaseViewer extends CaseCreator {
 			bottom.setStyleClass("bottom");
 			form.add(bottom);
 
-			Link home = getButtonLink(iwrb.getLocalizedString("my_page", "My page"));
-			home.setStyleClass("buttonHome");
-			if (getHomePage() != null) {
-				home.setPage(getHomePage());
+			if (iBackLink != null) {
+				Link home = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+				home.setPage(iBackLink);
+				bottom.add(home);
 			}
-			bottom.add(home);
+			
+			if (getHomePage() != null) {
+				Link home = getButtonLink(iwrb.getLocalizedString("my_page", "My page"));
+				home.setStyleClass("buttonHome");
+				home.setPage(getHomePage());
+				bottom.add(home);
+			}
 
 			add(form);
 		}
@@ -169,5 +176,10 @@ public class CaseViewer extends CaseCreator {
 	
 	public void setHomePage(ICPage page) {
 		iHomePage = page;
+	}
+
+	
+	public void setBackLink(ICPage backLink) {
+		iBackLink = backLink;
 	}
 }

@@ -32,6 +32,10 @@ import com.idega.util.IWTimestamp;
 
 public class ClosedCases extends CasesProcessor {
 
+	protected String getBlockID() {
+		return "closedCases";
+	}
+
 	protected Collection getCases(User user) throws RemoteException {
 		Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
 		return getBusiness().getClosedCases(groups);

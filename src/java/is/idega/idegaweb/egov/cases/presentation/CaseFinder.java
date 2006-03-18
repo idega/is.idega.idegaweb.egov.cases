@@ -11,12 +11,16 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
 import javax.ejb.FinderException;
+
 import com.idega.block.process.data.CaseStatus;
+import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -27,7 +31,6 @@ import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
-import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
@@ -47,7 +50,10 @@ public class CaseFinder extends CasesBlock {
 
 	private static final int ACTION_SEARCH = 1;
 	private static final int ACTION_RESULTS = 2;
-	private static final int ACTION_HANDLE = 3;
+	
+	private ICPage myCasesPage;
+	private ICPage openCasesPage;
+	private ICPage viewCasesPage;
 
 	protected void present(IWContext iwc) throws Exception {
 		switch (parseAction(iwc)) {
@@ -56,11 +62,8 @@ public class CaseFinder extends CasesBlock {
 				break;
 
 			case ACTION_RESULTS:
+				showSearchForm(iwc);
 				showResults(iwc);
-				break;
-
-			case ACTION_HANDLE:
-				showProcessor(iwc);
 				break;
 		}
 	}
@@ -85,10 +88,6 @@ public class CaseFinder extends CasesBlock {
 		helpLayer.setStyleClass("helperText");
 		helpLayer.add(new Text(getResourceBundle().getLocalizedString("case_finder.information_text", "Information text here...")));
 		layer.add(helpLayer);
-		
-		Paragraph paragraph = new Paragraph();
-		paragraph.add(new Text());
-		layer.add(paragraph);
 		
 		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
 		caseNumber.setStyleClass("textinput");
@@ -141,9 +140,6 @@ public class CaseFinder extends CasesBlock {
 	}
 	
 	private void showResults(IWContext iwc) throws RemoteException {
-		Form form = new Form();
-		form.setStyleClass("adminForm");
-		
 		Collection cases = new ArrayList();
 		if (iwc.isParameterSet(PARAMETER_CASE_NUMBER)) {
 			try {
@@ -176,13 +172,9 @@ public class CaseFinder extends CasesBlock {
 		if (cases.isEmpty()) {
 			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));
 			heading.setStyleClass("errorHeading");
-			form.add(heading);
+			add(heading);
 		}
 		else {
-			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.results", "Results"));
-			heading.setStyleClass("resultHeading");
-			form.add(heading);
-
 			Table2 table = new Table2();
 			table.setWidth("100%");
 			table.setCellpadding(0);
@@ -232,9 +224,23 @@ public class CaseFinder extends CasesBlock {
 					row.setStyleClass("lastRow");
 				}
 				
-				Link process = new Link(getBundle().getImage("edit.gif", getResourceBundle().getLocalizedString("edit", "Edit")));
-				process.addParameter(PARAMETER_CASE_NUMBER, theCase.getPrimaryKey().toString());
-				process.addParameter(PARAMETER_ACTION, ACTION_HANDLE);
+				boolean addProcessLink = false;
+				Link process = new Link(getBundle().getImage("edit.gif", getResourceBundle().getLocalizedString("view_case", "View case")));
+				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
+				if (openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
+					process.setPage(openCasesPage);
+					addProcessLink = true;
+				}
+				else if (myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) || theCase.getHandledBy().equals(iwc.getCurrentUser())) {
+					process.setPage(myCasesPage);
+					addProcessLink = true;
+				}
+				else if (viewCasesPage!= null) {
+					process.addParameter(getBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+					process.setPage(viewCasesPage);
+					addProcessLink = true;
+				}
 				
 				cell = row.createCell();
 				cell.setStyleClass("firstColumn");
@@ -256,7 +262,7 @@ public class CaseFinder extends CasesBlock {
 				
 				cell = row.createCell();
 				cell.setStyleClass("lastColumn");
-				if (status.equals(getBusiness().getCaseStatusOpen())) {
+				if (addProcessLink) {
 					cell.add(process);
 				}
 				else {
@@ -271,21 +277,19 @@ public class CaseFinder extends CasesBlock {
 				}
 			}
 	
-			form.add(table);
+			add(table);
 		}
-		
-		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("buttonLayer");
-		form.add(layer);
-		
-		SubmitButton back = new SubmitButton(getResourceBundle().getLocalizedString("back", "Back"), PARAMETER_ACTION, String.valueOf(ACTION_SEARCH));
-		back.setStyleClass("button");
-		layer.add(back);
-		
-		add(form);
 	}
 	
-	private void showProcessor(IWContext iwc) {
-		
+	public void setMyCasesPage(ICPage myCasesPage) {
+		this.myCasesPage = myCasesPage;
+	}
+	
+	public void setOpenCasesPage(ICPage openCasesPage) {
+		this.openCasesPage = openCasesPage;
+	}
+
+	public void setViewCasesPage(ICPage viewCasesPage) {
+		this.viewCasesPage = viewCasesPage;
 	}
 }
