@@ -111,10 +111,12 @@ public class CaseViewer extends CaseCreator {
 			clear.setStyleClass("Clear");
 			section.add(clear);
 			
-			if (user != null) {
 				Layer handler = new Layer(Layer.SPAN);
-				handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));
-				
+				if (user != null) {
+					handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));
+				} else {
+					handler.add(new Text(""));
+				}
 				heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 				heading.setStyleClass("subHeader");
 				form.add(heading);
@@ -146,7 +148,6 @@ public class CaseViewer extends CaseCreator {
 				}
 				
 				section.add(clear);
-			}
 		
 			Layer bottom = new Layer(Layer.DIV);
 			bottom.setStyleClass("bottom");
