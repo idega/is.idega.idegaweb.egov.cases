@@ -11,7 +11,7 @@ import com.idega.block.process.data.Case;
 public class OneSystemEventListener implements CaseChangeListener {
 
 	public CaseChangeResult afterCaseChange(CaseChangeEvent event) {
-		Case theCase = (Case) event.getCase();
+		Case theCase = event.getCase();
 		OneSystemSenderBean bean = new OneSystemSenderBean();
 
 		if (theCase instanceof GeneralCase) {
