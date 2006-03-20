@@ -109,6 +109,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	private void sendChildCareApplication() {
 		String xml = createChildcareFile();
 		String ret = sendFile(xml);
+		if (ret != null && ret.length() > 36) {
+			ret = ret.substring(0, 36);
+		}
 		application.setExternalId(ret);
 		application.store();
 	}
@@ -116,6 +119,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	private void sendGeneralCase() {
 		String xml = createGeneralCaseFile();
 		String ret = sendFile(xml);
+		if (ret != null && ret.length() > 36) {
+			ret = ret.substring(0, 36);
+		}
 		genCase.setExternalId(ret);
 		genCase.store();
 	}

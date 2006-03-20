@@ -155,8 +155,13 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			request.setMetadata(items);
 			
 			Case_response response = port.newCase(request);
+			String external = response.getExternal_case_id();
+			if (external != null && external.length() > 36) {
+				external = external.substring(0, 36);
+			}
 			genCase.setExternalId(response.getExternal_case_id());
 			genCase.store();
+			//System.out.println("external id = " + response.getExternal_case_id());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
