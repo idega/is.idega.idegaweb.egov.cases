@@ -111,13 +111,10 @@ public class CaseViewer extends CaseCreator {
 			clear.setStyleClass("Clear");
 			section.add(clear);
 			
-			if (!theCase.getCaseStatus().equals(getCasesBusiness(iwc).getCaseStatusOpen())) {
+			if (user != null) {
 				Layer handler = new Layer(Layer.SPAN);
 				handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));
 				
-				Layer reply = new Layer(Layer.SPAN);
-				reply.add(new Text(theCase.getReply()));
-			
 				heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 				heading.setStyleClass("subHeader");
 				form.add(heading);
@@ -134,15 +131,20 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(handler);
 				section.add(formItem);
 		
-				formItem = new Layer(Layer.DIV);
-				formItem.setStyleClass("formItem");
-				formItem.setStyleClass("informationItem");
-				label = new Label();
-				label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
-				formItem.add(label);
-				formItem.add(reply);
-				section.add(formItem);
-		
+				if (theCase.getReply() != null) {
+					Layer reply = new Layer(Layer.SPAN);
+					reply.add(new Text(theCase.getReply()));
+				
+					formItem = new Layer(Layer.DIV);
+					formItem.setStyleClass("formItem");
+					formItem.setStyleClass("informationItem");
+					label = new Label();
+					label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
+					formItem.add(label);
+					formItem.add(reply);
+					section.add(formItem);
+				}
+				
 				section.add(clear);
 			}
 		
