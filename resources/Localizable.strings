@@ -32,6 +32,7 @@ case_status_key.45=45
 case_status_key.46=46
 case_status_key.47=47
 case_status_key.48=48
+case_status_key.INPR=INPR
 case_status_key.KLAR=KLAR
 case_status_key.PEND=PEND
 case_status_key.TYST=TYST
