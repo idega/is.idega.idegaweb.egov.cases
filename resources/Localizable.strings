@@ -35,6 +35,7 @@ case_status_key.48=48
 case_status_key.INPR=INPR
 case_status_key.KLAR=KLAR
 case_status_key.PEND=PEND
+case_status_key.SHUT=SHUT
 case_status_key.TYST=TYST
 case_status_key.UBEH=UBEH
 case_status_key.WAIT=WAIT
