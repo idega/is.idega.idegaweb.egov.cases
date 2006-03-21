@@ -26,14 +26,12 @@ import com.idega.core.contact.data.PhoneTypeBMPBean;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.io.MemoryFileBuffer;
-import com.idega.io.MemoryOutputStream;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.xml.XMLCDATA;
 import com.idega.xml.XMLDocument;
 import com.idega.xml.XMLElement;
 import com.idega.xml.XMLOutput;
-import com.lowagie.text.Document;
 
 public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	// protected String URL =
@@ -237,9 +235,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			XMLElement file = new XMLElement(XML_FILE_DATA);
 			case_.addContent(file);
 
-			Document document = new Document();
+			/*Document document = new Document();
+			MemoryOutputStream mos = new MemoryOutputStream(buffer);*/
 			MemoryFileBuffer buffer = new MemoryFileBuffer();
-			MemoryOutputStream mos = new MemoryOutputStream(buffer);
 
 			int length = buffer.buffer().length;
 			case_.addContent(XML_FILE_SIZE, Integer.toString(length));
@@ -265,10 +263,10 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 		String outputString = "nothing";
 
-		File xmlFile = null;
+		//File xmlFile = null;
 		try {
-			xmlFile = File.createTempFile("testOS", "xml");
-			xmlFile = File.createTempFile("testOS", ".xml");
+			/*xmlFile =*/ File.createTempFile("testOS", "xml");
+			/*xmlFile =*/ File.createTempFile("testOS", ".xml");
 
 			XMLDocument doc = new XMLDocument(new XMLElement(XML_CASE));
 
