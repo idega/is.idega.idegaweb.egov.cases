@@ -271,7 +271,7 @@ public class CaseCreator extends ApplicationForm {
 		try {
 			getCasesBusiness(iwc).storeGeneralCase(iwc.getCurrentUser(), caseCategoryPK, caseTypePK, message);
 
-			addPhasesReceipt(iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
+			addPhasesReceipt(iwc, iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
 			Layer clearLayer = new Layer(Layer.DIV);
 			clearLayer.setStyleClass("Clear");
