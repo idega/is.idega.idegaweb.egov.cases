@@ -270,7 +270,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			XMLDocument doc = new XMLDocument(new XMLElement(XML_CASE));
 
-			Collection col = getCaseBusiness().getCaseLogsByCase(genCase);
+			Collection col = getCaseBusiness().getCaseLogsByCase(application);
 			IWTimestamp lastStamp = null;
 			if (col != null) {
 				Iterator it = col.iterator();
