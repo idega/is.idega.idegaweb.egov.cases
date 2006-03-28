@@ -2,7 +2,6 @@ package is.idega.idegaweb.egov.cases.business;
 
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
-import java.io.File;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
@@ -130,7 +129,12 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		try {
 			XMLDocument doc = new XMLDocument(new XMLElement(XML_CASE));
 
-			Collection col = getCaseBusiness().getCaseLogsByCase(genCase);
+			Collection col = null;
+			try {
+				getCaseBusiness().getCaseLogsByCase(genCase);
+			} catch(Exception e) {
+			}
+			
 			IWTimestamp lastStamp = null;
 			if (col != null) {
 				Iterator it = col.iterator();
@@ -263,14 +267,15 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 		String outputString = "nothing";
 
-		//File xmlFile = null;
 		try {
-			/*xmlFile =*/ File.createTempFile("testOS", "xml");
-			/*xmlFile =*/ File.createTempFile("testOS", ".xml");
-
 			XMLDocument doc = new XMLDocument(new XMLElement(XML_CASE));
 
-			Collection col = getCaseBusiness().getCaseLogsByCase(application);
+			Collection col = null;
+			try {
+				col = getCaseBusiness().getCaseLogsByCase(application);
+			} catch(Exception e) {
+			}
+			
 			IWTimestamp lastStamp = null;
 			if (col != null) {
 				Iterator it = col.iterator();
