@@ -294,7 +294,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			XMLElement case_ = doc.getRootElement();
 			case_.addContent(XML_ID, "-1");
-			case_.addContent(XML_EXTERNAL_ID, genCase.getUniqueId());
+			case_.addContent(XML_EXTERNAL_ID, application.getUniqueId());
 			case_.addContent(XML_CREATED, new IWTimestamp(application
 					.getCreated()).getDateString("yyyy-MM-dd hh:mm:ss"));
 			case_.addContent(XML_CODE, "Leikskólaumsókn");
