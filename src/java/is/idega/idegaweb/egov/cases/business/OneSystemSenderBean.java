@@ -459,6 +459,15 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			String mailserver = (String) getIWApplicationContext()
 					.getApplicationAttribute("messagebox_smtp_mailserver");
 
+			System.out.println("from = " + from);
+			System.out.println("mailserver = " + mailserver);
+			if (outputString == null) {
+				System.out.println("outputstring is null");
+			}
+			if (xmlFile == null) {
+				System.out.println("xmlFile is null");
+			}
+			
 			SendMail.send(from, "palli@idega.is", null, null, mailserver,
 					"test", outputString, xmlFile);
 		} catch (Exception e) {
@@ -765,7 +774,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				table4.addCell(new Phrase(relationString[0], textFont));
 				table4.addCell(new Phrase(relationString[1], textFont));
 				table4.addCell(new Phrase(relationString[2], textFont));
-				table4.addCell(new Phrase(iwb
+				table4.addCell(new Phrase(iwrb
 						.getLocalizedString("name", "Name"), tagFont));
 				table4.addCell(new Phrase(userName[0], textFont));
 				table4.addCell(new Phrase(userName[1], textFont));
