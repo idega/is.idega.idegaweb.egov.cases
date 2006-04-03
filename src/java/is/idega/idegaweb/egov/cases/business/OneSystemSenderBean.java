@@ -9,6 +9,8 @@ import is.idega.block.family.data.Relative;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.sql.Date;
@@ -48,6 +50,7 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.LocaleUtil;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.SendMail;
 import com.idega.util.text.Name;
 import com.idega.xml.XMLCDATA;
 import com.idega.xml.XMLDocument;
@@ -429,6 +432,24 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			//messagebox_smtp_mailserver
+			File xmlFile = File.createTempFile("testOS", ".xml");
+
+			FileOutputStream out = new FileOutputStream(xmlFile);
+
+			XMLOutput output = new XMLOutput(" ", true);
+			output.setLineSeparator(System.getProperty("line.separator"));
+			output.setTextNormalize(true);
+			output.setEncoding("UTF-8");
+			output.output(doc, out);
+
+			out.close();
+			
+			String from = (String) getIWApplicationContext().getApplicationAttribute("messagebox_from_mailaddress");
+			String mailserver = (String) getIWApplicationContext().getApplicationAttribute("messagebox_smtp_mailserver");
+			
+			SendMail.send(from, "palli@idega.is", null, null, mailserver, "test", outputString, xmlFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

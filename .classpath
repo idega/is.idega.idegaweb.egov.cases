@@ -29,6 +29,8 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/axis/jars/axis-jaxrpc-1.3.jar">
   </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/javamail/jars/javamail-1.3.2.jar">
+  </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/commons-httpclient/jars/commons-httpclient-2.0.2.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/itextpdf/jars/itext-paulo-139.jar">
