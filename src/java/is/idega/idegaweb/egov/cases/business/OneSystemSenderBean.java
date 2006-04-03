@@ -298,9 +298,16 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		return outputString;
 	}
 
+	
+	
+	protected String getBundleIdentifier() {
+		return "is.idega.idegaweb.egov.childcare";
+	}
+
 	private String createChildcareFile() {
 
 		IWBundle iwb = getIWMainApplication().getBundle(getBundleIdentifier());
+		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil.getIcelandicLocale());
 
 		String outputString = "nothing";
 
@@ -334,7 +341,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			case_.addContent(XML_EXTERNAL_ID, application.getUniqueId());
 			case_.addContent(XML_CREATED, new IWTimestamp(application
 					.getCreated()).getDateString("yyyy-MM-dd hh:mm:ss"));
-			case_.addContent(XML_CODE, iwb.getLocalizedString(
+			case_.addContent(XML_CODE, iwrb.getLocalizedString(
 					"childcare_application", "Childcare application"));
 			case_.addContent(XML_CATEGORY, "9999");
 			if (lastStamp != null) {
@@ -344,7 +351,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				case_.addContent(XML_MODIFIED, "");
 			}
 			case_.addContent(XML_STATUS, application.getStatus());
-			case_.addContent(XML_SUBJECT, iwb.getLocalizedString(
+			case_.addContent(XML_SUBJECT, iwrb.getLocalizedString(
 					"childcare_application", "Childcare application"));
 
 			XMLElement owner = new XMLElement(XML_OWNER);
