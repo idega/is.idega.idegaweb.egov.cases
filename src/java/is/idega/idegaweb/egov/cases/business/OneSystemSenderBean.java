@@ -298,8 +298,6 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		return outputString;
 	}
 
-	
-	
 	protected String getBundleIdentifier() {
 		return "is.idega.idegaweb.egov.childcare";
 	}
@@ -307,7 +305,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	private String createChildcareFile() {
 
 		IWBundle iwb = getIWMainApplication().getBundle(getBundleIdentifier());
-		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil.getIcelandicLocale());
+		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil
+				.getIcelandicLocale());
 
 		String outputString = "nothing";
 
@@ -426,9 +425,11 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			MemoryFileBuffer buffer = createPDF();
 
-			int length = buffer.buffer().length;
-			case_.addContent(XML_FILE_SIZE, Integer.toString(length));
-			file.addContent(new XMLCDATA(Base64.encode(buffer.buffer())));
+			if (buffer != null && buffer.buffer() != null) {
+				int length = buffer.buffer().length;
+				case_.addContent(XML_FILE_SIZE, Integer.toString(length));
+				file.addContent(new XMLCDATA(Base64.encode(buffer.buffer())));
+			}
 
 			try {
 				XMLOutput output = new XMLOutput();
@@ -439,8 +440,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			//messagebox_smtp_mailserver
+
+			// messagebox_smtp_mailserver
 			File xmlFile = File.createTempFile("testOS", ".xml");
 
 			FileOutputStream out = new FileOutputStream(xmlFile);
@@ -452,11 +453,14 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			output.output(doc, out);
 
 			out.close();
-			
-			String from = (String) getIWApplicationContext().getApplicationAttribute("messagebox_from_mailaddress");
-			String mailserver = (String) getIWApplicationContext().getApplicationAttribute("messagebox_smtp_mailserver");
-			
-			SendMail.send(from, "palli@idega.is", null, null, mailserver, "test", outputString, xmlFile);
+
+			String from = (String) getIWApplicationContext()
+					.getApplicationAttribute("messagebox_from_mailaddress");
+			String mailserver = (String) getIWApplicationContext()
+					.getApplicationAttribute("messagebox_smtp_mailserver");
+
+			SendMail.send(from, "palli@idega.is", null, null, mailserver,
+					"test", outputString, xmlFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -507,7 +511,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		Font textFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
 
 		IWBundle iwb = getIWMainApplication().getBundle(getBundleIdentifier());
-		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil.getIcelandicLocale());
+		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil
+				.getIcelandicLocale());
 
 		try {
 			MemoryFileBuffer buffer = new MemoryFileBuffer();
@@ -646,7 +651,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 
 			if (!custodians.isEmpty()) {
-				
+
 				int i = 0;
 				Address userAddress[] = new Address[3];
 				String userPhone[] = new String[3];
@@ -658,72 +663,97 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				String relationString[] = new String[3];
 				String userName[] = new String[3];
 				String userPersonalID[] = new String[3];
-				
+				String userStreetName[] = new String[3];
+				String userPostalCode[] = new String[3];
+
+				for (int j = 0; j < 3; j++) {
+					userPhone[j] = "";
+					userWork[j] = "";
+					userMobile[j] = "";
+					userEmail[j] = "";
+					userNationality[j] = "";
+					userMaritalStatus[j] = "";
+					relationString[j] = "";
+					userName[j] = "";
+					userPersonalID[j] = "";
+					userStreetName[j] = "";
+					userPostalCode[j] = "";
+				}
+
 				Iterator iter = custodians.iterator();
 				while (iter.hasNext() && i < 3) {
 					Custodian custodian = (Custodian) iter.next();
-					
-					userAddress[i] = getUserBusiness().getUsersMainAddress(custodian);
-					userNationality[i] = custodian.getNationality() == null ? "" : custodian.getNationality();
+
+					userAddress[i] = getUserBusiness().getUsersMainAddress(
+							custodian);
+					userNationality[i] = custodian.getNationality() == null ? ""
+							: custodian.getNationality();
 					userMaritalStatus[i] = custodian.getMaritalStatus();
+					userStreetName[i] = userAddress[i].getStreetAddress();
+					userPostalCode[i] = userAddress[i].getPostalAddress();
 
 					try {
-						Phone phone = getUserBusiness().getUsersHomePhone(custodian);
+						Phone phone = getUserBusiness().getUsersHomePhone(
+								custodian);
 						if (phone != null && phone.getNumber() != null) {
 							userPhone[i] = phone.getNumber();
 						}
-					}
-					catch (NoPhoneFoundException npfe) {
+					} catch (NoPhoneFoundException npfe) {
 						userPhone[i] = "";
 					}
-					
+
 					try {
-						Phone phone = getUserBusiness().getUsersWorkPhone(custodian);
+						Phone phone = getUserBusiness().getUsersWorkPhone(
+								custodian);
 						if (phone != null && phone.getNumber() != null) {
 							userPhone[i] = phone.getNumber();
 						}
-					}
-					catch (NoPhoneFoundException npfe) {
+					} catch (NoPhoneFoundException npfe) {
 						userWork[i] = "";
 					}
-					
+
 					try {
-						Phone phone = getUserBusiness().getUsersMobilePhone(custodian);
+						Phone phone = getUserBusiness().getUsersMobilePhone(
+								custodian);
 						if (phone != null && phone.getNumber() != null) {
 							userPhone[i] = phone.getNumber();
 						}
-					}
-					catch (NoPhoneFoundException npfe) {
+					} catch (NoPhoneFoundException npfe) {
 						userMobile[i] = "";
 					}
-					
+
 					try {
-						Email email = getUserBusiness().getUsersMainEmail(custodian);
+						Email email = getUserBusiness().getUsersMainEmail(
+								custodian);
 						if (email != null && email.getEmailAddress() != null) {
 							userEmail[i] = email.getEmailAddress();
 						}
-					}
-					catch (NoEmailFoundException nefe) {
+					} catch (NoEmailFoundException nefe) {
 						userEmail[i] = "";
 					}
-					
-					relationString[i] = iwrb.getLocalizedString("relation." + cChild.getRelation(custodian));
-										
-					Name custodianName = new Name(custodian.getFirstName(), custodian.getMiddleName(), custodian.getLastName());
-					userName[i] = custodianName.getName(LocaleUtil.getIcelandicLocale());
-					
-					userPersonalID[i] = PersonalIDFormatter.format(custodian.getPersonalID(), LocaleUtil.getIcelandicLocale()); 
+
+					relationString[i] = iwrb.getLocalizedString("relation."
+							+ cChild.getRelation(custodian));
+
+					Name custodianName = new Name(custodian.getFirstName(),
+							custodian.getMiddleName(), custodian.getLastName());
+					userName[i] = custodianName.getName(LocaleUtil
+							.getIcelandicLocale());
+
+					userPersonalID[i] = PersonalIDFormatter.format(custodian
+							.getPersonalID(), LocaleUtil.getIcelandicLocale());
 
 					if (userMaritalStatus[i] != null) {
-						userMaritalStatus[i] = iwrb.getLocalizedString("marital_status." + userMaritalStatus[i]);
+						userMaritalStatus[i] = iwrb
+								.getLocalizedString("marital_status."
+										+ userMaritalStatus[i]);
+					} else {
+						userMaritalStatus[i] = "";
 					}
-					else {
-						userMaritalStatus[i] = "";						
-					}
-					
+
 					i++;
 				}
-				
+
 				document.add(new Phrase("\n"));
 				document.add(new Phrase(iwrb.getLocalizedString(
 						"application.custodian_information",
@@ -740,21 +770,27 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				table4.addCell(new Phrase(userName[0], textFont));
 				table4.addCell(new Phrase(userName[1], textFont));
 				table4.addCell(new Phrase(userName[2], textFont));
-				table4.addCell(new Phrase(iwrb.getLocalizedString("personal_id",
-						"Personal ID"), tagFont));
+				table4.addCell(new Phrase(iwrb.getLocalizedString(
+						"personal_id", "Personal ID"), tagFont));
 				table4.addCell(new Phrase(userPersonalID[0], textFont));
 				table4.addCell(new Phrase(userPersonalID[1], textFont));
 				table4.addCell(new Phrase(userPersonalID[2], textFont));
 				table4.addCell(new Phrase(iwrb.getLocalizedString("address",
 						"Address"), tagFont));
-				table4.addCell(new Phrase(userAddress[0].getStreetName(), textFont));
-				table4.addCell(new Phrase(userAddress[1].getStreetName(), textFont));
-				table4.addCell(new Phrase(userAddress[2].getStreetName(), textFont));
+				table4.addCell(new Phrase(userStreetName[0],
+						textFont));
+				table4.addCell(new Phrase(userStreetName[1],
+						textFont));
+				table4.addCell(new Phrase(userStreetName[2],
+						textFont));
 				table4.addCell(new Phrase(iwrb.getLocalizedString("zip_code",
 						"Zip code"), tagFont));
-				table4.addCell(new Phrase(userAddress[0].getPostalAddress(), textFont));
-				table4.addCell(new Phrase(userAddress[1].getPostalAddress(), textFont));
-				table4.addCell(new Phrase(userAddress[2].getPostalAddress(), textFont));
+				table4.addCell(new Phrase(userPostalCode[0],
+						textFont));
+				table4.addCell(new Phrase(userPostalCode[1],
+						textFont));
+				table4.addCell(new Phrase(userPostalCode[2],
+						textFont));
 				table4.addCell(new Phrase(iwrb.getLocalizedString("home_phone",
 						"Home phone"), tagFont));
 				table4.addCell(new Phrase(userPhone[0], textFont));
@@ -775,8 +811,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				table4.addCell(new Phrase(userEmail[0], textFont));
 				table4.addCell(new Phrase(userEmail[1], textFont));
 				table4.addCell(new Phrase(userEmail[2], textFont));
-				table4.addCell(new Phrase(iwrb.getLocalizedString("nationality",
-						"Nationality"), tagFont));
+				table4.addCell(new Phrase(iwrb.getLocalizedString(
+						"nationality", "Nationality"), tagFont));
 				table4.addCell(new Phrase(userNationality[0], textFont));
 				table4.addCell(new Phrase(userNationality[1], textFont));
 				table4.addCell(new Phrase(userNationality[2], textFont));
@@ -789,80 +825,94 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				table4.setWidthPercentage(100);
 				document.add(table4);
 			}
-			
+
 			Collection relatives = cChild.getRelatives();
 			if (!relatives.isEmpty()) {
 				int i = 0;
 
-				String userPhone[] = new String[3];
-				String userWork[] = new String[3];
-				String userMobile[] = new String[3];
-				String userEmail[] = new String[3];
+				String userPhone[] = new String[2];
+				String userWork[] = new String[2];
+				String userMobile[] = new String[2];
+				String userEmail[] = new String[2];
 				String relationString[] = new String[2];
 				String userName[] = new String[2];
+				
+				for (int j = 0; j < 2; j++) {
+					userPhone[j] = "";
+					userWork[j] = "";
+					userMobile[j] = "";
+					userEmail[j] = "";
+					relationString[j] = "";
+					userName[j] = "";					
+				}
 
 				Iterator iter = custodians.iterator();
 				while (iter.hasNext() && i < 2) {
 					Relative relative = (Relative) iter.next();
 
 					userName[i] = relative.getName();
-					
+
 					if (relative.getHomePhone() != null) {
 						userPhone[i] = relative.getHomePhone();
-					}
-					else {
+					} else {
 						userPhone[i] = "";
 					}
 
 					if (relative.getWorkPhone() != null) {
 						userWork[i] = relative.getWorkPhone();
-					}
-					else {
+					} else {
 						userWork[i] = "";
 					}
 
 					if (relative.getMobilePhone() != null) {
 						userMobile[i] = relative.getMobilePhone();
-					}
-					else {
+					} else {
 						userMobile[i] = "";
 					}
 
 					if (relative.getEmail() != null) {
 						userEmail[i] = relative.getEmail();
-					}
-					else {
+					} else {
 						userEmail[i] = "";
 					}
-					
-					relationString[i] = iwrb.getLocalizedString("relation." + relative.getRelation(), "");
+
+					relationString[i] = iwrb.getLocalizedString("relation."
+							+ relative.getRelation(), "");
 				}
-				
+
 				document.add(new Phrase("\n"));
-				document.add(new Phrase(iwrb.getLocalizedString("application.relative_information", "Relative information"), paraFont));
+				document.add(new Phrase(iwrb.getLocalizedString(
+						"application.relative_information",
+						"Relative information"), paraFont));
 				PdfPTable table5 = new PdfPTable(4);
 				table5.getDefaultCell().setBorder(0);
-				table5.addCell(new Phrase(iwrb.getLocalizedString("relation", "Relation"), tagFont));
+				table5.addCell(new Phrase(iwrb.getLocalizedString("relation",
+						"Relation"), tagFont));
 				table5.addCell(new Phrase(relationString[0], textFont));
 				table5.addCell(new Phrase(relationString[1], textFont));
 				table5.addCell(new Phrase(""));
-				table5.addCell(new Phrase(iwrb.getLocalizedString("name", "Name"), tagFont));
+				table5.addCell(new Phrase(iwrb.getLocalizedString("name",
+						"Name"), tagFont));
 				table5.addCell(new Phrase(userName[0], textFont));
 				table5.addCell(new Phrase(userName[1], textFont));
 				table5.addCell(new Phrase(""));
-				table5.addCell(new Phrase(iwrb.getLocalizedString("home_phone", "Home phone"), tagFont));
+				table5.addCell(new Phrase(iwrb.getLocalizedString("home_phone",
+						"Home phone"), tagFont));
 				table5.addCell(new Phrase(userPhone[0], textFont));
 				table5.addCell(new Phrase(userPhone[1], textFont));
 				table5.addCell(new Phrase(""));
-				table5.addCell(new Phrase(iwrb.getLocalizedString("work_phone", "Work phone"), tagFont));
+				table5.addCell(new Phrase(iwrb.getLocalizedString("work_phone",
+						"Work phone"), tagFont));
 				table5.addCell(new Phrase(userWork[0], textFont));
 				table5.addCell(new Phrase(userWork[1], textFont));
 				table5.addCell(new Phrase(""));
-				table5.addCell(new Phrase(iwrb.getLocalizedString("mobile_phone", "Mobile phone"), tagFont));
+				table5.addCell(new Phrase(iwrb.getLocalizedString(
+						"mobile_phone", "Mobile phone"), tagFont));
 				table5.addCell(new Phrase(userMobile[0], textFont));
 				table5.addCell(new Phrase(userMobile[1], textFont));
 				table5.addCell(new Phrase(""));
-				table5.addCell(new Phrase(iwrb.getLocalizedString("email", "E-mail"), tagFont));
+				table5.addCell(new Phrase(iwrb.getLocalizedString("email",
+						"E-mail"), tagFont));
 				table5.addCell(new Phrase(userEmail[0], textFont));
 				table5.addCell(new Phrase(userEmail[0], textFont));
 				table5.addCell(new Phrase(""));
@@ -872,16 +922,17 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 
 			document.newPage();
-			
+
 			boolean hasMultiLanguageHome = cChild.hasMultiLanguageHome();
 			String language = cChild.getLanguage();
-			
-			Custodian custodian = getMemberFamilyLogic().getCustodian(application.getOwner());
+
+			Custodian custodian = getMemberFamilyLogic().getCustodian(
+					application.getOwner());
 			boolean hasStudies = custodian.hasStudies();
 			String studies = custodian.getStudies();
 			Date studyStart = custodian.getStudyStart();
 			Date studyEnd = custodian.getStudyEnd();
-			
+
 			Boolean hasGrowthDeviation = cChild.hasGrowthDeviation();
 			String growthDeviation = cChild.getGrowthDeviationDetails();
 			Boolean hasAllergies = cChild.hasAllergies();
@@ -893,14 +944,16 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			String otherInformation = student.getChildCareOtherInformation();
 			boolean hasCaretaker = student.hasCaretaker();
 
-			
-			document.add(new Phrase(iwrb.getLocalizedString("child.child_information", "Child information"), paraFont));
+			document.add(new Phrase(iwrb.getLocalizedString(
+					"child.child_information", "Child information"), paraFont));
 			PdfPTable table6 = new PdfPTable(1);
 			table6.getDefaultCell().setBorder(0);
-			
-			table6.addCell(new Phrase(iwrb.getLocalizedString("child.has_multi_language_home_overview", "Has multi language home"),
-					tagFont));
-			StringBuffer multiLangBuffer = new StringBuffer(getBooleanValue(hasMultiLanguageHome));
+
+			table6.addCell(new Phrase(iwrb.getLocalizedString(
+					"child.has_multi_language_home_overview",
+					"Has multi language home"), tagFont));
+			StringBuffer multiLangBuffer = new StringBuffer(
+					getBooleanValue(hasMultiLanguageHome));
 			if (hasMultiLanguageHome) {
 				if (language != null) {
 					multiLangBuffer.append(", ");
@@ -909,9 +962,11 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 			table6.addCell(new Phrase(multiLangBuffer.toString(), textFont));
 			table6.addCell(new Phrase(""));
-			
+
 			if (hasStudies) {
-				table6.addCell(new Phrase(iwrb.getLocalizedString("custodian.has_studies_overview", "Has studies"), tagFont));
+				table6.addCell(new Phrase(iwrb.getLocalizedString(
+						"custodian.has_studies_overview", "Has studies"),
+						tagFont));
 
 				StringBuffer studiesBuffer = new StringBuffer();
 				if (studies != null) {
@@ -919,45 +974,47 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				}
 				if (studyStart != null && studyEnd != null) {
 					studiesBuffer.append(" (");
-					studiesBuffer.append(new IWTimestamp(studyStart).getDateString("dd.MM.yyyy"));
+					studiesBuffer.append(new IWTimestamp(studyStart)
+							.getDateString("dd.MM.yyyy"));
 					studiesBuffer.append(" - ");
-					studiesBuffer.append(new IWTimestamp(studyEnd).getDateString("dd.MM.yyyy"));
+					studiesBuffer.append(new IWTimestamp(studyEnd)
+							.getDateString("dd.MM.yyyy"));
 					studiesBuffer.append(")");
-				}
-				else if (studyStart != null) {
+				} else if (studyStart != null) {
 					studiesBuffer.append(" (");
-					studiesBuffer.append(new IWTimestamp(studyStart).getDateString("dd.MM.yyyy"));
+					studiesBuffer.append(new IWTimestamp(studyStart)
+							.getDateString("dd.MM.yyyy"));
 					studiesBuffer.append(" - ????)");
-				}
-				else if (studyEnd != null) {
+				} else if (studyEnd != null) {
 					studiesBuffer.append(" (???? - ");
-					studiesBuffer.append(new IWTimestamp(studyEnd).getDateString("dd.MM.yyyy"));
+					studiesBuffer.append(new IWTimestamp(studyEnd)
+							.getDateString("dd.MM.yyyy"));
 					studiesBuffer.append(")");
 				}
 
-				table6.addCell(new Phrase(studiesBuffer.toString(),
-						textFont));
+				table6.addCell(new Phrase(studiesBuffer.toString(), textFont));
 				table6.addCell(new Phrase(""));
 			}
 
-			table6
-					.addCell(new Phrase(
-							iwrb.getLocalizedString("child.has_growth_deviation_overview", "Has growth deviation"),
-							tagFont));
-			StringBuffer growthDeviationBuffer = new StringBuffer(getBooleanValue(hasGrowthDeviation));
+			table6.addCell(new Phrase(iwrb.getLocalizedString(
+					"child.has_growth_deviation_overview",
+					"Has growth deviation"), tagFont));
+			StringBuffer growthDeviationBuffer = new StringBuffer(
+					getBooleanValue(hasGrowthDeviation));
 			if (hasGrowthDeviation != null) {
 				if (growthDeviation != null) {
 					growthDeviationBuffer.append(", ");
 					growthDeviationBuffer.append(growthDeviation);
 				}
 			}
-			table6.addCell(new Phrase(growthDeviationBuffer.toString(), textFont));
+			table6.addCell(new Phrase(growthDeviationBuffer.toString(),
+					textFont));
 			table6.addCell(new Phrase(""));
-			
-			table6
-					.addCell(new Phrase(iwrb.getLocalizedString("child.has_allergies_overview", "Has allergies"),
-							tagFont));
-			StringBuffer allergyBuffer = new StringBuffer(getBooleanValue(hasAllergies));
+
+			table6.addCell(new Phrase(iwrb.getLocalizedString(
+					"child.has_allergies_overview", "Has allergies"), tagFont));
+			StringBuffer allergyBuffer = new StringBuffer(
+					getBooleanValue(hasAllergies));
 			if (hasAllergies != null) {
 				if (allergies != null) {
 					allergyBuffer.append(", ");
@@ -965,39 +1022,41 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				}
 			}
 
-			table6.addCell(new Phrase(allergyBuffer.toString(),
-					textFont));
+			table6.addCell(new Phrase(allergyBuffer.toString(), textFont));
 			table6.addCell(new Phrase(""));
-			
-			table6.addCell(new Phrase(iwrb.getLocalizedString("child.has_caretaker_overview", "Has caretaker"), tagFont));
+
+			table6.addCell(new Phrase(iwrb.getLocalizedString(
+					"child.has_caretaker_overview", "Has caretaker"), tagFont));
 			table6.addCell(new Phrase(getBooleanValue(hasCaretaker), textFont));
 			table6.addCell(new Phrase(""));
-			
+
 			if (lastCareProvider != null) {
-				table6.addCell(new Phrase(iwrb.getLocalizedString("child.last_care_provider_overview", "Last care provider"),
-						tagFont));
+				table6.addCell(new Phrase(iwrb.getLocalizedString(
+						"child.last_care_provider_overview",
+						"Last care provider"), tagFont));
 				table6.addCell(new Phrase(lastCareProvider, textFont));
 				table6.addCell(new Phrase(""));
 			}
-						
-			table6
-					.addCell(new Phrase(
-							iwrb.getLocalizedString("child.can_contact_last_care_provider_overview", "Can contact last care provider"),
-							tagFont));
-			table6.addCell(new Phrase(getBooleanValue(canContactLastProvider), textFont));
+
+			table6.addCell(new Phrase(iwrb.getLocalizedString(
+					"child.can_contact_last_care_provider_overview",
+					"Can contact last care provider"), tagFont));
+			table6.addCell(new Phrase(getBooleanValue(canContactLastProvider),
+					textFont));
 			table6.addCell(new Phrase(""));
-			
-			table6.addCell(new Phrase(iwrb.getLocalizedString("child.can_display_images_overview", "Can display images"), tagFont));
-			table6.addCell(new Phrase(getBooleanValue(canDisplayImages), textFont));
+
+			table6.addCell(new Phrase(iwrb.getLocalizedString(
+					"child.can_display_images_overview", "Can display images"),
+					tagFont));
+			table6.addCell(new Phrase(getBooleanValue(canDisplayImages),
+					textFont));
 			table6.addCell(new Phrase(""));
-			
+
 			if (otherInformation != null) {
-				table6
-				.addCell(new Phrase(
-						iwrb.getLocalizedString("child.other_information", "Other information"),
+				table6.addCell(new Phrase(iwrb.getLocalizedString(
+						"child.other_information", "Other information"),
 						tagFont));
-				table6.addCell(new Phrase(otherInformation,
-				textFont));
+				table6.addCell(new Phrase(otherInformation, textFont));
 				table6.addCell(new Phrase(""));
 			}
 
@@ -1023,23 +1082,21 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	protected String getBooleanValue(boolean booleanValue) {
 		return getBooleanValue(new Boolean(booleanValue));
 	}
-	
+
 	protected String getBooleanValue(Boolean booleanValue) {
 		IWBundle iwb = getIWMainApplication().getBundle(getBundleIdentifier());
-		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil.getIcelandicLocale());
-		
+		IWResourceBundle iwrb = iwb.getResourceBundle(LocaleUtil
+				.getIcelandicLocale());
+
 		if (booleanValue == null) {
 			return iwrb.getLocalizedString("no_answer", "Won't answer");
-		}
-		else if (booleanValue.booleanValue()) {
+		} else if (booleanValue.booleanValue()) {
 			return iwrb.getLocalizedString("yes", "Yes");
-		}
-		else {
+		} else {
 			return iwrb.getLocalizedString("no", "No");
 		}
 	}
 
-	
 	protected ApplicationBusiness getApplicationBusiness() {
 		try {
 			return (ApplicationBusiness) getServiceInstance(ApplicationBusiness.class);
@@ -1067,8 +1124,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	protected SchoolBusiness getSchoolBusiness() {
 		try {
 			return (SchoolBusiness) getServiceInstance(SchoolBusiness.class);
-		}
-		catch (IBOLookupException ile) {
+		} catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
 	}
