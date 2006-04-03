@@ -454,11 +454,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			out.close();
 
-			String from = (String) getIWApplicationContext()
-					.getApplicationAttribute("messagebox_from_mailaddress");
-			String mailserver = (String) getIWApplicationContext()
-					.getApplicationAttribute("messagebox_smtp_mailserver");
-
+			String from = (String) getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
+			String mailserver = (String) getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
+			
 			System.out.println("from = " + from);
 			System.out.println("mailserver = " + mailserver);
 			if (outputString == null) {
@@ -466,6 +464,14 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 			if (xmlFile == null) {
 				System.out.println("xmlFile is null");
+			}
+			
+			if (from == null) {
+				from = "arborg@sunnan3.is";
+			}
+			
+			if (mailserver == null) {
+				mailserver = "ns1.anza.is";
 			}
 			
 			SendMail.send(from, "palli@idega.is", null, null, mailserver,
@@ -855,7 +861,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 					userName[j] = "";					
 				}
 
-				Iterator iter = custodians.iterator();
+				Iterator iter = relatives.iterator();
 				while (iter.hasNext() && i < 2) {
 					Relative relative = (Relative) iter.next();
 
