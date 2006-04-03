@@ -46,6 +46,17 @@
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
+      <artifactId>com.idega.block.school</artifactId>
+      <!--version>1.0.1</version-->
+      <version>SNAPSHOT</version>
+      <type>jar</type>
+      <url>http://www.idega.com/</url>
+      <properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>bundles</groupId>
       <artifactId>com.idega.block.process.webservice</artifactId>
       <!--version>1.0.1</version-->
       <version>SNAPSHOT</version>
@@ -69,6 +80,17 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>is.idega.idegaweb.egov.application</artifactId>
+      <!--version>1.0.1</version-->
+      <version>SNAPSHOT</version>
+      <type>jar</type>
+      <url>http://www.idega.com/</url>
+      <properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>bundles</groupId>
+      <artifactId>is.idega.block.family</artifactId>
       <!--version>1.0.1</version-->
       <version>SNAPSHOT</version>
       <type>jar</type>

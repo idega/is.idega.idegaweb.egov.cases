@@ -9,11 +9,15 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.process">
   </classpathentry>
+  <classpathentry kind="src" path="/com.idega.block.school">
+  </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.process.webservice">
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.user">
   </classpathentry>
   <classpathentry kind="src" path="/is.idega.idegaweb.egov.application">
+  </classpathentry>
+  <classpathentry kind="src" path="/is.idega.block.family">
   </classpathentry>
   <classpathentry kind="src" path="/se.idega.idegaweb.commune">
   </classpathentry>
