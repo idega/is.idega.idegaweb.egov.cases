@@ -186,7 +186,12 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 
 			XMLElement case_ = doc.getRootElement();
-			case_.addContent(XML_ID, "-1");
+			if (genCase.getExternalId() != null) {
+				case_.addContent(XML_ID, genCase.getExternalId());				
+			} 
+			else {
+				case_.addContent(XML_ID, "-1");
+			}
 			case_.addContent(XML_EXTERNAL_ID, genCase.getUniqueId());
 			case_.addContent(XML_CREATED, new IWTimestamp(genCase.getCreated())
 					.getDateString("yyyy-MM-dd hh:mm:ss"));
@@ -337,7 +342,12 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 
 			XMLElement case_ = doc.getRootElement();
-			case_.addContent(XML_ID, "-1");
+			if (application.getExternalId() != null) {
+				case_.addContent(XML_ID, application.getExternalId());				
+			}
+			else {
+				case_.addContent(XML_ID, "-1");
+			}
 			case_.addContent(XML_EXTERNAL_ID, application.getUniqueId());
 			case_.addContent(XML_CREATED, new IWTimestamp(application
 					.getCreated()).getDateString("yyyy-MM-dd hh:mm:ss"));
