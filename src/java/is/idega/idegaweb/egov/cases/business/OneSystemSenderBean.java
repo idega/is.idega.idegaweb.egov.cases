@@ -455,8 +455,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			out.close();
 
-			String from = (String) getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
-			String mailserver = (String) getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
+			String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
+			String mailserver = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
 			
 			System.out.println("from = " + from);
 			System.out.println("mailserver = " + mailserver);
