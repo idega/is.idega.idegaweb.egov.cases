@@ -15,6 +15,7 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -591,6 +592,25 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 					textFont));
 			table2.addCell(new Phrase(""));
 			table2.addCell(new Phrase(""));
+			
+			if (application.getFee() > 0.0) {
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+
+				NumberFormat format = NumberFormat.getCurrencyInstance(LocaleUtil.getIcelandicLocale());
+				
+				table2.addCell(new Phrase(iwrb.getLocalizedString("application.fee", "Fee"), tagFont));
+				table2.addCell(new Phrase(format.format(application.getFee()), textFont));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+				table2.addCell(new Phrase(""));
+			}
+			
 			table2.addCell(new Phrase(iwrb.getLocalizedString(
 					"application.from_date", "From date"), tagFont));
 			table2.addCell(new Phrase(
@@ -651,7 +671,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			table3.setWidthPercentage(100);
 			document.add(table3);
-
+		 	
 			Child cChild = getMemberFamilyLogic().getChild(child);
 
 			Collection custodians = null;
