@@ -741,7 +741,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 						Phone phone = getUserBusiness().getUsersWorkPhone(
 								custodian);
 						if (phone != null && phone.getNumber() != null) {
-							userPhone[i] = phone.getNumber();
+							userWork[i] = phone.getNumber();
 						}
 					} catch (NoPhoneFoundException npfe) {
 						userWork[i] = "";
@@ -751,7 +751,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 						Phone phone = getUserBusiness().getUsersMobilePhone(
 								custodian);
 						if (phone != null && phone.getNumber() != null) {
-							userPhone[i] = phone.getNumber();
+							userMobile[i] = phone.getNumber();
 						}
 					} catch (NoPhoneFoundException npfe) {
 						userMobile[i] = "";
@@ -913,6 +913,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 					relationString[i] = iwrb.getLocalizedString("relation."
 							+ relative.getRelation(), "");
+					i++;
 				}
 
 				document.add(new Phrase("\n"));
@@ -949,7 +950,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				table5.addCell(new Phrase(iwrb.getLocalizedString("email",
 						"E-mail"), tagFont));
 				table5.addCell(new Phrase(userEmail[0], textFont));
-				table5.addCell(new Phrase(userEmail[0], textFont));
+				table5.addCell(new Phrase(userEmail[1], textFont));
 				table5.addCell(new Phrase(""));
 
 				table5.setWidthPercentage(100);
