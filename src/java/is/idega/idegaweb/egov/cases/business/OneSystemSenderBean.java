@@ -593,7 +593,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			table2.addCell(new Phrase(""));
 			table2.addCell(new Phrase(""));
 			
-			if (application.getFee() > 0.0) {
+			if (application.getFee() > 0) {
 				table2.addCell(new Phrase(""));
 				table2.addCell(new Phrase(""));
 				table2.addCell(new Phrase(""));
