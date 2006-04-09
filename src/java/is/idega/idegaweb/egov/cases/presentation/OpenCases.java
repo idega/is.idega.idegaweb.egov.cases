@@ -67,8 +67,8 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.setEventListener(this.getClass());
-		if (iMyCasesPage != null) {
-			form.setPageToSubmitTo(iMyCasesPage);
+		if (this.iMyCasesPage != null) {
+			form.setPageToSubmitTo(this.iMyCasesPage);
 		}
 		form.addParameter(PARAMETER_ACTION, "");
 		form.maintainParameter(PARAMETER_CASE_PK);
@@ -167,6 +167,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	
 	public void setMyCasesPage(ICPage myCasesPage) {
-		iMyCasesPage = myCasesPage;
+		this.iMyCasesPage = myCasesPage;
 	}
 }

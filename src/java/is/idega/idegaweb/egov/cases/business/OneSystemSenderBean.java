@@ -118,9 +118,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	private GeneralCase genCase = null;
 
 	public void run() {
-		if (application != null) {
+		if (this.application != null) {
 			sendChildCareApplication();
-		} else if (genCase != null) {
+		} else if (this.genCase != null) {
 			sendGeneralCase();
 		}
 	}
@@ -143,8 +143,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		if (ret != null && ret.length() > 36) {
 			ret = ret.substring(0, 36);
 		}
-		application.setExternalId(ret);
-		application.store();
+		this.application.setExternalId(ret);
+		this.application.store();
 	}
 
 	private void sendGeneralCase() {
@@ -153,8 +153,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		if (ret != null && ret.length() > 36) {
 			ret = ret.substring(0, 36);
 		}
-		genCase.setExternalId(ret);
-		genCase.store();
+		this.genCase.setExternalId(ret);
+		this.genCase.store();
 	}
 
 	private String createGeneralCaseFile() {
@@ -165,7 +165,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			Collection col = null;
 			try {
-				getCaseBusiness().getCaseLogsByCase(genCase);
+				getCaseBusiness().getCaseLogsByCase(this.genCase);
 			} catch (Exception e) {
 			}
 
@@ -186,17 +186,17 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 
 			XMLElement case_ = doc.getRootElement();
-			if (genCase.getExternalId() != null) {
-				case_.addContent(XML_ID, genCase.getExternalId());				
+			if (this.genCase.getExternalId() != null) {
+				case_.addContent(XML_ID, this.genCase.getExternalId());				
 			} 
 			else {
 				case_.addContent(XML_ID, "-1");
 			}
-			case_.addContent(XML_EXTERNAL_ID, genCase.getUniqueId());
-			case_.addContent(XML_CREATED, new IWTimestamp(genCase.getCreated())
+			case_.addContent(XML_EXTERNAL_ID, this.genCase.getUniqueId());
+			case_.addContent(XML_CREATED, new IWTimestamp(this.genCase.getCreated())
 					.getDateString("yyyy-MM-dd hh:mm:ss"));
-			case_.addContent(XML_CODE, genCase.getCaseType().getName());
-			case_.addContent(XML_CATEGORY, ((Integer) genCase.getCaseCategory()
+			case_.addContent(XML_CODE, this.genCase.getCaseType().getName());
+			case_.addContent(XML_CATEGORY, ((Integer) this.genCase.getCaseCategory()
 					.getPrimaryKey()).toString());
 			if (lastStamp != null) {
 				case_.addContent(XML_MODIFIED, lastStamp
@@ -204,14 +204,14 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			} else {
 				case_.addContent(XML_MODIFIED, "");
 			}
-			case_.addContent(XML_STATUS, genCase.getStatus());
-			case_.addContent(XML_SUBJECT, genCase.getCaseType().getName());
-			case_.addContent(XML_BODY, genCase.getMessage());
+			case_.addContent(XML_STATUS, this.genCase.getStatus());
+			case_.addContent(XML_SUBJECT, this.genCase.getCaseType().getName());
+			case_.addContent(XML_BODY, this.genCase.getMessage());
 
 			XMLElement owner = new XMLElement(XML_OWNER);
 			case_.addContent(owner);
 
-			User uOwner = genCase.getOwner();
+			User uOwner = this.genCase.getOwner();
 			Address address = null;
 			PostalCode pCode = null;
 			Phone phone = null;
@@ -321,7 +321,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			Collection col = null;
 			try {
-				col = getCaseBusiness().getCaseLogsByCase(application);
+				col = getCaseBusiness().getCaseLogsByCase(this.application);
 			} catch (Exception e) {
 			}
 
@@ -342,14 +342,14 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			}
 
 			XMLElement case_ = doc.getRootElement();
-			if (application.getExternalId() != null) {
-				case_.addContent(XML_ID, application.getExternalId());				
+			if (this.application.getExternalId() != null) {
+				case_.addContent(XML_ID, this.application.getExternalId());				
 			}
 			else {
 				case_.addContent(XML_ID, "-1");
 			}
-			case_.addContent(XML_EXTERNAL_ID, application.getUniqueId());
-			case_.addContent(XML_CREATED, new IWTimestamp(application
+			case_.addContent(XML_EXTERNAL_ID, this.application.getUniqueId());
+			case_.addContent(XML_CREATED, new IWTimestamp(this.application
 					.getCreated()).getDateString("yyyy-MM-dd hh:mm:ss"));
 			case_.addContent(XML_CODE, iwrb.getLocalizedString(
 					"childcare_application", "Childcare application"));
@@ -360,14 +360,14 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			} else {
 				case_.addContent(XML_MODIFIED, "");
 			}
-			case_.addContent(XML_STATUS, application.getStatus());
+			case_.addContent(XML_STATUS, this.application.getStatus());
 			case_.addContent(XML_SUBJECT, iwrb.getLocalizedString(
 					"childcare_application", "Childcare application"));
 
 			XMLElement owner = new XMLElement(XML_OWNER);
 			case_.addContent(owner);
 
-			User uOwner = application.getOwner();
+			User uOwner = this.application.getOwner();
 			Address address = null;
 			PostalCode pCode = null;
 			Phone phone = null;
@@ -495,7 +495,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	}
 
 	private String sendFile(String xml) {
-		PostMethod authpost = new PostMethod(URL);
+		PostMethod authpost = new PostMethod(this.URL);
 
 		String ret = "-1";
 		try {
@@ -558,7 +558,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			document.add(new Phrase(""));
 			PdfPTable table = new PdfPTable(2);
 			table.getDefaultCell().setBorder(0);
-			User child = application.getChild();
+			User child = this.application.getChild();
 			Address address = getUserBusiness().getUsersMainAddress(child);
 			PostalCode postal = null;
 			if (address != null) {
@@ -597,13 +597,13 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			table2.getDefaultCell().setBorder(0);
 			table2.addCell(new Phrase(iwrb.getLocalizedString(
 					"application.provider", "Provider")
-					+ " " + application.getChoiceNumber(), tagFont));
-			table2.addCell(new Phrase(application.getProvider().getName(),
+					+ " " + this.application.getChoiceNumber(), tagFont));
+			table2.addCell(new Phrase(this.application.getProvider().getName(),
 					textFont));
 			table2.addCell(new Phrase(""));
 			table2.addCell(new Phrase(""));
 			
-			if (application.getFee() > 0) {
+			if (this.application.getFee() > 0) {
 				table2.addCell(new Phrase(""));
 				table2.addCell(new Phrase(""));
 				table2.addCell(new Phrase(""));
@@ -612,7 +612,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				NumberFormat format = NumberFormat.getCurrencyInstance(LocaleUtil.getIcelandicLocale());
 				
 				table2.addCell(new Phrase(iwrb.getLocalizedString("application.fee", "Fee"), tagFont));
-				table2.addCell(new Phrase(format.format(application.getFee()), textFont));
+				table2.addCell(new Phrase(format.format(this.application.getFee()), textFont));
 				table2.addCell(new Phrase(""));
 				table2.addCell(new Phrase(""));
 				table2.addCell(new Phrase(""));
@@ -624,7 +624,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			table2.addCell(new Phrase(iwrb.getLocalizedString(
 					"application.from_date", "From date"), tagFont));
 			table2.addCell(new Phrase(
-					new IWTimestamp(application.getFromDate())
+					new IWTimestamp(this.application.getFromDate())
 							.getDateString("dd.MM.yyyy"), textFont));
 			table2.addCell(new Phrase(""));
 			table2.addCell(new Phrase(""));
@@ -634,8 +634,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			table2.addCell(new Phrase(""));
 			table2.addCell(new Phrase(""));
 			table2.getDefaultCell().setColspan(4);
-			if (application.getMessage() != null) {
-				table2.addCell(new Phrase(application.getMessage(), textFont));
+			if (this.application.getMessage() != null) {
+				table2.addCell(new Phrase(this.application.getMessage(), textFont));
 			} else {
 				table2.addCell(new Phrase(""));
 			}
@@ -652,12 +652,12 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			table3.addCell(new Phrase(iwrb.getLocalizedString(
 					"application.from_time", "From time"), tagFont));
 			IWTimestamp from = null;
-			if (application.getFromTime() != null) {
-				from = new IWTimestamp(application.getFromTime());
+			if (this.application.getFromTime() != null) {
+				from = new IWTimestamp(this.application.getFromTime());
 			}
 			IWTimestamp to = null;
-			if (application.getToTime() != null) {
-				to = new IWTimestamp(application.getToTime());
+			if (this.application.getToTime() != null) {
+				to = new IWTimestamp(this.application.getToTime());
 			}
 
 			if (from != null) {
@@ -973,7 +973,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			String language = cChild.getLanguage();
 
 			Custodian custodian = getMemberFamilyLogic().getCustodian(
-					application.getOwner());
+					this.application.getOwner());
 			boolean hasStudies = custodian.hasStudies();
 			String studies = custodian.getStudies();
 			Date studyStart = custodian.getStudyStart();

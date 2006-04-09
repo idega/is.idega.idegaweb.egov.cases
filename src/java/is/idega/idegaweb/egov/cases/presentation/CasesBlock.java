@@ -121,20 +121,20 @@ public abstract class CasesBlock extends Block {
 	private void initialize(IWContext iwc) {
 		setResourceBundle(getResourceBundle(iwc));
 		setBundle(getBundle(iwc));
-		business = getCasesBusiness(iwc);
-		userBusiness = getUserBusiness(iwc);
+		this.business = getCasesBusiness(iwc);
+		this.userBusiness = getUserBusiness(iwc);
 	}
 	
 	protected IWBundle getBundle() {
-		return iwb;
+		return this.iwb;
 	}
 	
 	protected IWResourceBundle getResourceBundle() {
-		return iwrb;
+		return this.iwrb;
 	}
 	
 	protected CasesBusiness getBusiness() {
-		return business;
+		return this.business;
 	}
 
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
@@ -147,7 +147,7 @@ public abstract class CasesBlock extends Block {
 	}
 	
 	protected UserBusiness getUserBusiness() {
-		return userBusiness;
+		return this.userBusiness;
 	}
 	
 	private UserBusiness getUserBusiness(IWApplicationContext iwac) {
@@ -167,10 +167,10 @@ public abstract class CasesBlock extends Block {
 	}
 
 	protected ICPage getHomePage() {
-		return iHomePage;
+		return this.iHomePage;
 	}
 	
 	public void setHomePage(ICPage page) {
-		iHomePage = page;
+		this.iHomePage = page;
 	}
 }

@@ -62,7 +62,7 @@ public class CaseCreator extends ApplicationForm {
 	}
 
 	protected void present(IWContext iwc) {
-		iwrb = getResourceBundle(iwc);
+		this.iwrb = getResourceBundle(iwc);
 		
 		try {
 			switch (parseAction(iwc)) {
@@ -96,11 +96,11 @@ public class CaseCreator extends ApplicationForm {
 		form.setStyleClass("casesForm");
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1)));
 		
-		form.add(getPhasesHeader(iwrb.getLocalizedString("application.enter_new_case", "Enter new case"), 1, 3));
+		form.add(getPhasesHeader(this.iwrb.getLocalizedString("application.enter_new_case", "Enter new case"), 1, 3));
 
 		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
 		
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("case_creator.enter_case", "New case"));
+		Heading1 heading = new Heading1(this.iwrb.getLocalizedString("case_creator.enter_case", "New case"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
@@ -124,26 +124,26 @@ public class CaseCreator extends ApplicationForm {
 		
 		Layer helpLayer = new Layer(Layer.DIV);
 		helpLayer.setStyleClass("helperText");
-		helpLayer.add(new Text(iwrb.getLocalizedString("case_creator.information_text", "Information text here...")));
+		helpLayer.add(new Text(this.iwrb.getLocalizedString("case_creator.information_text", "Information text here...")));
 		section.add(helpLayer);
 		
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
-		Label label = new Label(iwrb.getLocalizedString("case_type", "Case type"), types);
+		Label label = new Label(this.iwrb.getLocalizedString("case_type", "Case type"), types);
 		formItem.add(label);
 		formItem.add(types);
 		section.add(formItem);
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
-		label = new Label(iwrb.getLocalizedString("case_category", "Case category"), categories);
+		label = new Label(this.iwrb.getLocalizedString("case_category", "Case category"), categories);
 		formItem.add(label);
 		formItem.add(categories);
 		section.add(formItem);
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
-		label = new Label(iwrb.getLocalizedString("message", "Message"), message);
+		label = new Label(this.iwrb.getLocalizedString("message", "Message"), message);
 		formItem.add(label);
 		formItem.add(message);
 		section.add(formItem);
@@ -156,7 +156,7 @@ public class CaseCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = getButtonLink(iwrb.getLocalizedString("next", "Next"));
+		Link next = getButtonLink(this.iwrb.getLocalizedString("next", "Next"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
 		next.setToFormSubmit(form);
 		bottom.add(next);
@@ -172,18 +172,18 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		
-		form.add(getPhasesHeader(iwrb.getLocalizedString("application.overview", "Overview"), 2, 3));
+		form.add(getPhasesHeader(this.iwrb.getLocalizedString("application.overview", "Overview"), 2, 3));
 
 		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
 		
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("case_creator.enter_case_overview", "New case overview"));
+		Heading1 heading = new Heading1(this.iwrb.getLocalizedString("case_creator.enter_case_overview", "New case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
 		
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		if (message == null || message.length() == 0) {
-			getParentPage().setAlertOnLoad(iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
+			getParentPage().setAlertOnLoad(this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
 			showPhaseOne(iwc);
 			return;
 		}
@@ -220,7 +220,7 @@ public class CaseCreator extends ApplicationForm {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(iwrb.getLocalizedString("case_type", "Case type"));
+		label.setLabel(this.iwrb.getLocalizedString("case_type", "Case type"));
 		formItem.add(label);
 		formItem.add(typeSpan);
 		section.add(formItem);
@@ -228,7 +228,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("case_category", "Case category"));
+		label.setLabel(this.iwrb.getLocalizedString("case_category", "Case category"));
 		formItem.add(label);
 		formItem.add(categorySpan);
 		section.add(formItem);
@@ -237,7 +237,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("message", "Message"));
+		label.setLabel(this.iwrb.getLocalizedString("message", "Message"));
 		formItem.add(label);
 		formItem.add(messageSpan);
 		section.add(formItem);
@@ -250,12 +250,12 @@ public class CaseCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = getButtonLink(iwrb.getLocalizedString("next", "Next"));
+		Link next = getButtonLink(this.iwrb.getLocalizedString("next", "Next"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
 
-		Link back = getButtonLink(iwrb.getLocalizedString("previous", "Previous"));
+		Link back = getButtonLink(this.iwrb.getLocalizedString("previous", "Previous"));
 		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
 		back.setToFormSubmit(form);
 		bottom.add(back);
@@ -271,7 +271,7 @@ public class CaseCreator extends ApplicationForm {
 		try {
 			getCasesBusiness(iwc).storeGeneralCase(iwc.getCurrentUser(), caseCategoryPK, caseTypePK, message);
 
-			addPhasesReceipt(iwc, iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
+			addPhasesReceipt(iwc, this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
 			Layer clearLayer = new Layer(Layer.DIV);
 			clearLayer.setStyleClass("Clear");
@@ -283,7 +283,7 @@ public class CaseCreator extends ApplicationForm {
 
 			try {
 				ICPage page = getUserBusiness(iwc).getHomePageForUser(iwc.getCurrentUser());
-				Link link = getButtonLink(iwrb.getLocalizedString("my_page", "My page"));
+				Link link = getButtonLink(this.iwrb.getLocalizedString("my_page", "My page"));
 				link.setStyleClass("homeButton");
 				link.setPage(page);
 				bottom.add(link);

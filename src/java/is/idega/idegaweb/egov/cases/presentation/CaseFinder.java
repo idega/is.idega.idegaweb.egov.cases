@@ -234,17 +234,17 @@ public class CaseFinder extends CasesBlock {
 				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
-				if (openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
-					process.setPage(openCasesPage);
+				if (this.openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
+					process.setPage(this.openCasesPage);
 					addProcessLink = true;
 				}
-				else if (myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) && (handler != null && handler.equals(iwc.getCurrentUser()))) {
-					process.setPage(myCasesPage);
+				else if (this.myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) && (handler != null && handler.equals(iwc.getCurrentUser()))) {
+					process.setPage(this.myCasesPage);
 					addProcessLink = true;
 				}
-				else if (viewCasesPage!= null) {
+				else if (this.viewCasesPage!= null) {
 					process.addParameter(getBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
-					process.setPage(viewCasesPage);
+					process.setPage(this.viewCasesPage);
 					addProcessLink = true;
 				}
 				

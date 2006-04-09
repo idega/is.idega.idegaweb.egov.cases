@@ -153,9 +153,9 @@ public class CaseViewer extends CaseCreator {
 			bottom.setStyleClass("bottom");
 			form.add(bottom);
 
-			if (iBackPage != null) {
+			if (this.iBackPage != null) {
 				Link home = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-				home.setPage(iBackPage);
+				home.setPage(this.iBackPage);
 				bottom.add(home);
 			}
 			
@@ -174,15 +174,15 @@ public class CaseViewer extends CaseCreator {
 	}
 	
 	protected ICPage getHomePage() {
-		return iHomePage;
+		return this.iHomePage;
 	}
 	
 	public void setHomePage(ICPage page) {
-		iHomePage = page;
+		this.iHomePage = page;
 	}
 
 	
 	public void setBackPage(ICPage backPage) {
-		iBackPage = backPage;
+		this.iBackPage = backPage;
 	}
 }

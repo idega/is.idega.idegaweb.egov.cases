@@ -33,14 +33,14 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 	private GeneralCase genCase = null;
 
 	public void run() {
-		if (genCase != null) {			
+		if (this.genCase != null) {			
 			sendGeneralCase();
 		}
 	}
 
 	private void sendGeneralCase() {
 		try {
-			User uOwner = genCase.getOwner();
+			User uOwner = this.genCase.getOwner();
 			Address address = null;
 			PostalCode pCode = null;
 			Phone phone = null;
@@ -74,7 +74,7 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 				}
 			}
 
-			Collection col = getCaseBusiness().getCaseLogsByCase(genCase);
+			Collection col = getCaseBusiness().getCaseLogsByCase(this.genCase);
 			IWTimestamp lastStamp = null;
 			if (col != null) {
 				Iterator it = col.iterator();
@@ -93,24 +93,24 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			
 			Case_NewCase_SoapPortLocator locator = new Case_NewCase_SoapPortLocator();
 			Case_NewCase_SoapPortSoap_PortType port = locator
-					.getCase_NewCase_SoapPortSoap(new URL(endpoint));
+					.getCase_NewCase_SoapPortSoap(new URL(this.endpoint));
 			Case_request request = new Case_request();
-			if (genCase.getExternalId() != null) {
-				request.setCase_id(genCase.getExternalId());
+			if (this.genCase.getExternalId() != null) {
+				request.setCase_id(this.genCase.getExternalId());
 			} else {
 				request.setCase_id("-1");				
 			}
 			request.setCode("GENERAL");
-			request.setCreated(new IWTimestamp(genCase.getCreated()).getDateString(
+			request.setCreated(new IWTimestamp(this.genCase.getCreated()).getDateString(
 					"dd-MM-yyyy hh:mm:ss"));
-			request.setBody(genCase.getMessage());
-			System.out.println("case id = " + genCase.getPrimaryKey().toString());
-			System.out.println("case unique id = " + genCase.getUniqueId());
-			request.setExternal_case_id(genCase.getUniqueId());
+			request.setBody(this.genCase.getMessage());
+			System.out.println("case id = " + this.genCase.getPrimaryKey().toString());
+			System.out.println("case unique id = " + this.genCase.getUniqueId());
+			request.setExternal_case_id(this.genCase.getUniqueId());
 			Commune defaultCommune = getCommuneBusiness().getDefaultCommune();
 			request.setSf_id(Integer.parseInt(defaultCommune.getCommuneCode()));// husavik = 6100, hveragerdi = 8716
-			request.setStatus(genCase.getStatus());
-			request.setSubject(genCase.getCaseType().getName());
+			request.setStatus(this.genCase.getStatus());
+			request.setSubject(this.genCase.getCaseType().getName());
 			Case_requestOwner owner = new Case_requestOwner();
 			owner.setAddress(address.getStreetAddress());
 			owner.setCase_role("owner");
@@ -149,8 +149,8 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			request.setOwner(owner);
 			
 			Case_requestItem[] items = new Case_requestItem[2];
-			items[0] = new Case_requestItem("CASE_TYPE", genCase.getCaseType().getName());
-			items[1] = new Case_requestItem("CASE_CATEGORY", genCase.getCaseCategory().getName());
+			items[0] = new Case_requestItem("CASE_TYPE", this.genCase.getCaseType().getName());
+			items[1] = new Case_requestItem("CASE_CATEGORY", this.genCase.getCaseCategory().getName());
 			
 			request.setMetadata(items);
 			
@@ -159,8 +159,8 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 			if (external != null && external.length() > 36) {
 				external = external.substring(0, 36);
 			}
-			genCase.setExternalId(response.getExternal_case_id());
-			genCase.store();
+			this.genCase.setExternalId(response.getExternal_case_id());
+			this.genCase.store();
 			//System.out.println("external id = " + response.getExternal_case_id());
 		} catch (Exception e) {
 			e.printStackTrace();
