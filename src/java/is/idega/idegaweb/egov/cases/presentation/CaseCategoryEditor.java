@@ -93,6 +93,7 @@ public class CaseCategoryEditor extends CasesBlock {
 	private void showList(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
+		form.setID("caseCategoryEditor");
 		
 		Table2 table = new Table2();
 		table.setWidth("100%");
@@ -113,15 +114,25 @@ public class CaseCategoryEditor extends CasesBlock {
 		TableRow row = group.createRow();
 		TableCell2 cell = row.createHeaderCell();
 		cell.setStyleClass("firstColumn");
+		cell.setStyleClass("name");
 		cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
 		
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler_group", "Handler group")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
+		cell = row.createHeaderCell();
+		cell.setStyleClass("description");
+		cell.add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("handlerGroup");
+		cell.add(new Text(getResourceBundle().getLocalizedString("handler_group", "Handler group")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("order");
+		cell.add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
 
 		row.createHeaderCell().add(Text.getNonBrakingSpace());
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
+		cell.setStyleClass("edit");
 		cell.add(Text.getNonBrakingSpace());
 		
 		group = table.createBodyRowGroup();
@@ -148,15 +159,25 @@ public class CaseCategoryEditor extends CasesBlock {
 
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
+			cell.setStyleClass("name");
 			cell.add(new Text(category.getName()));
 
-			row.createCell().add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
-			row.createCell().add(new Text(category.getHandlerGroup().getName()));
-			row.createCell().add(new Text(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "-"));
+			cell = row.createCell();
+			cell.setStyleClass("description");
+			cell.add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
+			
+			cell = row.createCell();
+			cell.setStyleClass("handlerGroup");
+			cell.add(new Text(category.getHandlerGroup().getName()));
+			
+			cell = row.createCell();
+			cell.setStyleClass("order");
+			cell.add(new Text(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "-"));
 
 			row.createCell().add(edit);
 			cell = row.createCell();
 			cell.setStyleClass("lastColumn");
+			cell.setStyleClass("edit");
 			cell.add(delete);
 			
 			if (iRow % 2 == 0) {
