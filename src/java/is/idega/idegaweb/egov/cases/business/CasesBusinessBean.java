@@ -20,6 +20,7 @@ import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -32,8 +33,10 @@ import com.idega.business.IBORuntimeException;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.text.Name;
 
 
 public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness , CasesBusiness{
@@ -45,6 +48,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	private CommuneMessageBusiness getMessageBusiness() {
 		try {
 			return (CommuneMessageBusiness) this.getServiceInstance(CommuneMessageBusiness.class);
+		}
+		catch (RemoteException e) {
+			throw new IBORuntimeException(e.getMessage());
+		}
+	}
+
+	private UserBusiness getUserBusiness() {
+		try {
+			return (UserBusiness) this.getServiceInstance(UserBusiness.class);
 		}
 		catch (RemoteException e) {
 			throw new IBORuntimeException(e.getMessage());
@@ -193,12 +205,31 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 			throw new CreateException("Trying to store a case with case type that has does not exist");
 		}
 		
+		Group handlerGroup = category.getHandlerGroup();
+		
 		theCase.setCaseCategory(category);
 		theCase.setCaseType(type);
 		theCase.setOwner(sender);
-		theCase.setHandler(category.getHandlerGroup());
+		theCase.setHandler(handlerGroup);
 		theCase.setMessage(message);
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group)null);
+		
+		try {
+			Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
+			Object[] arguments = { name.getName(getIWApplicationContext().getApplicationSettings().getDefaultLocale()), theCase.getCaseCategory().getName(), message };
+			String subject = getLocalizedString("case_sent_subject", "A new case sent in");
+			String body = MessageFormat.format(getLocalizedString("case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+			
+			Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+			Iterator iter = handlers.iterator();
+			while (iter.hasNext()) {
+				User handler = (User) iter.next();
+				sendMessage(theCase, handler, null, subject, body);
+			}
+		}
+		catch (RemoteException e) {
+			throw new IBORuntimeException(e);
+		}
 	}
 	
 	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, Locale locale) throws FinderException {
