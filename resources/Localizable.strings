@@ -56,6 +56,7 @@ handler_group=Handler group
 handler_overview=Handler overview
 home_phone=Home phone
 iw.component.is.idega.idegaweb.egov.cases.presentation.CaseCreator.name=CaseCreator
+iw.component.is.idega.idegaweb.egov.cases.presentation.CaseFinder.name=CaseFinder
 iw.component.is.idega.idegaweb.egov.cases.presentation.CaseTypeEditor.name=CaseTypeEditor
 iw.component.is.idega.idegaweb.egov.cases.presentation.CaseViewer.name=CaseViewer
 iw.component.is.idega.idegaweb.egov.cases.presentation.CasesProcessor.name=CasesProcessor
