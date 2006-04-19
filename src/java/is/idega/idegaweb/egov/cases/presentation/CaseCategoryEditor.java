@@ -129,11 +129,14 @@ public class CaseCategoryEditor extends CasesBlock {
 		cell.setStyleClass("order");
 		cell.add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
 
-		row.createHeaderCell().add(Text.getNonBrakingSpace());
+		cell = row.createHeaderCell();
+		cell.setStyleClass("edit");
+		cell.add(new Text(getResourceBundle().getLocalizedString("delete", "Delete")));
+
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
-		cell.setStyleClass("edit");
-		cell.add(Text.getNonBrakingSpace());
+		cell.setStyleClass("delete");
+		cell.add(new Text(getResourceBundle().getLocalizedString("edit", "Edit")));
 		
 		group = table.createBodyRowGroup();
 		int iRow = 1;
@@ -149,12 +152,13 @@ public class CaseCategoryEditor extends CasesBlock {
 				row.setStyleClass("lastRow");
 			}
 			
-			Link edit = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit", "Edit")));
+			Link edit = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit_category", "Edit")));
 			edit.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
 			edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
 			
-			Link delete = new Link(getBundle().getImage("delete.png", getResourceBundle().getLocalizedString("delete", "Delete")));
+			Link delete = new Link(getBundle().getImage("delete.png", getResourceBundle().getLocalizedString("delete_category", "Delete")));
 			delete.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
+			delete.setClickConfirmation(getResourceBundle().getLocalizedString("delete_confirmation", "Are you sure you want to delete this case category?"));
 			delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
 
 			cell = row.createCell();
