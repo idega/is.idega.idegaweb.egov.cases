@@ -82,6 +82,7 @@ reactivate_case=Reactivate case
 reply=Reply
 requires_case_number=Requires case number
 save=Save
+search=Search
 search_results.nothing_found=Nothing found
 search_results.results=Results
 send=Send
