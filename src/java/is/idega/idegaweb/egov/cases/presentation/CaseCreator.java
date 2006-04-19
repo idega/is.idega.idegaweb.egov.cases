@@ -26,6 +26,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
@@ -37,6 +38,8 @@ import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
+import com.idega.user.business.UserSession;
+import com.idega.user.data.User;
 
 
 public class CaseCreator extends ApplicationForm {
@@ -52,6 +55,7 @@ public class CaseCreator extends ApplicationForm {
 	private static final int ACTION_SAVE = 3;
 
 	private IWResourceBundle iwrb;
+	private boolean iUseSessionUser = false;
 	
 	public String getBundleIdentifier() {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
@@ -98,7 +102,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString("application.enter_new_case", "Enter new case"), 1, 3));
 
-		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
+		form.add(getPersonInfo(iwc, getUser(iwc)));
 		
 		Heading1 heading = new Heading1(this.iwrb.getLocalizedString("case_creator.enter_case", "New case"));
 		heading.setStyleClass("subHeader");
@@ -174,7 +178,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString("application.overview", "Overview"), 2, 3));
 
-		form.add(getPersonInfo(iwc, iwc.getCurrentUser()));
+		form.add(getPersonInfo(iwc, getUser(iwc)));
 		
 		Heading1 heading = new Heading1(this.iwrb.getLocalizedString("case_creator.enter_case_overview", "New case overview"));
 		heading.setStyleClass("subHeader");
@@ -269,7 +273,7 @@ public class CaseCreator extends ApplicationForm {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		
 		try {
-			getCasesBusiness(iwc).storeGeneralCase(iwc.getCurrentUser(), caseCategoryPK, caseTypePK, message);
+			getCasesBusiness(iwc).storeGeneralCase(getUser(iwc), caseCategoryPK, caseTypePK, message);
 
 			addPhasesReceipt(iwc, this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
@@ -298,6 +302,24 @@ public class CaseCreator extends ApplicationForm {
 		}
 	}
 
+	private User getUser(IWContext iwc) throws RemoteException {
+		if (this.iUseSessionUser) {
+			return getUserSession(iwc).getUser();
+		}
+		else {
+			return iwc.getCurrentUser();
+		}
+	}
+
+	private UserSession getUserSession(IWUserContext iwuc) {
+		try {
+			return (UserSession) IBOLookup.getSessionInstance(iwuc, UserSession.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+	
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
 			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
@@ -306,4 +328,8 @@ public class CaseCreator extends ApplicationForm {
 			throw new IBORuntimeException(ile);
 		}
 	}	
+
+	public void setUseSessionUser(boolean useSessionUser) {
+		this.iUseSessionUser = useSessionUser;
+	}
 }
