@@ -226,6 +226,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 				User handler = (User) iter.next();
 				sendMessage(theCase, handler, null, subject, body);
 			}
+			
+			Object[] arguments2 = { theCase.getCaseCategory().getName() };
+			subject = getLocalizedString("case_sent_confirmation_subject", "A new case sent in");
+			body = MessageFormat.format(getLocalizedString("case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
+			
+			sendMessage(theCase, sender, null, subject, body);
 		}
 		catch (RemoteException e) {
 			throw new IBORuntimeException(e);
