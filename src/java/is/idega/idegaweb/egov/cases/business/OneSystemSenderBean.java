@@ -508,7 +508,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			int status = client.executeMethod(authpost);
 
 			if (status == HttpStatus.SC_OK) {
-				ret = authpost.getRequestBodyAsString();
+				ret = authpost.getResponseBodyAsString();
 				// System.out.println("Submit complete, response="
 				// + authpost.getResponseBodyAsString());
 			} else {
