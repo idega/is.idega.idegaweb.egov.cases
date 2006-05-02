@@ -29,6 +29,8 @@ import com.idega.util.IWTimestamp;
 
 public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 	protected String endpoint = "http://10.30.11.55/Case/Case_NewCase_SoapPort.asmx?op=NewCase";
+	
+	protected String BIZTALK_CASE_SERVICE = "BIZTALK_CASESERVICE";
 
 	private GeneralCase genCase = null;
 
@@ -40,6 +42,9 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 
 	private void sendGeneralCase() {
 		try {
+			
+			endpoint = this.getIWApplicationContext().getApplicationSettings().getProperty(BIZTALK_CASE_SERVICE, endpoint);
+			
 			User uOwner = this.genCase.getOwner();
 			Address address = null;
 			PostalCode pCode = null;

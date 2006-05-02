@@ -70,6 +70,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	// protected String URL =
 	// "http://one.kerfisveita.is/datareceiver/saveapplication.aspx";
 	protected String URL = "http://172.29.199.102/datareceiver/saveapplication.aspx";
+	
+	protected String ONESYSTEM_CASE_SERVICE = "ONESYSTEM_CASESERVICE";
+
 
 	private static final String XML_CASE = "case";
 
@@ -495,6 +498,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	}
 
 	private String sendFile(String xml) {
+		URL = this.getIWApplicationContext().getApplicationSettings().getProperty(ONESYSTEM_CASE_SERVICE, URL);
+
 		PostMethod authpost = new PostMethod(this.URL);
 
 		String ret = "-1";
