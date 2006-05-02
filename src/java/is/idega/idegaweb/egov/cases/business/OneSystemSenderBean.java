@@ -498,7 +498,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 	}
 
 	private String sendFile(String xml) {
-		URL = this.getIWApplicationContext().getApplicationSettings().getProperty(ONESYSTEM_CASE_SERVICE, URL);
+		this.URL = this.getIWApplicationContext().getApplicationSettings().getProperty(this.ONESYSTEM_CASE_SERVICE, this.URL);
 
 		PostMethod authpost = new PostMethod(this.URL);
 

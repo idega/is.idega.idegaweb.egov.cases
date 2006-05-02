@@ -43,7 +43,7 @@ public class BizTalkSenderBean extends IBOServiceBean implements Runnable {
 	private void sendGeneralCase() {
 		try {
 			
-			endpoint = this.getIWApplicationContext().getApplicationSettings().getProperty(BIZTALK_CASE_SERVICE, endpoint);
+			this.endpoint = this.getIWApplicationContext().getApplicationSettings().getProperty(this.BIZTALK_CASE_SERVICE, this.endpoint);
 			
 			User uOwner = this.genCase.getOwner();
 			Address address = null;
