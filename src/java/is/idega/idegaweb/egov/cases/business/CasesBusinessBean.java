@@ -271,6 +271,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public void reactivateCase(Object casePK, User performer) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
+		theCase.setHandledBy(performer);
 		
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group)null);
 		
