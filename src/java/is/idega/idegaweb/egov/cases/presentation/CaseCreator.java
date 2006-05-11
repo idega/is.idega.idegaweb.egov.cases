@@ -295,6 +295,8 @@ public class CaseCreator extends ApplicationForm {
 			catch (FinderException fe) {
 				fe.printStackTrace();
 			}
+
+			addWindowToOpen(iwc, getParentPage());
 		}
 		catch (CreateException ce) {
 			ce.printStackTrace();
