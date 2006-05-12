@@ -100,6 +100,8 @@ public class CaseCreator extends ApplicationForm {
 		form.setStyleClass("casesForm");
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1)));
 		
+		addErrors(iwc, form);
+		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString("application.enter_new_case", "Enter new case"), 1, 3));
 
 		form.add(getPersonInfo(iwc, getUser(iwc)));
@@ -133,6 +135,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("required");
 		Label label = new Label(this.iwrb.getLocalizedString("case_type", "Case type"), types);
 		formItem.add(label);
 		formItem.add(types);
@@ -140,6 +143,7 @@ public class CaseCreator extends ApplicationForm {
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("required");
 		label = new Label(this.iwrb.getLocalizedString("case_category", "Case category"), categories);
 		formItem.add(label);
 		formItem.add(categories);
@@ -147,6 +151,7 @@ public class CaseCreator extends ApplicationForm {
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("required");
 		label = new Label(this.iwrb.getLocalizedString("message", "Message"), message);
 		formItem.add(label);
 		formItem.add(message);
@@ -187,7 +192,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		if (message == null || message.length() == 0) {
-			getParentPage().setAlertOnLoad(this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
+			setError(this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
 			showPhaseOne(iwc);
 			return;
 		}
