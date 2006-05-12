@@ -152,6 +152,9 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
+		if (hasError(PARAMETER_MESSAGE)) {
+			formItem.setStyleClass("hasError");
+		}
 		label = new Label(this.iwrb.getLocalizedString("message", "Message"), message);
 		formItem.add(label);
 		formItem.add(message);
@@ -192,7 +195,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		if (message == null || message.length() == 0) {
-			setError(this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
+			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
 			showPhaseOne(iwc);
 			return;
 		}
