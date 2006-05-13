@@ -262,7 +262,7 @@ public class CaseCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = getButtonLink(this.iwrb.getLocalizedString("next", "Next"));
+		Link next = getButtonLink(this.iwrb.getLocalizedString("send", "Send"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
