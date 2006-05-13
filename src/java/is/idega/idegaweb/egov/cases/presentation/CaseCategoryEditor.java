@@ -131,12 +131,12 @@ public class CaseCategoryEditor extends CasesBlock {
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("edit");
-		cell.add(new Text(getResourceBundle().getLocalizedString("delete", "Delete")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("edit", "Edit")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
 		cell.setStyleClass("delete");
-		cell.add(new Text(getResourceBundle().getLocalizedString("edit", "Edit")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("delete", "Delete")));
 		
 		group = table.createBodyRowGroup();
 		int iRow = 1;
