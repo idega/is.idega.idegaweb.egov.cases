@@ -10,12 +10,15 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.data.CaseType;
+
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
+
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -24,7 +27,6 @@ import com.idega.presentation.TableColumn;
 import com.idega.presentation.TableColumnGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
@@ -178,9 +180,6 @@ public class CaseTypeEditor extends CasesBlock {
 	private void showEditor(IWContext iwc, Object caseTypePK) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
-		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("new_edit_case_type", "New/Edit case type"));
-		form.add(heading);
 		
 		TextInput name = new TextInput(PARAMETER_NAME);
 		name.keepStatusOnAction(true);

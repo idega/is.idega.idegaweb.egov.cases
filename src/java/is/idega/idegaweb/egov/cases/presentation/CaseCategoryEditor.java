@@ -10,12 +10,15 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
+
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
+
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -24,7 +27,6 @@ import com.idega.presentation.TableColumn;
 import com.idega.presentation.TableColumnGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
@@ -92,14 +94,15 @@ public class CaseCategoryEditor extends CasesBlock {
 
 	private void showList(IWContext iwc) throws RemoteException {
 		Form form = new Form();
-		form.setStyleClass("casesForm");
+		form.setStyleClass("adminForm");
 		form.setID("caseCategoryEditor");
 		
 		Table2 table = new Table2();
 		table.setWidth("100%");
 		table.setCellpadding(0);
 		table.setCellspacing(0);
-		table.setStyleClass("casesTable");
+		form.setStyleClass("adminTable");
+		form.setStyleClass("ruler");
 		
 		TableColumnGroup columnGroup = table.createColumnGroup();
 		TableColumn column = columnGroup.createColumn();
@@ -207,10 +210,11 @@ public class CaseCategoryEditor extends CasesBlock {
 	
 	private void showEditor(IWContext iwc, Object caseCategoryPK) throws RemoteException {
 		Form form = new Form();
-		form.setStyleClass("casesForm");
+		form.setStyleClass("adminForm");
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("new_edit_case_category", "New/Edit case category"));
-		form.add(heading);
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		form.add(section);
 		
 		TextInput name = new TextInput(PARAMETER_NAME);
 		name.keepStatusOnAction(true);
@@ -244,21 +248,21 @@ public class CaseCategoryEditor extends CasesBlock {
 		}
 		
 		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		Label label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		layer.add(label);
 		layer.add(name);
 		form.add(layer);
 
 		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("description", "Description"), description);
 		layer.add(label);
 		layer.add(description);
 		form.add(layer);
 
 		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("handler_group", "Handler group"));
 		layer.add(label);
@@ -266,7 +270,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		form.add(layer);
 
 		layer = new Layer(Layer.DIV);
-		layer.setStyleClass("formElement");
+		layer.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("order", "Order"), order);
 		layer.add(label);
 		layer.add(order);
