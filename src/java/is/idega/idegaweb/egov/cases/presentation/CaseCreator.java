@@ -29,6 +29,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -136,7 +137,7 @@ public class CaseCreator extends ApplicationForm {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
-		Label label = new Label(this.iwrb.getLocalizedString("case_type", "Case type"), types);
+		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_type", "Case type"))), types);
 		formItem.add(label);
 		formItem.add(types);
 		section.add(formItem);
@@ -144,7 +145,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
-		label = new Label(this.iwrb.getLocalizedString("case_category", "Case category"), categories);
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
 		formItem.add(label);
 		formItem.add(categories);
 		section.add(formItem);
@@ -155,7 +156,7 @@ public class CaseCreator extends ApplicationForm {
 		if (hasError(PARAMETER_MESSAGE)) {
 			formItem.setStyleClass("hasError");
 		}
-		label = new Label(this.iwrb.getLocalizedString("message", "Message"), message);
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString("message", "Message"))), message);
 		formItem.add(label);
 		formItem.add(message);
 		section.add(formItem);
