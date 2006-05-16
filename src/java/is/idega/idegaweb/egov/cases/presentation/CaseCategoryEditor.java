@@ -101,8 +101,8 @@ public class CaseCategoryEditor extends CasesBlock {
 		table.setWidth("100%");
 		table.setCellpadding(0);
 		table.setCellspacing(0);
-		form.setStyleClass("adminTable");
-		form.setStyleClass("ruler");
+		table.setStyleClass("adminTable");
+		table.setStyleClass("ruler");
 		
 		TableColumnGroup columnGroup = table.createColumnGroup();
 		TableColumn column = columnGroup.createColumn();
