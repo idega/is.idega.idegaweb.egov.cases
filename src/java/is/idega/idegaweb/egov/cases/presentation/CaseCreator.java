@@ -118,10 +118,12 @@ public class CaseCreator extends ApplicationForm {
 		
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness(iwc).getCaseCategories(), "getName");
+		categories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_category", "Select category"));
 		categories.keepStatusOnAction(true);
 		categories.setStyleClass("caseCategoryDropdown");
 		
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness(iwc).getCaseTypes(), "getName");
+		types.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_type", "Select type"));
 		types.keepStatusOnAction(true);
 		types.setStyleClass("caseTypeDropdown");
 		
@@ -178,6 +180,21 @@ public class CaseCreator extends ApplicationForm {
 	}
 	
 	private void showOverview(IWContext iwc) throws RemoteException {
+		if (!iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK)) {
+			setError(PARAMETER_CASE_CATEGORY_PK, this.iwrb.getLocalizedString("case_creator.category_empty", "You must select a category"));
+		}
+		if (!iwc.isParameterSet(PARAMETER_CASE_TYPE_PK)) {
+			setError(PARAMETER_CASE_TYPE_PK, this.iwrb.getLocalizedString("case_creator.type_empty", "You must select a type"));
+		}
+		if (!iwc.isParameterSet(PARAMETER_MESSAGE)) {
+			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
+		}
+		
+		if (hasErrors()) {
+			showPhaseOne(iwc);
+			return;
+		}
+
 		Form form = new Form();
 		form.setStyleClass("casesForm");
 		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
@@ -194,13 +211,10 @@ public class CaseCreator extends ApplicationForm {
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
 		
-		String message = iwc.getParameter(PARAMETER_MESSAGE);
-		if (message == null || message.length() == 0) {
-			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString("case_creator.message_empty", "You must enter a message"));
-			showPhaseOne(iwc);
-			return;
-		}
+		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
+		String message = iwc.getParameter(PARAMETER_MESSAGE);
+		
 		CaseCategory category = null;
 		try {
 			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
@@ -208,7 +222,7 @@ public class CaseCreator extends ApplicationForm {
 		catch (FinderException fe) {
 			throw new IBORuntimeException(fe);
 		}
-		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
+
 		CaseType type = null;
 		try {
 			type = getCasesBusiness(iwc).getCaseType(caseTypePK);
