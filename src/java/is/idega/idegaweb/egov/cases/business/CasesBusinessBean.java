@@ -224,7 +224,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 			Iterator iter = handlers.iterator();
 			while (iter.hasNext()) {
 				User handler = (User) iter.next();
-				sendMessage(theCase, handler, null, subject, body);
+				sendMessage(theCase, handler, sender, subject, body);
 			}
 			
 			Object[] arguments2 = { theCase.getCaseCategory().getName() };
