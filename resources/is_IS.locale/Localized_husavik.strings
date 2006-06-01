@@ -1,3 +1,4 @@
 case_sent_body={0} hefur sent inn n\u00FDtt erindi \u00ED m\u00E1laflokknum {1}.\r\n\r\nErindi\u00F0 er eftirfarandi\:\r\n{2}\r\n\r\nEf \u00FE\u00FA ert ekki \u00FEegar innskr\u00E1\u00F0/ur \u00ED kerfi\u00F0, \u00FE\u00E1 skr\u00E1ir \u00FE\u00FA \u00FEig inn \u00E1 https\://husavik.skjalfandi.is. Smellir \u00FEar \u00E1 Opin m\u00E1l \u00ED flipanum Umsj\u00F3n til a\u00F0 taka a\u00F0 \u00FE\u00E9r erindi\u00F0 og svara \u00FEv\u00ED.
 case_sent_confirmation_body=Erindi \u00FEitt \u00ED m\u00E1laflokknum {0} hefur veri\u00F0 m\u00F3tteki\u00F0 og ver\u00F0ur afgreitt eins flj\u00F3tt og au\u00F0i\u00F0 er. \u00DE\u00FA f\u00E6r\u00F0 uppl\u00FDsingar um afgrei\u00F0slu erindisins \u00E1 s\u00ED\u00F0unni M\u00E1lin \u00FE\u00EDn. Um lei\u00F0 og breytingar ver\u00F0a \u00E1 st\u00F6\u00F0u erindis f\u00E6r\u00F0u skilabo\u00F0 \u00ED \u00FEj\u00F3nustug\u00E1ttina og \u00E1 uppgefi\u00F0 netfang.\r\n\r\n\r\n
+my_page=Til baka
 process=Sta\u00F0festa
