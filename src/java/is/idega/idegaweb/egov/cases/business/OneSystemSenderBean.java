@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.mail.MessagingException;
+
 import org.apache.axis.encoding.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -49,6 +51,7 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.LocaleUtil;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.SendMail;
 import com.idega.util.text.Name;
 import com.idega.xml.XMLCDATA;
 import com.idega.xml.XMLDocument;
@@ -514,15 +517,69 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			if (status == HttpStatus.SC_OK) {
 				ret = authpost.getResponseBodyAsString();
-				// System.out.println("Submit complete, response="
-				// + authpost.getResponseBodyAsString());
 			} else {
 				ret = "-1";
-				// System.out.println("Submit failed, response="
-				// + HttpStatus.getStatusText(status));
+				String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
+				String mailserver = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
+				
+				if (from == null) {
+					from = "arborg@sunnan3.is";
+				}
+				
+				if (mailserver == null) {
+					mailserver = "ns1.anza.is";
+				}
+				
+				StringBuffer to = new StringBuffer("palli@idega.is");
+				StringBuffer cc = new StringBuffer("eos@onesystems.is,siggi@sunnan3.is,geir@anza.is");
+				
+				StringBuffer message = new StringBuffer("Case number: ");
+				if (this.application != null) {
+					message.append(application.getUniqueId());
+				} else {
+					message.append(genCase.getUniqueId());					
+				}
+				message.append("\n\n");
+				message.append("Error:\n");
+				message.append(HttpStatus.getStatusText(status));
+				
+				SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
+						"Villa ’ svari fra OS", message.toString());
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
+			String mailserver = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
+			
+			if (from == null) {
+				from = "arborg@sunnan3.is";
+			}
+			
+			if (mailserver == null) {
+				mailserver = "ns1.anza.is";
+			}
+			
+			StringBuffer to = new StringBuffer("palli@idega.is");
+			StringBuffer cc = new StringBuffer("eos@onesystems.is,siggi@sunnan3.is,geir@anza.is");
+			
+			StringBuffer message = new StringBuffer("Case number: ");
+			if (this.application != null) {
+				message.append(application.getUniqueId());
+			} else {
+				message.append(genCase.getUniqueId());					
+			}
+			message.append("\n\n");
+			message.append("Error:\n");
+			if (ex.getMessage() != null) { 
+				message.append(ex.getMessage());
+				message.append("\n\n");
+			}
+			
+			try {
+				SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
+						"Villa ’ sendingu til OS", message.toString());
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}
 		} finally {
 			authpost.releaseConnection();
 		}
@@ -1179,4 +1236,27 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			throw new IBORuntimeException(ile);
 		}
 	}
+	
+/*	public static void main(String args[]) {
+			String from = "palli@idega.is";
+		
+			String mailserver = "mail.idega.is";
+		
+		StringBuffer to = new StringBuffer("kaja@hive.is");
+		StringBuffer cc = new StringBuffer("palli@idega.is,bluebottle@hive.is");
+		
+		StringBuffer message = new StringBuffer("Case number: ");
+			message.append("2123123142342");
+
+			message.append("\n\n");
+		message.append("Error:\n");
+		message.append("Eitthva? bila?");
+		
+		try {
+			SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
+					"Villa ’ svari fra OS", message.toString());
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+	}*/
 }
