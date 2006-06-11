@@ -535,9 +535,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				
 				StringBuffer message = new StringBuffer("Case number: ");
 				if (this.application != null) {
-					message.append(application.getUniqueId());
+					message.append(this.application.getUniqueId());
 				} else {
-					message.append(genCase.getUniqueId());					
+					message.append(this.genCase.getUniqueId());					
 				}
 				message.append("\n\n");
 				message.append("Error:\n");
@@ -563,9 +563,9 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			
 			StringBuffer message = new StringBuffer("Case number: ");
 			if (this.application != null) {
-				message.append(application.getUniqueId());
+				message.append(this.application.getUniqueId());
 			} else {
-				message.append(genCase.getUniqueId());					
+				message.append(this.genCase.getUniqueId());					
 			}
 			message.append("\n\n");
 			message.append("Error:\n");
