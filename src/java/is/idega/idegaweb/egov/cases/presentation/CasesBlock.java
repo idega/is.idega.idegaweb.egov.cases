@@ -14,6 +14,8 @@ import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
 
+import com.idega.block.process.data.CaseLog;
+import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -26,11 +28,16 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
+import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.Label;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.Name;
 
 
 public abstract class CasesBlock extends Block {
@@ -118,6 +125,63 @@ public abstract class CasesBlock extends Block {
 		return layer;
 	}
 
+	protected Layer getHandlerLayer(IWContext iwc, IWResourceBundle iwrb, CaseLog log) throws RemoteException {
+		Layer layer = new Layer(Layer.DIV);
+		layer.setStyleClass("handlerLayer");
+		
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
+		heading.setStyleClass("subHeader");
+		layer.add(heading);
+		
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		layer.add(section);
+		
+		User user = log.getPerformer();
+		IWTimestamp stamp = new IWTimestamp(log.getTimeStamp());
+		CaseStatus status = log.getCaseStatusAfter();
+		String reply = log.getComment();
+		
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label();
+		label.setLabel(iwrb.getLocalizedString("handler", "Handler"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true))));
+		section.add(formItem);
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		label = new Label();
+		label.setLabel(iwrb.getLocalizedString("timestamp", "Timestamp"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
+		section.add(formItem);
+		
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		label = new Label();
+		label.setLabel(iwrb.getLocalizedString("status", "Status"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale()))));
+		section.add(formItem);
+		
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("informationItem");
+		label = new Label();
+		label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(reply)));
+		section.add(formItem);
+		
+		Layer clear = new Layer(Layer.DIV);
+		clear.setStyleClass("Clear");
+		section.add(clear);
+		
+		return layer;
+	}
+	
 	private void initialize(IWContext iwc) {
 		setResourceBundle(getResourceBundle(iwc));
 		setBundle(getBundle(iwc));

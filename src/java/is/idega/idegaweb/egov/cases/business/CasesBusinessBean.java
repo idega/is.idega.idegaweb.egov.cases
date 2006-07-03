@@ -16,19 +16,24 @@ import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
+
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
+
 import se.idega.idegaweb.commune.message.business.CommuneMessageBusiness;
+
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
 import com.idega.block.process.data.Case;
+import com.idega.block.process.data.CaseLog;
 import com.idega.business.IBORuntimeException;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
@@ -166,6 +171,30 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		}
 	}
 	
+	public Collection getCaseLogs(GeneralCase theCase) {
+		try {
+			Collection logs = getCaseLogsByCase(theCase);
+			Collection returner = new ArrayList(logs);
+			User owner = theCase.getOwner();
+			
+			Iterator iter = logs.iterator();
+			while (iter.hasNext()) {
+				CaseLog log = (CaseLog) iter.next();
+				if (log.getPerformer().equals(owner)) {
+					returner.remove(log);
+				}
+				else if (log.getComment() == null || log.getComment().length() == 0) {
+					returner.remove(log);
+				}
+			}
+			
+			return returner;
+		}
+		catch (FinderException e) {
+			return new ArrayList();
+		}
+	}
+	
 	public void removeCaseCategory(Object caseCategoryPK) throws FinderException, RemoveException {
 		getCaseCategory(caseCategoryPK).remove();
 	}
@@ -247,7 +276,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		CaseType type = getCaseType(caseTypePK);
 		theCase.setCaseType(type);
 		
-		changeCaseStatus(theCase, status, performer, (Group)null);
+		changeCaseStatus(theCase, status, reply, performer, (Group)null, true);
 		
 		Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(getCaseStatus(status), locale) };
 		String subject = getLocalizedString("case_handled_subject", "Your case has been handled");

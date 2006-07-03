@@ -13,14 +13,19 @@ import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.data.CaseLog;
+import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -111,6 +116,15 @@ public class CaseViewer extends CaseCreator {
 			clear.setStyleClass("Clear");
 			section.add(clear);
 			
+			Collection logs = getCasesBusiness(iwc).getCaseLogs(theCase);
+			if (!logs.isEmpty()) {
+				Iterator iter = logs.iterator();
+				while (iter.hasNext()) {
+					CaseLog log = (CaseLog) iter.next();
+					form.add(getHandlerLayer(iwc, iwrb, log));
+				}
+			}
+			else {
 				Layer handler = new Layer(Layer.SPAN);
 				if (user != null) {
 					handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));
@@ -148,7 +162,8 @@ public class CaseViewer extends CaseCreator {
 				}
 				
 				section.add(clear);
-		
+			}
+			
 			Layer bottom = new Layer(Layer.DIV);
 			bottom.setStyleClass("bottom");
 			form.add(bottom);
@@ -171,6 +186,63 @@ public class CaseViewer extends CaseCreator {
 		catch (RemoteException re) {
 			throw new IBORuntimeException(re);
 		}
+	}
+	
+	private Layer getHandlerLayer(IWContext iwc, IWResourceBundle iwrb, CaseLog log) throws RemoteException {
+		Layer layer = new Layer(Layer.DIV);
+		layer.setStyleClass("handlerLayer");
+		
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
+		heading.setStyleClass("subHeader");
+		layer.add(heading);
+		
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		layer.add(section);
+		
+		User user = log.getPerformer();
+		IWTimestamp stamp = new IWTimestamp(log.getTimeStamp());
+		CaseStatus status = log.getCaseStatusAfter();
+		String reply = log.getComment();
+		
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label();
+		label.setLabel(iwrb.getLocalizedString("handler", "Handler"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true))));
+		section.add(formItem);
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		label = new Label();
+		label.setLabel(iwrb.getLocalizedString("timestamp", "Timestamp"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
+		section.add(formItem);
+		
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		label = new Label();
+		label.setLabel(iwrb.getLocalizedString("status", "Status"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale()))));
+		section.add(formItem);
+		
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("informationItem");
+		label = new Label();
+		label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(reply)));
+		section.add(formItem);
+		
+		Layer clear = new Layer(Layer.DIV);
+		clear.setStyleClass("Clear");
+		section.add(clear);
+		
+		return layer;
 	}
 	
 	protected ICPage getHomePage() {

@@ -15,9 +15,11 @@ import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.data.CaseLog;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -166,6 +168,15 @@ public class MyCases extends CasesProcessor {
 		section.add(element);
 
 		section.add(clear);
+
+		Collection logs = getCasesBusiness(iwc).getCaseLogs(theCase);
+		if (!logs.isEmpty()) {
+			Iterator iter = logs.iterator();
+			while (iter.hasNext()) {
+				CaseLog log = (CaseLog) iter.next();
+				form.add(getHandlerLayer(iwc, this.getResourceBundle(), log));
+			}
+		}
 
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
