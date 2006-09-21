@@ -8,15 +8,18 @@
   <currentVersion>1.0.2</currentVersion>
   <inceptionYear>2005</inceptionYear>
   <shortDescription>eGov General Cases</shortDescription>
-
   <versions>
     <version>
       <id>1.0.1</id>
       <name>1.0.1</name>
       <tag>CASES_1_0_1</tag>
     </version>
+    <version>
+      <id>1.0.2</id>
+      <name>1.0.2</name>
+      <tag>CASES_1_0_2</tag>
+    </version>
   </versions>
-
   <branches/>
   <developers>
     <developer>
@@ -102,6 +105,7 @@
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune</artifactId>
       <!--version>1.0.1</version-->
+
       <version>SNAPSHOT</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
@@ -113,6 +117,7 @@
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.care</artifactId>
       <!--version>1.0.1</version-->
+
       <version>SNAPSHOT</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
@@ -124,7 +129,6 @@
       <groupId>bundles</groupId>
       <artifactId>org.apache.axis</artifactId>
       <version>1.3</version>
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -183,7 +187,6 @@
       <url>http://ws.apache.org/axis</url>
     </dependency>
   </dependencies>
-
   <build>
     <sourceDirectory>src/java</sourceDirectory>
     <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
@@ -194,5 +197,4 @@
     </unitTest>
   </build>
   <properties/>
-
 </project>
