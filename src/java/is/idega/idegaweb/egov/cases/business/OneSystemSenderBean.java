@@ -454,42 +454,6 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
-/*			// messagebox_smtp_mailserver
-			File xmlFile = File.createTempFile("testOS", ".xml");
-
-			FileOutputStream out = new FileOutputStream(xmlFile);
-
-			XMLOutput output = new XMLOutput(" ", true);
-			output.setLineSeparator(System.getProperty("line.separator"));
-			output.setTextNormalize(true);
-			output.setEncoding("UTF-8");
-			output.output(doc, out);
-
-			out.close();
-
-			String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
-			String mailserver = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
-			
-			System.out.println("from = " + from);
-			System.out.println("mailserver = " + mailserver);
-			if (outputString == null) {
-				System.out.println("outputstring is null");
-			}
-			if (xmlFile == null) {
-				System.out.println("xmlFile is null");
-			}
-			
-			if (from == null) {
-				from = "arborg@sunnan3.is";
-			}
-			
-			if (mailserver == null) {
-				mailserver = "ns1.anza.is";
-			}
-			
-			SendMail.send(from, "palli@idega.is", null, null, mailserver,
-					"test", outputString, xmlFile);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -517,6 +481,35 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 
 			if (status == HttpStatus.SC_OK) {
 				ret = authpost.getResponseBodyAsString();
+				System.out.println("Answer from one system = " + ret);
+				
+				if (ret == null || "".equals(ret.trim())) {
+					ret = "-1";
+					String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
+					String mailserver = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
+					
+					if (from == null) {
+						from = "arborg@sunnan3.is";
+					}
+					
+					if (mailserver == null) {
+						mailserver = "ns1.anza.is";
+					}
+					
+					StringBuffer to = new StringBuffer("palli@idega.is");
+					StringBuffer cc = new StringBuffer("eos@onesystems.is,siggi@sunnan3.is,geir@anza.is");
+					
+					StringBuffer message = new StringBuffer("Case number: ");
+					if (this.application != null) {
+						message.append(this.application.getUniqueId());
+					} else {
+						message.append(this.genCase.getUniqueId());					
+					}
+					message.append("\n\n");
+					
+					SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
+							"Tomt svar fra OS", message.toString());
+				}
 			} else {
 				ret = "-1";
 				String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
@@ -547,6 +540,8 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 						"Villa ’ svari fra OS", message.toString());
 			}
 		} catch (Exception ex) {
+			ex.printStackTrace();
+			
 			String from = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_from_mailaddress");
 			String mailserver = getIWApplicationContext().getApplicationSettings().getProperty("messagebox_smtp_mailserver");
 			
