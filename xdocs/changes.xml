@@ -1,21 +1,26 @@
 <document>
-  <properties>
-    <title>Cases changes</title>
-    <author email="laddi@idega.com">Thorhallur "Laddi" Helgason</author>
-  </properties>
-  
-  <body>
-  	<release version="1.0.2" date="2006-09-21">
-		<action dev="palli" type="update">
-			Added a new check on the response from the one systems web service.      
-		</action>
-    </release>
-  
-   <release version="1.0.1" date="2006-07-11">
-      <action dev="laddi" type="update">
-        Declaring new version of block.
-      </action>
-    </release>
-
-  </body>
+	<properties>
+		<title>Cases changes</title>
+		<author email="laddi@idega.com">Thorhallur "Laddi" Helgason</author>
+	</properties>
+	
+	<body>
+		<release version="1.0.3" date="2006-09-29">
+			<action dev="palli" type="update">
+				Added check on empty respones and if empty then a mail is now sent out.      
+			</action>
+		</release>
+		
+		<release version="1.0.2" date="2006-09-21">
+			<action dev="palli" type="update">
+				Added a new check on the response from the one systems web service.      
+			</action>
+		</release>
+		
+		<release version="1.0.1" date="2006-07-11">
+			<action dev="laddi" type="update">
+				Declaring new version of block.
+			</action>
+		</release>
+	</body>
 </document>

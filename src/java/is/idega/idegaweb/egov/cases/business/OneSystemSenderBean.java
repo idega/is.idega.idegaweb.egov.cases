@@ -470,9 +470,6 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		try {
 			HttpClient client = new HttpClient();
 
-			System.out.println("XML = " + URLEncoder
-					.encode(xml, "ISO-8859-1"));
-			
 			NameValuePair file = new NameValuePair("xmldata", URLEncoder
 					.encode(xml, "ISO-8859-1"));
 			authpost.setRequestBody(new NameValuePair[] { file });
