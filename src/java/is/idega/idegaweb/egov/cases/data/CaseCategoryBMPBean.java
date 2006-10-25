@@ -12,6 +12,7 @@ package is.idega.idegaweb.egov.cases.data;
 import java.util.Collection;
 import javax.ejb.FinderException;
 import com.idega.data.GenericEntity;
+import com.idega.data.query.MatchCriteria;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
 import com.idega.user.data.Group;
@@ -25,6 +26,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	private static final String COLUMN_DESCRIPTION = "description";
 	private static final String COLUMN_HANDLER_GROUP = "handler_group";
 	private static final String COLUMN_ORDER = "category_order";
+	private static final String COLUMN_PARENT_CATEGORY = "parent_category";
 	
 	public String getEntityName() {
 		return ENTITY_NAME;
@@ -39,6 +41,8 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		
 		addManyToOneRelationship(COLUMN_HANDLER_GROUP, Group.class);
 		setNullable(COLUMN_HANDLER_GROUP, false);
+		
+		addManyToOneRelationship(COLUMN_PARENT_CATEGORY, CaseCategory.class);
 	}
 	
 	//Getters
@@ -56,6 +60,10 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	
 	public int getOrder() {
 		return getIntColumnValue(COLUMN_ORDER);
+	}
+	
+	public CaseCategory getParent() {
+		return (CaseCategory) getColumnValue(COLUMN_PARENT_CATEGORY);
 	}
 	
 	//Setters
@@ -79,12 +87,28 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		setColumn(COLUMN_ORDER, order);
 	}
 	
+	public void setParent(CaseCategory category) {
+		setColumn(COLUMN_PARENT_CATEGORY, category);
+	}
+	
 	//Finders
-	public Collection ejbFindAll() throws FinderException {
+	public Collection ejbFindAllTopLevelCategories() throws FinderException {
 		Table table = new Table(this);
 		
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName());
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_PARENT_CATEGORY)));
+		query.addOrder(table, COLUMN_ORDER, true);
+		
+		return idoFindPKsByQuery(query);
+	}
+	
+	public Collection ejbFindAllSubCategories(CaseCategory category) throws FinderException {
+		Table table = new Table(this);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_PARENT_CATEGORY), MatchCriteria.EQUALS, category));
 		query.addOrder(table, COLUMN_ORDER, true);
 		
 		return idoFindPKsByQuery(query);

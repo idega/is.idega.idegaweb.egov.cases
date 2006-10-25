@@ -86,7 +86,7 @@ public class CaseFinder extends CasesBlock {
 		
 		Layer helpLayer = new Layer(Layer.DIV);
 		helpLayer.setStyleClass("helperText");
-		helpLayer.add(new Text(getResourceBundle().getLocalizedString("case_finder.information_text", "Information text here...")));
+		helpLayer.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_finder.information_text", "Information text here...")));
 		layer.add(helpLayer);
 		
 		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
@@ -110,21 +110,21 @@ public class CaseFinder extends CasesBlock {
 		
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("case_number", "Case number"), caseNumber);
+		Label label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "case_number", "Case number"), caseNumber);
 		element.add(label);
 		element.add(caseNumber);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
+		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name"), name);
 		element.add(label);
 		element.add(name);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString("personal_id", "Personal ID"), personalID);
+		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "personal_id", "Personal ID"), personalID);
 		element.add(label);
 		element.add(personalID);
 		layer.add(element);
@@ -175,7 +175,7 @@ public class CaseFinder extends CasesBlock {
 		}
 		
 		if (cases.isEmpty()) {
-			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));
+			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "search_results.nothing_found", "Nothing found"));
 			heading.setStyleClass("errorHeading");
 			add(heading);
 		}
@@ -198,13 +198,13 @@ public class CaseFinder extends CasesBlock {
 			TableRow row = group.createRow();
 			TableCell2 cell = row.createHeaderCell();
 			cell.setStyleClass("firstColumn");
-			cell.add(new Text(getResourceBundle().getLocalizedString("case_nr", "Case nr.")));
+			cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
 			
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "sender", "Sender")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "status", "Status")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "handler", "Handler")));
 	
 			cell = row.createHeaderCell();
 			cell.setStyleClass("lastColumn");
@@ -231,7 +231,7 @@ public class CaseFinder extends CasesBlock {
 				}
 				
 				boolean addProcessLink = false;
-				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")));
+				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 				if (this.openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
@@ -252,11 +252,16 @@ public class CaseFinder extends CasesBlock {
 				cell.setStyleClass("firstColumn");
 				cell.add(new Text(theCase.getPrimaryKey().toString()));
 	
-				row.createCell().add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
+				if (owner != null) {
+					row.createCell().add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
+				}
+				else {
+					row.createCell().add(new Text("-"));
+				}
 				row.createCell().add(new Text(type.getName()));
 				row.createCell().add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 	
-				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale())));
+				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
 				
 				if (handler != null) {
 					row.createCell().add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));

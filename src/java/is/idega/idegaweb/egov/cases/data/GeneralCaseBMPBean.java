@@ -32,6 +32,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 	private static final String COLUMN_REPLY = "reply";
 	private static final String COLUMN_CASE_CATEGORY = "case_category";
 	private static final String COLUMN_CASE_TYPE = "case_type";
+	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	
 	/* (non-Javadoc)
@@ -57,6 +58,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		
 		addAttribute(COLUMN_MESSAGE, "Message", String.class, 4000);
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
+		addAttribute(COLUMN_TYPE, "Type", String.class);
 		
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -81,6 +83,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		return reply;
 	}
 	
+	public String getType() {
+		return getStringColumnValue(COLUMN_TYPE);
+	}
+	
 	public CaseCategory getCaseCategory() {
 		return (CaseCategory) getColumnValue(COLUMN_CASE_CATEGORY);
 	}
@@ -100,6 +106,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 	
 	public void setReply(String reply) {
 		setColumn(COLUMN_REPLY, reply);
+	}
+	
+	public void setType(String type) {
+		setColumn(COLUMN_TYPE, type);
 	}
 	
 	public void setCaseCategory(CaseCategory category) {

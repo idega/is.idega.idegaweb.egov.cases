@@ -91,32 +91,32 @@ public abstract class CasesProcessor extends CasesBlock {
 		TableCell2 cell = row.createHeaderCell();
 		cell.setStyleClass("firstColumn");
 		cell.setStyleClass("caseNumber");
-		cell.add(new Text(getResourceBundle().getLocalizedString("case_nr", "Case nr.")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("sender");
-		cell.add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "sender", "Sender")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("caseType");
-		cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("createdDate");
-		cell.add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("status");
-		cell.add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "status", "Status")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("handler");
-		cell.add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "handler", "Handler")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
 		cell.setStyleClass("view");
-		cell.add(new Text(getResourceBundle().getLocalizedString("view", "View")));
+		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "view", "View")));
 		
 		group = table.createBodyRowGroup();
 		int iRow = 1;
@@ -144,8 +144,12 @@ public abstract class CasesProcessor extends CasesBlock {
 
 			cell = row.createCell();
 			cell.setStyleClass("sender");
-			cell.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
-			
+			if (owner != null) {
+				cell.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
+			}
+			else {
+				cell.add(new Text("-"));
+			}
 			cell = row.createCell();
 			cell.setStyleClass("caseType");
 			cell.add(new Text(type.getName()));
@@ -156,7 +160,7 @@ public abstract class CasesProcessor extends CasesBlock {
 
 			cell = row.createCell();
 			cell.setStyleClass("status");
-			cell.add(new Text(getBusiness().getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale())));
+			cell.add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
 			
 			User handler = theCase.getHandledBy();
 			cell = row.createCell();
@@ -171,7 +175,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			cell = row.createCell();
 			cell.setStyleClass("lastColumn");
 			cell.setStyleClass("view");
-			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")), theCase));
+			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
 			
 			if (iRow % 2 == 0) {
 				row.setStyleClass("evenRow");

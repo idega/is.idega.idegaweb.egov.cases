@@ -56,13 +56,14 @@ public class ClosedCases extends CasesProcessor {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
+		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 		
 		form.add(getPersonInfo(iwc, owner));
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_overview", "Case overview"));
+		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "case_overview", "Case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
@@ -97,23 +98,45 @@ public class ClosedCases extends CasesProcessor {
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type"));
 		element.add(label);
 		element.add(caseType);
 		layer.add(element);
 
+		if (getCasesBusiness(iwc).useSubCategories()) {
+			Layer parentCaseCategory = new Layer(Layer.SPAN);
+			parentCaseCategory.add(new Text(parentCategory.getName()));
+			
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_category", "Case category"));
+			element.add(label);
+			element.add(parentCaseCategory);
+			layer.add(element);
+			
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "sub_case_category", "Sub case category"));
+			element.add(label);
+			element.add(caseCategory);
+			layer.add(element);
+		}
+		else {
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_category", "Case category"));
+			element.add(label);
+			element.add(caseCategory);
+			layer.add(element);
+		}
+		
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
-		element.add(label);
-		element.add(caseCategory);
-		layer.add(element);
-
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);
 		layer.add(element);
@@ -122,7 +145,7 @@ public class ClosedCases extends CasesProcessor {
 		element.setStyleClass("formItem");
 		element.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("message", "Message"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "message", "Message"));
 		element.add(label);
 		element.add(message);
 		layer.add(element);
@@ -131,7 +154,7 @@ public class ClosedCases extends CasesProcessor {
 		clear.setStyleClass("Clear");
 		layer.add(clear);
 
-		heading = new Heading1(getResourceBundle().getLocalizedString("handle_overview", "Handle overview"));
+		heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "handle_overview", "Handle overview"));
 		heading.setStyleClass("subHeader");
 		form.add(heading);
 		
@@ -142,7 +165,7 @@ public class ClosedCases extends CasesProcessor {
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("handler", "Handler"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "handler", "Handler"));
 		element.add(label);
 		element.add(handler);
 		layer.add(element);
@@ -151,7 +174,7 @@ public class ClosedCases extends CasesProcessor {
 		element.setStyleClass("formItem");
 		element.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("reply", "Reply"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "reply", "Reply"));
 		element.add(label);
 		element.add(reply);
 		layer.add(element);
@@ -167,7 +190,7 @@ public class ClosedCases extends CasesProcessor {
 		back.setToFormSubmit(form);
 		bottom.add(back);
 
-		Link next = getButtonLink(getResourceBundle().getLocalizedString("reactivate_case", "Reactivate case"));
+		Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "reactivate_case", "Reactivate case"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);

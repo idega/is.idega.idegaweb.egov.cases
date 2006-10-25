@@ -82,13 +82,14 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
+		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 		
 		form.add(getPersonInfo(iwc, owner));
 		
-		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("case_overview", "Case overview"));
+		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "case_overview", "Case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
@@ -112,23 +113,45 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type"));
 		element.add(label);
 		element.add(caseType);
 		section.add(element);
 
+		if (getCasesBusiness(iwc).useSubCategories()) {
+			Layer parentCaseCategory = new Layer(Layer.SPAN);
+			parentCaseCategory.add(new Text(parentCategory.getName()));
+			
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_category", "Case category"));
+			element.add(label);
+			element.add(parentCaseCategory);
+			section.add(element);
+			
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "sub_case_category", "Sub case category"));
+			element.add(label);
+			element.add(caseCategory);
+			section.add(element);
+		}
+		else {
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_category", "Case category"));
+			element.add(label);
+			element.add(caseCategory);
+			section.add(element);
+		}
+		
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
-		element.add(label);
-		element.add(caseCategory);
-		section.add(element);
-
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);
 		section.add(element);
@@ -136,7 +159,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("message", "Message"));
+		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "message", "Message"));
 		element.add(label);
 		element.add(message);
 		section.add(element);
@@ -149,7 +172,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString("take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"));
+		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		next.setToFormSubmit(form);
 		bottom.add(next);

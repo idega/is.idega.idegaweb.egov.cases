@@ -5,6 +5,19 @@
 	</properties>
 	
 	<body>
+
+		<release version="1.0.4" date="2006-10-20">
+			<action dev="laddi" type="update">
+				Added possibility to send anonymous cases.
+			</action>
+			<action dev="laddi" type="update">
+				Added support for sub categories.
+			</action>
+			<action dev="laddi" type="update">
+				Added possibility to set case typ to all presentation objects which is then used in localized strings.
+			</action>
+		</release>
+		
 		<release version="1.0.3" date="2006-09-29">
 			<action dev="palli" type="update">
 				Added check on empty respones and if empty then a mail is now sent out.      

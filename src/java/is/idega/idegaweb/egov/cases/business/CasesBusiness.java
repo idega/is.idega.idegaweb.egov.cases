@@ -5,6 +5,7 @@ import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.data.Case;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import javax.ejb.CreateException;
+import com.idega.block.process.data.CaseStatus;
 import com.idega.user.data.User;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import java.rmi.RemoteException;
@@ -21,6 +22,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseDescription
 	 */
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseStatusDescription
+	 */
+	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getGeneralCase
@@ -58,6 +64,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Collection getCaseCategories() throws RemoteException;
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
+	 */
+	public Collection getSubCategories(CaseCategory category) throws RemoteException;
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseLogs
 	 */
 	public Collection getCaseLogs(GeneralCase theCase) throws RemoteException;
@@ -85,7 +96,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message) throws CreateException, RemoteException;
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#handleCase
@@ -105,7 +116,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseCategory
 	 */
-	public void storeCaseCategory(Object caseCategoryPK, String name, String description, Object groupPK, int order) throws FinderException, CreateException, RemoteException;
+	public void storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int order) throws FinderException, CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseType
@@ -116,4 +127,9 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#canDeleteCase
 	 */
 	public boolean canDeleteCase(Case theCase) throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#useSubCategories
+	 */
+	public boolean useSubCategories() throws RemoteException;
 }

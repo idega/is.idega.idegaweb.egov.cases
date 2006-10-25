@@ -14,6 +14,7 @@ import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
@@ -49,6 +50,7 @@ public abstract class CasesBlock extends Block {
 	private IWResourceBundle iwrb;
 	
 	private ICPage iHomePage;
+	private String iType;
 
 	public void main(IWContext iwc) throws Exception {
 		initialize(iwc);
@@ -85,51 +87,53 @@ public abstract class CasesBlock extends Block {
 	}
 	
 	protected Layer getPersonInfo(IWContext iwc, User user) throws RemoteException {
-		Address address = getUserBusiness(iwc).getUsersMainAddress(user);
-		PostalCode postal = null;
-		if (address != null) {
-			postal = address.getPostalCode();
-		}
-
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("info");
 		
-		Layer personInfo = new Layer(Layer.DIV);
-		personInfo.setStyleClass("personInfo");
-		personInfo.setID("name");
-		personInfo.add(new Text(user.getName()));
-		layer.add(personInfo);
-		
-		personInfo = new Layer(Layer.DIV);
-		personInfo.setStyleClass("personInfo");
-		personInfo.setID("personalID");
-		personInfo.add(new Text(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())));
-		layer.add(personInfo);
-		
-		personInfo = new Layer(Layer.DIV);
-		personInfo.setStyleClass("personInfo");
-		personInfo.setID("address");
-		if (address != null) {
-			personInfo.add(new Text(address.getStreetAddress()));
+		if (user != null) {
+			Address address = getUserBusiness(iwc).getUsersMainAddress(user);
+			PostalCode postal = null;
+			if (address != null) {
+				postal = address.getPostalCode();
+			}
+	
+			Layer personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("name");
+			personInfo.add(new Text(user.getName()));
+			layer.add(personInfo);
+			
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("personalID");
+			personInfo.add(new Text(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())));
+			layer.add(personInfo);
+			
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("address");
+			if (address != null) {
+				personInfo.add(new Text(address.getStreetAddress()));
+			}
+			layer.add(personInfo);
+			
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("postal");
+			if (postal != null) {
+				personInfo.add(new Text(postal.getPostalAddress()));
+			}
+			layer.add(personInfo);
 		}
-		layer.add(personInfo);
-		
-		personInfo = new Layer(Layer.DIV);
-		personInfo.setStyleClass("personInfo");
-		personInfo.setID("postal");
-		if (postal != null) {
-			personInfo.add(new Text(postal.getPostalAddress()));
-		}
-		layer.add(personInfo);
 		
 		return layer;
 	}
 
-	protected Layer getHandlerLayer(IWContext iwc, IWResourceBundle iwrb, CaseLog log) throws RemoteException {
+	protected Layer getHandlerLayer(IWContext iwc, IWResourceBundle iwrb, Case theCase, CaseLog log) throws RemoteException {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("handlerLayer");
 		
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
+		Heading1 heading = new Heading1(iwrb.getLocalizedString(getPrefix() + "handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		layer.add(heading);
 		
@@ -145,7 +149,7 @@ public abstract class CasesBlock extends Block {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(iwrb.getLocalizedString("handler", "Handler"));
+		label.setLabel(iwrb.getLocalizedString(getPrefix() + "handler", "Handler"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true))));
 		section.add(formItem);
@@ -153,7 +157,7 @@ public abstract class CasesBlock extends Block {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("timestamp", "Timestamp"));
+		label.setLabel(iwrb.getLocalizedString(getPrefix() + "timestamp", "Timestamp"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
 		section.add(formItem);
@@ -161,16 +165,16 @@ public abstract class CasesBlock extends Block {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("status", "Status"));
+		label.setLabel(iwrb.getLocalizedString(getPrefix() + "status", "Status"));
 		formItem.add(label);
-		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(status, iwc.getCurrentLocale()))));
+		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 		section.add(formItem);
 		
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
+		label.setLabel(iwrb.getLocalizedString(getPrefix() + "reply", "Reply"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(reply)));
 		section.add(formItem);
@@ -189,6 +193,15 @@ public abstract class CasesBlock extends Block {
 		this.userBusiness = getUserBusiness(iwc);
 	}
 	
+	protected String getPrefix() {
+		if (getType() != null) {
+			return getType() + ".";
+		}
+		else {
+			return "";
+		}
+	}
+
 	protected IWBundle getBundle() {
 		return this.iwb;
 	}
@@ -236,5 +249,13 @@ public abstract class CasesBlock extends Block {
 	
 	public void setHomePage(ICPage page) {
 		this.iHomePage = page;
+	}
+	
+	protected String getType() {
+		return this.iType;
+	}
+
+	public void setType(String type) {
+		this.iType = type;
 	}
 }
