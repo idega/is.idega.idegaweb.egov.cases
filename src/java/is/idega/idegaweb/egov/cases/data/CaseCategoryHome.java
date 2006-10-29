@@ -12,6 +12,8 @@ public interface CaseCategoryHome extends IDOHome {
 
 	public CaseCategory findByPrimaryKey(Object pk) throws FinderException;
 
+	public Collection findAll() throws FinderException;
+
 	public Collection findAllTopLevelCategories() throws FinderException;
 
 	public Collection findAllSubCategories(CaseCategory category) throws FinderException;

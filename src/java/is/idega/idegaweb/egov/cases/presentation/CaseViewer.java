@@ -49,6 +49,7 @@ public class CaseViewer extends CaseCreator {
 			
 			Form form = new Form();
 			form.setStyleClass("adminForm");
+			form.setStyleClass("overview");
 			
 			GeneralCase theCase = null;
 			try {
@@ -93,10 +94,8 @@ public class CaseViewer extends CaseCreator {
 			form.add(section);
 			
 			Layer formItem = new Layer(Layer.DIV);
-			Label label = new Label();
-			
 			formItem.setStyleClass("formItem");
-			label = new Label();
+			Label label = new Label();
 			label.setLabel(iwrb.getLocalizedString(getPrefix() + "case_type", "Case type"));
 			formItem.add(label);
 			formItem.add(caseType);
@@ -106,6 +105,7 @@ public class CaseViewer extends CaseCreator {
 				Layer parentCaseCategory = new Layer(Layer.SPAN);
 				parentCaseCategory.add(new Text(parentCategory.getName()));
 				
+				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
 				label.setLabel(iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"));
@@ -113,6 +113,7 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(parentCaseCategory);
 				section.add(formItem);
 
+				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
 				label.setLabel(iwrb.getLocalizedString(getPrefix() + "sub_case_category", "Case category"));
@@ -121,6 +122,7 @@ public class CaseViewer extends CaseCreator {
 				section.add(formItem);
 			}
 			else {
+				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
 				label.setLabel(iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"));

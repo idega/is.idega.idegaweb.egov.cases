@@ -59,6 +59,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public CaseCategory getCaseCategory(Object caseCategoryPK) throws FinderException, RemoteException;
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getAllCaseCategories
+	 */
+	public Collection getAllCaseCategories() throws RemoteException;
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategories
 	 */
 	public Collection getCaseCategories() throws RemoteException;

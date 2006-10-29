@@ -251,6 +251,7 @@ public class CaseCreator extends ApplicationForm {
 
 		Form form = new Form();
 		form.setStyleClass("casesForm");
+		form.setStyleClass("overview");
 		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
 		form.maintainParameter(PARAMETER_MESSAGE);
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);

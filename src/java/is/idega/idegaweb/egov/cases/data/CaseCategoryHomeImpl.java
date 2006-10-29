@@ -21,6 +21,13 @@ public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome
 		return (CaseCategory) super.findByPrimaryKeyIDO(pk);
 	}
 
+	public Collection findAll() throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((CaseCategoryBMPBean) entity).ejbFindAll();
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
 	public Collection findAllTopLevelCategories() throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
 		Collection ids = ((CaseCategoryBMPBean) entity).ejbFindAllTopLevelCategories();

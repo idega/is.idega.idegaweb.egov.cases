@@ -114,7 +114,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		column.setSpan(2);
 		column.setWidth("12");
 
-		Collection categories = getBusiness().getCaseCategories();
+		Collection categories = getBusiness().getAllCaseCategories();
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();

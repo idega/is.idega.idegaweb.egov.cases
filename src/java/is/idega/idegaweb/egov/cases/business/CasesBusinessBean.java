@@ -115,7 +115,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		try {
 			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
-			return iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_status_key." + theCase.getCode(), theCase.getCode());
+			return iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_status_key." + theCase.getStatus(), theCase.getStatus());
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -172,6 +172,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public CaseCategory getCaseCategory(Object caseCategoryPK) throws FinderException {
 		return getCaseCategoryHome().findByPrimaryKey(new Integer(caseCategoryPK.toString()));
+	}
+	
+	public Collection getAllCaseCategories() {
+		try {
+			return getCaseCategoryHome().findAll();
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList();
+		}
 	}
 	
 	public Collection getCaseCategories() {

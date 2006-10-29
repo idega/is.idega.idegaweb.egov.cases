@@ -92,6 +92,16 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	}
 	
 	//Finders
+	public Collection ejbFindAll() throws FinderException {
+		Table table = new Table(this);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addOrder(table, COLUMN_ORDER, true);
+		
+		return idoFindPKsByQuery(query);
+	}
+	
 	public Collection ejbFindAllTopLevelCategories() throws FinderException {
 		Table table = new Table(this);
 		

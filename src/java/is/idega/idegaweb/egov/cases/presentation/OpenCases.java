@@ -66,6 +66,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
+		form.setStyleClass("overview");
 		form.setEventListener(this.getClass());
 		if (this.iMyCasesPage != null) {
 			form.setPageToSubmitTo(this.iMyCasesPage);

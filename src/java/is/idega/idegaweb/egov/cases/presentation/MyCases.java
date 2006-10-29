@@ -57,6 +57,7 @@ public class MyCases extends CasesProcessor {
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
+		form.setStyleClass("overview");
 		form.maintainParameter(PARAMETER_CASE_PK);
 		form.addParameter(PARAMETER_ACTION, "");
 		
