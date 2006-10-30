@@ -1,4 +1,5 @@
 address=Address
+application.case_creator=Case creator
 application_errors_occured=There was a problem with the following items
 back=Back
 cancel=Cancel

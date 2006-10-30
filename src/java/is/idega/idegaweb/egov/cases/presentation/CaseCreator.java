@@ -111,11 +111,15 @@ public class CaseCreator extends ApplicationForm {
 		
 		addErrors(iwc, form);
 		
+		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
+		heading.setStyleClass("applicationHeading");
+		form.add(heading);
+		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString(getPrefix() + "application.enter_new_case", "Enter new case"), 1, 3));
 
 		form.add(getPersonInfo(iwc, getUser(iwc)));
 		
-		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case", "New case"));
+		heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case", "New case"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
@@ -258,11 +262,15 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		
+		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
+		heading.setStyleClass("applicationHeading");
+		form.add(heading);
+		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString(getPrefix() + "application.overview", "Overview"), 2, 3));
 
 		form.add(getPersonInfo(iwc, getUser(iwc)));
 		
-		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case_overview", "New case overview"));
+		heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case_overview", "New case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
@@ -379,6 +387,9 @@ public class CaseCreator extends ApplicationForm {
 		try {
 			getCasesBusiness(iwc).storeGeneralCase(getUser(iwc), getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, message, getType());
 
+			Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
+			heading.setStyleClass("applicationHeading");
+			
 			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
 			Layer clearLayer = new Layer(Layer.DIV);
