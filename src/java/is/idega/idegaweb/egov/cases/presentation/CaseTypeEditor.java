@@ -117,10 +117,14 @@ public class CaseTypeEditor extends CasesBlock {
 		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "description", "Description")));
 		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "order", "Order")));
 
-		row.createHeaderCell().add(Text.getNonBrakingSpace());
+		cell = row.createHeaderCell();
+		cell.setStyleClass("edit");
+		cell.add(new Text(getResourceBundle().getLocalizedString("edit", "Edit")));
+
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
-		cell.add(Text.getNonBrakingSpace());
+		cell.setStyleClass("delete");
+		cell.add(new Text(getResourceBundle().getLocalizedString("delete", "Delete")));
 		
 		group = table.createBodyRowGroup();
 		int iRow = 1;
@@ -168,6 +172,7 @@ public class CaseTypeEditor extends CasesBlock {
 		
 		Layer layer = new Layer();
 		layer.setStyleClass("buttonLayer");
+		layer.setStyleClass("newButtonLayer");
 		form.add(layer);
 
 		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString(getPrefix() + "new_type", "New type"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));

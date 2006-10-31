@@ -216,6 +216,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		
 		Layer layer = new Layer();
 		layer.setStyleClass("buttonLayer");
+		layer.setStyleClass("newButtonLayer");
 		form.add(layer);
 
 		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString(getPrefix() + "new_category", "New category"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
