@@ -102,11 +102,13 @@ public class MyCases extends CasesProcessor {
 		subCategories.setSelectedElement(category.getPrimaryKey().toString());
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		
-		Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
-		Iterator iter = collection.iterator();
-		while (iter.hasNext()) {
-			CaseCategory subCategory = (CaseCategory) iter.next();
-			subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+		if (parentCategory != null) {
+			Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
+			Iterator iter = collection.iterator();
+			while (iter.hasNext()) {
+				CaseCategory subCategory = (CaseCategory) iter.next();
+				subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+			}
 		}
 		
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
@@ -211,7 +213,7 @@ public class MyCases extends CasesProcessor {
 
 		Collection logs = getCasesBusiness(iwc).getCaseLogs(theCase);
 		if (!logs.isEmpty()) {
-			iter = logs.iterator();
+			Iterator iter = logs.iterator();
 			while (iter.hasNext()) {
 				CaseLog log = (CaseLog) iter.next();
 				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
