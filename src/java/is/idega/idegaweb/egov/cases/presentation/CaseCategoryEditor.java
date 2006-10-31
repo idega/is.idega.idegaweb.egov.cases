@@ -277,14 +277,14 @@ public class CaseCategoryEditor extends CasesBlock {
 		Label label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name"), name);
 		layer.add(label);
 		layer.add(name);
-		form.add(layer);
+		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "description", "Description"), description);
 		layer.add(label);
 		layer.add(description);
-		form.add(layer);
+		section.add(layer);
 
 		if (getCasesBusiness(iwc).useSubCategories()) {
 			layer = new Layer(Layer.DIV);
@@ -292,7 +292,7 @@ public class CaseCategoryEditor extends CasesBlock {
 			label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "parent_category", "Parent category"), parentCategory);
 			layer.add(label);
 			layer.add(parentCategory);
-			form.add(layer);
+			section.add(layer);
 		}
 		
 		layer = new Layer(Layer.DIV);
@@ -301,18 +301,18 @@ public class CaseCategoryEditor extends CasesBlock {
 		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "handler_group", "Handler group"));
 		layer.add(label);
 		layer.add(chooser);
-		form.add(layer);
+		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "order", "Order"), order);
 		layer.add(label);
 		layer.add(order);
-		form.add(layer);
+		section.add(layer);
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
-		form.add(clear);
+		section.add(clear);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("buttonLayer");
