@@ -6,6 +6,12 @@
 	
 	<body>
 
+		<release version="1.0.8" date="2006-10-31">
+			<action dev="laddi" type="fix">
+				Layout and translation fixes.
+			</action>
+		</release>
+		
 		<release version="1.0.7" date="2006-10-30">
 			<action dev="sigtryggur" type="update">
 				Changed from skjalfandi.skjalfandi.is to www.skjalfandi.is in localized texts.

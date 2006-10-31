@@ -65,6 +65,7 @@ public class CaseCreator extends ApplicationForm {
 
 	private IWResourceBundle iwrb;
 	private boolean iUseSessionUser = false;
+	private boolean iUseAnonymous = false;
 	
 	public String getBundleIdentifier() {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
@@ -389,6 +390,7 @@ public class CaseCreator extends ApplicationForm {
 
 			Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
 			heading.setStyleClass("applicationHeading");
+			add(heading);
 			
 			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
@@ -400,7 +402,7 @@ public class CaseCreator extends ApplicationForm {
 			bottom.setStyleClass("bottom");
 			add(bottom);
 
-			if (iwc.isLoggedOn()) {
+			if (!this.iUseAnonymous && iwc.isLoggedOn()) {
 				try {
 					ICPage page = getUserBusiness(iwc).getHomePageForUser(iwc.getCurrentUser());
 					Link link = getButtonLink(this.iwrb.getLocalizedString("my_page", "My page"));
@@ -411,6 +413,12 @@ public class CaseCreator extends ApplicationForm {
 				catch (FinderException fe) {
 					fe.printStackTrace();
 				}
+			}
+			else {
+				Link link = getButtonLink(this.iwrb.getLocalizedString("close", "Close"));
+				link.setStyleClass("homeButton");
+				link.setAsCloseLink();
+				bottom.add(link);
 			}
 		}
 		catch (CreateException ce) {
@@ -429,6 +437,9 @@ public class CaseCreator extends ApplicationForm {
 	}
 
 	private User getUser(IWContext iwc) throws RemoteException {
+		if (this.iUseAnonymous) {
+			return null;
+		}
 		if (this.iUseSessionUser) {
 			return getUserSession(iwc).getUser();
 		}
@@ -462,6 +473,10 @@ public class CaseCreator extends ApplicationForm {
 
 	public void setUseSessionUser(boolean useSessionUser) {
 		this.iUseSessionUser = useSessionUser;
+	}
+	
+	public void setUseAnonymous(boolean useAnonymous) {
+		this.iUseAnonymous = useAnonymous;
 	}
 	
 	protected String getType() {
