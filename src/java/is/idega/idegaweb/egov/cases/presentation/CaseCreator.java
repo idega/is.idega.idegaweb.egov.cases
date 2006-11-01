@@ -163,20 +163,29 @@ public class CaseCreator extends ApplicationForm {
 		}
 		
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
-		subCategories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
+		boolean addEmptyElement = true;
 		if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK)) {
 			try {
 				CaseCategory category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
 				Collection subCats = getCasesBusiness(iwc).getSubCategories(category);
-				iter = subCats.iterator();
-				while (iter.hasNext()) {
-					category = (CaseCategory) iter.next();
+				if (!subCats.isEmpty()) {
+					iter = subCats.iterator();
+					while (iter.hasNext()) {
+						CaseCategory subCategory = (CaseCategory) iter.next();
+						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+					}
+				}
+				else {
+					addEmptyElement = false;
 					subCategories.addMenuElement(category.getPrimaryKey().toString(), category.getName());
 				}
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();
 			}
+		}
+		if (addEmptyElement) {
+			subCategories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
 		}
 		subCategories.keepStatusOnAction(true);
 		subCategories.setStyleClass("subCaseCategoryDropdown");
@@ -363,7 +372,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem.add(categorySpan);
 		section.add(formItem);
 
-		if (getCasesBusiness(iwc).useSubCategories()) {
+		if (getCasesBusiness(iwc).useSubCategories() && !subCategory.equals(category)) {
 			Layer subCategorySpan = new Layer(Layer.SPAN);
 			subCategorySpan.add(new Text(subCategory.getName()));
 			
