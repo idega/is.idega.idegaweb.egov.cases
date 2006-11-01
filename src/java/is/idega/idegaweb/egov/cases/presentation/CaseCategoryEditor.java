@@ -114,32 +114,26 @@ public class CaseCategoryEditor extends CasesBlock {
 		column.setSpan(2);
 		column.setWidth("12");
 
-		Collection categories = getBusiness().getAllCaseCategories();
+		Collection categories = getBusiness().getCaseCategories();
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
 		TableCell2 cell = row.createHeaderCell();
 		cell.setStyleClass("firstColumn");
 		cell.setStyleClass("name");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("description");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "description", "Description")));
-		
-		if (getCasesBusiness(iwc).useSubCategories()) {
-			cell = row.createHeaderCell();
-			cell.setStyleClass("parentCategory");
-			cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "parent_category", "Parent category")));
-		}
+		cell.add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("handlerGroup");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "handler_group", "Handler group")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("handler_group", "Handler group")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("order");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "order", "Order")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("edit");
@@ -156,59 +150,17 @@ public class CaseCategoryEditor extends CasesBlock {
 		Iterator iter = categories.iterator();
 		while (iter.hasNext()) {
 			CaseCategory category = (CaseCategory) iter.next();
-			row = group.createRow();
-			if (iRow == 1) {
-				row.setStyleClass("firstRow");
-			}
-			else if (!iter.hasNext()) {
-				row.setStyleClass("lastRow");
-			}
+			addCategoryToTable(group, category, iRow++, !iter.hasNext(), false);
 			
-			CaseCategory parentCategory = category.getParent();
-			
-			Link edit = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "edit_category", "Edit")));
-			edit.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
-			edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
-			
-			Link delete = new Link(getBundle().getImage("delete.png", getResourceBundle().getLocalizedString(getPrefix() + "delete_category", "Delete")));
-			delete.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
-			delete.setClickConfirmation(getResourceBundle().getLocalizedString(getPrefix() + "delete_confirmation", "Are you sure you want to delete this case category?"));
-			delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
-
-			cell = row.createCell();
-			cell.setStyleClass("firstColumn");
-			cell.setStyleClass("name");
-			cell.add(new Text(category.getName()));
-
-			cell = row.createCell();
-			cell.setStyleClass("description");
-			cell.add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
-			
-			if (getCasesBusiness(iwc).useSubCategories()) {
-				cell = row.createCell();
-				cell.setStyleClass("parentCategory");
-				cell.add(new Text(parentCategory != null ? parentCategory.getName() : "-"));
-			}
-			
-			cell = row.createCell();
-			cell.setStyleClass("handlerGroup");
-			cell.add(new Text(category.getHandlerGroup().getName()));
-			
-			cell = row.createCell();
-			cell.setStyleClass("order");
-			cell.add(new Text(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "-"));
-
-			row.createCell().add(edit);
-			cell = row.createCell();
-			cell.setStyleClass("lastColumn");
-			cell.setStyleClass("edit");
-			cell.add(delete);
-			
-			if (iRow % 2 == 0) {
-				row.setStyleClass("evenRow");
-			}
-			else {
-				row.setStyleClass("oddRow");
+			if (getBusiness().useSubCategories()) {
+				Collection subCategories = getBusiness().getSubCategories(category);
+				Iterator iterator = subCategories.iterator();
+				
+				int iSubRow = 1;
+				while (iterator.hasNext()) {
+					category = (CaseCategory) iterator.next();
+					addCategoryToTable(group, category, iSubRow++, !iterator.hasNext(), true);
+				}
 			}
 		}
 
@@ -219,11 +171,63 @@ public class CaseCategoryEditor extends CasesBlock {
 		layer.setStyleClass("newButtonLayer");
 		form.add(layer);
 
-		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString(getPrefix() + "new_category", "New category"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
+		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString("new_category", "New category"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
 		newButton.setStyleClass("button");
 		layer.add(newButton);
 
 		add(form);
+	}
+	
+	private void addCategoryToTable(TableRowGroup group, CaseCategory category, int iRow, boolean lastEntry, boolean isSubCategory) {
+		TableRow row = group.createRow();
+		if (iRow == 1) {
+			row.setStyleClass("firstRow");
+		}
+		else if (lastEntry) {
+			row.setStyleClass("lastRow");
+		}
+		if (isSubCategory) {
+			row.setStyleClass("subCategory");
+		}
+		
+		Link edit = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("edit_category", "Edit")));
+		edit.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
+		edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
+		
+		Link delete = new Link(getBundle().getImage("delete.png", getResourceBundle().getLocalizedString("delete_category", "Delete")));
+		delete.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
+		delete.setClickConfirmation(getResourceBundle().getLocalizedString("delete_confirmation", "Are you sure you want to delete this case category?"));
+		delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
+
+		TableCell2 cell = row.createCell();
+		cell.setStyleClass("firstColumn");
+		cell.setStyleClass("name");
+		cell.add(new Text(category.getName()));
+
+		cell = row.createCell();
+		cell.setStyleClass("description");
+		cell.add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
+		
+		cell = row.createCell();
+		cell.setStyleClass("handlerGroup");
+		cell.add(new Text(category.getHandlerGroup().getName()));
+		
+		cell = row.createCell();
+		cell.setStyleClass("order");
+		cell.add(new Text(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "-"));
+
+		row.createCell().add(edit);
+		cell = row.createCell();
+		cell.setStyleClass("lastColumn");
+		cell.setStyleClass("edit");
+		cell.add(delete);
+		
+		if (iRow % 2 == 0) {
+			row.setStyleClass("evenRow");
+		}
+		else {
+			row.setStyleClass("oddRow");
+		}
 	}
 	
 	private void showEditor(IWContext iwc, Object caseCategoryPK) throws RemoteException {
@@ -275,14 +279,14 @@ public class CaseCategoryEditor extends CasesBlock {
 		
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name"), name);
+		Label label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		layer.add(label);
 		layer.add(name);
 		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "description", "Description"), description);
+		label = new Label(getResourceBundle().getLocalizedString("description", "Description"), description);
 		layer.add(label);
 		layer.add(description);
 		section.add(layer);
@@ -290,7 +294,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		if (getCasesBusiness(iwc).useSubCategories()) {
 			layer = new Layer(Layer.DIV);
 			layer.setStyleClass("formItem");
-			label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "parent_category", "Parent category"), parentCategory);
+			label = new Label(getResourceBundle().getLocalizedString("parent_category", "Parent category"), parentCategory);
 			layer.add(label);
 			layer.add(parentCategory);
 			section.add(layer);
@@ -299,14 +303,14 @@ public class CaseCategoryEditor extends CasesBlock {
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "handler_group", "Handler group"));
+		label.setLabel(getResourceBundle().getLocalizedString("handler_group", "Handler group"));
 		layer.add(label);
 		layer.add(chooser);
 		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "order", "Order"), order);
+		label = new Label(getResourceBundle().getLocalizedString("order", "Order"), order);
 		layer.add(label);
 		layer.add(order);
 		section.add(layer);
@@ -331,18 +335,18 @@ public class CaseCategoryEditor extends CasesBlock {
 
 	private boolean saveCategory(IWContext iwc) throws RemoteException {
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
-		Object parentCaseCategoryPK = iwc.getParameter(PARAMETER_PARENT_CASE_CATEGORY_PK);
+		Object parentCaseCategoryPK = iwc.isParameterSet(PARAMETER_PARENT_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_PARENT_CASE_CATEGORY_PK) : null;
 		String name = iwc.getParameter(PARAMETER_NAME);
 		String description = iwc.getParameter(PARAMETER_DESCRIPTION);
 		String groupPK = iwc.getParameter(PARAMETER_GROUP);
 		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString(getPrefix() + "case_category.name_not_empty", "You must provide a name for the case category."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.name_not_empty", "You must provide a name for the case category."));
 			return false;
 		}
 		if (groupPK == null || groupPK.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString(getPrefix() + "case_category.group_not_empty", "You must select a handler group for the case category."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.group_not_empty", "You must select a handler group for the case category."));
 			return false;
 		}
 		if (groupPK.indexOf("_") != -1) {
@@ -368,7 +372,7 @@ public class CaseCategoryEditor extends CasesBlock {
 			getBusiness().removeCaseCategory(caseCategoryPK);
 		}
 		catch (RemoveException re) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString(getPrefix() + "remove_case_category_failed", "You can't remove a case category that already has cases connected to it."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_category_failed", "You can't remove a case category that already has cases connected to it."));
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

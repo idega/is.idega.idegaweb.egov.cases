@@ -95,28 +95,28 @@ public abstract class CasesProcessor extends CasesBlock {
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("sender");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "sender", "Sender")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("caseType");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("createdDate");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("status");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "status", "Status")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("handler");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "handler", "Handler")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("lastColumn");
 		cell.setStyleClass("view");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "view", "View")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("view", "View")));
 		
 		group = table.createBodyRowGroup();
 		int iRow = 1;

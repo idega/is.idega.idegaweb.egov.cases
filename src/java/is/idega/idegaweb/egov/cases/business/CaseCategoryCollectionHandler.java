@@ -40,18 +40,25 @@ public class CaseCategoryCollectionHandler implements RemoteScriptCollection {
 
 		Collection ids = new ArrayList();
 		Collection names = new ArrayList();
-		ids.add("");
-		names.add(iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
 		
 		try {
 			CaseCategory category = getBusiness(iwc).getCaseCategory(sourceID);
 
 			Collection categories = getBusiness(iwc).getSubCategories(category);
-			Iterator iter = categories.iterator();
-			while (iter.hasNext()) {
-				category = (CaseCategory) iter.next();
-				ids.add(category.getPrimaryKey().toString());
-				names.add(category.getName());
+			if (!categories.isEmpty()) {
+				ids.add("");
+				names.add(iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
+
+				Iterator iter = categories.iterator();
+				while (iter.hasNext()) {
+					category = (CaseCategory) iter.next();
+					ids.add(category.getPrimaryKey().toString());
+					names.add(category.getName());
+				}
+			}
+			else {
+				ids.add(sourceID);
+				names.add("");
 			}
 		}
 		catch (RemoteException e) {

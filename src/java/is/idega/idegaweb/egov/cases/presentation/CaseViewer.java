@@ -96,19 +96,19 @@ public class CaseViewer extends CaseCreator {
 			Layer formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			Label label = new Label();
-			label.setLabel(iwrb.getLocalizedString(getPrefix() + "case_type", "Case type"));
+			label.setLabel(iwrb.getLocalizedString("case_type", "Case type"));
 			formItem.add(label);
 			formItem.add(caseType);
 			section.add(formItem);
 
-			if (getCasesBusiness(iwc).useSubCategories()) {
+			if (parentCategory != null) {
 				Layer parentCaseCategory = new Layer(Layer.SPAN);
 				parentCaseCategory.add(new Text(parentCategory.getName()));
 				
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
-				label.setLabel(iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"));
+				label.setLabel(iwrb.getLocalizedString("case_category", "Case category"));
 				formItem.add(label);
 				formItem.add(parentCaseCategory);
 				section.add(formItem);
@@ -116,7 +116,7 @@ public class CaseViewer extends CaseCreator {
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
-				label.setLabel(iwrb.getLocalizedString(getPrefix() + "sub_case_category", "Case category"));
+				label.setLabel(iwrb.getLocalizedString("sub_case_category", "Case category"));
 				formItem.add(label);
 				formItem.add(caseCategory);
 				section.add(formItem);
@@ -125,7 +125,7 @@ public class CaseViewer extends CaseCreator {
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
-				label.setLabel(iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"));
+				label.setLabel(iwrb.getLocalizedString("case_category", "Case category"));
 				formItem.add(label);
 				formItem.add(caseCategory);
 				section.add(formItem);
@@ -134,7 +134,7 @@ public class CaseViewer extends CaseCreator {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			label = new Label();
-			label.setLabel(iwrb.getLocalizedString(getPrefix() + "created_date", "Created date"));
+			label.setLabel(iwrb.getLocalizedString("created_date", "Created date"));
 			formItem.add(label);
 			formItem.add(createdDate);
 			section.add(formItem);
@@ -167,7 +167,7 @@ public class CaseViewer extends CaseCreator {
 				} else {
 					handler.add(new Text(""));
 				}
-				heading = new Heading1(iwrb.getLocalizedString(getPrefix() + "handler_overview", "Handler overview"));
+				heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 				heading.setStyleClass("subHeader");
 				form.add(heading);
 				
@@ -178,7 +178,7 @@ public class CaseViewer extends CaseCreator {
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
-				label.setLabel(iwrb.getLocalizedString(getPrefix() + "handler", "Handler"));
+				label.setLabel(iwrb.getLocalizedString("handler", "Handler"));
 				formItem.add(label);
 				formItem.add(handler);
 				section.add(formItem);
@@ -191,7 +191,7 @@ public class CaseViewer extends CaseCreator {
 					formItem.setStyleClass("formItem");
 					formItem.setStyleClass("informationItem");
 					label = new Label();
-					label.setLabel(iwrb.getLocalizedString(getPrefix() + "reply", "Reply"));
+					label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
 					formItem.add(label);
 					formItem.add(reply);
 					section.add(formItem);
@@ -228,7 +228,7 @@ public class CaseViewer extends CaseCreator {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("handlerLayer");
 		
-		Heading1 heading = new Heading1(iwrb.getLocalizedString(getPrefix() + "handler_overview", "Handler overview"));
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		layer.add(heading);
 		
@@ -244,7 +244,7 @@ public class CaseViewer extends CaseCreator {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "handler", "Handler"));
+		label.setLabel(iwrb.getLocalizedString("handler", "Handler"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true))));
 		section.add(formItem);
@@ -252,7 +252,7 @@ public class CaseViewer extends CaseCreator {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "timestamp", "Timestamp"));
+		label.setLabel(iwrb.getLocalizedString("timestamp", "Timestamp"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
 		section.add(formItem);
@@ -260,7 +260,7 @@ public class CaseViewer extends CaseCreator {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "status", "Status"));
+		label.setLabel(iwrb.getLocalizedString("status", "Status"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 		section.add(formItem);
@@ -269,7 +269,7 @@ public class CaseViewer extends CaseCreator {
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "reply", "Reply"));
+		label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(reply)));
 		section.add(formItem);

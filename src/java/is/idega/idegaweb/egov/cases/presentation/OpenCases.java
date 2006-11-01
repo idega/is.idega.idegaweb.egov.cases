@@ -114,19 +114,19 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type"));
+		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 		element.add(label);
 		element.add(caseType);
 		section.add(element);
 
-		if (getCasesBusiness(iwc).useSubCategories()) {
+		if (parentCategory != null) {
 			Layer parentCaseCategory = new Layer(Layer.SPAN);
 			parentCaseCategory.add(new Text(parentCategory.getName()));
 			
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_category", "Case category"));
+			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(parentCaseCategory);
 			section.add(element);
@@ -134,7 +134,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "sub_case_category", "Sub case category"));
+			label.setLabel(getResourceBundle().getLocalizedString("sub_case_category", "Sub case category"));
 			element.add(label);
 			element.add(caseCategory);
 			section.add(element);
@@ -143,7 +143,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "case_category", "Case category"));
+			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(caseCategory);
 			section.add(element);
@@ -152,7 +152,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date"));
+		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);
 		section.add(element);
@@ -160,7 +160,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString(getPrefix() + "message", "Message"));
+		label.setLabel(getResourceBundle().getLocalizedString("message", "Message"));
 		element.add(label);
 		element.add(message);
 		section.add(element);
@@ -173,7 +173,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString("take_case", "Take case"));
+		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		next.setToFormSubmit(form);
 		bottom.add(next);

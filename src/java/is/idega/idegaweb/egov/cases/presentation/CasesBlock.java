@@ -133,7 +133,7 @@ public abstract class CasesBlock extends Block {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("handlerLayer");
 		
-		Heading1 heading = new Heading1(iwrb.getLocalizedString(getPrefix() + "handler_overview", "Handler overview"));
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		layer.add(heading);
 		
@@ -149,7 +149,7 @@ public abstract class CasesBlock extends Block {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "handler", "Handler"));
+		label.setLabel(iwrb.getLocalizedString("handler", "Handler"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true))));
 		section.add(formItem);
@@ -157,7 +157,7 @@ public abstract class CasesBlock extends Block {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "timestamp", "Timestamp"));
+		label.setLabel(iwrb.getLocalizedString("timestamp", "Timestamp"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
 		section.add(formItem);
@@ -165,7 +165,7 @@ public abstract class CasesBlock extends Block {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "status", "Status"));
+		label.setLabel(iwrb.getLocalizedString("status", "Status"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 		section.add(formItem);
@@ -174,7 +174,7 @@ public abstract class CasesBlock extends Block {
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
 		label = new Label();
-		label.setLabel(iwrb.getLocalizedString(getPrefix() + "reply", "Reply"));
+		label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
 		formItem.add(label);
 		formItem.add(new Span(new Text(reply)));
 		section.add(formItem);

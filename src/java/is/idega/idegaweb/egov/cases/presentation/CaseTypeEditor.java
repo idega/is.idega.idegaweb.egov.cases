@@ -112,10 +112,10 @@ public class CaseTypeEditor extends CasesBlock {
 		TableRow row = group.createRow();
 		TableCell2 cell = row.createHeaderCell();
 		cell.setStyleClass("firstColumn");
-		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name")));
+		cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
 		
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "description", "Description")));
-		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "order", "Order")));
+		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("description", "Description")));
+		row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("order", "Order")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("edit");
@@ -175,7 +175,7 @@ public class CaseTypeEditor extends CasesBlock {
 		layer.setStyleClass("newButtonLayer");
 		form.add(layer);
 
-		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString(getPrefix() + "new_type", "New type"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
+		SubmitButton newButton = new SubmitButton(getResourceBundle().getLocalizedString("new_type", "New type"), PARAMETER_ACTION, String.valueOf(ACTION_NEW));
 		newButton.setStyleClass("button");
 		layer.add(newButton);
 
@@ -219,21 +219,21 @@ public class CaseTypeEditor extends CasesBlock {
 		
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name"), name);
+		Label label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		layer.add(label);
 		layer.add(name);
 		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "description", "Description"), description);
+		label = new Label(getResourceBundle().getLocalizedString("description", "Description"), description);
 		layer.add(label);
 		layer.add(description);
 		section.add(layer);
 
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "order", "Order"), order);
+		label = new Label(getResourceBundle().getLocalizedString("order", "Order"), order);
 		layer.add(label);
 		layer.add(order);
 		section.add(layer);
@@ -262,7 +262,7 @@ public class CaseTypeEditor extends CasesBlock {
 		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString(getPrefix() + "case_type.name_not_empty", "You must provide a name for the case type."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_type.name_not_empty", "You must provide a name for the case type."));
 			return false;
 		}
 		
@@ -285,7 +285,7 @@ public class CaseTypeEditor extends CasesBlock {
 			getBusiness().removeCaseType(caseTypePK);
 		}
 		catch (RemoveException re) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString(getPrefix() + "remove_case_type_failed", "You can't remove a case type that already has cases connected to it."));
+			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_type_failed", "You can't remove a case type that already has cases connected to it."));
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

@@ -117,14 +117,14 @@ public class CaseFinder extends CasesBlock {
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "name", "Name"), name);
+		label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		element.add(label);
 		element.add(name);
 		layer.add(element);
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "personal_id", "Personal ID"), personalID);
+		label = new Label(getResourceBundle().getLocalizedString("personal_id", "Personal ID"), personalID);
 		element.add(label);
 		element.add(personalID);
 		layer.add(element);
@@ -175,7 +175,7 @@ public class CaseFinder extends CasesBlock {
 		}
 		
 		if (cases.isEmpty()) {
-			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "search_results.nothing_found", "Nothing found"));
+			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));
 			heading.setStyleClass("errorHeading");
 			add(heading);
 		}
@@ -200,11 +200,11 @@ public class CaseFinder extends CasesBlock {
 			cell.setStyleClass("firstColumn");
 			cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
 			
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "sender", "Sender")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_type", "Case type")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "created_date", "Created date")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "status", "Status")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "handler", "Handler")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
+			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
 	
 			cell = row.createHeaderCell();
 			cell.setStyleClass("lastColumn");

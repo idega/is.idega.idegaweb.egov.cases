@@ -6,6 +6,18 @@
 	
 	<body>
 
+		<release version="1.0.9" date="2006-11-01">
+			<action dev="laddi" type="fix">
+				Translation fixes. Changed so that the type prefix is only used when needed.
+			</action>
+			<action dev="laddi" type="update">
+				Changed so that when a parent category has no children the sub category dropdown get only one value, the parent value itself.
+			</action>
+			<action dev="laddi" type="update">
+				Added possibility to set which categories to display in the case creator with a builder property.
+			</action>
+		</release>
+		
 		<release version="1.0.8" date="2006-10-31">
 			<action dev="laddi" type="fix">
 				Layout and translation fixes.

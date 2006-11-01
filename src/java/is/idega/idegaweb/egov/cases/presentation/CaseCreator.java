@@ -17,6 +17,7 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -66,6 +67,8 @@ public class CaseCreator extends ApplicationForm {
 	private IWResourceBundle iwrb;
 	private boolean iUseSessionUser = false;
 	private boolean iUseAnonymous = false;
+	
+	private Collection iCategories;
 	
 	public String getBundleIdentifier() {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
@@ -130,18 +133,42 @@ public class CaseCreator extends ApplicationForm {
 		form.add(section);
 		
 		SelectorUtility util = new SelectorUtility();
-		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness(iwc).getCaseCategories(), "getName");
-		categories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_category", "Select category"));
+		DropdownMenu categories = new DropdownMenu(PARAMETER_CASE_CATEGORY_PK);
+		categories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_category", "Select category"));
 		categories.keepStatusOnAction(true);
 		categories.setStyleClass("caseCategoryDropdown");
 		
+		Collection parentCategories = getCasesBusiness(iwc).getCaseCategories();
+		Iterator iter = parentCategories.iterator();
+		while (iter.hasNext()) {
+			CaseCategory element = (CaseCategory) iter.next();
+			
+			boolean addCategory = false;
+			if (iCategories != null) {
+				Iterator iterator = iCategories.iterator();
+				while (iterator.hasNext()) {
+					String categoryPK = (String) iterator.next();
+					if (element.getPrimaryKey().toString().equals(categoryPK)) {
+						addCategory = true;
+					}
+				}
+			}
+			else {
+				addCategory = true;
+			}
+			
+			if (addCategory) {
+				categories.addMenuElement(element.getPrimaryKey().toString(), element.getName());
+			}
+		}
+		
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
-		subCategories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_sub_category", "Select sub category"));
+		subCategories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
 		if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK)) {
 			try {
 				CaseCategory category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
 				Collection subCats = getCasesBusiness(iwc).getSubCategories(category);
-				Iterator iter = subCats.iterator();
+				iter = subCats.iterator();
 				while (iter.hasNext()) {
 					category = (CaseCategory) iter.next();
 					subCategories.addMenuElement(category.getPrimaryKey().toString(), category.getName());
@@ -155,7 +182,7 @@ public class CaseCreator extends ApplicationForm {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness(iwc).getCaseTypes(), "getName");
-		types.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_type", "Select type"));
+		types.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_type", "Select type"));
 		types.keepStatusOnAction(true);
 		types.setStyleClass("caseTypeDropdown");
 		
@@ -171,7 +198,7 @@ public class CaseCreator extends ApplicationForm {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
-		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_type", "Case type"))), types);
+		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_type", "Case type"))), types);
 		formItem.add(label);
 		formItem.add(types);
 		section.add(formItem);
@@ -179,7 +206,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
-		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"))), categories);
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
 		formItem.add(label);
 		formItem.add(categories);
 		section.add(formItem);
@@ -200,7 +227,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
-			label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "sub_case_category", "Sub case category"))), subCategories);
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("sub_case_category", "Sub case category"))), subCategories);
 			formItem.add(label);
 			formItem.add(subCategories);
 			section.add(formItem);
@@ -236,14 +263,14 @@ public class CaseCreator extends ApplicationForm {
 	private void showOverview(IWContext iwc) throws RemoteException {
 		if (this.getCasesBusiness(iwc).useSubCategories()) {
 			if (!iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK)) {
-				setError(PARAMETER_CASE_CATEGORY_PK, this.iwrb.getLocalizedString(getPrefix() + "case_creator.sub_category_empty", "You must select a category"));
+				setError(PARAMETER_CASE_CATEGORY_PK, this.iwrb.getLocalizedString("case_creator.sub_category_empty", "You must select a category"));
 			}
 		}
 		if (!iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK)) {
-			setError(PARAMETER_CASE_CATEGORY_PK, this.iwrb.getLocalizedString(getPrefix() + "case_creator.category_empty", "You must select a category"));
+			setError(PARAMETER_CASE_CATEGORY_PK, this.iwrb.getLocalizedString("case_creator.category_empty", "You must select a category"));
 		}
 		if (!iwc.isParameterSet(PARAMETER_CASE_TYPE_PK)) {
-			setError(PARAMETER_CASE_TYPE_PK, this.iwrb.getLocalizedString(getPrefix() + "case_creator.type_empty", "You must select a type"));
+			setError(PARAMETER_CASE_TYPE_PK, this.iwrb.getLocalizedString("case_creator.type_empty", "You must select a type"));
 		}
 		if (!iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
@@ -323,7 +350,7 @@ public class CaseCreator extends ApplicationForm {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "case_type", "Case type"));
+		label.setLabel(this.iwrb.getLocalizedString("case_type", "Case type"));
 		formItem.add(label);
 		formItem.add(typeSpan);
 		section.add(formItem);
@@ -331,7 +358,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"));
+		label.setLabel(this.iwrb.getLocalizedString("case_category", "Case category"));
 		formItem.add(label);
 		formItem.add(categorySpan);
 		section.add(formItem);
@@ -343,7 +370,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			label = new Label();
-			label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "sub_case_category", "Sub case category"));
+			label.setLabel(this.iwrb.getLocalizedString("sub_case_category", "Sub case category"));
 			formItem.add(label);
 			formItem.add(subCategorySpan);
 			section.add(formItem);
@@ -485,5 +512,12 @@ public class CaseCreator extends ApplicationForm {
 
 	public void setType(String type) {
 		this.iType = type;
+	}
+	
+	public void setAllowedCategory(String categoryPK) {
+		if (iCategories == null) {
+			iCategories = new ArrayList();
+		}
+		iCategories.add(categoryPK);
 	}
 }
