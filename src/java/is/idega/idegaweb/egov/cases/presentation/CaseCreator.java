@@ -177,7 +177,7 @@ public class CaseCreator extends ApplicationForm {
 				}
 				else {
 					addEmptyElement = false;
-					subCategories.addMenuElement(category.getPrimaryKey().toString(), category.getName());
+					subCategories.addMenuElement(category.getPrimaryKey().toString(), "");
 				}
 			}
 			catch (FinderException fe) {
