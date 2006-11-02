@@ -94,7 +94,7 @@ public class MyCases extends CasesProcessor {
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getBusiness().getCaseCategories(), "getName");
 		categories.keepStatusOnAction(true);
-		categories.setSelectedElement(useSubCategories ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
 		categories.setStyleClass("caseCategoryDropdown");
 		
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
