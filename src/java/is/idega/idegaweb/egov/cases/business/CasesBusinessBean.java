@@ -278,10 +278,19 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group)null);
 		
 		try {
-			Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
-			Object[] arguments = { name.getName(getIWApplicationContext().getApplicationSettings().getDefaultLocale()), theCase.getCaseCategory().getName(), message };
-			String subject = getLocalizedString("case_sent_subject", "A new case sent in");
-			String body = MessageFormat.format(getLocalizedString("case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+			String prefix = (type != null ? type : "") + ".";
+			
+			String subject = getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
+			String body = null;
+			if (sender != null) {
+				Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
+				Object[] arguments = { name.getName(getIWApplicationContext().getApplicationSettings().getDefaultLocale()), theCase.getCaseCategory().getName(), message };
+				body = MessageFormat.format(getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+			}
+			else {
+				Object[] arguments = { getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getName(), message };
+				body = MessageFormat.format(getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+			}
 			
 			Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
 			Iterator iter = handlers.iterator();
@@ -292,8 +301,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 			
 			if (sender != null) {
 				Object[] arguments2 = { theCase.getCaseCategory().getName() };
-				subject = getLocalizedString("case_sent_confirmation_subject", "A new case sent in");
-				body = MessageFormat.format(getLocalizedString("case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
+				subject = getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
+				body = MessageFormat.format(getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
 				
 				sendMessage(theCase, sender, null, subject, body);
 			}
@@ -316,9 +325,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
+			String prefix = (theCase.getType() != null ? theCase.getType() : "") + ".";
+
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(theCase, getCaseStatus(status), locale) };
-			String subject = getLocalizedString("case_handled_subject", "Your case has been handled");
-			String body = MessageFormat.format(getLocalizedString("case_handled_body", "Your case with category {0} and type {1} has been handled by {2}.  The reply was as follows:\n\n{3}"), arguments);
+			String subject = getLocalizedString(prefix + "case_handled_subject", "Your case has been handled");
+			String body = MessageFormat.format(getLocalizedString(prefix + "case_handled_body", "Your case with category {0} and type {1} has been handled by {2}.  The reply was as follows:\n\n{3}"), arguments);
 			
 			sendMessage(theCase, owner, performer, subject, body);
 		}
@@ -332,9 +343,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
+			String prefix = (theCase.getType() != null ? theCase.getType() : "") + ".";
+
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
-			String subject = getLocalizedString("case_taken_subject", "Your case has been taken");
-			String body = MessageFormat.format(getLocalizedString("case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
+			String subject = getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
+			String body = MessageFormat.format(getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
 			
 			sendMessage(theCase, owner, performer, subject, body);
 		}
@@ -348,9 +361,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
+			String prefix = (theCase.getType() != null ? theCase.getType() : "") + ".";
+
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
-			String subject = getLocalizedString("case_reactivated_subject", "Your case has been reactivated");
-			String body = MessageFormat.format(getLocalizedString("case_reactivated_body", "Your case with category {0} and type {1} has been reactivated by {2}"), arguments);
+			String subject = getLocalizedString(prefix + "case_reactivated_subject", "Your case has been reactivated");
+			String body = MessageFormat.format(getLocalizedString(prefix + "case_reactivated_body", "Your case with category {0} and type {1} has been reactivated by {2}"), arguments);
 			
 			sendMessage(theCase, owner, performer, subject, body);
 		}

@@ -1,4 +1,5 @@
 address=Address
+anonymous_case_sent_body=A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}
 application.case_creator=Case creator
 application_errors_occured=There was a problem with the following items
 back=Back
@@ -101,6 +102,8 @@ sender=Sender
 status=Status
 sub_case_category=Sub category
 sub_category=Sub category
+suggestion.anonymous_case_creator.save_confirmation=Your case has been sent and will be processed accordingly.
+suggestion.anonymous_case_sent_body=A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}
 suggestion.application.case_creator=Case creator
 suggestion.application.enter_new_case=Enter new case
 suggestion.application.overview=Overview

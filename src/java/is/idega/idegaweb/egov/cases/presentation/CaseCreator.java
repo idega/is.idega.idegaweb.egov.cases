@@ -428,7 +428,7 @@ public class CaseCreator extends ApplicationForm {
 			heading.setStyleClass("applicationHeading");
 			add(heading);
 			
-			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString("case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
+			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), getUser(iwc) != null ? this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_confirmation", "Your case has been sent and will be processed accordingly.") : this.iwrb.getLocalizedString("anonymous_case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
 			Layer clearLayer = new Layer(Layer.DIV);
 			clearLayer.setStyleClass("Clear");
