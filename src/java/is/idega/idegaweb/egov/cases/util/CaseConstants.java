@@ -17,4 +17,5 @@ public class CaseConstants {
 	public static final String CASE_CODE_KEY = "GENCASE";
 	
 	public static final String PROPERTY_USE_SUB_CATEGORIES = "egov.cases.use.sub.categories";
+	public static final String PROPERTY_USE_TYPES = "egov.cases.use.types";
 }

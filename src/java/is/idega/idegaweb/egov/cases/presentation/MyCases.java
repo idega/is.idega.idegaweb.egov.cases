@@ -30,6 +30,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
@@ -116,6 +117,8 @@ public class MyCases extends CasesProcessor {
 		types.setSelectedElement(type.getPrimaryKey().toString());
 		types.setStyleClass("caseTypeDropdown");
 		
+		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
+		
 		DropdownMenu statuses = new DropdownMenu(PARAMETER_STATUS);
 		statuses.addMenuElement(getBusiness().getCaseStatusPending().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
 		statuses.addMenuElement(getBusiness().getCaseStatusWaiting().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
@@ -133,16 +136,21 @@ public class MyCases extends CasesProcessor {
 		reply.setStyleClass("textarea");
 		reply.keepStatusOnAction(true);
 		
+		if (getBusiness().useTypes()) {
+			Layer element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
+			element.add(label);
+			element.add(types);
+			section.add(element);
+		}
+		else {
+			form.add(hiddenType);
+		}
+		
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
-		element.add(label);
-		element.add(types);
-		section.add(element);
-
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
+		Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
 		element.add(label);
 		element.add(categories);
 		section.add(element);

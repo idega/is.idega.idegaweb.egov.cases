@@ -94,6 +94,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Collection getCaseTypes() throws RemoteException;
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getFirstAvailableCaseType
+	 */
+	public CaseType getFirstAvailableCaseType() throws RemoteException;
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#removeCaseType
 	 */
 	public void removeCaseType(Object caseTypePK) throws FinderException, RemoveException, RemoteException;
@@ -137,4 +142,9 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#useSubCategories
 	 */
 	public boolean useSubCategories() throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#useTypes
+	 */
+	public boolean useTypes() throws RemoteException;
 }

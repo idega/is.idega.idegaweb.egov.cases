@@ -1,36 +1,18 @@
-/*
- * $Id$
- * Created on Nov 7, 2005
- *
- * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
- */
 package is.idega.idegaweb.egov.cases.data;
 
+
 import java.util.Collection;
-import javax.ejb.FinderException;
+import javax.ejb.CreateException;
 import com.idega.data.IDOHome;
+import javax.ejb.FinderException;
 
-
-/**
- * <p>
- * TODO laddi Describe Type CaseTypeHome
- * </p>
- *  Last modified: $Date$ by $Author$
- * 
- * @author <a href="mailto:laddi@idega.com">laddi</a>
- * @version $Revision$
- */
 public interface CaseTypeHome extends IDOHome {
 
-	public CaseType create() throws javax.ejb.CreateException;
+	public CaseType create() throws CreateException;
 
-	public CaseType findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
+	public CaseType findByPrimaryKey(Object pk) throws FinderException;
 
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.CaseTypeBMPBean#ejbFindAll
-	 */
 	public Collection findAll() throws FinderException;
+
+	public CaseType findFirstType() throws FinderException;
 }

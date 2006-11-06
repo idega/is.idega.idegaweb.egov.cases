@@ -217,6 +217,11 @@ public class CaseTypeEditor extends CasesBlock {
 		section.setStyleClass("formSection");
 		form.add(section);
 		
+		Layer helpLayer = new Layer(Layer.DIV);
+		helpLayer.setStyleClass("helperText");
+		helpLayer.add(new Text(getResourceBundle().getLocalizedString("type_editor.help", "Help for creating/editing types.")));
+		section.add(helpLayer);
+		
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
 		Label label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);

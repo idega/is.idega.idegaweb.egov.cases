@@ -115,7 +115,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		try {
 			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
-			return iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_status_key." + theCase.getStatus(), theCase.getStatus());
+			return iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_status_key." + status.getStatus(), status.getStatus());
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -246,6 +246,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		}
 	}
 	
+	public CaseType getFirstAvailableCaseType() {
+		try {
+			return getCaseTypeHome().findFirstType();
+		}
+		catch (FinderException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public void removeCaseType(Object caseTypePK) throws FinderException, RemoveException {
 		getCaseType(caseTypePK).remove();
 	}
@@ -278,7 +288,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group)null);
 		
 		try {
-			String prefix = (type != null ? type : "") + ".";
+			String prefix = (type != null ? type + "." : "");
 			
 			String subject = getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
 			String body = null;
@@ -325,7 +335,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
-			String prefix = (theCase.getType() != null ? theCase.getType() : "") + ".";
+			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "") + ".";
 
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(theCase, getCaseStatus(status), locale) };
 			String subject = getLocalizedString(prefix + "case_handled_subject", "Your case has been handled");
@@ -343,7 +353,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
-			String prefix = (theCase.getType() != null ? theCase.getType() : "") + ".";
+			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "") + ".";
 
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
 			String subject = getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
@@ -361,7 +371,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
-			String prefix = (theCase.getType() != null ? theCase.getType() : "") + ".";
+			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "") + ".";
 
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
 			String subject = getLocalizedString(prefix + "case_reactivated_subject", "Your case has been reactivated");
@@ -427,5 +437,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public boolean useSubCategories() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_USE_SUB_CATEGORIES, false);
+	}
+
+	public boolean useTypes() {
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_USE_TYPES, true);
 	}
 }

@@ -97,9 +97,11 @@ public abstract class CasesProcessor extends CasesBlock {
 		cell.setStyleClass("sender");
 		cell.add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
 		
-		cell = row.createHeaderCell();
-		cell.setStyleClass("caseType");
-		cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+		if (getBusiness().useTypes()) {
+			cell = row.createHeaderCell();
+			cell.setStyleClass("caseType");
+			cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+		}
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("createdDate");
@@ -150,9 +152,12 @@ public abstract class CasesProcessor extends CasesBlock {
 			else {
 				cell.add(new Text("-"));
 			}
-			cell = row.createCell();
-			cell.setStyleClass("caseType");
-			cell.add(new Text(type.getName()));
+			
+			if (getBusiness().useTypes()) {
+				cell = row.createCell();
+				cell.setStyleClass("caseType");
+				cell.add(new Text(type.getName()));
+			}
 			
 			cell = row.createCell();
 			cell.setStyleClass("createdDate");

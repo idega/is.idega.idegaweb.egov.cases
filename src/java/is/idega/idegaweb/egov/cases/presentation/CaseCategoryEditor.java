@@ -238,6 +238,11 @@ public class CaseCategoryEditor extends CasesBlock {
 		section.setStyleClass("formSection");
 		form.add(section);
 		
+		Layer helpLayer = new Layer(Layer.DIV);
+		helpLayer.setStyleClass("helperText");
+		helpLayer.add(new Text(getResourceBundle().getLocalizedString("category_editor.help", "Help for creating/editing categories.")));
+		section.add(helpLayer);
+		
 		TextInput name = new TextInput(PARAMETER_NAME);
 		name.keepStatusOnAction(true);
 

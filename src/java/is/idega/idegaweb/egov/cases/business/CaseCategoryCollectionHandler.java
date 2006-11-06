@@ -58,7 +58,7 @@ public class CaseCategoryCollectionHandler implements RemoteScriptCollection {
 			}
 			else {
 				ids.add(sourceID);
-				names.add("");
+				names.add(iwrb.getLocalizedString("case_creator.no_sub_category", "no sub category"));
 			}
 		}
 		catch (RemoteException e) {

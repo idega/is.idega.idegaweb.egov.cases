@@ -111,21 +111,23 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 		
-		Layer element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		Label label = new Label();
-		label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
-		element.add(label);
-		element.add(caseType);
-		section.add(element);
-
+		if (getBusiness().useTypes()) {
+			Layer element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			Label label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
+			element.add(label);
+			element.add(caseType);
+			section.add(element);
+		}
+		
 		if (parentCategory != null) {
 			Layer parentCaseCategory = new Layer(Layer.SPAN);
 			parentCaseCategory.add(new Text(parentCategory.getName()));
 			
-			element = new Layer(Layer.DIV);
+			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			label = new Label();
+			Label label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(parentCaseCategory);
@@ -140,18 +142,18 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			section.add(element);
 		}
 		else {
-			element = new Layer(Layer.DIV);
+			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			label = new Label();
+			Label label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(caseCategory);
 			section.add(element);
 		}
 		
-		element = new Layer(Layer.DIV);
+		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		label = new Label();
+		Label label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);

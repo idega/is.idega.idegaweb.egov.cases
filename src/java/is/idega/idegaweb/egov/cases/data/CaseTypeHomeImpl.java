@@ -1,46 +1,37 @@
-/*
- * $Id$
- * Created on Nov 7, 2005
- *
- * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
- */
 package is.idega.idegaweb.egov.cases.data;
 
+
 import java.util.Collection;
+import javax.ejb.CreateException;
 import javax.ejb.FinderException;
+import com.idega.data.IDOEntity;
 import com.idega.data.IDOFactory;
 
-
-/**
- * <p>
- * TODO laddi Describe Type CaseTypeHomeImpl
- * </p>
- *  Last modified: $Date$ by $Author$
- * 
- * @author <a href="mailto:laddi@idega.com">laddi</a>
- * @version $Revision$
- */
 public class CaseTypeHomeImpl extends IDOFactory implements CaseTypeHome {
 
-	protected Class getEntityInterfaceClass() {
+	public Class getEntityInterfaceClass() {
 		return CaseType.class;
 	}
 
-	public CaseType create() throws javax.ejb.CreateException {
+	public CaseType create() throws CreateException {
 		return (CaseType) super.createIDO();
 	}
 
-	public CaseType findByPrimaryKey(Object pk) throws javax.ejb.FinderException {
+	public CaseType findByPrimaryKey(Object pk) throws FinderException {
 		return (CaseType) super.findByPrimaryKeyIDO(pk);
 	}
 
 	public Collection findAll() throws FinderException {
-		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
-		java.util.Collection ids = ((CaseTypeBMPBean) entity).ejbFindAll();
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((CaseTypeBMPBean) entity).ejbFindAll();
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
+	public CaseType findFirstType() throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Object pk = ((CaseTypeBMPBean) entity).ejbFindFirstType();
+		this.idoCheckInPooledEntity(entity);
+		return this.findByPrimaryKey(pk);
 	}
 }

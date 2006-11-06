@@ -195,6 +195,9 @@ public class CaseCreator extends ApplicationForm {
 		types.keepStatusOnAction(true);
 		types.setStyleClass("caseTypeDropdown");
 		
+		CaseType firstType = getCasesBusiness(iwc).getFirstAvailableCaseType();
+		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, firstType != null ? firstType.getPrimaryKey().toString() : "");
+		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		message.keepStatusOnAction(true);
@@ -204,18 +207,23 @@ public class CaseCreator extends ApplicationForm {
 		helpLayer.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.information_text", "Information text here...")));
 		section.add(helpLayer);
 		
+		if (getCasesBusiness(iwc).useTypes()) {
+			Layer formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("required");
+			Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_type", "Case type"))), types);
+			formItem.add(label);
+			formItem.add(types);
+			section.add(formItem);
+		}
+		else {
+			form.add(hiddenType);
+		}
+		
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
-		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_type", "Case type"))), types);
-		formItem.add(label);
-		formItem.add(types);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		formItem.setStyleClass("required");
-		label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
+		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
 		formItem.add(label);
 		formItem.add(categories);
 		section.add(formItem);
@@ -356,17 +364,19 @@ public class CaseCreator extends ApplicationForm {
 		Layer messageSpan = new Layer(Layer.SPAN);
 		messageSpan.add(new Text(message));
 		
+		if (getCasesBusiness(iwc).useTypes()) {
+			Layer formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			Label label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString("case_type", "Case type"));
+			formItem.add(label);
+			formItem.add(typeSpan);
+			section.add(formItem);
+		}
+		
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(this.iwrb.getLocalizedString("case_type", "Case type"));
-		formItem.add(label);
-		formItem.add(typeSpan);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
 		label.setLabel(this.iwrb.getLocalizedString("case_category", "Case category"));
 		formItem.add(label);
 		formItem.add(categorySpan);

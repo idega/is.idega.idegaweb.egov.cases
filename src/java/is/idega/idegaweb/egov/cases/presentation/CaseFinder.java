@@ -201,7 +201,9 @@ public class CaseFinder extends CasesBlock {
 			cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
 			
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
-			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+			if (getBusiness().useTypes()) {
+				row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
+			}
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
@@ -258,7 +260,11 @@ public class CaseFinder extends CasesBlock {
 				else {
 					row.createCell().add(new Text("-"));
 				}
-				row.createCell().add(new Text(type.getName()));
+				
+				if (getBusiness().useTypes()) {
+					row.createCell().add(new Text(type.getName()));
+				}
+				
 				row.createCell().add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 	
 				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));

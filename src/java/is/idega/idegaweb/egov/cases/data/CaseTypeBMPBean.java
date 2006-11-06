@@ -72,4 +72,14 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 		
 		return idoFindPKsByQuery(query);
 	}
+	
+	public Object ejbFindFirstType() throws FinderException {
+		Table table = new Table(this);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addOrder(table, COLUMN_ORDER, true);
+		
+		return idoFindOnePKByQuery(query);
+	}
 }
