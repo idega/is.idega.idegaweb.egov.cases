@@ -335,7 +335,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
-			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "") + ".";
+			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
 
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(theCase, getCaseStatus(status), locale) };
 			String subject = getLocalizedString(prefix + "case_handled_subject", "Your case has been handled");
@@ -353,7 +353,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
-			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "") + ".";
+			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
 
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
 			String subject = getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
@@ -371,7 +371,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
-			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "") + ".";
+			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
 
 			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
 			String subject = getLocalizedString(prefix + "case_reactivated_subject", "Your case has been reactivated");
