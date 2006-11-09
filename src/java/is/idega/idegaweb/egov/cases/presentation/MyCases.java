@@ -105,10 +105,15 @@ public class MyCases extends CasesProcessor {
 		
 		if (parentCategory != null) {
 			Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
-			Iterator iter = collection.iterator();
-			while (iter.hasNext()) {
-				CaseCategory subCategory = (CaseCategory) iter.next();
-				subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+			if (collection.isEmpty()) {
+				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+			}
+			else {
+				Iterator iter = collection.iterator();
+				while (iter.hasNext()) {
+					CaseCategory subCategory = (CaseCategory) iter.next();
+					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+				}
 			}
 		}
 		
@@ -232,15 +237,16 @@ public class MyCases extends CasesProcessor {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
+		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
+		back.setStyleClass("homeButton");
+		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.setToFormSubmit(form);
+		bottom.add(back);
+
 		Link next = getButtonLink(getResourceBundle().getLocalizedString("process", "Process"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
-
-		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-		back.setToFormSubmit(form);
-		bottom.add(back);
 
 		add(form);
 	}

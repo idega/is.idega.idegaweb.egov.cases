@@ -175,14 +175,15 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
+		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
+		back.setStyleClass("homeButton");
+		back.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		bottom.add(back);
+
 		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ?  getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		next.setToFormSubmit(form);
 		bottom.add(next);
-
-		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
-		back.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-		bottom.add(back);
 
 		add(form);
 	}

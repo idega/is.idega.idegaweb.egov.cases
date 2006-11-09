@@ -216,6 +216,7 @@ public class CaseViewer extends CaseCreator {
 
 			if (this.iBackPage != null) {
 				Link home = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+				home.setStyleClass("buttonHome");
 				home.setPage(this.iBackPage);
 				bottom.add(home);
 			}

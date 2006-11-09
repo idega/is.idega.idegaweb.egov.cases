@@ -177,7 +177,7 @@ public class CaseCreator extends ApplicationForm {
 				}
 				else {
 					addEmptyElement = false;
-					subCategories.addMenuElement(category.getPrimaryKey().toString(), "");
+					subCategories.addMenuElement(category.getPrimaryKey().toString(), iwrb.getLocalizedString("case_creator.no_sub_category", "no sub category"));
 				}
 			}
 			catch (FinderException fe) {
@@ -412,15 +412,16 @@ public class CaseCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
+		Link back = getButtonLink(this.iwrb.getLocalizedString("previous", "Previous"));
+		back.setStyleClass("homeButton");
+		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
+		back.setToFormSubmit(form);
+		bottom.add(back);
+
 		Link next = getButtonLink(this.iwrb.getLocalizedString("send", "Send"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
-
-		Link back = getButtonLink(this.iwrb.getLocalizedString("previous", "Previous"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1));
-		back.setToFormSubmit(form);
-		bottom.add(back);
 
 		add(form);
 	}

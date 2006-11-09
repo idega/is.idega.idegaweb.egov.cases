@@ -189,6 +189,7 @@ public class ClosedCases extends CasesProcessor {
 		form.add(bottom);
 
 		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
+		back.setStyleClass("homeButton");
 		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
