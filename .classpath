@@ -11,7 +11,7 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.school">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.block.process.webservice">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.process.webservice-3.1.0.jar">
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.user">
   </classpathentry>
@@ -23,7 +23,7 @@
   </classpathentry>
   <classpathentry kind="src" path="/se.idega.idegaweb.commune.care">
   </classpathentry>
-  <classpathentry kind="src" path="/org.apache.axis">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/org.apache.axis-1.3.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/axis/jars/axis-1.3.jar">
   </classpathentry>
