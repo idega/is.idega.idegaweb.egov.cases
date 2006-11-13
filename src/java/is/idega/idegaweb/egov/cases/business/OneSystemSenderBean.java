@@ -534,7 +534,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 				message.append(HttpStatus.getStatusText(status));
 				
 				SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
-						"Villa ’ svari fra OS", message.toString());
+						"Villa i svari fra OS", message.toString());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -568,7 +568,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 			
 			try {
 				SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
-						"Villa ’ sendingu til OS", message.toString());
+						"Villa i sendingu til OS", message.toString());
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
@@ -1246,7 +1246,7 @@ public class OneSystemSenderBean extends IBOServiceBean implements Runnable {
 		
 		try {
 			SendMail.send(from, to.toString(), cc.toString(), null, mailserver,
-					"Villa ’ svari fra OS", message.toString());
+					"Villa i svari fra OS", message.toString());
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
