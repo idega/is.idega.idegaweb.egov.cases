@@ -328,6 +328,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		CaseCategory category = getCaseCategory(caseCategoryPK);
 		theCase.setCaseCategory(category);
+
+		Group handlerGroup = category.getHandlerGroup();
+		theCase.setHandler(handlerGroup);
+
 		CaseType type = getCaseType(caseTypePK);
 		theCase.setCaseType(type);
 		
