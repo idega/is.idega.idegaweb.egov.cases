@@ -59,6 +59,11 @@
       <name>1.0.10</name>
       <tag>CASES_1_0_10</tag>
     </version>
+    <version>
+      <id>1.0.11</id>
+      <name>1.0.11</name>
+      <tag>CASES_1_0_11</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
@@ -107,7 +112,7 @@
       <version>3.1.0</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
-   </dependency>
+    </dependency>
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.user</artifactId>
