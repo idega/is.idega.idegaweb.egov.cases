@@ -21,10 +21,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.data.CaseStatusHome;
+import com.idega.business.IBORuntimeException;
+import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -42,6 +47,8 @@ import com.idega.util.database.ConnectionBroker;
 
 
 public class CasesStatistics extends CasesBlock {
+	
+	private String visibleStatuses = null;
 
 	protected void present(IWContext iwc) throws Exception {
 		
@@ -49,7 +56,22 @@ public class CasesStatistics extends CasesBlock {
 		boolean useTypes = super.getCasesBusiness(iwc).useTypes();
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
-		Collection statuses = getBusiness().getCaseStatuses();
+		Collection statuses = null;
+		if (visibleStatuses == null) {
+			statuses = getBusiness().getCaseStatuses();
+		} else {
+			statuses = new ArrayList();
+			StringTokenizer tok = new StringTokenizer(visibleStatuses, ",");
+			while (tok.hasMoreTokens()) {
+				String status = tok.nextToken().trim();
+				try {
+				CaseStatus cStat = getCaseStatusHome().findByPrimaryKey(status);
+				statuses.add(cStat);
+				} catch (FinderException f) {
+					f.printStackTrace();
+				}
+			}
+		}
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -185,7 +207,20 @@ public class CasesStatistics extends CasesBlock {
 		Handler handler = new CaseTypeHandler();
 		return getResults(iwc, handler, false, -1);
 	}
-
+	
+	public void setVisibleStatuses(String statuses) {
+		this.visibleStatuses = statuses;
+	}
+	
+	protected CaseStatusHome getCaseStatusHome() {
+		try {
+			return (CaseStatusHome) IDOLookup.getHome(CaseStatus.class);
+		}
+		catch (IDOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+	
 	private Collection getResults(IWContext iwc, Handler handler, boolean useSubCats, int parentID) {
 		Connection conn = null;
 		Statement stmt = null;
