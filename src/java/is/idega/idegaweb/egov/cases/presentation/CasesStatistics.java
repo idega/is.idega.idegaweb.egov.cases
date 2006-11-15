@@ -260,7 +260,7 @@ public class CasesStatistics extends CasesBlock {
 		public Collection getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException ;
 	}
 	
-	private class CategoryHandler implements Handler{
+	protected class CategoryHandler implements Handler{
 		
 		public String getSQL(boolean useSubCats, int parentID) {
 			StringBuffer buff = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
@@ -312,7 +312,7 @@ public class CasesStatistics extends CasesBlock {
 	
 	}
 
-	private class UserHandler implements Handler{
+	protected class UserHandler implements Handler{
 		
 		public String getSQL(boolean useSubCats, int parentID) {
 			return "select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
@@ -357,7 +357,7 @@ public class CasesStatistics extends CasesBlock {
 	
 	}
 
-	private class CaseTypeHandler implements Handler{
+	protected class CaseTypeHandler implements Handler{
 		
 		public String getSQL(boolean useSubCats, int parentID) {
 			return "select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
