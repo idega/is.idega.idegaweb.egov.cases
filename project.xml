@@ -64,6 +64,11 @@
       <name>1.0.11</name>
       <tag>CASES_1_0_11</tag>
     </version>
+    <version>
+      <id>1.0.11</id>
+      <name>1.0.11</name>
+      <tag>CASE_1_0_11</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
