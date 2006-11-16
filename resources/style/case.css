@@ -39,33 +39,6 @@
 	background-color: #FFFFFF;	
 }
 
-.statisticsLayer .ASWD {
-	display:none;
-}
-.statisticsLayer .BVJD {
-	display:none;
-}
-.statisticsLayer .CHIN {
-	display:none;
-}
-.statisticsLayer .FLYT {
-	display:none;
-}
-.statisticsLayer .GROU {
-	display:none;
-}
-.statisticsLayer .NYTT {
-	display:none;
-}
-.statisticsLayer .OMPR {
-	display:none;
-}
-.statisticsLayer .PLAC {
-	display:none;
-}
-.statisticsLayer .PREL {
-	display:none;
-}
 .statisticsLayer TH {
 	width : 100px;
 }
