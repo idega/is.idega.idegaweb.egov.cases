@@ -146,9 +146,14 @@ public class CasesStatistics extends CasesBlock {
 		while (iter.hasNext()) {
 			++iRow;
 			Result res = (Result) iter.next();
-			addResultToTable(statuses, group, iRow, res, isSubCategory);
+			boolean hasSubCats = false;
+			Collection subCats = null;
 			if (useSubCats) {
-				Collection subCats = getResults(iwc, true, res.getID());
+				subCats = getResults(iwc, true, res.getID());
+				hasSubCats = subCats != null && !subCats.isEmpty();
+			}
+			addResultToTable(statuses, group, iRow, res, isSubCategory, !hasSubCats);
+			if (hasSubCats) {
 				iRow = addResults(table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow);
 			}
 		}
@@ -157,7 +162,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 
 
-	private void addResultToTable(Collection statuses, TableRowGroup group, int iRow, Result res, boolean isSubCategory) {
+	private void addResultToTable(Collection statuses, TableRowGroup group, int iRow, Result res, boolean isSubCategory, boolean showNumbers) {
 		TableRow row;
 		TableCell2 cell;
 		Iterator statIter;
@@ -178,7 +183,11 @@ public class CasesStatistics extends CasesBlock {
 			}
 			cell = row.createCell();
 			cell.setStyleClass(status.getStatus());
-			cell.add(new Text(String.valueOf(val)));
+			if (showNumbers) {
+				cell.add(new Text(String.valueOf(val)));
+			} else {
+				cell.add(Text.getNonBrakingSpace());
+			}
 			cell.setHorizontalAlignment(Table2.HORIZONTAL_ALIGNMENT_CENTER);
 		}
 		cell.setStyleClass("lastColumn");
