@@ -320,7 +320,7 @@ public class CasesStatistics extends CasesBlock {
 						buff.append("where cc.parent_category is null");
 					}
 					buff.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ")
-					.append("ORDER BY COMM_CASE_CATEGORY_ID, cc.category_order");
+					.append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
 			
 			return buff.toString();
 		}
