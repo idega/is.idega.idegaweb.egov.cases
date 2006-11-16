@@ -136,7 +136,8 @@ public class CasesStatistics extends CasesBlock {
 				cell.setStyleClass(status.getStatus());
 				cell.add(new Text(iwrb.getLocalizedString("case_status_key."+status.getStatus(), status.getStatus())));
 			}
-			
+			cell.setStyleClass("lastColumn");
+
 			group = table.createBodyRowGroup();
 		}
 		
@@ -167,6 +168,7 @@ public class CasesStatistics extends CasesBlock {
 		row = group.createRow();
 		cell = row.createCell();
 		cell.add(new Text(res.getName()));
+		cell.setStyleClass("firstColumn");
 		while (statIter.hasNext()) {
 			status = (CaseStatus) statIter.next();
 			Integer value = (Integer) map.get(status.getStatus());
@@ -179,6 +181,7 @@ public class CasesStatistics extends CasesBlock {
 			cell.add(new Text(String.valueOf(val)));
 			cell.setHorizontalAlignment(Table2.HORIZONTAL_ALIGNMENT_CENTER);
 		}
+		cell.setStyleClass("lastColumn");
 
 		if (iRow % 2 == 0) {
 			row.setStyleClass("evenRow");
