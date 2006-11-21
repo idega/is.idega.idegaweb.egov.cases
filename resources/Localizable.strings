@@ -1,5 +1,6 @@
 address=Address
 anonymous=Anonymous
+anonymous_application.case_creator=Anonymous case creator
 anonymous_case_creator.save_confirmation=Your case has been sent and will be processed accordingly.
 anonymous_case_sent_body=A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows\:\n{2}
 application.case_creator=Case creator
@@ -121,6 +122,7 @@ sender=Sender
 status=Status
 sub_case_category=Sub category
 sub_category=Sub category
+suggestion.anonymous_application.case_creator=Anonymous suggestion
 suggestion.anonymous_case_creator.save_confirmation=Your case has been sent and will be processed accordingly.
 suggestion.anonymous_case_sent_body=A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows\:\n{2}
 suggestion.application.case_creator=Case creator

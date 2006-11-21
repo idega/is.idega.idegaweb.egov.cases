@@ -114,8 +114,8 @@ public class CaseCreator extends ApplicationForm {
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1)));
 		
 		addErrors(iwc, form);
-		
-		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
+
+		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator"));
 		heading.setStyleClass("applicationHeading");
 		form.add(heading);
 		

@@ -1,5 +1,6 @@
 address=Heimilisfang
 anonymous=Nafnlaus
+anonymous_application.case_creator=Nafnlaust erindi
 anonymous_case_creator.save_confirmation=Erindi \u00FEitt hefur n\u00FA veri\u00F0 m\u00F3tteki\u00F0.
 anonymous_case_sent_body=Nafnlaust erindi hefur veri\u00F0 sent inn \u00ED m\u00E1laflokknum {1}.\r\n\r\nErindi\u00F0 er eftirfarandi\:\r\n{2}\r\n\r\nEf \u00FE\u00FA ert ekki \u00FEegar innskr\u00E1\u00F0/ur \u00ED kerfi\u00F0, \u00FE\u00E1 skr\u00E1ir \u00FE\u00FA \u00FEig inn \u00E1 https\://rafraen.reykjavik.is. Smellir \u00FEar \u00E1 Opin m\u00E1l \u00ED flipanum Umsj\u00F3n til a\u00F0 taka a\u00F0 \u00FE\u00E9r erindi\u00F0 og svara \u00FEv\u00ED.
 application.case_creator=Erindi
