@@ -89,6 +89,10 @@ public class MyCases extends CasesProcessor {
 		section.setStyleClass("formSection");
 		form.add(section);
 		
+		if (theCase.isPrivate()) {
+			section.add(getAttentionLayer(getResourceBundle().getLocalizedString("case.is_private", "The sender wishes that this case be handled as confidential.")));
+		}
+		
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 

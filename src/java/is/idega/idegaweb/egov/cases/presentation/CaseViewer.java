@@ -93,6 +93,10 @@ public class CaseViewer extends CaseCreator {
 			section.setStyleClass("formSection");
 			form.add(section);
 			
+			if (theCase.isPrivate()) {
+				section.add(getAttentionLayer(iwrb.getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
+			}
+			
 			if (getCasesBusiness(iwc).useTypes()) {
 				Layer formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");

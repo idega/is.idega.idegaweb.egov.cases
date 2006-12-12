@@ -18,4 +18,6 @@ public class CaseConstants {
 	
 	public static final String PROPERTY_USE_SUB_CATEGORIES = "egov.cases.use.sub.categories";
 	public static final String PROPERTY_USE_TYPES = "egov.cases.use.types";
+	public static final String PROPERTY_ALLOW_PRIVATE_CASES = "egov.cases.allow.private.cases";
+
 }

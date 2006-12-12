@@ -34,6 +34,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 	private static final String COLUMN_CASE_TYPE = "case_type";
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
+	private static final String COLUMN_IS_PRIVATE = "is_private";
 	
 	/* (non-Javadoc)
 	 * @see com.idega.block.process.data.AbstractCaseBMPBean#getCaseCodeKey()
@@ -59,6 +60,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		addAttribute(COLUMN_MESSAGE, "Message", String.class, 4000);
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
 		addAttribute(COLUMN_TYPE, "Type", String.class);
+		addAttribute(COLUMN_IS_PRIVATE, "Is private", Boolean.class);
 		
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -99,6 +101,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 		return (User) getColumnValue(COLUMN_HANDLER);
 	}
 	
+	public boolean isPrivate() {
+		return getBooleanColumnValue(COLUMN_IS_PRIVATE, false);
+	}
+	
 	//Setters
 	public void setMessage(String message) {
 		setColumn(COLUMN_MESSAGE, message);
@@ -122,6 +128,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case , Ge
 	
 	public void setHandledBy(User handler) {
 		setColumn(COLUMN_HANDLER, handler);
+	}
+	
+	public void setAsPrivate(boolean isPrivate) {
+		setColumn(COLUMN_IS_PRIVATE, isPrivate);
 	}
 
 	//Finders

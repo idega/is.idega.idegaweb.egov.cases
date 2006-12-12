@@ -138,6 +138,9 @@ public abstract class CasesProcessor extends CasesBlock {
 			else if (!iter.hasNext()) {
 				row.setStyleClass("lastRow");
 			}
+			if (theCase.isPrivate()) {
+				row.setStyleClass("isPrivate");
+			}
 			
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
@@ -191,6 +194,9 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 
 		add(table);
+		if (getCasesBusiness(iwc).allowPrivateCases()) {
+			add(getLegend());
+		}
 	}
 	
 	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {

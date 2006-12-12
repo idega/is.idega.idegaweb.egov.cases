@@ -48,6 +48,11 @@ public interface GeneralCase extends IDOEntity, Case {
 	public User getHandledBy();
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#isPrivate
+	 */
+	public boolean isPrivate();
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setMessage
 	 */
 	public void setMessage(String message);
@@ -76,4 +81,9 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setHandledBy
 	 */
 	public void setHandledBy(User handler);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAsPrivate
+	 */
+	public void setAsPrivate(boolean isPrivate);
 }

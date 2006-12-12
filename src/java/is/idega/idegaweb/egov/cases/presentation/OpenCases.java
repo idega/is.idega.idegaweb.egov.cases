@@ -99,6 +99,10 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		section.setStyleClass("formSection");
 		form.add(section);
 		
+		if (theCase.isPrivate()) {
+			section.add(getAttentionLayer(getResourceBundle().getLocalizedString("case.is_private", "The sender wishes that this case be handled as confidential.")));
+		}
+		
 		Layer caseType = new Layer(Layer.SPAN);
 		caseType.add(new Text(type.getName()));
 		

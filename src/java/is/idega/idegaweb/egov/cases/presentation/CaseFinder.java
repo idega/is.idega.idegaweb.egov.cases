@@ -231,6 +231,9 @@ public class CaseFinder extends CasesBlock {
 				else if (!iter.hasNext()) {
 					row.setStyleClass("lastRow");
 				}
+				if (theCase.isPrivate()) {
+					row.setStyleClass("isPrivate");
+				}
 				
 				boolean addProcessLink = false;
 				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")));
@@ -294,6 +297,9 @@ public class CaseFinder extends CasesBlock {
 			}
 	
 			add(table);
+			if (getCasesBusiness(iwc).allowPrivateCases()) {
+				add(getLegend());
+			}
 		}
 	}
 	

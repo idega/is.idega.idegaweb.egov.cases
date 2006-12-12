@@ -260,7 +260,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		getCaseType(caseTypePK).remove();
 	}
 	
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type) throws CreateException {
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type, boolean isPrivate) throws CreateException {
 		GeneralCase theCase = getGeneralCaseHome().create();
 		CaseCategory category = null;
 		try {
@@ -285,6 +285,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		theCase.setHandler(handlerGroup);
 		theCase.setMessage(message);
 		theCase.setType(type);
+		theCase.setAsPrivate(isPrivate);
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group)null);
 		
 		try {
@@ -445,5 +446,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 
 	public boolean useTypes() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_USE_TYPES, true);
+	}
+
+	public boolean allowPrivateCases() {
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_PRIVATE_CASES, false);
 	}
 }

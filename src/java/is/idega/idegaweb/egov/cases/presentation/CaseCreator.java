@@ -38,7 +38,9 @@ import com.idega.presentation.Span;
 import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
@@ -57,6 +59,7 @@ public class CaseCreator extends ApplicationForm {
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
+	private static final String PARAMETER_PRIVATE = "prm_private";
 	
 	private static final int ACTION_PHASE_1 = 1;
 	private static final int ACTION_OVERVIEW = 2;
@@ -265,6 +268,35 @@ public class CaseCreator extends ApplicationForm {
 		clear.setStyleClass("Clear");
 		section.add(clear);
 
+		if (getCasesBusiness(iwc).allowPrivateCases() && !iUseAnonymous) {
+			heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.private_case_info", "Private case information"));
+			heading.setStyleClass("subHeader");
+			form.add(heading);
+			
+			section = new Layer(Layer.DIV);
+			section.setStyleClass("formSection");
+			form.add(section);
+			
+			CheckBox isPrivate = new CheckBox(PARAMETER_PRIVATE, Boolean.TRUE.toString());
+			isPrivate.setStyleClass("checkbox");
+			isPrivate.keepStatusOnAction(true);
+			
+			Paragraph paragraph = new Paragraph();
+			paragraph.setStyleClass("privateText");
+			paragraph.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.private_text", "Private text")));
+			section.add(paragraph);
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("radioButtonItem");
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.request_private_handling", "I request for my case to be handled confidentially"))), isPrivate);
+			formItem.add(isPrivate);
+			formItem.add(label);
+			section.add(formItem);
+			
+			section.add(clear);
+		}
+		
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
@@ -306,6 +338,7 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
+		form.maintainParameter(PARAMETER_PRIVATE);
 		
 		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
 		heading.setStyleClass("applicationHeading");
@@ -431,9 +464,10 @@ public class CaseCreator extends ApplicationForm {
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
+		boolean isPrivate = iwc.isParameterSet(PARAMETER_PRIVATE);
 		
 		try {
-			getCasesBusiness(iwc).storeGeneralCase(getUser(iwc), getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, message, getType());
+			getCasesBusiness(iwc).storeGeneralCase(getUser(iwc), getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, message, getType(), isPrivate);
 
 			Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
 			heading.setStyleClass("applicationHeading");

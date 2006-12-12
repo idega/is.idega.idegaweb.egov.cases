@@ -46,3 +46,11 @@
 .statisticsLayer .name{
 	width : 300px;
 }
+
+table.adminTable tr.isPrivate {
+	background-color: #cce7ff;
+}
+
+ul.legend li.isPrivate {
+	color: #0088ff;
+}

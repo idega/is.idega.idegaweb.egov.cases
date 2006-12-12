@@ -6,6 +6,12 @@
 	
 	<body>
 
+		<release version="1.0.12" date="2006-12-12">
+			<action dev="laddi" type="update">
+				Added support for marking cases as confidential.
+			</action>
+		</release>
+		
 		<release version="1.0.11" date="2006-11-15">
 			<action dev="gimmi" type="update">
 				CaseStatistics updated

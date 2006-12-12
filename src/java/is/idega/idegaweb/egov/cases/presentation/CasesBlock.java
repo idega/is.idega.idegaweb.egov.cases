@@ -32,6 +32,9 @@ import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.text.ListItem;
+import com.idega.presentation.text.Lists;
+import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Label;
 import com.idega.user.business.UserBusiness;
@@ -200,6 +203,41 @@ public abstract class CasesBlock extends Block {
 		else {
 			return "";
 		}
+	}
+
+	protected Lists getLegend() {
+		Lists list = new Lists();
+		list.setStyleClass("legend");
+		
+		ListItem item = new ListItem();
+		item.setStyleClass("isPrivate");
+		item.add(new Text(this.iwrb.getLocalizedString("legend.is_private", "Is private")));
+		list.add(item);
+		
+		return list;
+	}
+	
+	protected Layer getAttentionLayer(String text) {
+		Layer layer = new Layer(Layer.DIV);
+		layer.setStyleClass("attention");
+
+		Layer imageLayer = new Layer(Layer.DIV);
+		imageLayer.setStyleClass("attentionImage");
+		layer.add(imageLayer);
+
+		Layer textLayer = new Layer(Layer.DIV);
+		textLayer.setStyleClass("attentionText");
+		layer.add(textLayer);
+
+		Paragraph paragraph = new Paragraph();
+		paragraph.add(new Text(text));
+		textLayer.add(paragraph);
+
+		Layer clearLayer = new Layer(Layer.DIV);
+		clearLayer.setStyleClass("attentionClear");
+		layer.add(clearLayer);
+
+		return layer;
 	}
 
 	protected IWBundle getBundle() {
