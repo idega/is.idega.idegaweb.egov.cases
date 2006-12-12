@@ -74,7 +74,7 @@ public class ClosedCases extends CasesProcessor {
 		form.add(layer);
 		
 		if (theCase.isPrivate()) {
-			layer.add(getAttentionLayer(getResourceBundle().getLocalizedString("case.is_private", "The sender wishes that this case be handled as confidential.")));
+			layer.add(getAttentionLayer(getResourceBundle().getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
 		}
 		
 		Layer caseType = new Layer(Layer.SPAN);

@@ -48,9 +48,9 @@
 }
 
 table.adminTable tr.isPrivate {
-	background-color: #cce7ff;
+	background-color: #fff0cc;
 }
 
 ul.legend li.isPrivate {
-	color: #0088ff;
+	color: #f09e00;
 }
