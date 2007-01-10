@@ -6,6 +6,12 @@
 	
 	<body>
 
+		<release version="1.0.13" date="2007-01-10">
+			<action dev="eiki" type="update">
+				English localization and variants for Neytendastofa.
+			</action>
+		</release>
+		
 		<release version="1.0.12" date="2006-12-12">
 			<action dev="laddi" type="update">
 				Added support for marking cases as confidential.
