@@ -5,6 +5,13 @@
 	</properties>
 	
 	<body>
+	
+		<release version="1.0.17" date="2007-02-01">
+			<action dev="eiki" type="fix">
+				localization
+			</action>
+		</release>
+		
 		<release version="1.0.16" date="2007-02-01">
 			<action dev="eiki" type="fix">
 				Fixed bugs in categoryeditor and casecreator
