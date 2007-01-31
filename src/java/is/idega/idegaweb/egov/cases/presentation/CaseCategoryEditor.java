@@ -14,11 +14,15 @@ import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
 
+import com.idega.block.text.business.TextFinder;
+import com.idega.core.localisation.business.ICLocaleBusiness;
+import com.idega.core.localisation.presentation.ICLocalePresentation;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -47,6 +51,7 @@ public class CaseCategoryEditor extends CasesBlock {
 	
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_PARENT_CASE_CATEGORY_PK = "prm_parent_case_category_pk";
+	private static final String PARAMETER_LOCALE_ID = "prm_localeid";
 	private static final String PARAMETER_NAME = "prm_name";
 	private static final String PARAMETER_DESCRIPTION = "prm_description";
 	private static final String PARAMETER_GROUP = "prm_group";
@@ -59,43 +64,79 @@ public class CaseCategoryEditor extends CasesBlock {
 	private static final int ACTION_DELETE = 5;
 
 	protected void present(IWContext iwc) throws Exception {
+			
 		switch (parseAction(iwc)) {
 			case ACTION_VIEW:
+				iwc.removeSessionAttribute(PARAMETER_CASE_CATEGORY_PK);
 				showList(iwc);
 				break;
-
-			case ACTION_EDIT:
-				showEditor(iwc, iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
-				break;
-
 			case ACTION_NEW:
+				iwc.removeSessionAttribute(PARAMETER_CASE_CATEGORY_PK);
 				showEditor(iwc, null);
 				break;
-
 			case ACTION_SAVE:
-				if (saveCategory(iwc)) {
-					showList(iwc);
+				if (!saveCategory(iwc)) {
+					add(new Text(this.getResourceBundle(iwc).getLocalizedString("failed_to_save","FAILED TO SAVE THE CATEGORY!")));
 				}
-				else {
-					showEditor(iwc, iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
-				}
+				Object pk = getCaseCategoryPrimaryKey(iwc);				
+				showEditor(iwc,pk);
+				
 				break;
-
+			case ACTION_EDIT:
+				pk = getCaseCategoryPrimaryKey(iwc);				
+				showEditor(iwc, pk);
+				break;
 			case ACTION_DELETE:
+				iwc.removeSessionAttribute(PARAMETER_CASE_CATEGORY_PK);
 				removeCategory(iwc);
 				showList(iwc);
 				break;
 		}
 	}
 
-	private int parseAction(IWContext iwc) {
-		if (iwc.isParameterSet(PARAMETER_ACTION)) {
-			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+	/**
+	 * @param iwc
+	 * @return
+	 */
+	private Object getCaseCategoryPrimaryKey(IWContext iwc) {
+		Object pk = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
+		if(pk!=null){
+			iwc.setSessionAttribute(PARAMETER_CASE_CATEGORY_PK, pk);
 		}
-		return ACTION_VIEW;
+		else{
+			pk = iwc.getSessionAttribute(PARAMETER_CASE_CATEGORY_PK);
+		}
+		return pk;
+	}
+
+	private int parseAction(IWContext iwc) {
+		int actionInt = ACTION_VIEW;
+		
+		if (iwc.isParameterSet(PARAMETER_ACTION)) {
+			actionInt = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+					
+			if(actionInt==ACTION_EDIT || actionInt==ACTION_SAVE){
+				iwc.setSessionAttribute(PARAMETER_ACTION,new Integer(ACTION_EDIT));
+			}
+			else{
+				iwc.removeSessionAttribute(PARAMETER_ACTION);
+			}
+		}
+		else{
+			Integer action = (Integer) iwc.getSessionAttribute(PARAMETER_ACTION);
+			if(action!=null){
+				actionInt = action.intValue();
+			}
+		}
+		
+	
+		
+		return actionInt;
 	}
 
 	private void showList(IWContext iwc) throws RemoteException {
+		Locale locale = iwc.getCurrentLocale();
+		
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.setID("caseCategoryEditor");
@@ -145,12 +186,13 @@ public class CaseCategoryEditor extends CasesBlock {
 		cell.add(new Text(getResourceBundle().getLocalizedString("delete", "Delete")));
 		
 		group = table.createBodyRowGroup();
+		
 		int iRow = 1;
 		
 		Iterator iter = categories.iterator();
 		while (iter.hasNext()) {
 			CaseCategory category = (CaseCategory) iter.next();
-			addCategoryToTable(group, category, iRow++, !iter.hasNext(), false);
+			addCategoryToTable(group, category, iRow++, !iter.hasNext(), false, locale);
 			
 			if (getBusiness().useSubCategories()) {
 				Collection subCategories = getBusiness().getSubCategories(category);
@@ -159,7 +201,7 @@ public class CaseCategoryEditor extends CasesBlock {
 				int iSubRow = 1;
 				while (iterator.hasNext()) {
 					category = (CaseCategory) iterator.next();
-					addCategoryToTable(group, category, iSubRow++, !iterator.hasNext(), true);
+					addCategoryToTable(group, category, iSubRow++, !iterator.hasNext(), true, locale);
 				}
 			}
 		}
@@ -178,7 +220,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		add(form);
 	}
 	
-	private void addCategoryToTable(TableRowGroup group, CaseCategory category, int iRow, boolean lastEntry, boolean isSubCategory) {
+	private void addCategoryToTable(TableRowGroup group, CaseCategory category, int iRow, boolean lastEntry, boolean isSubCategory,Locale locale) {
 		TableRow row = group.createRow();
 		if (iRow == 1) {
 			row.setStyleClass("firstRow");
@@ -202,11 +244,12 @@ public class CaseCategoryEditor extends CasesBlock {
 		TableCell2 cell = row.createCell();
 		cell.setStyleClass("firstColumn");
 		cell.setStyleClass("name");
-		cell.add(new Text(category.getName()));
+		cell.add(new Text(category.getLocalizedCategoryName(locale)));
 
 		cell = row.createCell();
 		cell.setStyleClass("description");
-		cell.add(new Text(category.getDescription() != null ? category.getDescription() : "-"));
+		String description = category.getLocalizedCategoryDescription(locale);
+		cell.add(new Text( description != null ? description : "-"));
 		
 		cell = row.createCell();
 		cell.setStyleClass("handlerGroup");
@@ -243,12 +286,24 @@ public class CaseCategoryEditor extends CasesBlock {
 		helpLayer.add(new Text(getResourceBundle().getLocalizedString("category_editor.help", "Help for creating/editing categories.")));
 		section.add(helpLayer);
 		
+		Locale locale = iwc.getCurrentLocale();
+		String localeId = iwc.getParameter(PARAMETER_LOCALE_ID);
+		DropdownMenu localeDrop = ICLocalePresentation.getLocaleDropdownIdKeyed(PARAMETER_LOCALE_ID);
+		localeDrop.setToSubmit();
+		if(localeId==null){
+			localeId = Integer.toString(TextFinder.getLocaleId(locale));	
+		}
+		else{
+			locale = ICLocaleBusiness.getLocale(Integer.parseInt(localeId));
+		}
+		
+		localeDrop.setSelectedElement(localeId);
+		
 		TextInput name = new TextInput(PARAMETER_NAME);
-		name.keepStatusOnAction(true);
 
 		TextArea description = new TextArea(PARAMETER_DESCRIPTION);
 		description.setStyleClass("textarea");
-		description.keepStatusOnAction(true);
+
 		
 		GroupChooser chooser = new GroupChooser(PARAMETER_GROUP);
 		
@@ -257,7 +312,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		parentCategory.addMenuElementFirst("", "");
 		
 		TextInput order = new TextInput(PARAMETER_ORDER);
-		order.keepStatusOnAction(true);
+
 
 		if (caseCategoryPK != null) {
 			try {
@@ -265,9 +320,10 @@ public class CaseCategoryEditor extends CasesBlock {
 				CaseCategory parent = category.getParent();
 				Group group = category.getHandlerGroup();
 				
-				name.setContent(category.getName());
-				if (category.getDescription() != null) {
-					description.setContent(category.getDescription());
+				name.setContent(category.getLocalizedCategoryName(locale));
+				String descriptionText = category.getLocalizedCategoryDescription(locale);
+				if (descriptionText != null) {
+					description.setContent(descriptionText);
 				}
 				chooser.setSelectedGroup(group.getPrimaryKey().toString(), group.getName());
 				order.setContent(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "");
@@ -282,9 +338,18 @@ public class CaseCategoryEditor extends CasesBlock {
 			}
 		}
 		
+	
+		
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
+		Label label = new Label(getResourceBundle().getLocalizedString("language", "Language"), name);
+		layer.add(label);
+		layer.add(localeDrop);
+		section.add(layer);
+		
+		layer = new Layer(Layer.DIV);
+		layer.setStyleClass("formItem");
+		label = new Label(getResourceBundle().getLocalizedString("name", "Name"), name);
 		layer.add(label);
 		layer.add(name);
 		section.add(layer);
@@ -330,10 +395,10 @@ public class CaseCategoryEditor extends CasesBlock {
 		
 		SubmitButton save = new SubmitButton(getResourceBundle().getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		save.setStyleClass("button");
-		SubmitButton cancel = new SubmitButton(getResourceBundle().getLocalizedString("cancel", "Cancel"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		SubmitButton cancel = new SubmitButton(getResourceBundle().getLocalizedString("back_to_list", "Back to list"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		cancel.setStyleClass("button");
 		layer.add(cancel);
-		layer.add(save);
+		layer.add(save);	
 
 		add(form);
 	}
@@ -344,6 +409,9 @@ public class CaseCategoryEditor extends CasesBlock {
 		String name = iwc.getParameter(PARAMETER_NAME);
 		String description = iwc.getParameter(PARAMETER_DESCRIPTION);
 		String groupPK = iwc.getParameter(PARAMETER_GROUP);
+		int localeId = Integer.parseInt(iwc.getParameter(PARAMETER_LOCALE_ID));
+		
+		
 		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
@@ -359,7 +427,8 @@ public class CaseCategoryEditor extends CasesBlock {
 		}
 		
 		try {
-			getBusiness().storeCaseCategory(caseCategoryPK, parentCaseCategoryPK, name, description, groupPK, order);
+			CaseCategory category = getBusiness().storeCaseCategory(caseCategoryPK, parentCaseCategoryPK, name, description, groupPK, localeId, order);
+			iwc.setSessionAttribute(PARAMETER_CASE_CATEGORY_PK,category.getPrimaryKey());
 			return true;
 		}
 		catch (FinderException e) {

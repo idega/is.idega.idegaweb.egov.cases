@@ -45,7 +45,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
 			
 			try {
-				getCasesBusiness(iwc).takeCase(casePK, iwc.getCurrentUser());
+				getCasesBusiness(iwc).takeCase(casePK, iwc.getCurrentUser(), iwc);
 				return true;
 			}
 			catch (RemoteException re) {
@@ -107,7 +107,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		caseType.add(new Text(type.getName()));
 		
 		Layer caseCategory = new Layer(Layer.SPAN);
-		caseCategory.add(new Text(category.getName()));
+		caseCategory.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
 		
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(theCase.getMessage()));
@@ -127,7 +127,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		
 		if (parentCategory != null) {
 			Layer parentCaseCategory = new Layer(Layer.SPAN);
-			parentCaseCategory.add(new Text(parentCategory.getName()));
+			parentCaseCategory.add(new Text(parentCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
 			
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");

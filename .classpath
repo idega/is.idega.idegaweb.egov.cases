@@ -1,7 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <classpath>
-	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry excluding="" kind="src" path="src/java">
+  </classpathentry>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+  </classpathentry>
+  <classpathentry kind="src" path="/com.idega.core">
+  </classpathentry>
+  <classpathentry kind="src" path="/com.idega.block.process">
+  </classpathentry>
+  <classpathentry kind="src" path="/com.idega.block.text">
+  </classpathentry>
+  <classpathentry kind="src" path="/com.idega.block.school">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.process.webservice-3.1.0.jar">
+  </classpathentry>
+  <classpathentry kind="src" path="/com.idega.user">
+  </classpathentry>
+  <classpathentry kind="src" path="/is.idega.idegaweb.egov.application">
+  </classpathentry>
+  <classpathentry kind="src" path="/is.idega.block.family">
+  </classpathentry>
+  <classpathentry kind="src" path="/se.idega.idegaweb.commune">
+  </classpathentry>
+  <classpathentry kind="src" path="/se.idega.idegaweb.commune.care">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/org.apache.axis-1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/axis/jars/axis-1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/axis/jars/axis-jaxrpc-1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/javamail/jars/javamail-1.3.2.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/commons-httpclient/jars/commons-httpclient-2.0.2.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/itextpdf/jars/itext-paulo-139.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/myfaces/jars/myfaces-jsf-api-1.1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/myfaces/jars/myfaces-tomahawk-1.1.3.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/jspapi/jars/jsp-api-2.0.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/ejb/jars/ejb-2.0.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-spec1_0_1.jar">
+  </classpathentry>
+  <classpathentry kind="src" path="/com.idega.block.web2.0">
+  </classpathentry>
+  <classpathentry kind="output" path="target/classes">
+  </classpathentry>
 </classpath>

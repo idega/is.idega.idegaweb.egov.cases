@@ -116,7 +116,7 @@ public class MyCases extends CasesProcessor {
 				Iterator iter = collection.iterator();
 				while (iter.hasNext()) {
 					CaseCategory subCategory = (CaseCategory) iter.next();
-					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 				}
 			}
 		}
@@ -264,7 +264,7 @@ public class MyCases extends CasesProcessor {
 		String reply = iwc.getParameter(PARAMETER_REPLY);
 		
 		try {
-			getBusiness().handleCase(casePK, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, status, iwc.getCurrentUser(), reply, iwc.getCurrentLocale());
+			getBusiness().handleCase(casePK, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, status, iwc.getCurrentUser(), reply, iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

@@ -76,7 +76,7 @@ public class CaseViewer extends CaseCreator {
 			caseType.add(new Text(type.getName()));
 			
 			Layer caseCategory = new Layer(Layer.SPAN);
-			caseCategory.add(new Text(category.getName()));
+			caseCategory.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
 			
 			Layer message = new Layer(Layer.SPAN);
 			message.add(new Text(theCase.getMessage()));
@@ -109,7 +109,7 @@ public class CaseViewer extends CaseCreator {
 			
 			if (parentCategory != null) {
 				Layer parentCaseCategory = new Layer(Layer.SPAN);
-				parentCaseCategory.add(new Text(parentCategory.getName()));
+				parentCaseCategory.add(new Text(parentCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
 				
 				Layer formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");

@@ -81,7 +81,7 @@ public class ClosedCases extends CasesProcessor {
 		caseType.add(new Text(type.getName()));
 		
 		Layer caseCategory = new Layer(Layer.SPAN);
-		caseCategory.add(new Text(category.getName()));
+		caseCategory.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
 		
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(theCase.getMessage()));
@@ -112,7 +112,7 @@ public class ClosedCases extends CasesProcessor {
 		
 		if (parentCategory != null) {
 			Layer parentCaseCategory = new Layer(Layer.SPAN);
-			parentCaseCategory.add(new Text(parentCategory.getName()));
+			parentCaseCategory.add(new Text(parentCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
 			
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -210,7 +210,7 @@ public class ClosedCases extends CasesProcessor {
 		Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
 		
 		try {
-			getBusiness().reactivateCase(casePK, iwc.getCurrentUser());
+			getBusiness().reactivateCase(casePK, iwc.getCurrentUser(), iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

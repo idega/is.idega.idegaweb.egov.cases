@@ -112,6 +112,7 @@ public class CaseCreator extends ApplicationForm {
 	}
 
 	private void showPhaseOne(IWContext iwc) throws RemoteException {
+		User user = getUser(iwc);
 		Form form = new Form();
 		form.setStyleClass("casesForm");
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1)));
@@ -124,7 +125,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString(getPrefix() + "application.enter_new_case", "Enter new case"), 1, 3));
 
-		form.add(getPersonInfo(iwc, getUser(iwc)));
+		form.add(getPersonInfo(iwc, user));
 		
 		heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case", "New case"));
 		heading.setStyleClass("subHeader");
@@ -161,7 +162,7 @@ public class CaseCreator extends ApplicationForm {
 			}
 			
 			if (addCategory) {
-				categories.addMenuElement(element.getPrimaryKey().toString(), element.getName());
+				categories.addMenuElement(element.getPrimaryKey().toString(), element.getLocalizedCategoryName(iwc.getCurrentLocale()));
 			}
 		}
 		
@@ -175,7 +176,7 @@ public class CaseCreator extends ApplicationForm {
 					iter = subCats.iterator();
 					while (iter.hasNext()) {
 						CaseCategory subCategory = (CaseCategory) iter.next();
-						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 					}
 				}
 				else {
@@ -330,6 +331,8 @@ public class CaseCreator extends ApplicationForm {
 			return;
 		}
 
+		User user = getUser(iwc);
+		
 		Form form = new Form();
 		form.setStyleClass("casesForm");
 		form.setStyleClass("overview");
@@ -346,7 +349,7 @@ public class CaseCreator extends ApplicationForm {
 		
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString(getPrefix() + "application.overview", "Overview"), 2, 3));
 
-		form.add(getPersonInfo(iwc, getUser(iwc)));
+		form.add(getPersonInfo(iwc, user));
 		
 		heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case_overview", "New case overview"));
 		heading.setStyleClass("subHeader");
@@ -392,7 +395,7 @@ public class CaseCreator extends ApplicationForm {
 		typeSpan.add(new Text(type.getName()));
 		
 		Layer categorySpan = new Layer(Layer.SPAN);
-		categorySpan.add(new Text(category.getName()));
+		categorySpan.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
 		
 		Layer messageSpan = new Layer(Layer.SPAN);
 		messageSpan.add(new Text(message));
@@ -417,7 +420,7 @@ public class CaseCreator extends ApplicationForm {
 
 		if (getCasesBusiness(iwc).useSubCategories() && !subCategory.equals(category)) {
 			Layer subCategorySpan = new Layer(Layer.SPAN);
-			subCategorySpan.add(new Text(subCategory.getName()));
+			subCategorySpan.add(new Text(subCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
 			
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
@@ -467,13 +470,14 @@ public class CaseCreator extends ApplicationForm {
 		boolean isPrivate = iwc.isParameterSet(PARAMETER_PRIVATE);
 		
 		try {
-			getCasesBusiness(iwc).storeGeneralCase(getUser(iwc), getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, message, getType(), isPrivate);
+			User user = getUser(iwc);
+			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
 
 			Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
 			heading.setStyleClass("applicationHeading");
 			add(heading);
 			
-			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), getUser(iwc) != null ? this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_confirmation", "Your case has been sent and will be processed accordingly.") : this.iwrb.getLocalizedString(getPrefix() + "anonymous_case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
+			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), user != null ? this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_confirmation", "Your case has been sent and will be processed accordingly.") : this.iwrb.getLocalizedString(getPrefix() + "anonymous_case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
 
 			Layer clearLayer = new Layer(Layer.DIV);
 			clearLayer.setStyleClass("Clear");

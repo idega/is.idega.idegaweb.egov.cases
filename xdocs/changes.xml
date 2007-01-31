@@ -6,6 +6,16 @@
 	
 	<body>
 
+		<release version="1.0.14" date="2007-01-31">
+			<action dev="eiki" type="update">
+				Added localization support for case categories.
+				Added support for localizing messages by the users prefererred locale.
+				Updated to se.idega.idegaweb.commune 1.0.5 
+				Updated to com.idega.core 3.1.29
+				Updated to com.idega.block.process 3.1.7
+			</action>
+		</release>
+		
 		<release version="1.0.13" date="2007-01-10">
 			<action dev="eiki" type="update">
 				English localization and variants for Neytendastofa.

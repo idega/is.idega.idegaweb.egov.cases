@@ -352,7 +352,7 @@ public class CasesStatistics extends CasesBlock {
 		private void addResult(IWContext iwc, Collection results, int prevID, HashMap statuses) throws FinderException, RemoteException {
 			if (prevID > -1) {
 				CaseCategory cat = getCasesBusiness(iwc).getCaseCategory(new Integer(prevID));
-				Result res = new Result(prevID, cat.getName(), statuses);
+				Result res = new Result(prevID, cat.getLocalizedCategoryName(iwc.getCurrentLocale()), statuses);
 				results.add(res);
 			}
 		}

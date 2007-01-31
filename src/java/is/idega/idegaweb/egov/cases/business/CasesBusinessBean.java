@@ -18,6 +18,7 @@ import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,10 +36,13 @@ import com.idega.block.process.business.CaseBusinessBean;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.text.data.LocalizedText;
+import com.idega.block.text.data.LocalizedTextHome;
 import com.idega.business.IBORuntimeException;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.presentation.IWContext;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
@@ -97,10 +101,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	}
 	
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) {
+		//Should not need to check the preferred locale for a user for now since it isn't used in sending messages
 		try {
 			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
 			CaseCategory type = genCase.getCaseCategory();
-			Object[] arguments = { type.getName() };
+			Object[] arguments = { type.getLocalizedCategoryName(locale) };
 			
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
 			return MessageFormat.format(iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_code_key." + theCase.getCode(), theCase.getCode()), arguments);
@@ -112,6 +117,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	}
 
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) {
+		//Should not need to check the preferred locale for a user for now since the only method that uses it,handleCase
+		//passes the preferred locale in.
 		try {
 			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
@@ -260,7 +267,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		getCaseType(caseTypePK).remove();
 	}
 	
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type, boolean isPrivate) throws CreateException {
+	/**
+	 * The iwrb is the users preferred locale
+	 */
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+		Locale locale = iwrb.getLocale();
+		
 		GeneralCase theCase = getGeneralCaseHome().create();
 		CaseCategory category = null;
 		try {
@@ -291,16 +303,17 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		try {
 			String prefix = (type != null ? type + "." : "");
 			
-			String subject = getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
+			String subject = iwrb.getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
 			String body = null;
 			if (sender != null) {
 				Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
-				Object[] arguments = { name.getName(getIWApplicationContext().getApplicationSettings().getDefaultLocale()), theCase.getCaseCategory().getName(), message };
-				body = MessageFormat.format(getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+							
+				Object[] arguments = { name.getName(locale), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
+				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
 			}
 			else {
-				Object[] arguments = { getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getName(), message };
-				body = MessageFormat.format(getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+				Object[] arguments = { iwrb.getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
+				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
 			}
 			
 			Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
@@ -311,9 +324,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 			}
 			
 			if (sender != null) {
-				Object[] arguments2 = { theCase.getCaseCategory().getName() };
-				subject = getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
-				body = MessageFormat.format(getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
+				Object[] arguments2 = { theCase.getCaseCategory().getLocalizedCategoryName(locale) };
+				subject = iwrb.getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
+				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
 				
 				sendMessage(theCase, sender, null, subject, body);
 			}
@@ -323,7 +336,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		}
 	}
 	
-	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, Locale locale) throws FinderException {
+	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		theCase.setReply(reply);
 		
@@ -340,17 +353,40 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
+			IWResourceBundle iwrb = getIWResourceBundleForUser(owner, iwc);
+			Locale locale = iwrb.getLocale();
 			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
 
-			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(theCase, getCaseStatus(status), locale) };
-			String subject = getLocalizedString(prefix + "case_handled_subject", "Your case has been handled");
-			String body = MessageFormat.format(getLocalizedString(prefix + "case_handled_body", "Your case with category {0} and type {1} has been handled by {2}.  The reply was as follows:\n\n{3}"), arguments);
+			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(locale), theCase.getCaseType().getName(), performer.getName(), reply, getLocalizedCaseStatusDescription(theCase, getCaseStatus(status), locale) };
+			String subject = getLocalizedString(prefix + "case_handled_subject", "Your case has been handled",locale);
+			String body = MessageFormat.format(getLocalizedString(prefix + "case_handled_body", "Your case with category {0} and type {1} has been handled by {2}.  The reply was as follows:\n\n{3}",locale), arguments);
 			
 			sendMessage(theCase, owner, performer, subject, body);
 		}
 	}
 	
-	public void takeCase(Object casePK, User performer) throws FinderException {
+	public void takeCase(Object casePK, User performer, IWContext iwc) throws FinderException {
+		GeneralCase theCase = getGeneralCase(casePK);
+		theCase.setHandledBy(performer);
+		
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group)null);
+		
+		User owner = theCase.getOwner();
+		
+		IWResourceBundle iwrb =  this.getIWResourceBundleForUser(owner, iwc);
+		
+		
+		if (owner != null) {
+			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
+			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
+			String subject = iwrb.getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
+			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
+			
+			sendMessage(theCase, owner, performer, subject, body);
+		}
+	}
+	
+	public void reactivateCase(Object casePK, User performer, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		theCase.setHandledBy(performer);
 		
@@ -358,35 +394,18 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		
 		User owner = theCase.getOwner();
 		if (owner != null) {
+			IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
+			
 			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
-
-			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
-			String subject = getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
-			String body = MessageFormat.format(getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
+			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
+			String subject = iwrb.getLocalizedString(prefix + "case_reactivated_subject", "Your case has been reactivated");
+			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_reactivated_body", "Your case with category {0} and type {1} has been reactivated by {2}"), arguments);
 			
 			sendMessage(theCase, owner, performer, subject, body);
 		}
 	}
 	
-	public void reactivateCase(Object casePK, User performer) throws FinderException {
-		GeneralCase theCase = getGeneralCase(casePK);
-		theCase.setHandledBy(performer);
-		
-		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group)null);
-		
-		User owner = theCase.getOwner();
-		if (owner != null) {
-			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
-
-			Object[] arguments = { theCase.getCaseCategory().getName(), theCase.getCaseType().getName(), performer.getName() };
-			String subject = getLocalizedString(prefix + "case_reactivated_subject", "Your case has been reactivated");
-			String body = MessageFormat.format(getLocalizedString(prefix + "case_reactivated_body", "Your case with category {0} and type {1} has been reactivated by {2}"), arguments);
-			
-			sendMessage(theCase, owner, performer, subject, body);
-		}
-	}
-	
-	public void storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int order) throws FinderException, CreateException {
+	public CaseCategory storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int localeId, int order) throws FinderException, CreateException {
 		CaseCategory category = null;
 		if (caseCategoryPK != null) {
 			category = getCaseCategory(caseCategoryPK);
@@ -400,14 +419,44 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 			parentCategory = getCaseCategory(parentCaseCategoryPK);
 		}
 		
-		category.setName(name);
-		category.setDescription(description);
+		if(category.getName()==null){
+			category.setName(name);
+		}
+		
+		if(category.getDescription()==null){
+			category.setDescription(description);
+		}
+		
 		category.setParent(parentCategory);
 		category.setHandlerGroup(groupPK);
 		if (order != -1) {
 			category.setOrder(order);
 		}
+		
 		category.store();
+		
+		//localization
+		
+		LocalizedText locText = category.getLocalizedText(localeId);
+		if (locText == null) {
+			locText = ((LocalizedTextHome)com.idega.data.IDOLookup.getHomeLegacy(LocalizedText.class)).createLegacy();
+		}
+
+		locText.setHeadline(name);
+		locText.setBody(description);
+		locText.setLocaleId(localeId);
+		locText.store();
+	
+		try {
+			category.addLocalization(locText);
+		} catch (SQLException e) {
+			//error usually means the text is already added
+			//e.printStackTrace();
+		//	throw new CreateException("Failed to add localization, the message was : "+e.getMessage());
+		}
+		
+		return category;
+		
 	}
 	
 	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException {
