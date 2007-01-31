@@ -45,7 +45,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		addAttribute(getIDColumnName());
 
 		addAttribute(COLUMN_NAME, "Name", String.class);
-		addAttribute(COLUMN_DESCRIPTION, "Description", String.class);
+		addAttribute(COLUMN_DESCRIPTION, "Description", String.class, 4000);
 		addAttribute(COLUMN_ORDER, "Order", Integer.class);
 		
 		addManyToOneRelationship(COLUMN_HANDLER_GROUP, Group.class);

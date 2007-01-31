@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.16" date="2007-02-01">
+			<action dev="eiki" type="fix">
+				Fixed bugs in categoryeditor and casecreator
+			</action>
+		</release>
+		
 		<release version="1.0.15" date="2007-01-31">
 			<action dev="eiki" type="update">
 				Added support for displaying the case category description in CaseCreator

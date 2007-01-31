@@ -170,7 +170,9 @@ public class CaseCreator extends ApplicationForm {
 		categories.setStyleClass("caseCategoryDropdown");
 		
 		if(category!=null && hideOtherCategories){
+			form.add(new HiddenInput(PARAMETER_HIDE_OTHERS,"true"));
 			categories.addMenuElement(category.getPrimaryKey().toString(), category.getLocalizedCategoryName(locale));
+			categories.setSelectedElement(category.getPrimaryKey().toString());
 		}
 		else{
 			categories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_category", "Select category"));
@@ -194,7 +196,11 @@ public class CaseCreator extends ApplicationForm {
 				}
 				
 				if (addCategory) {
-					categories.addMenuElement(element.getPrimaryKey().toString(), element.getLocalizedCategoryName(locale));
+					String primaryKey = element.getPrimaryKey().toString();
+					categories.addMenuElement(primaryKey, element.getLocalizedCategoryName(locale));
+					if(category!=null && category.getPrimaryKey().equals(primaryKey)){
+						categories.setSelectedElement(primaryKey);
+					}
 				}
 			}
 		}

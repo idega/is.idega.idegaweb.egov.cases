@@ -437,7 +437,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		}
 		
 //		watch out for endless nesting
-		if( (caseCategoryPK!=null && parentCaseCategoryPK!=null) && !caseCategoryPK.equals(parentCaseCategoryPK)){
+		if( parentCaseCategoryPK!=null && !parentCaseCategoryPK.equals(caseCategoryPK)){
 			category.setParent(parentCategory);
 		}
 		
