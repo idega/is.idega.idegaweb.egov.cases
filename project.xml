@@ -94,6 +94,11 @@
       <name>1.0.16</name>
       <tag>EGOV_CASES_1_0_16</tag>
     </version>
+    <version>
+      <id>1.0.17</id>
+      <name>1.0.17</name>
+      <tag>EGOV_CASES_1_0_17</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
