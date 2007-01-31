@@ -37,10 +37,10 @@ import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
+import com.idega.presentation.ui.SelectOption;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
-import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.presentation.GroupChooser;
 
@@ -307,12 +307,10 @@ public class CaseCategoryEditor extends CasesBlock {
 		
 		GroupChooser chooser = new GroupChooser(PARAMETER_GROUP);
 		
-		SelectorUtility util = new SelectorUtility();
-		DropdownMenu parentCategory = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_PARENT_CASE_CATEGORY_PK), getCasesBusiness(iwc).getCaseCategories(), "getName");
+		DropdownMenu parentCategory = getCaseCategoriesDropdownMenu(getCasesBusiness(iwc).getCaseCategories(),PARAMETER_PARENT_CASE_CATEGORY_PK,locale);			
 		parentCategory.addMenuElementFirst("", "");
 		
 		TextInput order = new TextInput(PARAMETER_ORDER);
-
 
 		if (caseCategoryPK != null) {
 			try {
@@ -401,6 +399,23 @@ public class CaseCategoryEditor extends CasesBlock {
 		layer.add(save);	
 
 		add(form);
+	}
+
+	
+	protected DropdownMenu getCaseCategoriesDropdownMenu(Collection caseCategories, String key, Locale locale) {
+		DropdownMenu menu = new DropdownMenu(key);
+		if (caseCategories != null) {
+			Iterator iter = caseCategories.iterator();
+			while (iter.hasNext()) {
+				CaseCategory category = (CaseCategory) iter.next();
+				SelectOption option = new SelectOption(category.getPrimaryKey().toString());
+				String value = category.getLocalizedCategoryName(locale);
+				option.setName(value + " ("+category.getName()+")");
+				menu.addOption(option);
+			}
+		}
+		
+		return menu;
 	}
 
 	private boolean saveCategory(IWContext iwc) throws RemoteException {

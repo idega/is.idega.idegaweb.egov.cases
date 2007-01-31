@@ -5,7 +5,12 @@
 	</properties>
 	
 	<body>
-
+		<release version="1.0.15" date="2007-01-31">
+			<action dev="eiki" type="update">
+				Added support for displaying the case category description in CaseCreator
+		</action>
+		</release>
+		
 		<release version="1.0.14" date="2007-01-31">
 			<action dev="eiki" type="update">
 				Added localization support for case categories.

@@ -39,6 +39,7 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextHome;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWResourceBundle;
@@ -50,6 +51,11 @@ import com.idega.util.text.Name;
 
 
 public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness , CasesBusiness{
+
+	/**
+	 * Comment for <code>serialVersionUID</code>
+	 */
+	private static final long serialVersionUID = -1807320113180412800L;
 
 	protected String getBundleIdentifier() {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
@@ -407,6 +413,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	
 	public CaseCategory storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int localeId, int order) throws FinderException, CreateException {
 		CaseCategory category = null;
+		boolean isDefaultLocale = ICLocaleBusiness.getLocaleId(this.getDefaultLocale())==localeId;
+		
 		if (caseCategoryPK != null) {
 			category = getCaseCategory(caseCategoryPK);
 		}
@@ -415,19 +423,28 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		}
 		
 		CaseCategory parentCategory = null;
+		
 		if (parentCaseCategoryPK != null) {
 			parentCategory = getCaseCategory(parentCaseCategoryPK);
 		}
 		
-		if(category.getName()==null){
+		if(category.getName()==null || isDefaultLocale){
 			category.setName(name);
 		}
 		
-		if(category.getDescription()==null){
+		if(category.getDescription()==null || isDefaultLocale ){
 			category.setDescription(description);
 		}
 		
-		category.setParent(parentCategory);
+//		watch out for endless nesting
+		if( (caseCategoryPK!=null && parentCaseCategoryPK!=null) && !caseCategoryPK.equals(parentCaseCategoryPK)){
+			category.setParent(parentCategory);
+		}
+		
+		if(parentCaseCategoryPK==null){
+			category.setParent(null);
+		}
+		
 		category.setHandlerGroup(groupPK);
 		if (order != -1) {
 			category.setOrder(order);

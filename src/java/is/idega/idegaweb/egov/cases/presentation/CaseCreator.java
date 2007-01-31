@@ -10,7 +10,6 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
-import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
@@ -20,6 +19,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -35,7 +35,6 @@ import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
-import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Paragraph;
@@ -57,6 +56,7 @@ public class CaseCreator extends ApplicationForm {
 	
 	private static final String PARAMETER_MESSAGE = "prm_message";
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
+	private static final String PARAMETER_HIDE_OTHERS = "hide_others";
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	private static final String PARAMETER_PRIVATE = "prm_private";
@@ -113,13 +113,41 @@ public class CaseCreator extends ApplicationForm {
 
 	private void showPhaseOne(IWContext iwc) throws RemoteException {
 		User user = getUser(iwc);
+		Locale locale = iwc.getCurrentLocale();
+		boolean hideOtherCategories = "true".equalsIgnoreCase(iwc.getParameter(PARAMETER_HIDE_OTHERS));
+		
+		CaseCategory category = null;
+		if(iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK)){
+			try{
+				category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
+			}
+			catch (FinderException fe) {
+				fe.printStackTrace();
+			}
+		}
+		
+		CaseCategory subCategory = null;
+		if (getCasesBusiness(iwc).useSubCategories() && iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK)) {
+			try {
+				subCategory = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK));
+			}
+			catch (FinderException fe) {
+				throw new IBORuntimeException(fe);
+			}
+		}
+		
 		Form form = new Form();
 		form.setStyleClass("casesForm");
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_PHASE_1)));
 		
 		addErrors(iwc, form);
 
-		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator"));
+		String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
+		if(category!=null){
+			headingText += " - "+category.getLocalizedCategoryName(locale);
+		}
+		
+		Heading1 heading = new Heading1(headingText);
 		heading.setStyleClass("applicationHeading");
 		form.add(heading);
 		
@@ -138,60 +166,61 @@ public class CaseCreator extends ApplicationForm {
 		
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = new DropdownMenu(PARAMETER_CASE_CATEGORY_PK);
-		categories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_category", "Select category"));
 		categories.keepStatusOnAction(true);
 		categories.setStyleClass("caseCategoryDropdown");
 		
-		Collection parentCategories = getCasesBusiness(iwc).getCaseCategories();
-		Iterator iter = parentCategories.iterator();
-		while (iter.hasNext()) {
-			CaseCategory element = (CaseCategory) iter.next();
-			
-			boolean addCategory = false;
-			if (iCategories != null) {
-				Iterator iterator = iCategories.iterator();
-				while (iterator.hasNext()) {
-					String categoryPK = (String) iterator.next();
-					if (element.getPrimaryKey().toString().equals(categoryPK)) {
-						addCategory = true;
-					}
-				}
-			}
-			else {
-				addCategory = true;
-			}
-			
-			if (addCategory) {
-				categories.addMenuElement(element.getPrimaryKey().toString(), element.getLocalizedCategoryName(iwc.getCurrentLocale()));
-			}
+		if(category!=null && hideOtherCategories){
+			categories.addMenuElement(category.getPrimaryKey().toString(), category.getLocalizedCategoryName(locale));
 		}
-		
-		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
-		boolean addEmptyElement = true;
-		if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK)) {
-			try {
-				CaseCategory category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY_PK));
-				Collection subCats = getCasesBusiness(iwc).getSubCategories(category);
-				if (!subCats.isEmpty()) {
-					iter = subCats.iterator();
-					while (iter.hasNext()) {
-						CaseCategory subCategory = (CaseCategory) iter.next();
-						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
+		else{
+			categories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_category", "Select category"));
+			Collection parentCategories = getCasesBusiness(iwc).getCaseCategories();
+			Iterator iter = parentCategories.iterator();
+			while (iter.hasNext()) {
+				CaseCategory element = (CaseCategory) iter.next();
+				
+				boolean addCategory = false;
+				if (iCategories != null) {
+					Iterator iterator = iCategories.iterator();
+					while (iterator.hasNext()) {
+						String categoryPK = (String) iterator.next();
+						if (element.getPrimaryKey().toString().equals(categoryPK)) {
+							addCategory = true;
+						}
 					}
 				}
 				else {
-					addEmptyElement = false;
-					subCategories.addMenuElement(category.getPrimaryKey().toString(), iwrb.getLocalizedString("case_creator.no_sub_category", "no sub category"));
+					addCategory = true;
+				}
+				
+				if (addCategory) {
+					categories.addMenuElement(element.getPrimaryKey().toString(), element.getLocalizedCategoryName(locale));
 				}
 			}
-			catch (FinderException fe) {
-				fe.printStackTrace();
+		}
+		categories.setToSubmit();
+		
+		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
+		boolean addEmptyElement = true;
+		if (category!=null) {
+			Collection subCats = getCasesBusiness(iwc).getSubCategories(category);
+			if (!subCats.isEmpty()) {
+				Iterator iter = subCats.iterator();
+				while (iter.hasNext()) {
+					CaseCategory subCat = (CaseCategory) iter.next();
+					subCategories.addMenuElement(subCat.getPrimaryKey().toString(), subCat.getLocalizedCategoryName(locale));
+				}
+			}
+			else {
+				addEmptyElement = false;
+				subCategories.addMenuElement(category.getPrimaryKey().toString(), iwrb.getLocalizedString("case_creator.no_sub_category", "no sub category"));
 			}
 		}
 		if (addEmptyElement) {
 			subCategories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
 		}
 		subCategories.keepStatusOnAction(true);
+		subCategories.setToSubmit();
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness(iwc).getCaseTypes(), "getName");
@@ -208,8 +237,24 @@ public class CaseCreator extends ApplicationForm {
 		
 		Layer helpLayer = new Layer(Layer.DIV);
 		helpLayer.setStyleClass("helperText");
-		helpLayer.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.information_text", "Information text here...")));
+		String helperText = this.iwrb.getLocalizedString(getPrefix() + "case_creator.information_text", "Information text here...");
+		//If the category has a description use it, subcategories override!
+		if(subCategory!=null && subCategory.getLocalizedCategoryDescription(locale)!=null){
+			helperText = subCategory.getLocalizedCategoryDescription(locale);
+		}
+		else if(category!=null && category.getLocalizedCategoryDescription(locale)!=null){
+			helperText = category.getLocalizedCategoryDescription(locale);	
+		}
+		
+		helpLayer.add(new Text(helperText));
 		section.add(helpLayer);
+		
+		if(this.iUseAnonymous){
+			Layer helpLayerExtra = new Layer(Layer.DIV);
+			helpLayerExtra.setStyleClass("helperTextExtra");
+			helpLayerExtra.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.information_text_extra", "Please note that we can only answer notifications from registered users due to the fact that anonymous notifications do not include any information about the sender.")));
+			helpLayer.add(helpLayerExtra);
+		}
 		
 		if (getCasesBusiness(iwc).useTypes()) {
 			Layer formItem = new Layer(Layer.DIV);
@@ -233,17 +278,19 @@ public class CaseCreator extends ApplicationForm {
 		section.add(formItem);
 		
 		if (getCasesBusiness(iwc).useSubCategories()) {
-			try {
-				RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
-				rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
-				formItem.add(rsh);
-			}
-			catch (IllegalAccessException iae) {
-				iae.printStackTrace();
-			}
-			catch (InstantiationException ie) {
-				ie.printStackTrace();
-			}
+			//CANNOT USE THIS CRAP because we need the new category id to display stuff and have to reload to do so!
+			//If this is a must then use DWR not an IFrame... (Eiki)
+//			try {
+//				RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
+//				rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
+//				formItem.add(rsh);
+//			}
+//			catch (IllegalAccessException iae) {
+//				iae.printStackTrace();
+//			}
+//			catch (InstantiationException ie) {
+//				ie.printStackTrace();
+//			}
 
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
@@ -311,6 +358,40 @@ public class CaseCreator extends ApplicationForm {
 	}
 	
 	private void showOverview(IWContext iwc) throws RemoteException {
+		Locale locale = iwc.getCurrentLocale();
+		
+		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
+		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
+		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
+		String message = iwc.getParameter(PARAMETER_MESSAGE);
+		
+		CaseCategory category = null;
+		try {
+			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
+		}
+		catch (FinderException fe) {
+			throw new IBORuntimeException(fe);
+		}
+		
+		
+		CaseCategory subCategory = null;
+		if (getCasesBusiness(iwc).useSubCategories() && subCaseCategoryPK!=null) {
+			try {
+				subCategory = getCasesBusiness(iwc).getCaseCategory(subCaseCategoryPK);
+			}
+			catch (FinderException fe) {
+				throw new IBORuntimeException(fe);
+			}
+		}
+
+		CaseType type = null;
+		try {
+			type = getCasesBusiness(iwc).getCaseType(caseTypePK);
+		}
+		catch (FinderException fe) {
+			throw new IBORuntimeException(fe);
+		}
+		
 		if (this.getCasesBusiness(iwc).useSubCategories()) {
 			if (!iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK)) {
 				setError(PARAMETER_CASE_CATEGORY_PK, this.iwrb.getLocalizedString("case_creator.sub_category_empty", "You must select a category"));
@@ -343,6 +424,11 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_PRIVATE);
 		
+		
+		String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
+		if(category!=null){
+			headingText += " - "+category.getLocalizedCategoryName(locale);
+		}
 		Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
 		heading.setStyleClass("applicationHeading");
 		form.add(heading);
@@ -355,37 +441,6 @@ public class CaseCreator extends ApplicationForm {
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
-		
-		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
-		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
-		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
-		String message = iwc.getParameter(PARAMETER_MESSAGE);
-		
-		CaseCategory category = null;
-		try {
-			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
-		}
-		catch (FinderException fe) {
-			throw new IBORuntimeException(fe);
-		}
-		
-		CaseCategory subCategory = null;
-		if (getCasesBusiness(iwc).useSubCategories()) {
-			try {
-				subCategory = getCasesBusiness(iwc).getCaseCategory(subCaseCategoryPK);
-			}
-			catch (FinderException fe) {
-				throw new IBORuntimeException(fe);
-			}
-		}
-
-		CaseType type = null;
-		try {
-			type = getCasesBusiness(iwc).getCaseType(caseTypePK);
-		}
-		catch (FinderException fe) {
-			throw new IBORuntimeException(fe);
-		}
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -395,7 +450,7 @@ public class CaseCreator extends ApplicationForm {
 		typeSpan.add(new Text(type.getName()));
 		
 		Layer categorySpan = new Layer(Layer.SPAN);
-		categorySpan.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
+		categorySpan.add(new Text(category.getLocalizedCategoryName(locale)));
 		
 		Layer messageSpan = new Layer(Layer.SPAN);
 		messageSpan.add(new Text(message));
@@ -420,7 +475,7 @@ public class CaseCreator extends ApplicationForm {
 
 		if (getCasesBusiness(iwc).useSubCategories() && !subCategory.equals(category)) {
 			Layer subCategorySpan = new Layer(Layer.SPAN);
-			subCategorySpan.add(new Text(subCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
+			subCategorySpan.add(new Text(subCategory.getLocalizedCategoryName(locale)));
 			
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
@@ -468,17 +523,30 @@ public class CaseCreator extends ApplicationForm {
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		boolean isPrivate = iwc.isParameterSet(PARAMETER_PRIVATE);
+		Locale locale = iwc.getCurrentLocale();
+		
+		CaseCategory category = null;
+		try {
+			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
+		}
+		catch (FinderException fe) {
+			throw new IBORuntimeException(fe);
+		}
 		
 		try {
 			User user = getUser(iwc);
 			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
 
+			String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
+			if(category!=null){
+				headingText += " - "+category.getLocalizedCategoryName(locale);
+			}
 			Heading1 heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "application.case_creator", "Case creator"));
 			heading.setStyleClass("applicationHeading");
 			add(heading);
 			
 			addPhasesReceipt(iwc, this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_completed", "Application sent"), user != null ? this.iwrb.getLocalizedString(getPrefix() + "case_creator.save_confirmation", "Your case has been sent and will be processed accordingly.") : this.iwrb.getLocalizedString(getPrefix() + "anonymous_case_creator.save_confirmation", "Your case has been sent and will be processed accordingly."), 3, 3);
-
+		
 			Layer clearLayer = new Layer(Layer.DIV);
 			clearLayer.setStyleClass("Clear");
 			add(clearLayer);
