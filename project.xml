@@ -99,6 +99,11 @@
       <name>1.0.17</name>
       <tag>EGOV_CASES_1_0_17</tag>
     </version>
+    <version>
+      <id>1.0.18</id>
+      <name>1.0.18</name>
+      <tag>EGOV_CASES_1_0_18</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
