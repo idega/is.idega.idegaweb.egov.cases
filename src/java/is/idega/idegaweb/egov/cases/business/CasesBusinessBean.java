@@ -348,18 +348,56 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 		theCase.setReply(reply);
 		
 		CaseCategory category = getCaseCategory(caseCategoryPK);
+		boolean isSameCategory = category.equals(theCase.getCaseCategory());
 		theCase.setCaseCategory(category);
 
 		Group handlerGroup = category.getHandlerGroup();
+		boolean isInGroup = performer.hasRelationTo(handlerGroup);
 		theCase.setHandler(handlerGroup);
+		
+		if (!isInGroup) {
+			theCase.setHandledBy(null);
+			status = getCaseStatusOpen().getStatus();
+		}
 
+		if (!isSameCategory) {
+			String prefix = (theCase.getType() != null ? theCase.getType() + "." : "");
+			User sender = theCase.getOwner();
+			
+			String subject = getLocalizedString(prefix + "case_sent_subject", "A new case sent in", iwc.getApplicationSettings().getDefaultLocale());
+			String body = null;
+			if (sender != null) {
+				Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
+							
+				Object[] arguments = { name.getName(iwc.getCurrentLocale()), theCase.getCaseCategory().getLocalizedCategoryName( iwc.getApplicationSettings().getDefaultLocale()), theCase.getMessage() };
+				body = MessageFormat.format(getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}", iwc.getApplicationSettings().getDefaultLocale()), arguments);
+			}
+			else {
+				Object[] arguments = { getLocalizedString("anonymous", "Anonymous", iwc.getApplicationSettings().getDefaultLocale()), theCase.getCaseCategory().getLocalizedCategoryName(iwc.getApplicationSettings().getDefaultLocale()), theCase.getMessage() };
+				body = MessageFormat.format(getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}", iwc.getApplicationSettings().getDefaultLocale()), arguments);
+			}
+			
+			try {
+				Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+
+				Iterator iter = handlers.iterator();
+				while (iter.hasNext()) {
+					User handler = (User) iter.next();
+					sendMessage(theCase, handler, sender, subject, body);
+				}
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		CaseType type = getCaseType(caseTypePK);
 		theCase.setCaseType(type);
 		
 		changeCaseStatus(theCase, status, reply, performer, (Group)null, true);
 		
 		User owner = theCase.getOwner();
-		if (owner != null) {
+		if (owner != null && isInGroup) {
 			IWResourceBundle iwrb = getIWResourceBundleForUser(owner, iwc);
 			Locale locale = iwrb.getLocale();
 			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";

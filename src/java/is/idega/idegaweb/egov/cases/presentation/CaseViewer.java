@@ -40,11 +40,26 @@ import com.idega.util.text.Name;
 
 public class CaseViewer extends CaseCreator {
 	
+	public static final String PARAMETER_ACTION = "cp_prm_action";
+	
+	public static final String PARAMETER_CASE_PK = "prm_case_pk";
+
+	protected static final int ACTION_SAVE = 1;
+
 	private ICPage iHomePage;
 	private ICPage iBackPage;
 
 	protected void present(IWContext iwc) {
 		try {
+			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
+				try {
+					getCasesBusiness(iwc).reactivateCase(iwc.getParameter(PARAMETER_CASE_PK), iwc.getCurrentUser(), iwc);
+				}
+				catch (FinderException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			IWResourceBundle iwrb = getResourceBundle(iwc);
 			
 			Form form = new Form();
@@ -61,6 +76,7 @@ public class CaseViewer extends CaseCreator {
 			}
 			CaseCategory category = theCase.getCaseCategory();
 			CaseCategory parentCategory = category.getParent();
+			CaseStatus status = theCase.getCaseStatus();
 			CaseType type = theCase.getCaseType();
 			User user = getCasesBusiness(iwc).getLastModifier(theCase);
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
@@ -194,7 +210,7 @@ public class CaseViewer extends CaseCreator {
 				label = new Label();
 				label.setLabel(iwrb.getLocalizedString("status", "Status"));
 				formItem.add(label);
-				formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, theCase.getCaseStatus(), iwc.getCurrentLocale()))));
+				formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 				section.add(formItem);
 				
 				if (theCase.getReply() != null && theCase.getReply().length() > 0) {
@@ -232,6 +248,13 @@ public class CaseViewer extends CaseCreator {
 				bottom.add(home);
 			}
 
+			if (status.equals(getCasesBusiness(iwc).getCaseStatusInactive()) || status.equals(getCasesBusiness(iwc).getCaseStatusReady())) {
+				Link next = getButtonLink(iwrb.getLocalizedString(getPrefix() + "reactivate_case", "Reactivate case"));
+				next.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
+				bottom.add(next);
+			}
+			
 			add(form);
 		}
 		catch (RemoteException re) {

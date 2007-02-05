@@ -9,6 +9,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
@@ -36,6 +37,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
@@ -220,9 +222,15 @@ public class CaseFinder extends CasesBlock {
 				GeneralCase theCase = (GeneralCase) iter.next();
 				CaseStatus status = theCase.getCaseStatus();
 				CaseType type = theCase.getCaseType();
+				CaseCategory category = theCase.getCaseCategory();
+				Group handlerGroup = category.getHandlerGroup();
 				User owner = theCase.getOwner();
 				User handler = theCase.getHandledBy();
 				IWTimestamp created = new IWTimestamp(theCase.getCreated());
+				
+				if (!iwc.getCurrentUser().hasRelationTo(handlerGroup)) {
+					continue;
+				}
 				
 				row = group.createRow();
 				if (iRow == 1) {
