@@ -124,7 +124,7 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.process</artifactId>
-      <version>3.1.7</version>
+      <version>3.1.9</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
