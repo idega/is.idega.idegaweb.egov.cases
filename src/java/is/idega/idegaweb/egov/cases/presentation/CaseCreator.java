@@ -245,11 +245,12 @@ public class CaseCreator extends ApplicationForm {
 		helpLayer.setStyleClass("helperText");
 		String helperText = this.iwrb.getLocalizedString(getPrefix() + "case_creator.information_text", "Information text here...");
 		//If the category has a description use it, subcategories override!
-		if(subCategory!=null && subCategory.getLocalizedCategoryDescription(locale)!=null){
-			helperText = subCategory.getLocalizedCategoryDescription(locale);
+		String tempHelperText = null; //so we don't make useless calls for localized texts from the db!
+		if(subCategory!=null && (tempHelperText=subCategory.getLocalizedCategoryDescription(locale))!=null && !"".equals(tempHelperText) ){
+			helperText = tempHelperText;
 		}
-		else if(category!=null && category.getLocalizedCategoryDescription(locale)!=null){
-			helperText = category.getLocalizedCategoryDescription(locale);	
+		else if(category!=null && (tempHelperText=category.getLocalizedCategoryDescription(locale))!=null && !"".equals(tempHelperText)){
+			helperText = tempHelperText;
 		}
 		
 		helpLayer.add(new Text(helperText));
@@ -337,7 +338,7 @@ public class CaseCreator extends ApplicationForm {
 			
 			Paragraph paragraph = new Paragraph();
 			paragraph.setStyleClass("privateText");
-			paragraph.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.private_text", "Private text")));
+			paragraph.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.private_text", "If you would like your case to be handled confidentially please check the checkbox here below.")));
 			section.add(paragraph);
 			
 			formItem = new Layer(Layer.DIV);

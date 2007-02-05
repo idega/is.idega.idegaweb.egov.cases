@@ -278,6 +278,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness 
 	 */
 	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
+		//TODO use users preferred language!!
 		
 		GeneralCase theCase = getGeneralCaseHome().create();
 		CaseCategory category = null;

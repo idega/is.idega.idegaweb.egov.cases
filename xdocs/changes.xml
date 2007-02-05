@@ -6,6 +6,12 @@
 	
 	<body>
 	
+		<release version="1.0.18" date="2007-02-05">
+			<action dev="eiki" type="fix">
+				localization fixes and fixed the bug with empty description overriding parent descriptions for case categories
+			</action>
+		</release>
+		
 		<release version="1.0.17" date="2007-02-01">
 			<action dev="eiki" type="fix">
 				localization
