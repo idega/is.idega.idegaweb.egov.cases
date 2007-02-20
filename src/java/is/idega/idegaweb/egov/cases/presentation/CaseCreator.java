@@ -233,13 +233,14 @@ public class CaseCreator extends ApplicationForm {
 		types.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_type", "Select type"));
 		types.keepStatusOnAction(true);
 		types.setStyleClass("caseTypeDropdown");
-		
+	
 		CaseType firstType = getCasesBusiness(iwc).getFirstAvailableCaseType();
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, firstType != null ? firstType.getPrimaryKey().toString() : "");
 		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		message.keepStatusOnAction(true);
+		
 		
 		Layer helpLayer = new Layer(Layer.DIV);
 		helpLayer.setStyleClass("helperText");
@@ -373,16 +374,17 @@ public class CaseCreator extends ApplicationForm {
 		String message = iwc.getParameter(PARAMETER_MESSAGE);
 		
 		CaseCategory category = null;
-		try {
-			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
-		}
-		catch (FinderException fe) {
-			throw new IBORuntimeException(fe);
-		}
-		
-		
+		if(caseCategoryPK!=null && !"".equals(caseCategoryPK)){
+			try {
+				category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
+			}
+			catch (FinderException fe) {
+				throw new IBORuntimeException(fe);
+			}
+		}		
+	
 		CaseCategory subCategory = null;
-		if (getCasesBusiness(iwc).useSubCategories() && subCaseCategoryPK!=null) {
+		if (getCasesBusiness(iwc).useSubCategories() && subCaseCategoryPK!=null && !"".equals(subCaseCategoryPK)) {
 			try {
 				subCategory = getCasesBusiness(iwc).getCaseCategory(subCaseCategoryPK);
 			}
@@ -392,11 +394,13 @@ public class CaseCreator extends ApplicationForm {
 		}
 
 		CaseType type = null;
-		try {
-			type = getCasesBusiness(iwc).getCaseType(caseTypePK);
-		}
-		catch (FinderException fe) {
-			throw new IBORuntimeException(fe);
+		if(caseTypePK!=null && !"".equals(caseTypePK)){
+			try {
+				type = getCasesBusiness(iwc).getCaseType(caseTypePK);
+			}
+			catch (FinderException fe) {
+				throw new IBORuntimeException(fe);
+			}
 		}
 		
 		if (this.getCasesBusiness(iwc).useSubCategories()) {
@@ -533,11 +537,13 @@ public class CaseCreator extends ApplicationForm {
 		Locale locale = iwc.getCurrentLocale();
 		
 		CaseCategory category = null;
-		try {
-			category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
-		}
-		catch (FinderException fe) {
-			throw new IBORuntimeException(fe);
+		if(caseCategoryPK!=null && !"".equals(caseCategoryPK)){
+			try {
+				category = getCasesBusiness(iwc).getCaseCategory(caseCategoryPK);
+			}
+			catch (FinderException fe) {
+				throw new IBORuntimeException(fe);
+			}
 		}
 		
 		try {
