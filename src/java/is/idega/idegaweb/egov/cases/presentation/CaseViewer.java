@@ -68,7 +68,12 @@ public class CaseViewer extends CaseCreator {
 			
 			GeneralCase theCase = null;
 			try {
-				theCase = getCasesBusiness(iwc).getGeneralCase(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()));
+				String casePK = iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter());
+				if(casePK==null || "".equals(casePK)){
+					casePK = iwc.getParameter(PARAMETER_CASE_PK);
+				}
+				
+				theCase = getCasesBusiness(iwc).getGeneralCase(casePK);
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();

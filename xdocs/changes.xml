@@ -5,6 +5,13 @@
 	</properties>
 	
 	<body>
+	
+		<release version="1.0.21" date="2007-02-22">
+			<action dev="eiki" type="fix">
+				Fixed a NPE in CaseViewer when a user reactivates a case.
+			</action>
+		</release>
+		
 		<release version="1.0.20" date="2007-02-20">
 			<action dev="eiki" type="fix">
 				Fixed a NPE in CaseCreator when a user submits the form without selecting anything.
