@@ -239,7 +239,11 @@ public class CaseCreator extends ApplicationForm {
 		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
-		message.keepStatusOnAction(true);
+		//message.keepStatusOnAction(true);
+		String messageText = getMessageParameterValue(iwc);
+		if(messageText!=null){
+			message.setContent(messageText);
+		}
 		
 		
 		Layer helpLayer = new Layer(Layer.DIV);
@@ -371,7 +375,7 @@ public class CaseCreator extends ApplicationForm {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
-		String message = iwc.getParameter(PARAMETER_MESSAGE);
+		String message = getMessageParameterValue(iwc);
 		
 		CaseCategory category = null;
 		if(caseCategoryPK!=null && !"".equals(caseCategoryPK)){
@@ -429,7 +433,9 @@ public class CaseCreator extends ApplicationForm {
 		form.setStyleClass("casesForm");
 		form.setStyleClass("overview");
 		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_OVERVIEW));
-		form.maintainParameter(PARAMETER_MESSAGE);
+		
+		//form.maintainParameter(PARAMETER_MESSAGE);
+		//cannot use from maintainParameter here because the message can contain html letters like < > and that isn't encoded in the form
 		form.maintainParameter(PARAMETER_CASE_TYPE_PK);
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
@@ -529,7 +535,9 @@ public class CaseCreator extends ApplicationForm {
 	}
 	
 	private void save(IWContext iwc) throws RemoteException {
-		String message = iwc.getParameter(PARAMETER_MESSAGE);
+		String message = getMessageParameterValue(iwc);
+		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
+		
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
@@ -591,6 +599,23 @@ public class CaseCreator extends ApplicationForm {
 			ce.printStackTrace();
 			throw new IBORuntimeException(ce);
 		}
+	}
+
+	/**
+	 * @param iwc
+	 * @return
+	 */
+	protected String getMessageParameterValue(IWContext iwc) {
+		String message = iwc.getParameter(PARAMETER_MESSAGE);
+			
+		if(message==null){
+			message = (String) iwc.getSessionAttribute(PARAMETER_MESSAGE);
+		}
+		else{
+			iwc.setSessionAttribute(PARAMETER_MESSAGE, message);
+		}
+		
+		return message;
 	}
 	
 	protected String getPrefix() {

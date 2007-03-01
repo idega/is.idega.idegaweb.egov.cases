@@ -6,6 +6,13 @@
 	
 	<body>
 	
+		<release version="1.0.22" date="2007-03-01">
+			<action dev="eiki" type="fix">
+				Changed CaseCreator so it does not use Form.maintainParameter for the message text. 
+				The text would be sent incomplete if it contained html characters because of the confirmation step and a hidden input. The html would get invalid.
+			</action>
+		</release>
+		
 		<release version="1.0.21" date="2007-02-22">
 			<action dev="eiki" type="fix">
 				Fixed a NPE in CaseViewer when a user reactivates a case.
