@@ -235,6 +235,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));
 
+		System.out.println(query.toString());
 		return idoFindPKsByQuery(query);
 	}
 

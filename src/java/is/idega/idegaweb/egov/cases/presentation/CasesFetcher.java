@@ -120,6 +120,7 @@ public class CasesFetcher extends CasesBlock {
 			DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY), getBusiness().getCaseCategories(), "getName");
 			categories.keepStatusOnAction(true);
 			categories.setStyleClass("caseCategoryDropdown");
+			categories.setMenuElementFirst("", "");
 
 			DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY);
 			subCategories.keepStatusOnAction(true);
@@ -137,11 +138,13 @@ public class CasesFetcher extends CasesBlock {
 						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 					}
 				}
+				subCategories.setMenuElementFirst("", "");
 			}
 
 			DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE), getBusiness().getCaseTypes(), "getName");
 			types.keepStatusOnAction(true);
 			types.setStyleClass("caseTypeDropdown");
+			types.setMenuElementFirst("", "");
 
 			DropdownMenu statuses = new DropdownMenu(PARAMETER_CASE_STATUS);
 			statuses.addMenuElement(getBusiness().getCaseStatusOpen().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusOpen(), iwc.getCurrentLocale()));
@@ -150,6 +153,14 @@ public class CasesFetcher extends CasesBlock {
 			statuses.addMenuElement(getBusiness().getCaseStatusReady().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
 			statuses.keepStatusOnAction(true);
 			statuses.setStyleClass("caseStatusDropdown");
+			statuses.setMenuElementFirst("", "");
+
+			DropdownMenu anonymous = new DropdownMenu(PARAMETER_ANONYMOUS);
+			anonymous.addMenuElement("", "");
+			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.yes", "Yes"));
+			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
+			anonymous.keepStatusOnAction(true);
+			anonymous.setStyleClass("anonymousDropdown");
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -193,6 +204,13 @@ public class CasesFetcher extends CasesBlock {
 			label = new Label(getResourceBundle().getLocalizedString("status", "status"), statuses);
 			element.add(label);
 			element.add(statuses);
+			section.add(element);
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.show_anonymous", "Show anonymous"), anonymous);
+			element.add(label);
+			element.add(anonymous);
 			section.add(element);
 
 			SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));
