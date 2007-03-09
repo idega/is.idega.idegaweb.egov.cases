@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.24" date="2007-03-09">
+			<action dev="palli" type="update">
+				Updating and fixing dependencies to create a new sunnan3
+				application.
+			</action>
+		</release>
 	
 		<release version="1.0.23" date="2007-03-09">
 			<action dev="laddi" type="update">

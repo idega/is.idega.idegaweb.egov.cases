@@ -5,27 +5,25 @@
   </classpathentry>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.core">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.core-3.1.39.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.block.process">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.process-3.1.11.jar">
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.text">
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.school">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.process.webservice-3.1.0.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.process.webservice-3.1.2.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.user">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.user-3.1.4.jar">
   </classpathentry>
   <classpathentry kind="src" path="/is.idega.idegaweb.egov.application">
   </classpathentry>
-  <classpathentry kind="src" path="/is.idega.block.family">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/is.idega.block.family-1.0.3.jar">
   </classpathentry>
   <classpathentry kind="src" path="/se.idega.idegaweb.commune">
   </classpathentry>
   <classpathentry kind="src" path="/se.idega.idegaweb.commune.care">
-  </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/poi/jars/poi-2.5-final-20040428.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/org.apache.axis-1.3.jar">
   </classpathentry>
@@ -41,6 +39,8 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar">
   </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/poi/jars/poi-2.5-final-20040428.jar">
+  </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/myfaces/jars/myfaces-jsf-api-1.1.3.jar">
@@ -53,7 +53,7 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-spec1_0_1.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.block.web2.0">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.web2.0-3.1.4.jar">
   </classpathentry>
   <classpathentry kind="output" path="target/classes">
   </classpathentry>
