@@ -211,7 +211,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		Table process = new Table(Case.class);
 
 		SelectQuery query = new SelectQuery(table);
-		query.addColumn(table, getIDColumnName(), true);
+		query.addColumn(table, getIDColumnName());
 		try {
 			query.addJoin(table, process);
 		}
