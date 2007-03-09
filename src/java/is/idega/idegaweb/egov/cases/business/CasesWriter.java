@@ -136,9 +136,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		short cellColumn = 0;
 		HSSFSheet sheet = workbook.createSheet(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_fetcher.statistics", "Statistics"), 30));
 		sheet.setColumnWidth(cellColumn++, (short) (8 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (30 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
-		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (18 * 256));
 		if (getBusiness(iwc).useTypes()) {
 			sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		}

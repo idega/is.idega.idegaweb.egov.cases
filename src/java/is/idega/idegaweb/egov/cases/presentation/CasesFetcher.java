@@ -268,9 +268,11 @@ public class CasesFetcher extends CasesBlock {
 		cell.setStyleClass("category");
 		cell.add(new Text(getResourceBundle().getLocalizedString("case_category", "Category")));
 
-		cell = row.createHeaderCell();
-		cell.setStyleClass("type");
-		cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Type")));
+		if (getCasesBusiness(iwc).useTypes()) {
+			cell = row.createHeaderCell();
+			cell.setStyleClass("type");
+			cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Type")));
+		}
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("status");
