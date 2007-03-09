@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.data;
 
 import com.idega.data.IDOException;
 import java.util.Collection;
+import com.idega.block.process.data.CaseStatus;
 import javax.ejb.CreateException;
 import com.idega.data.IDOHome;
 import javax.ejb.FinderException;
@@ -23,6 +24,8 @@ public interface GeneralCaseHome extends IDOHome {
 	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException;
 
 	public Collection findAllByUsers(Collection users) throws FinderException;
+
+	public Collection findByCriteria(CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException;
 
 	public int getCountByGroup(Collection groups) throws IDOException;
 

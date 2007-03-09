@@ -6,6 +6,12 @@
 	
 	<body>
 	
+		<release version="1.0.23" date="2007-03-09">
+			<action dev="laddi" type="update">
+				Added a new block to fetch all cases by a user specified criteria.  An Excel sheet can then be fetched based on the results.
+			</action>
+		</release>
+		
 		<release version="1.0.22" date="2007-03-01">
 			<action dev="eiki" type="fix">
 				Changed CaseCreator so it does not use Form.maintainParameter for the message text. 

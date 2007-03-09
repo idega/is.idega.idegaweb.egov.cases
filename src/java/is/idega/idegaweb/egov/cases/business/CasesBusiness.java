@@ -1,31 +1,34 @@
 package is.idega.idegaweb.egov.cases.business;
 
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
+import com.idega.block.process.business.CaseBusiness;
+import com.idega.presentation.IWContext;
+import com.idega.idegaweb.IWResourceBundle;
+import com.idega.block.process.data.Case;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-
-import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.Locale;
-
 import javax.ejb.CreateException;
+import com.idega.block.process.data.CaseStatus;
+import com.idega.user.data.User;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import java.rmi.RemoteException;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import java.util.Locale;
+import java.util.Collection;
 import javax.ejb.FinderException;
+import com.idega.business.IBOService;
 import javax.ejb.RemoveException;
 
-import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.data.Case;
-import com.idega.block.process.data.CaseStatus;
-import com.idega.business.IBOService;
-import com.idega.idegaweb.IWResourceBundle;
-import com.idega.presentation.IWContext;
-import com.idega.user.data.User;
-
 public interface CasesBusiness extends IBOService, CaseBusiness {
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseDescription
 	 */
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseStatusDescription
+	 */
+	public String getLocalizedCaseStatusDescription(CaseStatus status, Locale locale) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseStatusDescription
@@ -56,6 +59,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByUsers
 	 */
 	public Collection getCasesByUsers(Collection users) throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByCriteria
+	 */
+	public Collection getCasesByCriteria(CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategory

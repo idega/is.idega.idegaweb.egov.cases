@@ -5,7 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>eGov General Cases</name>
   <artifactId>is.idega.idegaweb.egov.cases</artifactId>
-  <currentVersion>1.0.22</currentVersion>
+  <currentVersion>1.0.23</currentVersion>
   <inceptionYear>2005</inceptionYear>
   <shortDescription>eGov General Cases</shortDescription>
   <versions>
@@ -123,6 +123,11 @@
       <id>1.0.22</id>
       <name>1.0.22</name>
       <tag>EGOV_CASES_1_0_22</tag>
+    </version>
+    <version>
+      <id>1.0.23</id>
+      <name>1.0.23</name>
+      <tag>EGOV_CASES_1_0_23</tag>
     </version>
   </versions>
   <branches/>
@@ -290,6 +295,14 @@
       <version>1.0</version>
       <type>jar</type>
       <url>http://ws.apache.org/axis</url>
+    </dependency>
+    <dependency>
+      <groupId>poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>2.5-final-20040428</version>
+      <type>jar</type>
+      <url>http://jakarta.apache.org/poi/</url>
+      <properties/>
     </dependency>
   </dependencies>
   <build>
