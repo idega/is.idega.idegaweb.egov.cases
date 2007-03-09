@@ -119,12 +119,10 @@ public class CasesFetcher extends CasesBlock {
 			SelectorUtility util = new SelectorUtility();
 			DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY), getBusiness().getCaseCategories(), "getName");
 			categories.keepStatusOnAction(true);
-			categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
 			categories.setStyleClass("caseCategoryDropdown");
 
 			DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY);
 			subCategories.keepStatusOnAction(true);
-			subCategories.setSelectedElement(category.getPrimaryKey().toString());
 			subCategories.setStyleClass("subCaseCategoryDropdown");
 
 			if (parentCategory != null) {
@@ -143,7 +141,6 @@ public class CasesFetcher extends CasesBlock {
 
 			DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE), getBusiness().getCaseTypes(), "getName");
 			types.keepStatusOnAction(true);
-			types.setSelectedElement(type.getPrimaryKey().toString());
 			types.setStyleClass("caseTypeDropdown");
 
 			DropdownMenu statuses = new DropdownMenu(PARAMETER_CASE_STATUS);
