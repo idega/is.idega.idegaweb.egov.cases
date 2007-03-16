@@ -193,8 +193,12 @@ public class MyCases extends CasesProcessor {
 		section.add(element);
 
 		if (attachment != null) {
+			Link link = new Link(new Text(attachment.getName()));
+			link.setFile(attachment);
+			link.setTarget(Link.TARGET_BLANK_WINDOW);
+
 			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(new Text(attachment.getName()));
+			attachmentSpan.add(link);
 
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");

@@ -556,8 +556,12 @@ public class CaseCreator extends ApplicationForm {
 		}
 
 		if (attachment != null) {
+			Link link = new Link(new Text(attachment.getName()));
+			link.setFile(attachment);
+			link.setTarget(Link.TARGET_BLANK_WINDOW);
+
 			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(new Text(attachment.getName()));
+			attachmentSpan.add(link);
 
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
