@@ -165,6 +165,19 @@ public class CaseViewer extends CaseCreator {
 			formItem.add(createdDate);
 			section.add(formItem);
 
+			if (attachment != null) {
+				Layer attachmentSpan = new Layer(Layer.SPAN);
+				attachmentSpan.add(new Text(attachment.getName()));
+
+				formItem = new Layer(Layer.DIV);
+				formItem.setStyleClass("formItem");
+				label = new Label();
+				label.setLabel(iwrb.getLocalizedString("attachment", "Attachment"));
+				formItem.add(label);
+				formItem.add(attachmentSpan);
+				section.add(formItem);
+			}
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("informationItem");
@@ -173,20 +186,6 @@ public class CaseViewer extends CaseCreator {
 			formItem.add(label);
 			formItem.add(message);
 			section.add(formItem);
-
-			if (attachment != null) {
-				Layer attachmentSpan = new Layer(Layer.SPAN);
-				attachmentSpan.add(new Text(attachment.getName()));
-
-				formItem = new Layer(Layer.DIV);
-				formItem.setStyleClass("formItem");
-				formItem.setStyleClass("informationItem");
-				label = new Label();
-				label.setLabel(iwrb.getLocalizedString("attachment", "Attachment"));
-				formItem.add(label);
-				formItem.add(attachmentSpan);
-				section.add(formItem);
-			}
 
 			Layer clear = new Layer(Layer.DIV);
 			clear.setStyleClass("Clear");

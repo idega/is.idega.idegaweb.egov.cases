@@ -318,17 +318,6 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 		}
 
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		formItem.setStyleClass("required");
-		if (hasError(PARAMETER_MESSAGE)) {
-			formItem.setStyleClass("hasError");
-		}
-		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "message", "Message"))), message);
-		formItem.add(label);
-		formItem.add(message);
-		section.add(formItem);
-
 		if (getCasesBusiness(iwc).allowAttachments()) {
 			FileInput file = new FileInput();
 
@@ -340,6 +329,17 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(file);
 			section.add(formItem);
 		}
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("required");
+		if (hasError(PARAMETER_MESSAGE)) {
+			formItem.setStyleClass("hasError");
+		}
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "message", "Message"))), message);
+		formItem.add(label);
+		formItem.add(message);
+		section.add(formItem);
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
@@ -414,8 +414,6 @@ public class CaseCreator extends ApplicationForm {
 				catch (Exception ex) {
 					System.err.println("MediaBusiness: deleting the temporary file at " + uploadFile.getRealPath() + " failed.");
 				}
-
-				add(new HiddenInput(PARAMETER_ATTACHMENT_PK, attachment.getPrimaryKey().toString()));
 			}
 			catch (RemoteException e) {
 				e.printStackTrace(System.err);
@@ -492,6 +490,9 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_PRIVATE);
+		if (attachment != null) {
+			form.add(new HiddenInput(PARAMETER_ATTACHMENT_PK, attachment.getPrimaryKey().toString()));
+		}
 
 		String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
 		if (category != null) {
@@ -554,6 +555,19 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 		}
 
+		if (attachment != null) {
+			Layer attachmentSpan = new Layer(Layer.SPAN);
+			attachmentSpan.add(new Text(attachment.getName()));
+
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString("attachment", "Attachment"));
+			formItem.add(label);
+			formItem.add(attachmentSpan);
+			section.add(formItem);
+		}
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
@@ -562,20 +576,6 @@ public class CaseCreator extends ApplicationForm {
 		formItem.add(label);
 		formItem.add(messageSpan);
 		section.add(formItem);
-
-		if (attachment != null) {
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(new Text(attachment.getName()));
-
-			formItem = new Layer(Layer.DIV);
-			formItem.setStyleClass("formItem");
-			formItem.setStyleClass("informationItem");
-			label = new Label();
-			label.setLabel(this.iwrb.getLocalizedString("attachment", "Attachment"));
-			formItem.add(label);
-			formItem.add(attachmentSpan);
-			section.add(formItem);
-		}
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");

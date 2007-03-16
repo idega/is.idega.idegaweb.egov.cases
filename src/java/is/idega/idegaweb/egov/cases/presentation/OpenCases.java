@@ -162,6 +162,19 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		element.add(createdDate);
 		section.add(element);
 
+		if (attachment != null) {
+			Layer attachmentSpan = new Layer(Layer.SPAN);
+			attachmentSpan.add(new Text(attachment.getName()));
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+			element.add(label);
+			element.add(attachmentSpan);
+			section.add(element);
+		}
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
@@ -169,20 +182,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		element.add(label);
 		element.add(message);
 		section.add(element);
-
-		if (attachment != null) {
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(new Text(attachment.getName()));
-
-			element = new Layer(Layer.DIV);
-			element.setStyleClass("formItem");
-			element.setStyleClass("informationItem");
-			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
-			element.add(label);
-			element.add(attachmentSpan);
-			section.add(element);
-		}
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");

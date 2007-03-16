@@ -147,6 +147,19 @@ public class ClosedCases extends CasesProcessor {
 		element.add(createdDate);
 		layer.add(element);
 
+		if (attachment != null) {
+			Layer attachmentSpan = new Layer(Layer.SPAN);
+			attachmentSpan.add(new Text(attachment.getName()));
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+			element.add(label);
+			element.add(attachmentSpan);
+			layer.add(element);
+		}
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		element.setStyleClass("informationItem");
@@ -155,20 +168,6 @@ public class ClosedCases extends CasesProcessor {
 		element.add(label);
 		element.add(message);
 		layer.add(element);
-
-		if (attachment != null) {
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(new Text(attachment.getName()));
-
-			element = new Layer(Layer.DIV);
-			element.setStyleClass("formItem");
-			element.setStyleClass("informationItem");
-			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
-			element.add(label);
-			element.add(attachmentSpan);
-			layer.add(element);
-		}
 
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
