@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.26" date="2007-03-16">
+			<action dev="palli" type="update">
+				Moved biztalk and onesystem listeners to new bundles.
+			</action>
+		</release>
+
 		<release version="1.0.25" date="2007-03-16">
 			<action dev="laddi" type="update">
 				Added possibility to add attachments to new cases.

@@ -5,7 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>eGov General Cases</name>
   <artifactId>is.idega.idegaweb.egov.cases</artifactId>
-  <currentVersion>1.0.25</currentVersion>
+  <currentVersion>1.0.26</currentVersion>
   <inceptionYear>2005</inceptionYear>
   <shortDescription>eGov General Cases</shortDescription>
   <versions>
@@ -167,40 +167,6 @@
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
-      <artifactId>com.idega.block.text</artifactId>
-      <version>3.1.1</version>
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
-      <properties>
-        <eclipse.dependency>true</eclipse.dependency>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
-      <artifactId>com.idega.block.school</artifactId>
-      <version>3.1.11</version>
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
-      <properties>
-        <eclipse.dependency>true</eclipse.dependency>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
-      <artifactId>com.idega.block.process.webservice</artifactId>
-      <version>3.1.2</version>
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
-    </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
-      <artifactId>com.idega.user</artifactId>
-      <version>3.1.4</version>
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
-    </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
       <artifactId>is.idega.idegaweb.egov.application</artifactId>
       <version>1.0.11</version>
       <type>jar</type>
@@ -208,13 +174,6 @@
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
-    </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
-      <artifactId>is.idega.block.family</artifactId>
-      <version>1.0.3</version>
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
@@ -228,71 +187,10 @@
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
-      <artifactId>se.idega.idegaweb.commune.care</artifactId>
-      <version>1.0.2</version>
+      <artifactId>com.idega.user</artifactId>
+      <version>3.1.4</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
-      <properties>
-        <eclipse.dependency>true</eclipse.dependency>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
-      <artifactId>org.apache.axis</artifactId>
-      <version>1.3</version>
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
-    </dependency>
-    <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis</artifactId>
-      <version>1.3</version>
-      <type>jar</type>
-      <url>http://ws.apache.org/axis</url>
-      <properties>
-        <idegaweb.bundle.include>true</idegaweb.bundle.include>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-jaxrpc</artifactId>
-      <version>1.3</version>
-      <type>jar</type>
-      <url>http://jax-rpc.dev.java.net/</url>
-      <properties>
-        <idegaweb.bundle.include>true</idegaweb.bundle.include>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>javamail</groupId>
-      <artifactId>javamail</artifactId>
-      <version>1.3.2</version>
-      <type>jar</type>
-      <url>http://java.sun.com/products/javamail/</url>
-      <properties>
-        <idegaweb.bundle.include>true</idegaweb.bundle.include>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>2.0.2</version>
-      <type>jar</type>
-      <url>http://ws.apache.org/axis</url>
-    </dependency>
-    <dependency>
-      <groupId>itextpdf</groupId>
-      <artifactId>itext-paulo</artifactId>
-      <version>139</version>
-      <type>jar</type>
-      <url>http://ws.apache.org/axis</url>
-    </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.0</version>
-      <type>jar</type>
-      <url>http://ws.apache.org/axis</url>
     </dependency>
     <dependency>
       <groupId>poi</groupId>
@@ -301,6 +199,16 @@
       <type>jar</type>
       <url>http://jakarta.apache.org/poi/</url>
       <properties/>
+    </dependency>
+    <dependency>
+      <groupId>bundles</groupId>
+      <artifactId>com.idega.block.text</artifactId>
+      <version>3.1.1</version>
+      <type>jar</type>
+      <url>http://www.idega.com/</url>
+      <properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
   </dependencies>
   <build>

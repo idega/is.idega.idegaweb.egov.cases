@@ -5,11 +5,9 @@
   <comment>
   </comment>
   <projects>
-    <project>com.idega.block.text</project>
-    <project>com.idega.block.school</project>
     <project>is.idega.idegaweb.egov.application</project>
     <project>se.idega.idegaweb.commune</project>
-    <project>se.idega.idegaweb.commune.care</project>
+    <project>com.idega.block.text</project>
   </projects>
   <buildSpec>
     <buildCommand>
