@@ -5,6 +5,15 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.25" date="2007-03-16">
+			<action dev="laddi" type="update">
+				Added possibility to add attachments to new cases.
+			</action>
+			<action dev="laddi" type="fix">
+				Fixed so that the cases fetcher allows for choosing only parent category and leaving sub category blank.
+			</action>
+		</release>
+	
 		<release version="1.0.24" date="2007-03-09">
 			<action dev="palli" type="update">
 				Updating and fixing dependencies to create a new sunnan3

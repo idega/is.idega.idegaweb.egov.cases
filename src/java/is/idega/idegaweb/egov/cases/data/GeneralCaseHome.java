@@ -25,7 +25,7 @@ public interface GeneralCaseHome extends IDOHome {
 
 	public Collection findAllByUsers(Collection users) throws FinderException;
 
-	public Collection findByCriteria(CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException;
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException;
 
 	public int getCountByGroup(Collection groups) throws IDOException;
 

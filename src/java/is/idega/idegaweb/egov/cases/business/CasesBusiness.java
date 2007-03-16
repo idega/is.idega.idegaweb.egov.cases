@@ -2,6 +2,7 @@ package is.idega.idegaweb.egov.cases.business;
 
 
 import com.idega.block.process.business.CaseBusiness;
+import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.block.process.data.Case;
@@ -19,6 +20,11 @@ import com.idega.business.IBOService;
 import javax.ejb.RemoveException;
 
 public interface CasesBusiness extends IBOService, CaseBusiness {
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getAttachment
+	 */
+	public ICFile getAttachment(Object attachmentPK) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseDescription
@@ -63,7 +69,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByCriteria
 	 */
-	public Collection getCasesByCriteria(CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws RemoteException;
+	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategory
@@ -118,7 +124,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#handleCase
@@ -164,4 +170,9 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allowPrivateCases
 	 */
 	public boolean allowPrivateCases() throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allowAttachments
+	 */
+	public boolean allowAttachments() throws RemoteException;
 }

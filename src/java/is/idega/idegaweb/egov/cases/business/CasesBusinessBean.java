@@ -37,6 +37,8 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextHome;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.file.data.ICFile;
+import com.idega.core.file.data.ICFileHome;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
@@ -101,6 +103,20 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		catch (IDOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
+	}
+
+	public ICFile getAttachment(Object attachmentPK) {
+		try {
+			return ((ICFileHome) IDOLookup.getHome(ICFile.class)).findByPrimaryKey(attachmentPK);
+		}
+		catch (IDOLookupException e) {
+			e.printStackTrace();
+		}
+		catch (FinderException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) {
@@ -184,9 +200,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	public Collection getCasesByCriteria(CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) {
+	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) {
 		try {
-			return getGeneralCaseHome().findByCriteria(category, type, status, anonymous);
+			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -287,7 +303,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -306,6 +322,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		catch (FinderException fe) {
 			throw new CreateException("Trying to store a case with case type that does not exist");
 		}
+		ICFile attachment = null;
+		if (attachmentPK != null) {
+			attachment = getAttachment(attachmentPK);
+		}
 
 		Group handlerGroup = category.getHandlerGroup();
 
@@ -314,6 +334,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setOwner(sender);
 		theCase.setHandler(handlerGroup);
 		theCase.setMessage(message);
+		theCase.setAttachment(attachment);
 		theCase.setType(type);
 		theCase.setAsPrivate(isPrivate);
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group) null);
@@ -566,5 +587,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	public boolean allowPrivateCases() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_PRIVATE_CASES, false);
+	}
+
+	public boolean allowAttachments() {
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_ATTACHMENTS, false);
 	}
 }

@@ -13,6 +13,7 @@ import javax.ejb.FinderException;
 import com.idega.block.process.data.AbstractCaseBMPBean;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.core.file.data.ICFile;
 import com.idega.data.IDOException;
 import com.idega.data.IDORelationshipException;
 import com.idega.data.query.CountColumn;
@@ -31,6 +32,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_REPLY = "reply";
 	private static final String COLUMN_CASE_CATEGORY = "case_category";
 	private static final String COLUMN_CASE_TYPE = "case_type";
+	private static final String COLUMN_FILE = "ic_file_id";
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
@@ -67,6 +69,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
+		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
 	}
 
@@ -100,6 +103,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return (CaseType) getColumnValue(COLUMN_CASE_TYPE);
 	}
 
+	public ICFile getAttachment() {
+		return (ICFile) getColumnValue(COLUMN_FILE);
+	}
+
 	public User getHandledBy() {
 		return (User) getColumnValue(COLUMN_HANDLER);
 	}
@@ -127,6 +134,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 	public void setCaseType(CaseType type) {
 		setColumn(COLUMN_CASE_TYPE, type);
+	}
+
+	public void setAttachment(ICFile attachment) {
+		setColumn(COLUMN_FILE, attachment);
 	}
 
 	public void setHandledBy(User handler) {
@@ -206,9 +217,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
-	public Collection ejbFindByCriteria(CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
+	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
+		Table categories = new Table(CaseCategory.class);
 
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName());
@@ -220,8 +232,20 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			throw new FinderException(e.getMessage());
 		}
 
-		if (category != null) {
-			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_CATEGORY), MatchCriteria.EQUALS, category));
+		if (parentCategory != null) {
+			if (category == null) {
+				try {
+					query.addJoin(table, categories);
+				}
+				catch (IDORelationshipException e) {
+					e.printStackTrace();
+					throw new FinderException(e.getMessage());
+				}
+				query.addCriteria(new MatchCriteria(categories.getColumn("parent_category"), MatchCriteria.EQUALS, parentCategory));
+			}
+			else {
+				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_CATEGORY), MatchCriteria.EQUALS, category));
+			}
 		}
 		if (type != null) {
 			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_TYPE), MatchCriteria.EQUALS, type));

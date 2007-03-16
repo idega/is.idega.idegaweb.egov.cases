@@ -54,6 +54,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 	private IWResourceBundle iwrb;
 
 	public static final String PARAMETER_CASE_CATEGORY = "prm_case_category";
+	public static final String PARAMETER_SUB_CASE_CATEGORY = "prm_sub_case_category";
 	public static final String PARAMETER_CASE_TYPE = "prm_case_type";
 	public static final String PARAMETER_CASE_STATUS = "prm_case_status";
 	public static final String PARAMETER_ANONYMOUS = "prm_anonymous";
@@ -70,6 +71,16 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY)) {
 				try {
 					category = getBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY));
+				}
+				catch (FinderException fe) {
+					fe.printStackTrace();
+				}
+			}
+
+			CaseCategory subCategory = null;
+			if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY)) {
+				try {
+					subCategory = getBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY));
 				}
 				catch (FinderException fe) {
 					fe.printStackTrace();
@@ -96,7 +107,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 				anonymous = new Boolean(iwc.getParameter(PARAMETER_ANONYMOUS));
 			}
 
-			Collection cases = getBusiness(iwc).getCasesByCriteria(category, type, status, anonymous);
+			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, anonymous);
 
 			this.buffer = writeXLS(iwc, cases);
 			setAsDownload(iwc, "cases.xls", this.buffer.length());

@@ -1,11 +1,9 @@
 /*
- * $Id$
- * Created on Oct 31, 2005
- *
+ * $Id$ Created on Oct 31, 2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
@@ -24,6 +22,7 @@ import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.file.data.ICFile;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -37,11 +36,10 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
 
-
 public class CaseViewer extends CaseCreator {
-	
+
 	public static final String PARAMETER_ACTION = "cp_prm_action";
-	
+
 	public static final String PARAMETER_CASE_PK = "prm_case_pk";
 
 	protected static final int ACTION_SAVE = 1;
@@ -59,20 +57,20 @@ public class CaseViewer extends CaseCreator {
 					e.printStackTrace();
 				}
 			}
-			
+
 			IWResourceBundle iwrb = getResourceBundle(iwc);
-			
+
 			Form form = new Form();
 			form.setStyleClass("adminForm");
 			form.setStyleClass("overview");
-			
+
 			GeneralCase theCase = null;
 			try {
 				String casePK = iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter());
-				if(casePK==null || "".equals(casePK)){
+				if (casePK == null || "".equals(casePK)) {
 					casePK = iwc.getParameter(PARAMETER_CASE_PK);
 				}
-				
+
 				theCase = getCasesBusiness(iwc).getGeneralCase(casePK);
 			}
 			catch (FinderException fe) {
@@ -83,41 +81,42 @@ public class CaseViewer extends CaseCreator {
 			CaseCategory parentCategory = category.getParent();
 			CaseStatus status = theCase.getCaseStatus();
 			CaseType type = theCase.getCaseType();
+			ICFile attachment = theCase.getAttachment();
 			User user = getCasesBusiness(iwc).getLastModifier(theCase);
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
-			
+
 			form.add(getHeader(iwrb.getLocalizedString(getPrefix() + "case_viewer.view_case", "View case")));
 
 			form.add(getPersonInfo(iwc, theCase.getOwner()));
-			
+
 			Layer clearLayer = new Layer(Layer.DIV);
 			clearLayer.setStyleClass("Clear");
-			
+
 			Layer caseType = new Layer(Layer.SPAN);
 			caseType.add(new Text(type.getName()));
-			
+
 			Layer caseCategory = new Layer(Layer.SPAN);
 			caseCategory.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
-			
+
 			Layer message = new Layer(Layer.SPAN);
 			message.add(new Text(theCase.getMessage()));
-			
+
 			Layer createdDate = new Layer(Layer.SPAN);
 			createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
-			
+
 			Heading1 heading = new Heading1(iwrb.getLocalizedString(getPrefix() + "case_overview", "Case overview"));
 			heading.setStyleClass("subHeader");
 			heading.setStyleClass("topSubHeader");
 			form.add(heading);
-			
+
 			Layer section = new Layer(Layer.DIV);
 			section.setStyleClass("formSection");
 			form.add(section);
-			
+
 			if (theCase.isPrivate()) {
 				section.add(getAttentionLayer(iwrb.getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
 			}
-			
+
 			if (getCasesBusiness(iwc).useTypes()) {
 				Layer formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
@@ -127,11 +126,11 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(caseType);
 				section.add(formItem);
 			}
-			
+
 			if (parentCategory != null) {
 				Layer parentCaseCategory = new Layer(Layer.SPAN);
 				parentCaseCategory.add(new Text(parentCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
-				
+
 				Layer formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				Label label = new Label();
@@ -157,7 +156,7 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(caseCategory);
 				section.add(formItem);
 			}
-			
+
 			Layer formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			Label label = new Label();
@@ -165,7 +164,7 @@ public class CaseViewer extends CaseCreator {
 			formItem.add(label);
 			formItem.add(createdDate);
 			section.add(formItem);
-	
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("informationItem");
@@ -174,11 +173,25 @@ public class CaseViewer extends CaseCreator {
 			formItem.add(label);
 			formItem.add(message);
 			section.add(formItem);
-	
+
+			if (attachment != null) {
+				Layer attachmentSpan = new Layer(Layer.SPAN);
+				attachmentSpan.add(new Text(attachment.getName()));
+
+				formItem = new Layer(Layer.DIV);
+				formItem.setStyleClass("formItem");
+				formItem.setStyleClass("informationItem");
+				label = new Label();
+				label.setLabel(iwrb.getLocalizedString("attachment", "Attachment"));
+				formItem.add(label);
+				formItem.add(attachmentSpan);
+				section.add(formItem);
+			}
+
 			Layer clear = new Layer(Layer.DIV);
 			clear.setStyleClass("Clear");
 			section.add(clear);
-			
+
 			Collection logs = getCasesBusiness(iwc).getCaseLogs(theCase);
 			if (!logs.isEmpty()) {
 				Iterator iter = logs.iterator();
@@ -191,17 +204,18 @@ public class CaseViewer extends CaseCreator {
 				Layer handler = new Layer(Layer.SPAN);
 				if (user != null) {
 					handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));
-				} else {
+				}
+				else {
 					handler.add(new Text(""));
 				}
 				heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 				heading.setStyleClass("subHeader");
 				form.add(heading);
-				
+
 				section = new Layer(Layer.DIV);
 				section.setStyleClass("formSection");
 				form.add(section);
-				
+
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
@@ -209,7 +223,7 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(label);
 				formItem.add(handler);
 				section.add(formItem);
-		
+
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
@@ -217,11 +231,11 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(label);
 				formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 				section.add(formItem);
-				
+
 				if (theCase.getReply() != null && theCase.getReply().length() > 0) {
 					Layer reply = new Layer(Layer.SPAN);
 					reply.add(new Text(theCase.getReply()));
-				
+
 					formItem = new Layer(Layer.DIV);
 					formItem.setStyleClass("formItem");
 					formItem.setStyleClass("informationItem");
@@ -231,10 +245,10 @@ public class CaseViewer extends CaseCreator {
 					formItem.add(reply);
 					section.add(formItem);
 				}
-				
+
 				section.add(clear);
 			}
-			
+
 			Layer bottom = new Layer(Layer.DIV);
 			bottom.setStyleClass("bottom");
 			form.add(bottom);
@@ -245,7 +259,7 @@ public class CaseViewer extends CaseCreator {
 				home.setPage(this.iBackPage);
 				bottom.add(home);
 			}
-			
+
 			if (getHomePage() != null) {
 				Link home = getButtonLink(iwrb.getLocalizedString("my_page", "My page"));
 				home.setStyleClass("buttonHome");
@@ -259,31 +273,31 @@ public class CaseViewer extends CaseCreator {
 				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
 				bottom.add(next);
 			}
-			
+
 			add(form);
 		}
 		catch (RemoteException re) {
 			throw new IBORuntimeException(re);
 		}
 	}
-	
+
 	private Layer getHandlerLayer(IWContext iwc, IWResourceBundle iwrb, Case theCase, CaseLog log) throws RemoteException {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("handlerLayer");
-		
+
 		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		layer.add(heading);
-		
+
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		layer.add(section);
-		
+
 		User user = log.getPerformer();
 		IWTimestamp stamp = new IWTimestamp(log.getTimeStamp());
 		CaseStatus status = log.getCaseStatusAfter();
 		String reply = log.getComment();
-		
+
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
@@ -299,7 +313,7 @@ public class CaseViewer extends CaseCreator {
 		formItem.add(label);
 		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
 		section.add(formItem);
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
@@ -307,7 +321,7 @@ public class CaseViewer extends CaseCreator {
 		formItem.add(label);
 		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 		section.add(formItem);
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
@@ -316,23 +330,22 @@ public class CaseViewer extends CaseCreator {
 		formItem.add(label);
 		formItem.add(new Span(new Text(reply)));
 		section.add(formItem);
-		
+
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		section.add(clear);
-		
+
 		return layer;
 	}
-	
+
 	protected ICPage getHomePage() {
 		return this.iHomePage;
 	}
-	
+
 	public void setHomePage(ICPage page) {
 		this.iHomePage = page;
 	}
 
-	
 	public void setBackPage(ICPage backPage) {
 		this.iBackPage = backPage;
 	}

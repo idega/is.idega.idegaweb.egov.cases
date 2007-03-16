@@ -6,6 +6,7 @@ anonymous_case_sent_body=A new anonymous case has been sent in by {0} in case ca
 application.case_creator=Case creator
 application.enter_new_case=Enter new case
 application_errors_occured=There was a problem with the following items
+attachment=Attachment
 back=Back
 back_to_list=Back to list
 cancel=Cancel

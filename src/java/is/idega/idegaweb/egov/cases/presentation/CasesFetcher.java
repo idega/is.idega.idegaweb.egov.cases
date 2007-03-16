@@ -94,7 +94,7 @@ public class CasesFetcher extends CasesBlock {
 		}
 
 		if (iwc.isParameterSet(PARAMETER_SHOW_RESULTS)) {
-			cases = getCasesBusiness(iwc).getCasesByCriteria(category, type, status, anonymous);
+			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, anonymous);
 		}
 	}
 
@@ -357,8 +357,11 @@ public class CasesFetcher extends CasesBlock {
 		link.setStyleClass("xls");
 		link.setTarget(Link.TARGET_NEW_WINDOW);
 		link.setMediaWriterClass(CasesWriter.class);
+		if (parentCategory != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, parentCategory.getPrimaryKey().toString());
+		}
 		if (category != null) {
-			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, category.getPrimaryKey().toString());
+			link.addParameter(CasesWriter.PARAMETER_SUB_CASE_CATEGORY, category.getPrimaryKey().toString());
 		}
 		if (type != null) {
 			link.addParameter(CasesWriter.PARAMETER_CASE_TYPE, type.getPrimaryKey().toString());
