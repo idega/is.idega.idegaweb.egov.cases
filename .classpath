@@ -9,15 +9,17 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.process-3.1.11.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/is.idega.idegaweb.egov.application">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.text-3.1.1.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/se.idega.idegaweb.commune">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.web2.0-3.1.4.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.user-3.1.4.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/poi/jars/poi-2.5-final-20040428.jar">
+  <classpathentry kind="src" path="/is.idega.idegaweb.egov.application">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.block.text">
+  <classpathentry kind="src" path="/is.idega.idegaweb.egov.message">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/poi/jars/poi-2.5-final-20040428.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4.jar">
   </classpathentry>
@@ -30,8 +32,6 @@
   <classpathentry kind="var" path="MAVEN_REPO/ejb/jars/ejb-2.0.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-spec1_0_1.jar">
-  </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.web2.0-3.1.4.jar">
   </classpathentry>
   <classpathentry kind="output" path="target/classes">
   </classpathentry>

@@ -42,8 +42,6 @@ public class MyCases extends CasesProcessor {
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-	private static final String PARAMETER_REPLY = "prm_reply";
-	private static final String PARAMETER_STATUS = "prm_status";
 
 	protected String getBlockID() {
 		return "myCases";
@@ -285,5 +283,9 @@ public class MyCases extends CasesProcessor {
 		catch (FinderException fe) {
 			fe.printStackTrace();
 		}
+	}
+
+	protected boolean showCheckBox() {
+		return false;
 	}
 }

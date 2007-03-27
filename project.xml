@@ -5,7 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>eGov General Cases</name>
   <artifactId>is.idega.idegaweb.egov.cases</artifactId>
-  <currentVersion>1.0.26</currentVersion>
+  <currentVersion>1.0.27</currentVersion>
   <inceptionYear>2005</inceptionYear>
   <shortDescription>eGov General Cases</shortDescription>
   <versions>
@@ -144,6 +144,11 @@
       <name>1.0.26</name>
       <tag>EGOV_CASES_1_0_26</tag>
     </version>
+    <version>
+      <id>1.0.27</id>
+      <name>1.0.27</name>
+      <tag>EGOV_CASES_1_0_27</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
@@ -179,8 +184,8 @@
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
-      <artifactId>se.idega.idegaweb.commune</artifactId>
-      <version>1.0.9</version>
+      <artifactId>is.idega.idegaweb.egov.message</artifactId>
+      <version>1.0.1</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>

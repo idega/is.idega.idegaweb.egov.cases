@@ -17,6 +17,7 @@ import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -56,6 +57,8 @@ public class CasesFetcher extends CasesBlock {
 	private Boolean anonymous;
 
 	private Collection cases;
+
+	private ICPage iPage;
 
 	private void parse(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY)) {
@@ -276,8 +279,17 @@ public class CasesFetcher extends CasesBlock {
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("status");
-		cell.setStyleClass("lastColumn");
+		if (getResponsePage() == null) {
+			cell.setStyleClass("lastColumn");
+		}
 		cell.add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
+
+		cell = row.createHeaderCell();
+		cell.setStyleClass("view");
+		if (getResponsePage() != null) {
+			cell.setStyleClass("lastColumn");
+		}
+		cell.add(Text.getNonBrakingSpace());
 
 		group = table.createBodyRowGroup();
 		int iRow = 1;
@@ -302,7 +314,15 @@ public class CasesFetcher extends CasesBlock {
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
 			cell.setStyleClass("caseID");
-			cell.add(new Text(theCase.getPrimaryKey().toString()));
+			if (getResponsePage() != null) {
+				Link link = new Link(new Text(theCase.getPrimaryKey().toString()));
+				link.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+				link.setPage(getResponsePage());
+				cell.add(link);
+			}
+			else {
+				cell.add(new Text(theCase.getPrimaryKey().toString()));
+			}
 
 			cell = row.createCell();
 			cell.setStyleClass("createdDate");
@@ -340,8 +360,21 @@ public class CasesFetcher extends CasesBlock {
 
 			cell = row.createCell();
 			cell.setStyleClass("status");
-			cell.setStyleClass("lastColumn");
+			if (getResponsePage() == null) {
+				cell.setStyleClass("lastColumn");
+			}
 			cell.add(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
+
+			if (getResponsePage() != null) {
+				Link view = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString("view_case", "View case")));
+				view.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+				view.setPage(getResponsePage());
+
+				cell = row.createCell();
+				cell.setStyleClass("view");
+				cell.setStyleClass("lastColumn");
+				cell.add(view);
+			}
 
 			iRow++;
 		}
@@ -376,5 +409,13 @@ public class CasesFetcher extends CasesBlock {
 		layer.add(link);
 
 		return layer;
+	}
+
+	public void setResponsePage(ICPage page) {
+		this.iPage = page;
+	}
+
+	private ICPage getResponsePage() {
+		return this.iPage;
 	}
 }

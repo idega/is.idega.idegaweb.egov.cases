@@ -232,4 +232,8 @@ public class ClosedCases extends CasesProcessor {
 			fe.printStackTrace();
 		}
 	}
+
+	protected boolean showCheckBox() {
+		return false;
+	}
 }

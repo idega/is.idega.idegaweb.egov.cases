@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.27" date="2007-03-27">
+			<action dev="palli" type="update">
+				Refactoring/Elimination of se bundles.
+			</action>
+		</release>
+
 		<release version="1.0.26" date="2007-03-16">
 			<action dev="palli" type="update">
 				Moved biztalk and onesystem listeners to new bundles.

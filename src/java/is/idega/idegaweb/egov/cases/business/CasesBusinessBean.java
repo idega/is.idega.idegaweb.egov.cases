@@ -14,6 +14,7 @@ import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
 import java.sql.SQLException;
@@ -26,8 +27,6 @@ import java.util.Locale;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
-
-import se.idega.idegaweb.commune.message.business.CommuneMessageBusiness;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
@@ -159,7 +158,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	public Collection getOpenCases(Collection groups) {
 		try {
-			String[] statuses = { getCaseStatusOpen().getStatus() };
+			String[] statuses = { getCaseStatusOpen().getStatus(), getCaseStatusReview().getStatus() };
 			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses);
 		}
 		catch (FinderException fe) {
@@ -375,11 +374,28 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	public void allocateCase(GeneralCase theCase, User user, String message, User performer, IWContext iwc) {
+		takeCase(theCase, user, iwc);
+
+		Name name = new Name(performer.getFirstName(), performer.getMiddleName(), performer.getLastName());
+		Object[] arguments = { name.getName(iwc.getCurrentLocale()), theCase.getCaseCategory().getLocalizedCategoryName(iwc.getApplicationSettings().getDefaultLocale()), theCase.getPrimaryKey().toString(), message };
+
+		String subject = getLocalizedString("case_allocation_subject", "A case has been allocated to you", iwc.getApplicationSettings().getDefaultLocale());
+		String body = MessageFormat.format(getLocalizedString("case_allocation_body", "{0} has allocated case nr. {2} in the category {1} to you with the following message:\n{3}", iwc.getApplicationSettings().getDefaultLocale()), arguments);
+		sendMessage(theCase, user, performer, subject, body);
+	}
+
 	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
+		CaseCategory category = getCaseCategory(caseCategoryPK);
+		CaseType type = getCaseType(caseTypePK);
+
+		handleCase(theCase, category, type, status, performer, reply, iwc);
+	}
+
+	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) {
 		theCase.setReply(reply);
 
-		CaseCategory category = getCaseCategory(caseCategoryPK);
 		boolean isSameCategory = category.equals(theCase.getCaseCategory());
 		theCase.setCaseCategory(category);
 
@@ -390,6 +406,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		if (!isInGroup) {
 			theCase.setHandledBy(null);
 			status = getCaseStatusOpen().getStatus();
+		}
+		else {
+			theCase.setHandledBy(performer);
 		}
 
 		if (!isSameCategory) {
@@ -423,7 +442,6 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		}
 
-		CaseType type = getCaseType(caseTypePK);
 		theCase.setCaseType(type);
 
 		changeCaseStatus(theCase, status, reply, performer, (Group) null, true);
@@ -444,6 +462,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	public void takeCase(Object casePK, User performer, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
+		takeCase(theCase, performer, iwc);
+	}
+
+	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) {
 		theCase.setHandledBy(performer);
 
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group) null);
@@ -478,6 +500,43 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_reactivated_body", "Your case with category {0} and type {1} has been reactivated by {2}"), arguments);
 
 			sendMessage(theCase, owner, performer, subject, body);
+		}
+	}
+
+	public void reviewCase(Object casePK, User performer, IWContext iwc) throws FinderException {
+		GeneralCase theCase = getGeneralCase(casePK);
+		CaseCategory category = theCase.getCaseCategory();
+		Group handlerGroup = category.getHandlerGroup();
+
+		changeCaseStatus(theCase, getCaseStatusReview().getStatus(), performer, (Group) null);
+
+		User owner = theCase.getOwner();
+		try {
+			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
+			IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
+
+			Name name = new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName());
+			Object[] arguments = { name.getName(iwrb.getLocale()), theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getMessage() };
+			String subject = iwrb.getLocalizedString(prefix + "case_review_handler_subject", "A case sent for review");
+			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_review_handler_body", "A case has been sent in for review by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+
+			Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+			Iterator iter = handlers.iterator();
+			while (iter.hasNext()) {
+				User handler = (User) iter.next();
+				sendMessage(theCase, handler, owner, subject, body);
+			}
+
+			if (owner != null) {
+				Object[] args = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
+				subject = iwrb.getLocalizedString(prefix + "case_review_subject", "Your case has been sent for review");
+				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_review_body", "Your case with category {0} and type {1} has been sent for review"), args);
+
+				sendMessage(theCase, owner, performer, subject, body);
+			}
+		}
+		catch (RemoteException e) {
+			throw new IBORuntimeException(e);
 		}
 	}
 
@@ -587,6 +646,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	public boolean allowPrivateCases() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_PRIVATE_CASES, false);
+	}
+
+	public boolean allowAnonymousCases() {
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_ANONYMOUS_CASES, false);
 	}
 
 	public boolean allowAttachments() {

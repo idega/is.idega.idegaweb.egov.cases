@@ -40,6 +40,8 @@ public class CaseViewer extends CaseCreator {
 
 	public static final String PARAMETER_ACTION = "cp_prm_action";
 
+	public static final String PARAMETER_ACTION_REACTIVATE = "prm_action_reactivate";
+	public static final String PARAMETER_ACTION_REVIEW = "prm_action_review";
 	public static final String PARAMETER_CASE_PK = "prm_case_pk";
 
 	protected static final int ACTION_SAVE = 1;
@@ -50,11 +52,21 @@ public class CaseViewer extends CaseCreator {
 	protected void present(IWContext iwc) {
 		try {
 			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
-				try {
-					getCasesBusiness(iwc).reactivateCase(iwc.getParameter(PARAMETER_CASE_PK), iwc.getCurrentUser(), iwc);
+				if (iwc.isParameterSet(PARAMETER_ACTION_REACTIVATE)) {
+					try {
+						getCasesBusiness(iwc).reactivateCase(iwc.getParameter(PARAMETER_CASE_PK), iwc.getCurrentUser(), iwc);
+					}
+					catch (FinderException e) {
+						e.printStackTrace();
+					}
 				}
-				catch (FinderException e) {
-					e.printStackTrace();
+				else if (iwc.isParameterSet(PARAMETER_ACTION_REVIEW)) {
+					try {
+						getCasesBusiness(iwc).reviewCase(iwc.getParameter(PARAMETER_CASE_PK), iwc.getCurrentUser(), iwc);
+					}
+					catch (FinderException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -71,6 +83,11 @@ public class CaseViewer extends CaseCreator {
 					casePK = iwc.getParameter(PARAMETER_CASE_PK);
 				}
 
+				if (casePK == null) {
+					add("No case selected...");
+					return;
+				}
+
 				theCase = getCasesBusiness(iwc).getGeneralCase(casePK);
 			}
 			catch (FinderException fe) {
@@ -83,6 +100,10 @@ public class CaseViewer extends CaseCreator {
 			CaseType type = theCase.getCaseType();
 			ICFile attachment = theCase.getAttachment();
 			User user = getCasesBusiness(iwc).getLastModifier(theCase);
+			User owner = theCase.getOwner();
+			if (user.equals(owner)) {
+				user = null;
+			}
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
 
 			form.add(getHeader(iwrb.getLocalizedString(getPrefix() + "case_viewer.view_case", "View case")));
@@ -169,10 +190,10 @@ public class CaseViewer extends CaseCreator {
 				Link link = new Link(new Text(attachment.getName()));
 				link.setFile(attachment);
 				link.setTarget(Link.TARGET_BLANK_WINDOW);
-				
+
 				Layer attachmentSpan = new Layer(Layer.SPAN);
 				attachmentSpan.add(link);
-				
+
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
@@ -272,6 +293,14 @@ public class CaseViewer extends CaseCreator {
 
 			if (status.equals(getCasesBusiness(iwc).getCaseStatusInactive()) || status.equals(getCasesBusiness(iwc).getCaseStatusReady())) {
 				Link next = getButtonLink(iwrb.getLocalizedString(getPrefix() + "reactivate_case", "Reactivate case"));
+				next.addParameter(PARAMETER_ACTION_REACTIVATE, Boolean.TRUE.toString());
+				next.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
+				bottom.add(next);
+			}
+			else if (iwc.getCurrentUser().equals(owner) && status.equals(getCasesBusiness(iwc).getCaseStatusOpen())) {
+				Link next = getButtonLink(iwrb.getLocalizedString(getPrefix() + "review_case", "Review case"));
+				next.addParameter(PARAMETER_ACTION_REVIEW, Boolean.TRUE.toString());
 				next.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
 				bottom.add(next);

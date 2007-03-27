@@ -51,6 +51,14 @@ table.adminTable tr.isPrivate {
 	background-color: #fff0cc;
 }
 
+table.adminTable tr.isReview {
+	background-color: #cce7ff;
+}
+
 ul.legend li.isPrivate {
 	color: #f09e00;
+}
+
+ul.legend li.isReview {
+	color: #0088ff;
 }

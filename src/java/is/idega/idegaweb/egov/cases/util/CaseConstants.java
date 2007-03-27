@@ -13,9 +13,12 @@ public class CaseConstants {
 
 	public static final String CASE_CODE_KEY = "GENCASE";
 
+	public static final String ROLE_CASES_SUPER_ADMIN = "cases_super_admin";
+
 	public static final String PROPERTY_USE_SUB_CATEGORIES = "egov.cases.use.sub.categories";
 	public static final String PROPERTY_USE_TYPES = "egov.cases.use.types";
 	public static final String PROPERTY_ALLOW_PRIVATE_CASES = "egov.cases.allow.private.cases";
+	public static final String PROPERTY_ALLOW_ANONYMOUS_CASES = "egov.cases.allow.anonymous.cases";
 	public static final String PROPERTY_ALLOW_ATTACHMENTS = "egov.cases.allow.attachments";
 
 }

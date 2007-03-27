@@ -10,6 +10,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -200,6 +201,13 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		back.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		bottom.add(back);
 
+		if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
+			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
+			next.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
+			next.maintainParameter(PARAMETER_CASE_PK, iwc);
+			bottom.add(next);
+		}
+
 		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ? getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		next.setToFormSubmit(form);
@@ -209,6 +217,28 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
+		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
+		if (casePK != null) {
+			try {
+				GeneralCase theCase = getCasesBusiness(iwc).getGeneralCase(new Integer(casePK));
+				Object userPK = iwc.getParameter(PARAMETER_USER);
+				String message = iwc.getParameter(PARAMETER_MESSAGE);
+
+				User user = getUserBusiness().getUser(new Integer(userPK.toString()));
+
+				getCasesBusiness(iwc).allocateCase(theCase, user, message, iwc.getCurrentUser(), iwc);
+			}
+			catch (RemoteException e) {
+				throw new IBORuntimeException(e);
+			}
+			catch (FinderException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	protected boolean showCheckBox() {
+		return true;
 	}
 
 	public void setMyCasesPage(ICPage myCasesPage) {
