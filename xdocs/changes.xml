@@ -5,8 +5,14 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.28" date="2007-03-28">
+			<action dev="laddi" type="update">
+				Added displaying of sender's email and phone when viewing cases as administrator.
+			</action>
+		</release>
+
 		<release version="1.0.27" date="2007-03-27">
-			<action dev="palli" type="update">
+			<action dev="laddi" type="update">
 				Refactoring/Elimination of se bundles.
 			</action>
 		</release>

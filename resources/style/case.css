@@ -62,3 +62,7 @@ ul.legend li.isPrivate {
 ul.legend li.isReview {
 	color: #0088ff;
 }
+
+div.info div#phone, div.info div#email {
+	float: right;
+}

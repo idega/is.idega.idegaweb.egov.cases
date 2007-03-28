@@ -19,6 +19,8 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.contact.data.Email;
+import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.idegaweb.IWApplicationContext;
@@ -35,6 +37,8 @@ import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Label;
+import com.idega.user.business.NoEmailFoundException;
+import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
@@ -96,6 +100,20 @@ public abstract class CasesBlock extends Block {
 			if (address != null) {
 				postal = address.getPostalCode();
 			}
+			Phone phone = null;
+			try {
+				phone = getUserBusiness(iwc).getUsersHomePhone(user);
+			}
+			catch (NoPhoneFoundException e) {
+				e.printStackTrace();
+			}
+			Email email = null;
+			try {
+				email = getUserBusiness(iwc).getUsersMainEmail(user);
+			}
+			catch (NoEmailFoundException e) {
+				e.printStackTrace();
+			}
 
 			Layer personInfo = new Layer(Layer.DIV);
 			personInfo.setStyleClass("personInfo");
@@ -119,9 +137,25 @@ public abstract class CasesBlock extends Block {
 
 			personInfo = new Layer(Layer.DIV);
 			personInfo.setStyleClass("personInfo");
+			personInfo.setID("phone");
+			if (phone != null) {
+				personInfo.add(new Text(phone.getNumber()));
+			}
+			layer.add(personInfo);
+
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
 			personInfo.setID("postal");
 			if (postal != null) {
 				personInfo.add(new Text(postal.getPostalAddress()));
+			}
+			layer.add(personInfo);
+
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("email");
+			if (email != null) {
+				personInfo.add(new Text(email.getEmailAddress()));
 			}
 			layer.add(personInfo);
 		}
