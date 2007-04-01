@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.data;
 
 import com.idega.data.IDOException;
 import java.util.Collection;
+import com.idega.block.process.data.CaseStatus;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import com.idega.user.data.User;
@@ -54,6 +55,13 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	public Collection findAllByUsers(Collection users) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
 		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByUsers(users);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(parentCategory, category, type, status, anonymous);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}

@@ -1,11 +1,9 @@
 /*
- * $Id$
- * Created on Nov 7, 2005
- *
+ * $Id$ Created on Nov 7, 2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
@@ -22,6 +20,7 @@ import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseLog;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.remotescripting.RemoteScriptHandler;
@@ -38,14 +37,11 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.TextSoap;
 
-
 public class MyCases extends CasesProcessor {
 
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-	private static final String PARAMETER_REPLY = "prm_reply";
-	private static final String PARAMETER_STATUS = "prm_status";
 
 	protected String getBlockID() {
 		return "myCases";
@@ -54,16 +50,16 @@ public class MyCases extends CasesProcessor {
 	protected Collection getCases(User user) throws RemoteException {
 		return getBusiness().getMyCases(user);
 	}
-	
+
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.setStyleClass("overview");
 		form.maintainParameter(PARAMETER_CASE_PK);
 		form.addParameter(PARAMETER_ACTION, "");
-		
+
 		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
-		
+
 		GeneralCase theCase = null;
 		try {
 			theCase = getBusiness().getGeneralCase(casePK);
@@ -75,24 +71,25 @@ public class MyCases extends CasesProcessor {
 		CaseCategory category = theCase.getCaseCategory();
 		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
+		ICFile attachment = theCase.getAttachment();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
-		
+
 		form.add(getPersonInfo(iwc, owner));
-		
+
 		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "case_overview", "Case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
-		
+
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		form.add(section);
-		
+
 		if (theCase.isPrivate()) {
 			section.add(getAttentionLayer(getResourceBundle().getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
 		}
-		
+
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 
@@ -101,12 +98,12 @@ public class MyCases extends CasesProcessor {
 		categories.keepStatusOnAction(true);
 		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
 		categories.setStyleClass("caseCategoryDropdown");
-		
+
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
 		subCategories.keepStatusOnAction(true);
 		subCategories.setSelectedElement(category.getPrimaryKey().toString());
 		subCategories.setStyleClass("subCaseCategoryDropdown");
-		
+
 		if (parentCategory != null) {
 			Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
 			if (collection.isEmpty()) {
@@ -116,35 +113,35 @@ public class MyCases extends CasesProcessor {
 				Iterator iter = collection.iterator();
 				while (iter.hasNext()) {
 					CaseCategory subCategory = (CaseCategory) iter.next();
-					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getName());
+					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 				}
 			}
 		}
-		
+
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
 		types.setSelectedElement(type.getPrimaryKey().toString());
 		types.setStyleClass("caseTypeDropdown");
-		
+
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
-		
+
 		DropdownMenu statuses = new DropdownMenu(PARAMETER_STATUS);
 		statuses.addMenuElement(getBusiness().getCaseStatusPending().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
 		statuses.addMenuElement(getBusiness().getCaseStatusWaiting().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
 		statuses.addMenuElement(getBusiness().getCaseStatusReady().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
 		statuses.setSelectedElement(theCase.getStatus());
 		statuses.setStyleClass("caseStatusDropdown");
-		
+
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(TextSoap.formatText(theCase.getMessage())));
-		
+
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
-		
+
 		TextArea reply = new TextArea(PARAMETER_REPLY);
 		reply.setStyleClass("textarea");
 		reply.keepStatusOnAction(true);
-		
+
 		if (getBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -156,14 +153,14 @@ public class MyCases extends CasesProcessor {
 		else {
 			form.add(hiddenType);
 		}
-		
+
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
 		element.add(label);
 		element.add(categories);
 		section.add(element);
-		
+
 		if (useSubCategories) {
 			try {
 				RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
@@ -184,7 +181,7 @@ public class MyCases extends CasesProcessor {
 			element.add(subCategories);
 			section.add(element);
 		}
-		
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
@@ -192,6 +189,23 @@ public class MyCases extends CasesProcessor {
 		element.add(label);
 		element.add(createdDate);
 		section.add(element);
+
+		if (attachment != null) {
+			Link link = new Link(new Text(attachment.getName()));
+			link.setFile(attachment);
+			link.setTarget(Link.TARGET_BLANK_WINDOW);
+
+			Layer attachmentSpan = new Layer(Layer.SPAN);
+			attachmentSpan.add(link);
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+			element.add(label);
+			element.add(attachmentSpan);
+			section.add(element);
+		}
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
@@ -203,15 +217,15 @@ public class MyCases extends CasesProcessor {
 		section.add(element);
 
 		section.add(clear);
-		
+
 		heading = new Heading1(getResourceBundle().getLocalizedString("handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		form.add(heading);
-		
+
 		section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		form.add(section);
-		
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("status", "status"), statuses);
@@ -254,7 +268,7 @@ public class MyCases extends CasesProcessor {
 
 		add(form);
 	}
-	
+
 	protected void save(IWContext iwc) throws RemoteException {
 		Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
@@ -262,12 +276,16 @@ public class MyCases extends CasesProcessor {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		String status = iwc.getParameter(PARAMETER_STATUS);
 		String reply = iwc.getParameter(PARAMETER_REPLY);
-		
+
 		try {
-			getBusiness().handleCase(casePK, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, status, iwc.getCurrentUser(), reply, iwc.getCurrentLocale());
+			getBusiness().handleCase(casePK, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, status, iwc.getCurrentUser(), reply, iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
 		}
+	}
+
+	protected boolean showCheckBox() {
+		return false;
 	}
 }

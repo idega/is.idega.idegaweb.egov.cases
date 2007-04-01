@@ -8,7 +8,6 @@ import com.idega.data.IDOEntity;
 import com.idega.data.IDOFactory;
 
 public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome {
-
 	public Class getEntityInterfaceClass() {
 		return CaseCategory.class;
 	}

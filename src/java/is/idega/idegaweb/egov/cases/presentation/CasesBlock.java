@@ -1,11 +1,9 @@
 /*
- * $Id$
- * Created on Oct 30, 2005
- *
+ * $Id$ Created on Oct 30, 2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
@@ -21,6 +19,8 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.contact.data.Email;
+import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.idegaweb.IWApplicationContext;
@@ -37,21 +37,22 @@ import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Label;
+import com.idega.user.business.NoEmailFoundException;
+import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
 
-
 public abstract class CasesBlock extends Block {
 
 	private CasesBusiness business;
 	private UserBusiness userBusiness;
-	
+
 	private IWBundle iwb;
 	private IWResourceBundle iwrb;
-	
+
 	private ICPage iHomePage;
 	private String iType;
 
@@ -69,49 +70,63 @@ public abstract class CasesBlock extends Block {
 	protected Link getButtonLink(String text) {
 		Layer all = new Layer(Layer.SPAN);
 		all.setStyleClass("buttonSpan");
-		
+
 		Layer left = new Layer(Layer.SPAN);
 		left.setStyleClass("left");
 		all.add(left);
-		
+
 		Layer middle = new Layer(Layer.SPAN);
 		middle.setStyleClass("middle");
 		middle.add(new Text(text));
 		all.add(middle);
-		
+
 		Layer right = new Layer(Layer.SPAN);
 		right.setStyleClass("right");
 		all.add(right);
-		
+
 		Link link = new Link(all);
 		link.setStyleClass("button");
-		
+
 		return link;
 	}
-	
+
 	protected Layer getPersonInfo(IWContext iwc, User user) throws RemoteException {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("info");
-		
+
 		if (user != null) {
 			Address address = getUserBusiness(iwc).getUsersMainAddress(user);
 			PostalCode postal = null;
 			if (address != null) {
 				postal = address.getPostalCode();
 			}
-	
+			Phone phone = null;
+			try {
+				phone = getUserBusiness(iwc).getUsersHomePhone(user);
+			}
+			catch (NoPhoneFoundException e) {
+				e.printStackTrace();
+			}
+			Email email = null;
+			try {
+				email = getUserBusiness(iwc).getUsersMainEmail(user);
+			}
+			catch (NoEmailFoundException e) {
+				e.printStackTrace();
+			}
+
 			Layer personInfo = new Layer(Layer.DIV);
 			personInfo.setStyleClass("personInfo");
 			personInfo.setID("name");
 			personInfo.add(new Text(user.getName()));
 			layer.add(personInfo);
-			
+
 			personInfo = new Layer(Layer.DIV);
 			personInfo.setStyleClass("personInfo");
 			personInfo.setID("personalID");
 			personInfo.add(new Text(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())));
 			layer.add(personInfo);
-			
+
 			personInfo = new Layer(Layer.DIV);
 			personInfo.setStyleClass("personInfo");
 			personInfo.setID("address");
@@ -119,7 +134,15 @@ public abstract class CasesBlock extends Block {
 				personInfo.add(new Text(address.getStreetAddress()));
 			}
 			layer.add(personInfo);
-			
+
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("phone");
+			if (phone != null) {
+				personInfo.add(new Text(phone.getNumber()));
+			}
+			layer.add(personInfo);
+
 			personInfo = new Layer(Layer.DIV);
 			personInfo.setStyleClass("personInfo");
 			personInfo.setID("postal");
@@ -127,28 +150,36 @@ public abstract class CasesBlock extends Block {
 				personInfo.add(new Text(postal.getPostalAddress()));
 			}
 			layer.add(personInfo);
+
+			personInfo = new Layer(Layer.DIV);
+			personInfo.setStyleClass("personInfo");
+			personInfo.setID("email");
+			if (email != null) {
+				personInfo.add(new Text(email.getEmailAddress()));
+			}
+			layer.add(personInfo);
 		}
-		
+
 		return layer;
 	}
 
 	protected Layer getHandlerLayer(IWContext iwc, IWResourceBundle iwrb, Case theCase, CaseLog log) throws RemoteException {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("handlerLayer");
-		
+
 		Heading1 heading = new Heading1(iwrb.getLocalizedString("handler_overview", "Handler overview"));
 		heading.setStyleClass("subHeader");
 		layer.add(heading);
-		
+
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		layer.add(section);
-		
+
 		User user = log.getPerformer();
 		IWTimestamp stamp = new IWTimestamp(log.getTimeStamp());
 		CaseStatus status = log.getCaseStatusAfter();
 		String reply = log.getComment();
-		
+
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
@@ -164,7 +195,7 @@ public abstract class CasesBlock extends Block {
 		formItem.add(label);
 		formItem.add(new Span(new Text(stamp.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT))));
 		section.add(formItem);
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
@@ -172,7 +203,7 @@ public abstract class CasesBlock extends Block {
 		formItem.add(label);
 		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 		section.add(formItem);
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
@@ -181,21 +212,21 @@ public abstract class CasesBlock extends Block {
 		formItem.add(label);
 		formItem.add(new Span(new Text(reply)));
 		section.add(formItem);
-		
+
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		section.add(clear);
-		
+
 		return layer;
 	}
-	
+
 	private void initialize(IWContext iwc) {
 		setResourceBundle(getResourceBundle(iwc));
 		setBundle(getBundle(iwc));
 		this.business = getCasesBusiness(iwc);
 		this.userBusiness = getUserBusiness(iwc);
 	}
-	
+
 	protected String getPrefix() {
 		if (getType() != null) {
 			return getType() + ".";
@@ -205,18 +236,25 @@ public abstract class CasesBlock extends Block {
 		}
 	}
 
-	protected Lists getLegend() {
+	protected Lists getLegend(IWContext iwc) throws RemoteException {
 		Lists list = new Lists();
 		list.setStyleClass("legend");
-		
+
+		if (getCasesBusiness(iwc).allowPrivateCases()) {
+			ListItem item = new ListItem();
+			item.setStyleClass("isPrivate");
+			item.add(new Text(this.iwrb.getLocalizedString("legend.is_private", "Is private")));
+			list.add(item);
+		}
+
 		ListItem item = new ListItem();
-		item.setStyleClass("isPrivate");
-		item.add(new Text(this.iwrb.getLocalizedString("legend.is_private", "Is private")));
+		item.setStyleClass("isReview");
+		item.add(new Text(this.iwrb.getLocalizedString("legend.is_review", "Is review")));
 		list.add(item);
-		
+
 		return list;
 	}
-	
+
 	protected Layer getAttentionLayer(String text) {
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("attention");
@@ -243,11 +281,11 @@ public abstract class CasesBlock extends Block {
 	protected IWBundle getBundle() {
 		return this.iwb;
 	}
-	
+
 	protected IWResourceBundle getResourceBundle() {
 		return this.iwrb;
 	}
-	
+
 	protected CasesBusiness getBusiness() {
 		return this.business;
 	}
@@ -260,11 +298,11 @@ public abstract class CasesBlock extends Block {
 			throw new IBORuntimeException(ile);
 		}
 	}
-	
+
 	protected UserBusiness getUserBusiness() {
 		return this.userBusiness;
 	}
-	
+
 	private UserBusiness getUserBusiness(IWApplicationContext iwac) {
 		try {
 			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
@@ -273,10 +311,11 @@ public abstract class CasesBlock extends Block {
 			throw new IBORuntimeException(ile);
 		}
 	}
+
 	private void setBundle(IWBundle iwb) {
 		this.iwb = iwb;
 	}
-	
+
 	private void setResourceBundle(IWResourceBundle iwrb) {
 		this.iwrb = iwrb;
 	}
@@ -284,11 +323,11 @@ public abstract class CasesBlock extends Block {
 	protected ICPage getHomePage() {
 		return this.iHomePage;
 	}
-	
+
 	public void setHomePage(ICPage page) {
 		this.iHomePage = page;
 	}
-	
+
 	protected String getType() {
 		return this.iType;
 	}

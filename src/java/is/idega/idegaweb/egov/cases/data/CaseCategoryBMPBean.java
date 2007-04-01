@@ -9,9 +9,18 @@
  */
 package is.idega.idegaweb.egov.cases.data;
 
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Locale;
+
 import javax.ejb.FinderException;
+import javax.ejb.RemoveException;
+
+import com.idega.block.text.data.LocalizedText;
+import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.GenericEntity;
+import com.idega.data.IDORelationshipException;
 import com.idega.data.query.MatchCriteria;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
@@ -36,13 +45,17 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		addAttribute(getIDColumnName());
 
 		addAttribute(COLUMN_NAME, "Name", String.class);
-		addAttribute(COLUMN_DESCRIPTION, "Description", String.class);
+		addAttribute(COLUMN_DESCRIPTION, "Description", String.class, 4000);
 		addAttribute(COLUMN_ORDER, "Order", Integer.class);
 		
 		addManyToOneRelationship(COLUMN_HANDLER_GROUP, Group.class);
 		setNullable(COLUMN_HANDLER_GROUP, false);
 		
 		addManyToOneRelationship(COLUMN_PARENT_CATEGORY, CaseCategory.class);
+		
+		//localization
+		addManyToManyRelationShip(LocalizedText.class);
+		 
 	}
 	
 	//Getters
@@ -120,7 +133,95 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		query.addColumn(table, getIDColumnName());
 		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_PARENT_CATEGORY), MatchCriteria.EQUALS, category));
 		query.addOrder(table, COLUMN_ORDER, true);
-		
 		return idoFindPKsByQuery(query);
 	}
+	
+	public String getLocalizedCategoryName(Locale locale){
+		LocalizedText text = getLocalizedText(locale);
+		
+		if(text!=null){
+			return text.getHeadline();
+		}
+		else{
+			return this.getName();
+		}
+	}
+	
+	public String getLocalizedCategoryDescription(Locale locale){
+		LocalizedText text = getLocalizedText(locale);
+		
+		if(text!=null){
+			return text.getBody();
+		}
+		else{
+			return this.getDescription();
+		}
+	}
+	
+	public void addLocalization(LocalizedText localizedText) throws SQLException{
+		this.addTo(localizedText);
+	}
+	
+	public LocalizedText getLocalizedText(int icLocaleId){
+		Collection locales = null;
+		LocalizedText text = null;
+		
+		try {
+			locales = idoGetRelatedEntities(LocalizedText.class);
+		} catch (IDORelationshipException e) {
+			return null;
+		}
+		
+		
+		for (Iterator iter = locales.iterator(); iter.hasNext();) {
+			text = (LocalizedText) iter.next();
+			if(text.getLocaleId()==icLocaleId){
+				return text;
+			}
+		}
+		
+		return null;
+	}
+	
+	
+	public LocalizedText getLocalizedText(Locale locale){
+		return getLocalizedText(ICLocaleBusiness.getLocaleId(locale));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.data.GenericEntity#remove()
+	 */
+	public void remove() throws RemoveException {
+		//get rid of localizations first
+		Collection locales = null;
+		LocalizedText text = null;
+		
+		
+		
+		try {
+			locales = idoGetRelatedEntities(LocalizedText.class);
+		} catch (IDORelationshipException e) {
+			
+		}
+		
+		
+		for (Iterator iter = locales.iterator(); iter.hasNext();) {
+			text = (LocalizedText) iter.next();
+			try {
+				this.removeFrom(text);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			text.remove();
+		}
+		
+		
+		super.remove();
+	}
+	
+	
+	
+	
+	
+	
 }

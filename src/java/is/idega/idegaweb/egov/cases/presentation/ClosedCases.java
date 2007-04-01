@@ -1,11 +1,9 @@
 /*
- * $Id$
- * Created on Nov 7, 2005
- *
+ * $Id$ Created on Nov 7, 2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
@@ -19,6 +17,7 @@ import java.util.Collection;
 import javax.ejb.FinderException;
 
 import com.idega.business.IBORuntimeException;
+import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
@@ -28,7 +27,6 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
-
 
 public class ClosedCases extends CasesProcessor {
 
@@ -47,7 +45,7 @@ public class ClosedCases extends CasesProcessor {
 		form.setStyleClass("overview");
 		form.addParameter(PARAMETER_ACTION, "");
 		form.maintainParameter(PARAMETER_CASE_PK);
-		
+
 		GeneralCase theCase = null;
 		try {
 			theCase = getBusiness().getGeneralCase(casePK);
@@ -59,36 +57,37 @@ public class ClosedCases extends CasesProcessor {
 		CaseCategory category = theCase.getCaseCategory();
 		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
+		ICFile attachment = theCase.getAttachment();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
-		
+
 		form.add(getPersonInfo(iwc, owner));
-		
+
 		Heading1 heading = new Heading1(getResourceBundle().getLocalizedString(getPrefix() + "case_overview", "Case overview"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
-		
+
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formSection");
 		form.add(layer);
-		
+
 		if (theCase.isPrivate()) {
 			layer.add(getAttentionLayer(getResourceBundle().getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
 		}
-		
+
 		Layer caseType = new Layer(Layer.SPAN);
 		caseType.add(new Text(type.getName()));
-		
+
 		Layer caseCategory = new Layer(Layer.SPAN);
-		caseCategory.add(new Text(category.getName()));
-		
+		caseCategory.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
+
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(theCase.getMessage()));
-		
+
 		Layer reply = new Layer(Layer.SPAN);
 		reply.add(new Text(theCase.getReply()));
-		
+
 		Layer handler = new Layer(Layer.SPAN);
 		if (theCase.getHandledBy() != null) {
 			handler.add(new Text(theCase.getHandledBy().getName()));
@@ -96,10 +95,10 @@ public class ClosedCases extends CasesProcessor {
 		else {
 			handler.add(new Text("-"));
 		}
-		
+
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
-		
+
 		if (getBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -109,11 +108,11 @@ public class ClosedCases extends CasesProcessor {
 			element.add(caseType);
 			layer.add(element);
 		}
-		
+
 		if (parentCategory != null) {
 			Layer parentCaseCategory = new Layer(Layer.SPAN);
-			parentCaseCategory.add(new Text(parentCategory.getName()));
-			
+			parentCaseCategory.add(new Text(parentCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
+
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			Label label = new Label();
@@ -121,7 +120,7 @@ public class ClosedCases extends CasesProcessor {
 			element.add(label);
 			element.add(parentCaseCategory);
 			layer.add(element);
-			
+
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label();
@@ -139,7 +138,7 @@ public class ClosedCases extends CasesProcessor {
 			element.add(caseCategory);
 			layer.add(element);
 		}
-		
+
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label();
@@ -147,6 +146,23 @@ public class ClosedCases extends CasesProcessor {
 		element.add(label);
 		element.add(createdDate);
 		layer.add(element);
+
+		if (attachment != null) {
+			Link link = new Link(new Text(attachment.getName()));
+			link.setFile(attachment);
+			link.setTarget(Link.TARGET_BLANK_WINDOW);
+
+			Layer attachmentSpan = new Layer(Layer.SPAN);
+			attachmentSpan.add(link);
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+			element.add(label);
+			element.add(attachmentSpan);
+			layer.add(element);
+		}
 
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
@@ -164,11 +180,11 @@ public class ClosedCases extends CasesProcessor {
 		heading = new Heading1(getResourceBundle().getLocalizedString("handle_overview", "Handle overview"));
 		heading.setStyleClass("subHeader");
 		form.add(heading);
-		
+
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formSection");
 		form.add(layer);
-		
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label();
@@ -208,12 +224,16 @@ public class ClosedCases extends CasesProcessor {
 
 	protected void save(IWContext iwc) throws RemoteException {
 		Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
-		
+
 		try {
-			getBusiness().reactivateCase(casePK, iwc.getCurrentUser());
+			getBusiness().reactivateCase(casePK, iwc.getCurrentUser(), iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
 		}
+	}
+
+	protected boolean showCheckBox() {
+		return false;
 	}
 }

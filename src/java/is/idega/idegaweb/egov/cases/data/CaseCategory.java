@@ -1,11 +1,14 @@
 package is.idega.idegaweb.egov.cases.data;
 
 
-import com.idega.user.data.Group;
+import java.sql.SQLException;
+import java.util.Locale;
+
+import com.idega.block.text.data.LocalizedText;
 import com.idega.data.IDOEntity;
+import com.idega.user.data.Group;
 
 public interface CaseCategory extends IDOEntity {
-
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getName
 	 */
@@ -60,4 +63,29 @@ public interface CaseCategory extends IDOEntity {
 	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#setParent
 	 */
 	public void setParent(CaseCategory category);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getLocalizedCategoryName
+	 */
+	public String getLocalizedCategoryName(Locale locale);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getLocalizedCategoryDescription
+	 */
+	public String getLocalizedCategoryDescription(Locale locale);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#addLocalization
+	 */
+	public void addLocalization(LocalizedText localizedText) throws SQLException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getLocalizedText
+	 */
+	public LocalizedText getLocalizedText(int icLocaleId);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getLocalizedText
+	 */
+	public LocalizedText getLocalizedText(Locale locale);
 }

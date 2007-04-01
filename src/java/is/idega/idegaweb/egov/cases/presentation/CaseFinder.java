@@ -1,14 +1,13 @@
 /*
- * $Id$
- * Created on Nov 7, 2005
- *
+ * $Id$ Created on Nov 7, 2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
@@ -36,10 +35,10 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
-
 
 public class CaseFinder extends CasesBlock {
 
@@ -50,7 +49,7 @@ public class CaseFinder extends CasesBlock {
 
 	private static final int ACTION_SEARCH = 1;
 	private static final int ACTION_RESULTS = 2;
-	
+
 	private ICPage myCasesPage;
 	private ICPage openCasesPage;
 	private ICPage viewCasesPage;
@@ -67,7 +66,7 @@ public class CaseFinder extends CasesBlock {
 				break;
 		}
 	}
-	
+
 	private int parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_ACTION)) {
 			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
@@ -75,20 +74,19 @@ public class CaseFinder extends CasesBlock {
 		return ACTION_SEARCH;
 	}
 
-
 	private void showSearchForm(IWContext iwc) {
 		Form form = new Form();
 		form.setStyleClass("casesForm");
-		
+
 		Layer layer = new Layer(Layer.DIV);
 		layer.setStyleClass("formSection");
 		form.add(layer);
-		
+
 		Layer helpLayer = new Layer(Layer.DIV);
 		helpLayer.setStyleClass("helperText");
 		helpLayer.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_finder.information_text", "Information text here...")));
 		layer.add(helpLayer);
-		
+
 		TextInput caseNumber = new TextInput(PARAMETER_CASE_NUMBER);
 		caseNumber.setStyleClass("textinput");
 		caseNumber.keepStatusOnAction(true);
@@ -100,14 +98,14 @@ public class CaseFinder extends CasesBlock {
 		TextInput personalID = new TextInput(PARAMETER_PERSONAL_ID);
 		personalID.setStyleClass("textinput");
 		personalID.keepStatusOnAction(true);
-		
+
 		caseNumber.setToDisableOnWhenNotEmpty(name);
 		caseNumber.setToDisableOnWhenNotEmpty(personalID);
 		name.setToDisableOnWhenNotEmpty(caseNumber);
 		name.setToDisableOnWhenNotEmpty(personalID);
 		personalID.setToDisableOnWhenNotEmpty(caseNumber);
 		personalID.setToDisableOnWhenNotEmpty(name);
-		
+
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		Label label = new Label(getResourceBundle().getLocalizedString(getPrefix() + "case_number", "Case number"), caseNumber);
@@ -128,7 +126,7 @@ public class CaseFinder extends CasesBlock {
 		element.add(label);
 		element.add(personalID);
 		layer.add(element);
-		
+
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");
 		layer.add(clearLayer);
@@ -136,14 +134,14 @@ public class CaseFinder extends CasesBlock {
 		layer = new Layer(Layer.DIV);
 		layer.setStyleClass("buttonLayer");
 		form.add(layer);
-		
+
 		SubmitButton next = new SubmitButton(getResourceBundle().getLocalizedString("search", "Search"), PARAMETER_ACTION, String.valueOf(ACTION_RESULTS));
 		next.setStyleClass("button");
 		layer.add(next);
 
 		add(form);
 	}
-	
+
 	private void showResults(IWContext iwc) throws RemoteException {
 		Collection cases = new ArrayList();
 		if (iwc.isParameterSet(PARAMETER_CASE_NUMBER)) {
@@ -152,7 +150,7 @@ public class CaseFinder extends CasesBlock {
 				cases.add(theCase);
 			}
 			catch (FinderException fe) {
-				//Nothing found
+				// Nothing found
 			}
 		}
 		else if (iwc.isParameterSet(PARAMETER_NAME)) {
@@ -173,7 +171,7 @@ public class CaseFinder extends CasesBlock {
 				fe.printStackTrace();
 			}
 		}
-		
+
 		if (cases.isEmpty()) {
 			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));
 			heading.setStyleClass("errorHeading");
@@ -186,7 +184,7 @@ public class CaseFinder extends CasesBlock {
 			table.setCellspacing(0);
 			table.setStyleClass("adminTable");
 			table.setStyleClass("ruler");
-			
+
 			TableColumnGroup columnGroup = table.createColumnGroup();
 			TableColumn column = columnGroup.createColumn();
 			column.setSpan(6);
@@ -199,7 +197,7 @@ public class CaseFinder extends CasesBlock {
 			TableCell2 cell = row.createHeaderCell();
 			cell.setStyleClass("firstColumn");
 			cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
-			
+
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
 			if (getBusiness().useTypes()) {
 				row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
@@ -207,23 +205,29 @@ public class CaseFinder extends CasesBlock {
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
-	
+
 			cell = row.createHeaderCell();
 			cell.setStyleClass("lastColumn");
 			cell.add(Text.getNonBrakingSpace());
-			
+
 			group = table.createBodyRowGroup();
 			int iRow = 1;
-			
+
 			Iterator iter = cases.iterator();
 			while (iter.hasNext()) {
 				GeneralCase theCase = (GeneralCase) iter.next();
 				CaseStatus status = theCase.getCaseStatus();
 				CaseType type = theCase.getCaseType();
+				CaseCategory category = theCase.getCaseCategory();
+				Group handlerGroup = category.getHandlerGroup();
 				User owner = theCase.getOwner();
 				User handler = theCase.getHandledBy();
 				IWTimestamp created = new IWTimestamp(theCase.getCreated());
-				
+
+				if (!iwc.getCurrentUser().hasRelationTo(handlerGroup)) {
+					continue;
+				}
+
 				row = group.createRow();
 				if (iRow == 1) {
 					row.setStyleClass("firstRow");
@@ -234,7 +238,10 @@ public class CaseFinder extends CasesBlock {
 				if (theCase.isPrivate()) {
 					row.setStyleClass("isPrivate");
 				}
-				
+				if (status.equals(getCasesBusiness(iwc).getCaseStatusReview())) {
+					row.setStyleClass("isReview");
+				}
+
 				boolean addProcessLink = false;
 				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
@@ -247,38 +254,38 @@ public class CaseFinder extends CasesBlock {
 					process.setPage(this.myCasesPage);
 					addProcessLink = true;
 				}
-				else if (this.viewCasesPage!= null) {
+				else if (this.viewCasesPage != null) {
 					process.addParameter(getBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 					process.setPage(this.viewCasesPage);
 					addProcessLink = true;
 				}
-				
+
 				cell = row.createCell();
 				cell.setStyleClass("firstColumn");
 				cell.add(new Text(theCase.getPrimaryKey().toString()));
-	
+
 				if (owner != null) {
 					row.createCell().add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
 				}
 				else {
 					row.createCell().add(new Text("-"));
 				}
-				
+
 				if (getBusiness().useTypes()) {
 					row.createCell().add(new Text(type.getName()));
 				}
-				
+
 				row.createCell().add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
-	
+
 				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
-				
+
 				if (handler != null) {
 					row.createCell().add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));
 				}
 				else {
 					row.createCell().add(new Text("-"));
 				}
-				
+
 				cell = row.createCell();
 				cell.setStyleClass("lastColumn");
 				if (addProcessLink) {
@@ -287,7 +294,7 @@ public class CaseFinder extends CasesBlock {
 				else {
 					cell.add(Text.getNonBrakingSpace());
 				}
-				
+
 				if (iRow % 2 == 0) {
 					row.setStyleClass("evenRow");
 				}
@@ -295,18 +302,16 @@ public class CaseFinder extends CasesBlock {
 					row.setStyleClass("oddRow");
 				}
 			}
-	
+
 			add(table);
-			if (getCasesBusiness(iwc).allowPrivateCases()) {
-				add(getLegend());
-			}
+			add(getLegend(iwc));
 		}
 	}
-	
+
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.myCasesPage = myCasesPage;
 	}
-	
+
 	public void setOpenCasesPage(ICPage openCasesPage) {
 		this.openCasesPage = openCasesPage;
 	}
