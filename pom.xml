@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: pom.xml,v 1.3 2007/04/01 13:25:21 civilis Exp $ -->
+<!-- $Id: pom.xml,v 1.4 2007/04/18 08:07:20 civilis Exp $ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -8,14 +8,18 @@
   <groupId>com.idega.block.egov</groupId>
   <artifactId>is.idega.idegaweb.egov.cases</artifactId>
   <packaging>jar</packaging>
-  <version>3.5.0</version>
+  <version>4.0-SNAPSHOT</version>
   <inceptionYear>2005</inceptionYear>
   <description>eGov General Cases</description>
   <parent>
     <groupId>com.idega.block.platform</groupId>
     <artifactId>com.idega.block.base</artifactId>
-    <version>3.5.0</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
+  <scm>
+    <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
+    <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection>
+  </scm>
   <developers>
     <developer>
       <name>Thorhallur Helgason</name>
@@ -29,25 +33,25 @@
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.core</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
       <type>jar</type>
      </dependency>
      <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.block.process</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.user</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
     <dependency>
       <groupId>com.idega.block.egov</groupId>
       <artifactId>is.idega.idegaweb.egov.application</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
     <dependency>
@@ -59,13 +63,13 @@
     <dependency>
       <groupId>com.idega.block.legacy</groupId>
       <artifactId>com.idega.block.text</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
     <dependency>
       <groupId>com.idega.block.egov</groupId>
       <artifactId>is.idega.idegaweb.egov.message</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
   </dependencies>
