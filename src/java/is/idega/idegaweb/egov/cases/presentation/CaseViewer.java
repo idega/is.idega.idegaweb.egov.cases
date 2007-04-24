@@ -101,7 +101,7 @@ public class CaseViewer extends CaseCreator {
 			ICFile attachment = theCase.getAttachment();
 			User user = getCasesBusiness(iwc).getLastModifier(theCase);
 			User owner = theCase.getOwner();
-			if (user.equals(owner)) {
+			if (user != null && user.equals(owner)) {
 				user = null;
 			}
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
