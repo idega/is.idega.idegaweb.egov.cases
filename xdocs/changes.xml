@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.29" date="2007-08-31">
+			<action dev="laddi" type="update">
+				Update dependency to com.idega.block.process to 3.1.14
+			</action>
+		</release>
+		
 		<release version="1.0.28" date="2007-03-28">
 			<action dev="laddi" type="update">
 				Added displaying of sender's email and phone when viewing cases as administrator.

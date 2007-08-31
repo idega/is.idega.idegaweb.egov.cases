@@ -169,7 +169,7 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.core</artifactId>
-      <version>3.1.40</version>
+      <version>3.1.62</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
     </dependency>
@@ -183,7 +183,7 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>is.idega.idegaweb.egov.application</artifactId>
-      <version>1.0.11</version>
+      <version>1.0.14</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
     </dependency>
