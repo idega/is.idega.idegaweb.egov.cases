@@ -70,7 +70,7 @@
             <type>map</type>
           </key>
           <key>
-            <name>:method:1:implied:void:setType:String:</name>
+            <name>:method:1:implied:void:setType:java.lang.String:</name>
             <value>
               <map>
                 <key>
@@ -117,7 +117,7 @@
                 <key>
                   <name>iw_method_identifier</name>
                   <type>java.lang.String</type>
-                  <value>:method:1:implied:void:setType:String:</value>
+                  <value>:method:1:implied:void:setType:java.lang.String:</value>
                 </key>
               </map>
             </value>
