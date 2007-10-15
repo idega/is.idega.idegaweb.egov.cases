@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="simpleCasesProcessTemplate">
+   <start-state name="start">
+      <transition name="toCreateRequest" to="createRequest"></transition>
+   </start-state>
+   <end-state name="end"></end-state>
+   <task-node name="createRequest">
+      <task name="createRequestTask">
+         <controller>
+            <variable name="string:requestMessage"></variable>
+         </controller>
+      </task>
+      <transition name="toCreateResponse" to="createResponse"></transition>
+   </task-node>
+   <task-node name="createResponse">
+      <task name="createResponseTask">
+         <controller>
+            <variable name="string:requestMessage" access="read"></variable>
+            <variable name="string:responseMessage"></variable>
+         </controller>
+      </task>
+      <transition name="toEnd" to="end"></transition>
+      <transition name="toCreateRequest" to="createRequest"></transition>
+   </task-node>
+</process-definition>
