@@ -97,4 +97,8 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAsPrivate
 	 */
 	public void setAsPrivate(boolean isPrivate);
+	
+	public abstract void setJbpmProcessInstanceId(Double pid);
+	
+	public abstract Double getJbpmProcessInstanceId();
 }
