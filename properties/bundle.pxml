@@ -36,6 +36,8 @@
             </value>
             <type>map</type>
           </key>
+          <!--
+          abstract class  
           <key>
             <name>is.idega.idegaweb.egov.cases.presentation.CasesProcessor</name>
             <value>
@@ -49,6 +51,7 @@
             </value>
             <type>map</type>
           </key>
+          -->
           <key>
             <name>is.idega.idegaweb.egov.cases.presentation.CaseTypeEditor</name>
             <value>
