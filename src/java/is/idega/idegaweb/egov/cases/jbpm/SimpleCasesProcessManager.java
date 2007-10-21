@@ -20,6 +20,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -45,9 +46,9 @@ import com.idega.jbpm.def.ViewToTask;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/10/15 16:14:51 $ by $Author: civilis $
+ * Last modified: $Date: 2007/10/21 21:17:54 $ by $Author: civilis $
  *
  */
 public class SimpleCasesProcessManager {
@@ -111,9 +112,15 @@ public class SimpleCasesProcessManager {
 			return null;
 		}
 			
-		JbpmConfiguration cfg = getJbpmConfiguration();
-		JbpmContext ctx = cfg.createJbpmContext();
-		Session session = null;
+		Session session = getSessionFactory().getCurrentSession();
+		Transaction transaction = session.getTransaction();
+		boolean transactionWasActive = transaction.isActive();
+		
+		if(!transactionWasActive)
+			transaction.begin();
+		
+		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
+		ctx.setSession(session);
 		
 		try {
 			FacesContext facesCtx = FacesContext.getCurrentInstance();
@@ -152,16 +159,12 @@ public class SimpleCasesProcessManager {
 //			bind create response
 			getViewToTaskBinder().bind(view, pd.getTaskMgmtDefinition().getTask(createResTaskName));
 			
-			session = getSessionFactory().openSession();
-			session.beginTransaction();
-			
 			CasesJbpmBind bind = new CasesJbpmBind();
 			bind.setCasesCategoryId(Long.parseLong(getCaseCategory()));
 			bind.setCasesTypeId(Long.parseLong(getCaseType()));
 			bind.setProcDefId(pd.getId());
 			
 			session.save(bind);
-			session.getTransaction().commit();
 			
 		} catch (IOException e) {
 			setMessage("IO Exception occured");
@@ -173,8 +176,8 @@ public class SimpleCasesProcessManager {
 			
 			ctx.close();
 			
-			if(session != null)
-				session.close();
+			if(!transactionWasActive)
+				transaction.commit();
 		}
 		
 		return null;
@@ -360,5 +363,26 @@ public class SimpleCasesProcessManager {
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
+	}
+	
+	public List<SelectItem> getSimpleCasesProcessesDefinitions() {
+
+		try {
+//			Session session = getSessionFactory().getCurrentSession();
+//			
+//			session.beginTransaction();
+//			
+////			List unknown = session.createQuery("select pd.ID_, pd.NAME_ from "+ProcessDefinition.class.getName()+" pd, "+CasesJbpmBind.class.getName()+" cb where pd.ID_ = cb.process_definition_id").list();
+//			List unknown = session.createQuery("from "+ProcessDefinition.class.getName()).list();
+//			System.out.println("anyway: "+unknown);
+//			session.getTransaction().commit();
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		return new ArrayList<SelectItem>();
 	}
 }
