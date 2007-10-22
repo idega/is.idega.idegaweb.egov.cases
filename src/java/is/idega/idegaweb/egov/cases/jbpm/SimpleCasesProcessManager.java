@@ -46,9 +46,9 @@ import com.idega.jbpm.def.ViewToTask;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2007/10/21 21:17:54 $ by $Author: civilis $
+ * Last modified: $Date: 2007/10/22 15:39:00 $ by $Author: civilis $
  *
  */
 public class SimpleCasesProcessManager {
@@ -63,6 +63,8 @@ public class SimpleCasesProcessManager {
 	private ViewToTask viewToTaskBinder;
 	private String caseCategory;
 	private String caseType;
+	private String processDefinitionId;
+	private String processInstanceId;
 	
 	private String processDefinitionTemplateLocation;
 	private String createRequestFormTemplateLocation;
@@ -70,6 +72,7 @@ public class SimpleCasesProcessManager {
 	
 	private List<SelectItem> casesTypes = new ArrayList<SelectItem>();
 	private List<SelectItem> casesCategories = new ArrayList<SelectItem>();
+	private List<SelectItem> casesProcessesDefinitions = new ArrayList<SelectItem>();
 
 	public PersistenceManager getPersistenceManager() {
 		return persistenceManager;
@@ -163,6 +166,7 @@ public class SimpleCasesProcessManager {
 			bind.setCasesCategoryId(Long.parseLong(getCaseCategory()));
 			bind.setCasesTypeId(Long.parseLong(getCaseType()));
 			bind.setProcDefId(pd.getId());
+			bind.setInitTaskName(createReqTaskName);
 			
 			session.save(bind);
 			
@@ -365,24 +369,74 @@ public class SimpleCasesProcessManager {
 		this.sessionFactory = sessionFactory;
 	}
 	
+	private void addDefaultSelectItem(List<SelectItem> selectItems) {
+		
+		SelectItem item = new SelectItem();
+		
+		item.setValue("");
+		item.setLabel("No selection");
+		
+		selectItems.add(item);
+	}
+	
 	public List<SelectItem> getSimpleCasesProcessesDefinitions() {
 
+		casesProcessesDefinitions.clear();
+		addDefaultSelectItem(casesProcessesDefinitions);
+		
+		Session session = getSessionFactory().getCurrentSession();
+		Transaction transaction = session.getTransaction();
+		boolean transactionWasActive = transaction.isActive();
+		
+		if(!transactionWasActive)
+			transaction.begin();
+		
 		try {
-//			Session session = getSessionFactory().getCurrentSession();
-//			
-//			session.beginTransaction();
-//			
-////			List unknown = session.createQuery("select pd.ID_, pd.NAME_ from "+ProcessDefinition.class.getName()+" pd, "+CasesJbpmBind.class.getName()+" cb where pd.ID_ = cb.process_definition_id").list();
-//			List unknown = session.createQuery("from "+ProcessDefinition.class.getName()).list();
-//			System.out.println("anyway: "+unknown);
-//			session.getTransaction().commit();
 			
+			//query from CasesJbpmBind
+			@SuppressWarnings("unchecked")			
+			List<Object[]> casesProcesses = session.getNamedQuery("casesJbpmBind.simpleCasesProcessesDefinitionsQuery").list();
 			
+			if(casesProcesses == null)
+				return casesProcessesDefinitions;
+			
+			for (Object[] idAndName : casesProcesses) {
+				
+				SelectItem item = new SelectItem();
+				
+				item.setValue(String.valueOf(idAndName[0]));
+				item.setLabel((String)idAndName[1]);
+				casesProcessesDefinitions.add(item);
+			}
+			
+			return casesProcessesDefinitions;
 			
 		} catch (Exception e) {
+			setMessage("Exception occured");
 			e.printStackTrace();
+			casesProcessesDefinitions.clear();
+			return casesProcessesDefinitions;
+			
+		} finally {
+		
+			if(!transactionWasActive)
+				transaction.commit();
 		}
-	
-		return new ArrayList<SelectItem>();
+	}
+
+	public String getProcessDefinitionId() {
+		return processDefinitionId;
+	}
+
+	public void setProcessDefinitionId(String processDefinitionId) {
+		this.processDefinitionId = processDefinitionId;
+	}
+
+	public String getProcessInstanceId() {
+		return processInstanceId;
+	}
+
+	public void setProcessInstanceId(String processInstanceId) {
+		this.processInstanceId = processInstanceId;
 	}
 }
