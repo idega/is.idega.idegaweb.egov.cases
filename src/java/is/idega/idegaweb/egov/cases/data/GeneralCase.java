@@ -98,7 +98,7 @@ public interface GeneralCase extends IDOEntity, Case {
 	 */
 	public void setAsPrivate(boolean isPrivate);
 	
-	public abstract void setJbpmProcessInstanceId(Double pid);
+	public abstract void setJbpmProcessInstanceId(Integer pid);
 	
-	public abstract Double getJbpmProcessInstanceId();
+	public abstract Integer getJbpmProcessInstanceId();
 }

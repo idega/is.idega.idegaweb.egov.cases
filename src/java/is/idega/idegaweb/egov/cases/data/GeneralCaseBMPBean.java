@@ -69,7 +69,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
 		addAttribute(COLUMN_TYPE, "Type", String.class);
 		addAttribute(COLUMN_IS_PRIVATE, "Is private", Boolean.class);
-		addAttribute(COLUMN_JBPM_PROCESS_INSTANCE_ID, "JBPM process instance id", Double.class);
+		addAttribute(COLUMN_JBPM_PROCESS_INSTANCE_ID, "JBPM process instance id", Integer.class);
 
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -82,8 +82,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return getStringColumnValue(COLUMN_MESSAGE);
 	}
 	
-	public Double getJbpmProcessInstanceId() {
-		return getDoubleColumnValue(COLUMN_JBPM_PROCESS_INSTANCE_ID);
+	public Integer getJbpmProcessInstanceId() {
+		return getIntegerColumnValue(COLUMN_JBPM_PROCESS_INSTANCE_ID);
 	}
 
 	public String getReply() {
@@ -128,7 +128,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		setColumn(COLUMN_MESSAGE, message);
 	}
 	
-	public void setJbpmProcessInstanceId(Double pid) {
+	public void setJbpmProcessInstanceId(Integer pid) {
 		setColumn(COLUMN_JBPM_PROCESS_INSTANCE_ID, pid);
 	}
 
