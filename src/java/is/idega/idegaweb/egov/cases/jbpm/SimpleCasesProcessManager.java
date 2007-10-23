@@ -46,9 +46,9 @@ import com.idega.jbpm.def.ViewToTask;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2007/10/22 15:39:00 $ by $Author: civilis $
+ * Last modified: $Date: 2007/10/23 21:53:46 $ by $Author: civilis $
  *
  */
 public class SimpleCasesProcessManager {
@@ -65,6 +65,8 @@ public class SimpleCasesProcessManager {
 	private String caseType;
 	private String processDefinitionId;
 	private String processInstanceId;
+	private String chosenProcessDefinitionId;
+	private String chosenProcessInstanceId;
 	
 	private String processDefinitionTemplateLocation;
 	private String createRequestFormTemplateLocation;
@@ -438,5 +440,31 @@ public class SimpleCasesProcessManager {
 
 	public void setProcessInstanceId(String processInstanceId) {
 		this.processInstanceId = processInstanceId;
+	}
+
+	public String getChosenProcessDefinitionId() {
+		return chosenProcessDefinitionId;
+	}
+
+	public void setChosenProcessDefinitionId(String chosenProcessDefinitionId) {
+		this.chosenProcessDefinitionId = chosenProcessDefinitionId;
+	}
+
+	public String getChosenProcessInstanceId() {
+		return chosenProcessInstanceId;
+	}
+
+	public void setChosenProcessInstanceId(String chosenProcessInstanceId) {
+		this.chosenProcessInstanceId = chosenProcessInstanceId;
+	}
+	
+	public void showProcessInitationForm() {
+	
+		setChosenProcessDefinitionId(getProcessDefinitionId());
+	}
+	
+	public void showProcessProgressForm() {
+		
+		setChosenProcessInstanceId(getProcessInstanceId());
 	}
 }
