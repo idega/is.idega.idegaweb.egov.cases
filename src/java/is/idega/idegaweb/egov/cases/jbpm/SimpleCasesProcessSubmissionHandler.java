@@ -38,9 +38,9 @@ import com.idega.webface.WFUtil;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/10/23 21:53:37 $ by $Author: civilis $
+ * Last modified: $Date: 2007/10/24 15:28:39 $ by $Author: civilis $
  */
 public class SimpleCasesProcessSubmissionHandler extends AbstractConnector implements SubmissionHandler {
     
@@ -71,8 +71,6 @@ public class SimpleCasesProcessSubmissionHandler extends AbstractConnector imple
     	
     	if(parameters.containsKey(SimpleCaseFormCreateDMIManager.type)) {
     		
-    		
-    		System.out.println("create process ....................");
     		processCreateProcess(parameters, instance);
     		
     	} else if(false) {
@@ -132,14 +130,14 @@ public class SimpleCasesProcessSubmissionHandler extends AbstractConnector imple
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
 			
 			
-			//now we save variables values in the task and progress further
+			//now we save variables values in the task and end task therefore progressing further
+			
+			TaskInstance ti = tis.iterator().next();
 			
 	    	VariablesHandler vh = (VariablesHandler)WFUtil.getBeanInstance("process_xforms_variablesHandler");
 	    	
-	    	vh.submit(tis.iterator().next().getId(), instance);
-	    	
-//	    	proceed
-	    	pi.getRootToken().signal();
+	    	vh.submit(ti.getId(), instance);
+	    	ti.end();
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
