@@ -244,4 +244,11 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.iMyCasesPage = myCasesPage;
 	}
+
+	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
+
+		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
+	}
 }

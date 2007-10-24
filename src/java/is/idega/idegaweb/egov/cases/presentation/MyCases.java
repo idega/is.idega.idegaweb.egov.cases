@@ -288,4 +288,11 @@ public class MyCases extends CasesProcessor {
 	protected boolean showCheckBox() {
 		return false;
 	}
+
+	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
+
+		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
+	}
 }

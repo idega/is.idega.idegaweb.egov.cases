@@ -101,6 +101,10 @@ public abstract class CasesProcessor extends CasesBlock {
 		Form form = new Form();
 		form.addParameter(PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
 
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery-1.2.1.pack.js");
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery.tablesorter.pack.js");
+		initializeTableSorter(iwc);
+
 		Table2 table = new Table2();
 		table.setWidth("100%");
 		table.setCellpadding(0);
@@ -442,4 +446,6 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
 	protected abstract boolean showCheckBox();
+
+	protected abstract void initializeTableSorter(IWContext iwc) throws RemoteException;
 }
