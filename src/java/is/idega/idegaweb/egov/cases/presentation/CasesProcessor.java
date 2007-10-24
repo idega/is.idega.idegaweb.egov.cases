@@ -19,6 +19,7 @@ import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
@@ -59,6 +60,8 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_ALLOCATION_FORM = 6;
 
 	protected abstract String getBlockID();
+	
+	private ICPage jbpmProcessViewerPage;
 
 	protected void present(IWContext iwc) throws Exception {
 		switch (parseAction(iwc)) {
@@ -67,6 +70,7 @@ public abstract class CasesProcessor extends CasesBlock {
 				break;
 
 			case ACTION_PROCESS:
+				
 				showProcessor(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 				break;
 
@@ -98,6 +102,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 
 	private void showList(IWContext iwc) throws RemoteException {
+		
 		Form form = new Form();
 		form.addParameter(PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
 
@@ -116,7 +121,8 @@ public abstract class CasesProcessor extends CasesBlock {
 		column.setSpan(1);
 		column.setWidth("12");
 
-		Collection cases = getCases(iwc.getCurrentUser());
+		@SuppressWarnings("unchecked")
+		Collection<GeneralCase> cases = getCases(iwc.getCurrentUser());
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -166,9 +172,11 @@ public abstract class CasesProcessor extends CasesBlock {
 		group = table.createBodyRowGroup();
 		int iRow = 1;
 
-		Iterator iter = cases.iterator();
+		Iterator<GeneralCase> iter = cases.iterator();
+		
 		while (iter.hasNext()) {
-			GeneralCase theCase = (GeneralCase) iter.next();
+			
+			GeneralCase theCase = iter.next();
 			CaseStatus status = theCase.getCaseStatus();
 			CaseType type = theCase.getCaseType();
 			User owner = theCase.getOwner();
@@ -231,6 +239,7 @@ public abstract class CasesProcessor extends CasesBlock {
 				cell.setStyleClass("lastColumn");
 			}
 			cell.setStyleClass("view");
+			
 			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
 
 			if (showCheckBoxes) {
@@ -427,10 +436,21 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 
-	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-		Link process = new Link(object);
-		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
+		Link process = new Link("edit");
+		
+		if(theCase.getJbpmProcessInstanceId() == null || true) {
+			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+			
+		} else {
+			
+			if(getJbpmProcessViewerPage() == null)
+				return process;
+
+			process.setPage(getJbpmProcessViewerPage());
+			process.addParameter("processInstanceId", String.valueOf(theCase.getJbpmProcessInstanceId()));
+		}
 
 		return process;
 	}
@@ -442,4 +462,12 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
 	protected abstract boolean showCheckBox();
+
+	public ICPage getJbpmProcessViewerPage() {
+		return jbpmProcessViewerPage;
+	}
+
+	public void setJbpmProcessViewerPage(ICPage jbpmProcessViewerPage) {
+		this.jbpmProcessViewerPage = jbpmProcessViewerPage;
+	}
 }

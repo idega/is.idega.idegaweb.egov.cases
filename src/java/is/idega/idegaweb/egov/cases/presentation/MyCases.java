@@ -23,6 +23,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.PresentationObject;
 import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
@@ -42,7 +43,7 @@ public class MyCases extends CasesProcessor {
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-
+	
 	protected String getBlockID() {
 		return "myCases";
 	}
@@ -287,5 +288,25 @@ public class MyCases extends CasesProcessor {
 
 	protected boolean showCheckBox() {
 		return false;
+	}
+	
+	@Override
+	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
+		Link process = new Link("edit");
+		
+		if(theCase.getJbpmProcessInstanceId() == null) {
+			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+			
+		} else {
+			
+			if(getJbpmProcessViewerPage() == null)
+				return process;
+
+			process.setPage(getJbpmProcessViewerPage());
+			process.addParameter("processInstanceId", String.valueOf(theCase.getJbpmProcessInstanceId()));
+		}
+
+		return process;
 	}
 }
