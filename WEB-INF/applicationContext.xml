@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+	<bean id="simpleCasesProcessSubmissionBean" class="is.idega.idegaweb.egov.cases.jbpm.SimpleCasesProcessSubmissionBean" scope="singleton">
+		<property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
+		<property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
+        <property name="variablesHandler" ref="process_xforms_variablesHandler" />
+	</bean>
+</beans>
