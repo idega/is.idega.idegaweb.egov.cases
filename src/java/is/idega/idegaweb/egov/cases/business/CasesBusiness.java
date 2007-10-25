@@ -1,5 +1,6 @@
 package is.idega.idegaweb.egov.cases.business;
 
+
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
@@ -128,7 +129,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allocateCase
 	 */
-	public void allocateCase(GeneralCase theCase, User user, String message, User performer, IWContext iwc) throws RemoteException;
+	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#handleCase
@@ -153,12 +154,17 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reactivateCase
 	 */
-	public void reactivateCase(Object casePK, User performer, IWContext iwc) throws FinderException, RemoteException;
+	public void reactivateCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reviewCase
 	 */
-	public void reviewCase(Object casePK, User performer, IWContext iwc) throws FinderException, RemoteException;
+	public void reviewCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException, RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#sendReminder
+	 */
+	public void sendReminder(GeneralCase theCase, User receiver, User sender, String message, IWContext iwc) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseCategory

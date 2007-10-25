@@ -226,7 +226,8 @@ public class ClosedCases extends CasesProcessor {
 		Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
 
 		try {
-			getBusiness().reactivateCase(casePK, iwc.getCurrentUser(), iwc);
+			GeneralCase theCase = getBusiness().getGeneralCase(casePK);
+			getBusiness().reactivateCase(theCase, iwc.getCurrentUser(), iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

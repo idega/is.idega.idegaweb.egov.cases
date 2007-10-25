@@ -7,6 +7,8 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
+import is.idega.idegaweb.egov.cases.business.CaseHandlerCollectionHandler;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -28,14 +30,17 @@ import com.idega.presentation.TableColumn;
 import com.idega.presentation.TableColumnGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
+import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
@@ -46,6 +51,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	public static final String PARAMETER_ACTION = "cp_prm_action";
 
 	public static final String PARAMETER_CASE_PK = "prm_case_pk";
+	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
+	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
+	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	protected static final String PARAMETER_REPLY = "prm_reply";
 	protected static final String PARAMETER_STATUS = "prm_status";
 	protected static final String PARAMETER_USER = "prm_iser";
@@ -338,6 +346,8 @@ public abstract class CasesProcessor extends CasesBlock {
 		form.maintainParameter(PARAMETER_CASE_PK);
 		form.addParameter(PARAMETER_ACTION, "");
 
+		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
+
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		form.add(section);
@@ -359,8 +369,42 @@ public abstract class CasesProcessor extends CasesBlock {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
+		CaseCategory parentCategory = category.getParent();
+		CaseType type = theCase.getCaseType();
 		Group handlerGroup = category.getHandlerGroup();
 		Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+
+		SelectorUtility util = new SelectorUtility();
+		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getBusiness().getCaseCategories(), "getName");
+		categories.keepStatusOnAction(true);
+		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		categories.setStyleClass("caseCategoryDropdown");
+
+		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
+		subCategories.keepStatusOnAction(true);
+		subCategories.setSelectedElement(category.getPrimaryKey().toString());
+		subCategories.setStyleClass("subCaseCategoryDropdown");
+
+		if (parentCategory != null) {
+			Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
+			if (collection.isEmpty()) {
+				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+			}
+			else {
+				Iterator iter = collection.iterator();
+				while (iter.hasNext()) {
+					CaseCategory subCategory = (CaseCategory) iter.next();
+					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
+				}
+			}
+		}
+
+		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
+		types.keepStatusOnAction(true);
+		types.setSelectedElement(type.getPrimaryKey().toString());
+		types.setStyleClass("caseTypeDropdown");
+
+		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
 
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
 
@@ -374,9 +418,65 @@ public abstract class CasesProcessor extends CasesBlock {
 		message.setStyleClass("textarea");
 		message.keepStatusOnAction(true);
 
+		if (getBusiness().useTypes()) {
+			Layer element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
+			element.add(label);
+			element.add(types);
+			section.add(element);
+		}
+		else {
+			form.add(hiddenType);
+		}
+
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("handler", "Handler"), users);
+		Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
+		element.add(label);
+		element.add(categories);
+		section.add(element);
+
+		try {
+			RemoteScriptHandler rsh = new RemoteScriptHandler(categories, users);
+			rsh.setRemoteScriptCollectionClass(CaseHandlerCollectionHandler.class);
+			element.add(rsh);
+		}
+		catch (IllegalAccessException iae) {
+			iae.printStackTrace();
+		}
+		catch (InstantiationException ie) {
+			ie.printStackTrace();
+		}
+
+		if (useSubCategories) {
+			try {
+				RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
+				rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
+				element.add(rsh);
+
+				RemoteScriptHandler rsh2 = new RemoteScriptHandler(subCategories, users);
+				rsh2.setRemoteScriptCollectionClass(CaseHandlerCollectionHandler.class);
+				element.add(rsh2);
+			}
+			catch (IllegalAccessException iae) {
+				iae.printStackTrace();
+			}
+			catch (InstantiationException ie) {
+				ie.printStackTrace();
+			}
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label(getResourceBundle().getLocalizedString("sub_case_category", "Sub case category"), subCategories);
+			element.add(label);
+			element.add(subCategories);
+			section.add(element);
+		}
+
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		label = new Label(getResourceBundle().getLocalizedString("handler", "Handler"), users);
 		element.add(label);
 		element.add(users);
 		section.add(element);

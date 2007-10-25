@@ -8,6 +8,8 @@
 		<release version="1.0.30" date="2007-10-24">
 			<action dev="laddi" type="update">
 				Added extremely cool table sorter to case lists.
+				Added possibility to change category and/or type when allocating.
+				Added possibility to send a reminder for incomplete cases.
 			</action>
 		</release>
 		

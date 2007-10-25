@@ -218,6 +218,9 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	protected void save(IWContext iwc) throws RemoteException {
 		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
+		Object caseCategoryPK = iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_CASE_CATEGORY_PK) : null;
+		Object subCaseCategoryPK = iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK) : null;
+		Object caseTypePK = iwc.isParameterSet(PARAMETER_CASE_TYPE_PK) ? iwc.getParameter(PARAMETER_CASE_TYPE_PK) : null;
 		if (casePK != null) {
 			try {
 				GeneralCase theCase = getCasesBusiness(iwc).getGeneralCase(new Integer(casePK));
@@ -226,7 +229,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 				User user = getUserBusiness().getUser(new Integer(userPK.toString()));
 
-				getCasesBusiness(iwc).allocateCase(theCase, user, message, iwc.getCurrentUser(), iwc);
+				getCasesBusiness(iwc).allocateCase(theCase, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, user, message, iwc.getCurrentUser(), iwc);
 			}
 			catch (RemoteException e) {
 				throw new IBORuntimeException(e);

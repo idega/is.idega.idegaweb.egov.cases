@@ -374,7 +374,26 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	public void allocateCase(GeneralCase theCase, User user, String message, User performer, IWContext iwc) {
+	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) {
+		try {
+			CaseCategory category = caseCategoryPK != null ? getCaseCategory(caseCategoryPK) : null;
+			Group handlerGroup = category != null ? category.getHandlerGroup() : null;
+			if (category != null && !category.equals(theCase.getCaseCategory())) {
+				theCase.setCaseCategory(category);
+				theCase.setHandler(handlerGroup);
+			}
+
+			CaseType type = caseTypePK != null ? getCaseType(caseTypePK) : null;
+			if (type != null && !theCase.getCaseType().equals(type)) {
+				theCase.setCaseType(type);
+			}
+
+			theCase.store();
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+		}
+
 		takeCase(theCase, user, iwc);
 
 		Name name = new Name(performer.getFirstName(), performer.getMiddleName(), performer.getLastName());
@@ -484,8 +503,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	public void reactivateCase(Object casePK, User performer, IWContext iwc) throws FinderException {
-		GeneralCase theCase = getGeneralCase(casePK);
+	public void reactivateCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException {
 		theCase.setHandledBy(performer);
 
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group) null);
@@ -503,8 +521,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	public void reviewCase(Object casePK, User performer, IWContext iwc) throws FinderException {
-		GeneralCase theCase = getGeneralCase(casePK);
+	public void reviewCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException {
 		CaseCategory category = theCase.getCaseCategory();
 		Group handlerGroup = category.getHandlerGroup();
 
@@ -538,6 +555,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		catch (RemoteException e) {
 			throw new IBORuntimeException(e);
 		}
+	}
+
+	public void sendReminder(GeneralCase theCase, User receiver, User sender, String message, IWContext iwc) {
+		IWResourceBundle iwrb = this.getIWResourceBundleForUser(receiver, iwc);
+
+		Object[] args = { theCase.getPrimaryKey().toString(), sender.getName(), message };
+		String subject = iwrb.getLocalizedString("case_reminder_subject", "You have received a reminder for a case");
+		String body = MessageFormat.format(iwrb.getLocalizedString("case_reminder_body", "{1} has sent you a reminder for case nr. {0} with the following message:\n{2}"), args);
+
+		sendMessage(theCase, receiver, sender, subject, body);
 	}
 
 	public CaseCategory storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int localeId, int order) throws FinderException, CreateException {

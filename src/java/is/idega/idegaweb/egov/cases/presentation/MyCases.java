@@ -39,10 +39,6 @@ import com.idega.util.text.TextSoap;
 
 public class MyCases extends CasesProcessor {
 
-	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
-	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
-	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-
 	protected String getBlockID() {
 		return "myCases";
 	}

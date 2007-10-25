@@ -10,6 +10,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
+import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
@@ -42,47 +44,20 @@ public class CaseViewer extends CaseCreator {
 
 	public static final String PARAMETER_ACTION_REACTIVATE = "prm_action_reactivate";
 	public static final String PARAMETER_ACTION_REVIEW = "prm_action_review";
-	public static final String PARAMETER_CASE_PK = "prm_case_pk";
+	public static final String PARAMETER_MESSAGE = "prm_message";
 
-	protected static final int ACTION_SAVE = 1;
+	private static final int ACTION_VIEW = 1;
+	private static final int ACTION_SEND_REMINDER = 2;
+	private static final int ACTION_SAVE = 3;
 
 	private ICPage iHomePage;
 	private ICPage iBackPage;
 
 	protected void present(IWContext iwc) {
 		try {
-			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
-				if (iwc.isParameterSet(PARAMETER_ACTION_REACTIVATE)) {
-					try {
-						getCasesBusiness(iwc).reactivateCase(iwc.getParameter(PARAMETER_CASE_PK), iwc.getCurrentUser(), iwc);
-					}
-					catch (FinderException e) {
-						e.printStackTrace();
-					}
-				}
-				else if (iwc.isParameterSet(PARAMETER_ACTION_REVIEW)) {
-					try {
-						getCasesBusiness(iwc).reviewCase(iwc.getParameter(PARAMETER_CASE_PK), iwc.getCurrentUser(), iwc);
-					}
-					catch (FinderException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-			IWResourceBundle iwrb = getResourceBundle(iwc);
-
-			Form form = new Form();
-			form.setStyleClass("adminForm");
-			form.setStyleClass("overview");
-
 			GeneralCase theCase = null;
 			try {
 				String casePK = iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter());
-				if (casePK == null || "".equals(casePK)) {
-					casePK = iwc.getParameter(PARAMETER_CASE_PK);
-				}
-
 				if (casePK == null) {
 					add("No case selected...");
 					return;
@@ -94,6 +69,58 @@ public class CaseViewer extends CaseCreator {
 				fe.printStackTrace();
 				throw new IBORuntimeException(fe);
 			}
+
+			switch (parseAction(iwc)) {
+				case ACTION_VIEW:
+					showOverview(iwc, theCase);
+					break;
+
+				case ACTION_SEND_REMINDER:
+					showReminderForm(iwc, theCase);
+					break;
+
+				case ACTION_SAVE:
+					save(iwc, theCase);
+					break;
+			}
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+	}
+
+	private int parseAction(IWContext iwc) {
+		if (iwc.isParameterSet(PARAMETER_ACTION)) {
+			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		}
+		return ACTION_VIEW;
+	}
+
+	private void showOverview(IWContext iwc, GeneralCase theCase) {
+		try {
+			if (iwc.isParameterSet(PARAMETER_ACTION_REACTIVATE)) {
+				try {
+					getCasesBusiness(iwc).reactivateCase(theCase, iwc.getCurrentUser(), iwc);
+				}
+				catch (FinderException e) {
+					e.printStackTrace();
+				}
+			}
+			else if (iwc.isParameterSet(PARAMETER_ACTION_REVIEW)) {
+				try {
+					getCasesBusiness(iwc).reviewCase(theCase, iwc.getCurrentUser(), iwc);
+				}
+				catch (FinderException e) {
+					e.printStackTrace();
+				}
+			}
+
+			IWResourceBundle iwrb = getResourceBundle(iwc);
+
+			Form form = new Form();
+			form.setStyleClass("adminForm");
+			form.setStyleClass("overview");
+
 			CaseCategory category = theCase.getCaseCategory();
 			CaseCategory parentCategory = category.getParent();
 			CaseStatus status = theCase.getCaseStatus();
@@ -294,14 +321,21 @@ public class CaseViewer extends CaseCreator {
 			if (status.equals(getCasesBusiness(iwc).getCaseStatusInactive()) || status.equals(getCasesBusiness(iwc).getCaseStatusReady())) {
 				Link next = getButtonLink(iwrb.getLocalizedString(getPrefix() + "reactivate_case", "Reactivate case"));
 				next.addParameter(PARAMETER_ACTION_REACTIVATE, Boolean.TRUE.toString());
-				next.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				next.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
 				bottom.add(next);
 			}
 			else if (iwc.getCurrentUser().equals(owner) && status.equals(getCasesBusiness(iwc).getCaseStatusOpen())) {
 				Link next = getButtonLink(iwrb.getLocalizedString(getPrefix() + "review_case", "Review case"));
 				next.addParameter(PARAMETER_ACTION_REVIEW, Boolean.TRUE.toString());
-				next.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				next.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
+				bottom.add(next);
+			}
+			else if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc) && (status.equals(getCasesBusiness(iwc).getCaseStatusPending()) || status.equals(getCasesBusiness(iwc).getCaseStatusWaiting()))) {
+				Link next = getButtonLink(iwrb.getLocalizedString("send_reminder", "Send reminder"));
+				next.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_SEND_REMINDER));
+				next.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 				next.maintainParameter(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()), iwc);
 				bottom.add(next);
 			}
@@ -368,6 +402,79 @@ public class CaseViewer extends CaseCreator {
 		section.add(clear);
 
 		return layer;
+	}
+
+	protected void showReminderForm(IWContext iwc, GeneralCase theCase) throws RemoteException {
+		Form form = new Form();
+		form.setStyleClass("adminForm");
+		form.maintainParameter(getCasesBusiness(iwc).getSelectedCaseParameter());
+		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+
+		form.add(getHeader(iwrb.getLocalizedString("case_viewer.send_reminder", "Send reminder")));
+		form.add(getPersonInfo(iwc, theCase.getOwner()));
+
+		Layer section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
+		form.add(section);
+
+		Layer clear = new Layer(Layer.DIV);
+		clear.setStyleClass("Clear");
+
+		TextArea message = new TextArea(PARAMETER_MESSAGE);
+		message.setStyleClass("textarea");
+		message.keepStatusOnAction(true);
+
+		Layer element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		Label label = new Label(iwrb.getLocalizedString("allocation_message", "Message"), message);
+		element.add(label);
+		element.add(message);
+		section.add(element);
+
+		section.add(clear);
+
+		Layer bottom = new Layer(Layer.DIV);
+		bottom.setStyleClass("bottom");
+		form.add(bottom);
+
+		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+		back.setStyleClass("homeButton");
+		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.setToFormSubmit(form);
+		bottom.add(back);
+
+		Link next = getButtonLink(iwrb.getLocalizedString("send_reminder", "Send reminder"));
+		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		next.setToFormSubmit(form);
+		bottom.add(next);
+
+		add(form);
+	}
+
+	private void save(IWContext iwc, GeneralCase theCase) throws RemoteException {
+		String message = iwc.getParameter(PARAMETER_MESSAGE);
+		User user = getCasesBusiness(iwc).getLastModifier(theCase);
+
+		getCasesBusiness(iwc).sendReminder(theCase, user, iwc.getCurrentUser(), message, iwc);
+
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+
+		addReceipt(iwc, iwrb.getLocalizedString("case_view.reminder_sent", "Reminder sent"), iwrb.getLocalizedString("case_view.reminder_sent_subject", "A reminder was sent"), iwrb.getLocalizedString("case_viewer.reminder_sent_body", "You have successfully sent a reminder for completion of the case."));
+
+		Layer clearLayer = new Layer(Layer.DIV);
+		clearLayer.setStyleClass("Clear");
+		add(clearLayer);
+
+		Layer bottom = new Layer(Layer.DIV);
+		bottom.setStyleClass("bottom");
+		add(bottom);
+
+		Link link = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+		link.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+		link.setStyleClass("homeButton");
+		bottom.add(link);
 	}
 
 	protected ICPage getHomePage() {
