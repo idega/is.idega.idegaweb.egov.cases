@@ -178,7 +178,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			e.printStackTrace();
 			throw new FinderException(e.getMessage());
 		}
-		query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseHandlerColumnName()), groups));
+		if (groups != null) {
+			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseHandlerColumnName()), groups));
+		}
 		if (statuses != null) {
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}

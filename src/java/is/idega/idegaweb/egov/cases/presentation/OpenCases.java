@@ -57,12 +57,15 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		return false;
 	}
 
+	@Override
 	protected Collection getCases(User user) throws RemoteException {
+		boolean isCaseSuperAdmin = getIWApplicationContext().getIWMainApplication().getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, getIWUserContext());
 		Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
-		return getBusiness().getOpenCases(groups);
+		return getBusiness().getOpenCases(!isCaseSuperAdmin ? groups : null);
 	}
 
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
+		
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.setStyleClass("overview");
@@ -217,6 +220,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
+		
 		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
 		if (casePK != null) {
 			try {
