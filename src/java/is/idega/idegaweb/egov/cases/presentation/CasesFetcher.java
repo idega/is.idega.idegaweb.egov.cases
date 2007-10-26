@@ -253,7 +253,7 @@ public class CasesFetcher extends CasesBlock {
 		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery.tablesorter.pack.js");
 
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("$(document).ready(function() { $('#caseFetcher').tablesorter( { headers: { 1: { sorter: false }, " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
+		buffer.append("$(document).ready(function() { $('#casesFetcher').tablesorter( { headers: { 1: { sorter: false }, " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
 
 		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 
