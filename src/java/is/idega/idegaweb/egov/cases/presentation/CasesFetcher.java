@@ -106,7 +106,7 @@ public class CasesFetcher extends CasesBlock {
 			parse(iwc);
 
 			Form form = new Form();
-			form.setID("casesFetcher");
+			form.setID("caseFetcher");
 			form.setStyleClass("adminForm");
 			form.addParameter(PARAMETER_SHOW_RESULTS, Boolean.TRUE.toString());
 
@@ -161,7 +161,7 @@ public class CasesFetcher extends CasesBlock {
 			DropdownMenu anonymous = new DropdownMenu(PARAMETER_ANONYMOUS);
 			anonymous.addMenuElement("", "");
 			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.yes", "Yes"));
-			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
+			anonymous.addMenuElement(Boolean.FALSE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
 			anonymous.keepStatusOnAction(true);
 			anonymous.setStyleClass("anonymousDropdown");
 
@@ -253,7 +253,7 @@ public class CasesFetcher extends CasesBlock {
 		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery.tablesorter.pack.js");
 
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("$(document).ready(function() { $('#casesFetcher').tablesorter( { headers: { " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
+		buffer.append("$(document).ready(function() { $('#caseFetcher').tablesorter( { headers: { 1: { sorter: false }, " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
 
 		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 
