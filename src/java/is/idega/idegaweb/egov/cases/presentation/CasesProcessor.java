@@ -7,8 +7,6 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
-import is.idega.idegaweb.egov.cases.business.CaseHandlerCollectionHandler;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -30,7 +28,6 @@ import com.idega.presentation.TableColumn;
 import com.idega.presentation.TableColumnGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
@@ -56,7 +53,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	protected static final String PARAMETER_REPLY = "prm_reply";
 	protected static final String PARAMETER_STATUS = "prm_status";
-	protected static final String PARAMETER_USER = "prm_iser";
+	protected static final String PARAMETER_USER = "prm_user";
 	protected static final String PARAMETER_MESSAGE = "prm_message";
 
 	protected static final int ACTION_VIEW = 1;
@@ -348,6 +345,11 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
 
+		super.getParentPage().addJavascriptURL("/dwr/interface/CasesDWRUtil.js");
+		super.getParentPage().addJavascriptURL("/dwr/engine.js");
+		super.getParentPage().addJavascriptURL("/dwr/util.js");
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesVirtualPath() + "/js/navigation.js");
+
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		form.add(section);
@@ -376,26 +378,30 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getBusiness().getCaseCategories(), "getName");
-		categories.keepStatusOnAction(true);
+		categories.setID(PARAMETER_CASE_CATEGORY_PK);
 		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
 		categories.setStyleClass("caseCategoryDropdown");
+		if (useSubCategories) {
+			categories.setOnChange("changeSubCategories('" + PARAMETER_CASE_CATEGORY_PK + "', '" + iwc.getCurrentLocale().getCountry() + "')");
+		}
+		categories.setOnChange("changeUsers('" + PARAMETER_CASE_CATEGORY_PK + "')");
 
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
-		subCategories.keepStatusOnAction(true);
+		subCategories.setID(PARAMETER_SUB_CASE_CATEGORY_PK);
 		subCategories.setSelectedElement(category.getPrimaryKey().toString());
 		subCategories.setStyleClass("subCaseCategoryDropdown");
+		subCategories.setOnChange("changeUsers('" + PARAMETER_SUB_CASE_CATEGORY_PK + "')");
 
-		if (parentCategory != null) {
-			Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
-			if (collection.isEmpty()) {
-				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
-			}
-			else {
-				Iterator iter = collection.iterator();
-				while (iter.hasNext()) {
-					CaseCategory subCategory = (CaseCategory) iter.next();
-					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
-				}
+		Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
+		if (collection.isEmpty()) {
+			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+		}
+		else {
+			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
+			Iterator iter = collection.iterator();
+			while (iter.hasNext()) {
+				CaseCategory subCategory = (CaseCategory) iter.next();
+				subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 			}
 		}
 
@@ -407,6 +413,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
 
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
+		users.setID(PARAMETER_USER);
 
 		Iterator iter = handlers.iterator();
 		while (iter.hasNext()) {
@@ -437,35 +444,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		element.add(categories);
 		section.add(element);
 
-		try {
-			RemoteScriptHandler rsh = new RemoteScriptHandler(categories, users);
-			rsh.setRemoteScriptCollectionClass(CaseHandlerCollectionHandler.class);
-			element.add(rsh);
-		}
-		catch (IllegalAccessException iae) {
-			iae.printStackTrace();
-		}
-		catch (InstantiationException ie) {
-			ie.printStackTrace();
-		}
-
 		if (useSubCategories) {
-			try {
-				RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
-				rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
-				element.add(rsh);
-
-				RemoteScriptHandler rsh2 = new RemoteScriptHandler(subCategories, users);
-				rsh2.setRemoteScriptCollectionClass(CaseHandlerCollectionHandler.class);
-				element.add(rsh2);
-			}
-			catch (IllegalAccessException iae) {
-				iae.printStackTrace();
-			}
-			catch (InstantiationException ie) {
-				ie.printStackTrace();
-			}
-
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label(getResourceBundle().getLocalizedString("sub_case_category", "Sub case category"), subCategories);

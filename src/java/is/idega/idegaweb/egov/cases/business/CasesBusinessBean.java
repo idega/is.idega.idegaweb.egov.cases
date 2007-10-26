@@ -22,7 +22,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -648,6 +650,72 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			type.setOrder(order);
 		}
 		type.store();
+	}
+
+	public Map getSubCategories(String categoryPK, String country) {
+		Map map = new LinkedHashMap();
+		Locale locale = new Locale(country, country.toUpperCase());
+
+		if (categoryPK != null && categoryPK.length() > 0 && Integer.parseInt(categoryPK) > -1) {
+			CaseCategory category = null;
+			try {
+				category = getCaseCategory(categoryPK);
+			}
+			catch (FinderException e) {
+				e.printStackTrace();
+			}
+
+			if (category != null) {
+				Collection coll = getSubCategories(category);
+
+				if (!coll.isEmpty()) {
+					map.put(categoryPK, getLocalizedString("case_creator.select_sub_category", "Select sub category", locale));
+
+					Iterator iter = coll.iterator();
+					while (iter.hasNext()) {
+						CaseCategory subCategory = (CaseCategory) iter.next();
+						map.put(subCategory.getPrimaryKey().toString(), subCategory.getName());
+					}
+				}
+				else {
+					map.put(categoryPK, getLocalizedString("case_creator.no_sub_category", "no sub category", locale));
+				}
+			}
+		}
+		return map;
+	}
+
+	public Map getUsers(String categoryPK) {
+		try {
+			Map map = new LinkedHashMap();
+
+			if (categoryPK != null && categoryPK.length() > 0 && Integer.parseInt(categoryPK) > -1) {
+				CaseCategory category = null;
+				try {
+					category = getCaseCategory(categoryPK);
+				}
+				catch (FinderException e) {
+					e.printStackTrace();
+				}
+
+				if (category != null) {
+					Group handlerGroup = category.getHandlerGroup();
+
+					Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+					if (!handlers.isEmpty()) {
+						Iterator iter = handlers.iterator();
+						while (iter.hasNext()) {
+							User handler = (User) iter.next();
+							map.put(handler.getPrimaryKey().toString(), handler.getName());
+						}
+					}
+				}
+			}
+			return map;
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
 	}
 
 	private void sendMessage(GeneralCase theCase, User receiver, User sender, String subject, String body) {

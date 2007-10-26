@@ -7,6 +7,7 @@ import com.idega.presentation.IWContext;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.block.process.data.Case;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import java.util.Map;
 import javax.ejb.CreateException;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.user.data.User;
@@ -175,6 +176,16 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseType
 	 */
 	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException, RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
+	 */
+	public Map getSubCategories(String categoryPK, String country) throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getUsers
+	 */
+	public Map getUsers(String categoryPK) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#canDeleteCase

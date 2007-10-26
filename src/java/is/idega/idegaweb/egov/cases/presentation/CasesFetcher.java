@@ -132,7 +132,7 @@ public class CasesFetcher extends CasesBlock {
 			if (parentCategory != null) {
 				Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
 				if (collection.isEmpty()) {
-					subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+					subCategories.addMenuElement(parentCategory.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
 				}
 				else {
 					Iterator iter = collection.iterator();
@@ -247,6 +247,15 @@ public class CasesFetcher extends CasesBlock {
 		table.setCellspacing(0);
 		table.setStyleClass("ruler");
 		table.setStyleClass("adminTable");
+		table.setID("casesFetcher");
+
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery-1.2.1.pack.js");
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery.tablesorter.pack.js");
+
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("$(document).ready(function() { $('#casesFetcher').tablesorter( { headers: { " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
+
+		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
