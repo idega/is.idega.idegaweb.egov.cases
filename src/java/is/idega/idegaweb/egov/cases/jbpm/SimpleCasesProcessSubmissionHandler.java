@@ -15,9 +15,9 @@ import com.idega.webface.WFUtil;
  * TODO: move all this logic to spring bean
  * 
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2007/10/24 19:12:10 $ by $Author: civilis $
+ * Last modified: $Date: 2007/10/30 22:00:02 $ by $Author: civilis $
  */
 public class SimpleCasesProcessSubmissionHandler extends AbstractConnector implements SubmissionHandler {
     
@@ -26,7 +26,7 @@ public class SimpleCasesProcessSubmissionHandler extends AbstractConnector imple
      */
 	@SuppressWarnings("unchecked")
     public Map submit(Submission submission, Node instance) throws XFormsException {
-
+		
     	//method - post, replace - none
     	if (!submission.getReplace().equalsIgnoreCase("none"))
             throw new XFormsException("Submission mode '" + submission.getReplace() + "' not supported");

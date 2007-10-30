@@ -7,4 +7,27 @@
 		<property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
         <property name="variablesHandler" ref="process_xforms_variablesHandler" />
 	</bean>
+    
+    <bean id="casesJbpmFormsBundleFactory" class="is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleFactory" scope="singleton">
+        <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
+        <property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
+        <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
+        <property name="persistenceManager" ref="xformsPersistenceManager" />
+        <property name="viewFactory" ref="process_xforms_viewFactory" />
+        <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
+    </bean>
+    
+    <bean id="simpleCasesProcessManager" class="is.idega.idegaweb.egov.cases.jbpm.SimpleCasesProcessManager" scope="request">
+        <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
+        <property name="casesJbpmFormsBundleFactory" ref="casesJbpmFormsBundleFactory" />
+        <property name="templateBundleLocation" value="resources/casesJbpmTemplates/simpleCasesProcessTemplate/" />
+    </bean>
+    
+    <bean id="casesJbpmProcess" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess" scope="singleton">
+        <property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
+        <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
+        <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
+        <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
+        <property name="variablesHandler" ref="process_xforms_variablesHandler" />
+    </bean>
 </beans>

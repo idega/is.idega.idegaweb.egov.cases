@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-diagram name="simpleCasesProcessTemplate" width="1086" height="671">
+  <node name="start" x="110" y="113" width="-1" height="-1">
+    <transition name="toCreateRequest">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="end" x="375" y="518" width="140" height="40"/>
+  <node name="createRequest" x="96" y="246" width="140" height="40">
+    <transition name="toOverviewCase">
+      <label x="-34" y="-8"/>
+    </transition>
+  </node>
+  <node name="createResponse" x="362" y="402" width="140" height="40">
+    <transition name="close">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="more info needed">
+      <label x="-53" y="-4"/>
+      <bendpoint w1="-129" h1="-23" w2="122" h2="-14"/>
+    </transition>
+  </node>
+  <node name="overviewCase" x="400" y="262" width="140" height="40">
+    <transition name="takeCase">
+      <label x="5" y="-10"/>
+      <bendpoint w1="12" h1="93" w2="82" h2="-92"/>
+    </transition>
+    <transition name="allocateCase">
+      <label x="-35" y="-23"/>
+      <bendpoint w1="-51" h1="87" w2="19" h2="-98"/>
+    </transition>
+  </node>
+  <node name="provide more info" x="66" y="394" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="146" h1="16" w2="-150" h2="8"/>
+    </transition>
+  </node>
+</process-diagram>

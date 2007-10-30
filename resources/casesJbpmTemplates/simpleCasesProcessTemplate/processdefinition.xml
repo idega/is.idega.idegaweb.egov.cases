@@ -12,7 +12,7 @@
             <variable name="string:requestMessage"></variable>
          </controller>
       </task>
-      <transition name="toCreateResponse" to="createResponse"></transition>
+      <transition name="toOverviewCase" to="overviewCase"></transition>
    </task-node>
    <task-node name="createResponse">
       <task name="createResponseTask">
@@ -21,7 +21,14 @@
             <variable name="string:responseMessage"></variable>
          </controller>
       </task>
-      <transition name="toEnd" to="end"></transition>
-      <transition name="toCreateRequest" to="createRequest"></transition>
+      <transition name="close" to="end"></transition>
+      <transition name="more info needed" to="provide more info"></transition>
+   </task-node>
+   <task-node name="overviewCase">
+      <transition name="takeCase" to="createResponse"></transition>
+      <transition name="allocateCase" to="createResponse"></transition>
+   </task-node>
+   <task-node name="provide more info">
+      <transition name="" to="createResponse"></transition>
    </task-node>
 </process-definition>
