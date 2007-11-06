@@ -8,8 +8,11 @@
 package is.idega.idegaweb.egov.cases.data;
 
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
+
 import java.util.Collection;
+
 import javax.ejb.FinderException;
+
 import com.idega.block.process.data.AbstractCaseBMPBean;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
@@ -259,6 +262,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));
 
+		System.out.println(query.toString());
 		return idoFindPKsByQuery(query);
 	}
 
