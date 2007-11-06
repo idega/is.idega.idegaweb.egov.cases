@@ -81,6 +81,7 @@ case_view.reminder_sent_subject=\u00C1minning send
 case_viewer.reminder_sent_body=\u00C1minning um a\u00F0 kl\u00E1ra afgrei\u00F0slu erindisins var send \u00E1 umsj\u00F3narmann \u00FEess.
 case_viewer.send_reminder=Senda \u00E1minningu
 case_viewer.view_case=Sko\u00F0a erindi
+cases_fetcher.both=B\u00E6\u00F0i
 cases_fetcher.case_id=Nr.
 cases_fetcher.fetch=S\u00E6kja
 cases_fetcher.help_text=Veldu skilyr\u00F0in sem \u00FE\u00FA vilt nota og smelltu \u00E1 'S\u00E6kja'.  Ni\u00F0urst\u00F6\u00F0urnar ver\u00F0a birtar h\u00E9r fyrir ne\u00F0an.

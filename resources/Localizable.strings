@@ -99,6 +99,7 @@ case_view.reminder_sent_subject=A reminder was sent
 case_viewer.reminder_sent_body=You have successfully sent a reminder for completion of the case.
 case_viewer.send_reminder=Send reminder
 case_viewer.view_case=View case
+cases_fetcher.both=Both
 cases_fetcher.case_id=Case ID
 cases_fetcher.fetch=Fetch
 cases_fetcher.help_text=Select your criteria and click 'fetch'.  The results will be displayed below.

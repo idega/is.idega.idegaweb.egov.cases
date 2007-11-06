@@ -159,7 +159,7 @@ public class CasesFetcher extends CasesBlock {
 			statuses.setMenuElementFirst("", "");
 
 			DropdownMenu anonymous = new DropdownMenu(PARAMETER_ANONYMOUS);
-			anonymous.addMenuElement("", "");
+			anonymous.addMenuElement("", getResourceBundle().getLocalizedString("cases_fetcher.both", "Both"));
 			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.yes", "Yes"));
 			anonymous.addMenuElement(Boolean.FALSE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
 			anonymous.keepStatusOnAction(true);
