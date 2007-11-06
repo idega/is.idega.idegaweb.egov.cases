@@ -72,7 +72,7 @@ public class CasesFetcher extends CasesBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY)) {
 			try {
-				category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY));
+				category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY));
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();
