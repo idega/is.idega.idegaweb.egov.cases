@@ -296,7 +296,7 @@ public class MyCases extends CasesProcessor {
 
 	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { 2: { sorter: false }, " + (getBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
+		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
 
 		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 	}
