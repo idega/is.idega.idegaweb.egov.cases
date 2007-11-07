@@ -377,26 +377,31 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) {
+		boolean hasChanges = false;
 		try {
 			CaseCategory category = caseCategoryPK != null ? getCaseCategory(caseCategoryPK) : null;
 			Group handlerGroup = category != null ? category.getHandlerGroup() : null;
 			if (category != null && !category.equals(theCase.getCaseCategory())) {
 				theCase.setCaseCategory(category);
 				theCase.setHandler(handlerGroup);
+				hasChanges = true;
 			}
 
 			CaseType type = caseTypePK != null ? getCaseType(caseTypePK) : null;
 			if (type != null && !theCase.getCaseType().equals(type)) {
 				theCase.setCaseType(type);
+				hasChanges = true;
 			}
 
-			theCase.store();
+			if (hasChanges) {
+				theCase.store();
+			}
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
 		}
 
-		takeCase(theCase, user, iwc);
+		takeCase(theCase, user, iwc, performer, hasChanges);
 
 		Name name = new Name(performer.getFirstName(), performer.getMiddleName(), performer.getLastName());
 		Object[] arguments = { name.getName(iwc.getCurrentLocale()), theCase.getCaseCategory().getLocalizedCategoryName(iwc.getApplicationSettings().getDefaultLocale()), theCase.getPrimaryKey().toString(), message };
@@ -487,21 +492,34 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) {
-		theCase.setHandledBy(performer);
+		takeCase(theCase, performer, iwc, performer, false);
+	}
 
-		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group) null);
+	public void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges) {
+		theCase.setHandledBy(user);
+
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), user, (Group) null);
 
 		User owner = theCase.getOwner();
 
 		IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
 
 		if (owner != null) {
+			if (hasChanges) {
+				Name name = new Name(performer.getFirstName(), performer.getMiddleName(), performer.getLastName());
+				Object[] arguments2 = { name.getName(iwc.getCurrentLocale()), theCase.getCaseCategory().getLocalizedCategoryName(iwc.getApplicationSettings().getDefaultLocale()), theCase.getPrimaryKey().toString() };
+
+				String subject = getLocalizedString("case_changed_subject", "Your case has been changed", iwc.getApplicationSettings().getDefaultLocale());
+				String body = MessageFormat.format(getLocalizedString("case_changed_body", "{0} has changed case nr. {2} to the category {1}", iwc.getApplicationSettings().getDefaultLocale()), arguments2);
+				sendMessage(theCase, owner, performer, subject, body);
+			}
+
 			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
-			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
+			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), user.getName() };
 			String subject = iwrb.getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
 			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
 
-			sendMessage(theCase, owner, performer, subject, body);
+			sendMessage(theCase, owner, user, subject, body);
 		}
 	}
 
