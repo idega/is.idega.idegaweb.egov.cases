@@ -20,6 +20,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -99,10 +100,18 @@ public class ClosedCases extends CasesProcessor {
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label();
+		label.setLabel(getResourceBundle().getLocalizedString("case_nr", "Case nr"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
+		layer.add(formItem);
+
 		if (getBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 			element.add(label);
 			element.add(caseType);
@@ -115,7 +124,7 @@ public class ClosedCases extends CasesProcessor {
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(parentCaseCategory);
@@ -132,7 +141,7 @@ public class ClosedCases extends CasesProcessor {
 		else {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(caseCategory);
@@ -141,7 +150,7 @@ public class ClosedCases extends CasesProcessor {
 
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label();
+		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);

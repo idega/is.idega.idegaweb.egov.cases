@@ -505,16 +505,17 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
 
 		if (owner != null) {
+			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
+
 			if (hasChanges) {
 				Name name = new Name(performer.getFirstName(), performer.getMiddleName(), performer.getLastName());
 				Object[] arguments2 = { name.getName(iwc.getCurrentLocale()), theCase.getCaseCategory().getLocalizedCategoryName(iwc.getApplicationSettings().getDefaultLocale()), theCase.getPrimaryKey().toString() };
 
-				String subject = getLocalizedString("case_changed_subject", "Your case has been changed", iwc.getApplicationSettings().getDefaultLocale());
-				String body = MessageFormat.format(getLocalizedString("case_changed_body", "{0} has changed case nr. {2} to the category {1}", iwc.getApplicationSettings().getDefaultLocale()), arguments2);
+				String subject = getLocalizedString(prefix + "case_changed_subject", "Your case has been changed", iwc.getApplicationSettings().getDefaultLocale());
+				String body = MessageFormat.format(getLocalizedString(prefix + "case_changed_body", "{0} has changed case nr. {2} to the category {1}", iwc.getApplicationSettings().getDefaultLocale()), arguments2);
 				sendMessage(theCase, owner, performer, subject, body);
 			}
 
-			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
 			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), user.getName() };
 			String subject = iwrb.getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
 			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);

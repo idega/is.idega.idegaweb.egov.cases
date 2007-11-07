@@ -23,6 +23,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
@@ -138,10 +139,18 @@ public class MyCases extends CasesProcessor {
 		reply.setStyleClass("textarea");
 		reply.keepStatusOnAction(true);
 
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label();
+		label.setLabel(getResourceBundle().getLocalizedString("case_nr", "Case nr"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
+		section.add(formItem);
+
 		if (getBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
+			label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
 			element.add(label);
 			element.add(types);
 			section.add(element);
@@ -152,7 +161,7 @@ public class MyCases extends CasesProcessor {
 
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
+		label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
 		element.add(label);
 		element.add(categories);
 		section.add(element);

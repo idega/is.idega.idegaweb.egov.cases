@@ -165,10 +165,18 @@ public class CaseViewer extends CaseCreator {
 				section.add(getAttentionLayer(iwrb.getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
 			}
 
+			Layer formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			Label label = new Label();
+			label.setLabel(iwrb.getLocalizedString("case_nr", "Case nr"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
+			section.add(formItem);
+
 			if (getCasesBusiness(iwc).useTypes()) {
-				Layer formItem = new Layer(Layer.DIV);
+				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
-				Label label = new Label();
+				label = new Label();
 				label.setLabel(iwrb.getLocalizedString("case_type", "Case type"));
 				formItem.add(label);
 				formItem.add(caseType);
@@ -179,9 +187,9 @@ public class CaseViewer extends CaseCreator {
 				Layer parentCaseCategory = new Layer(Layer.SPAN);
 				parentCaseCategory.add(new Text(parentCategory.getLocalizedCategoryName(iwc.getCurrentLocale())));
 
-				Layer formItem = new Layer(Layer.DIV);
+				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
-				Label label = new Label();
+				label = new Label();
 				label.setLabel(iwrb.getLocalizedString("case_category", "Case category"));
 				formItem.add(label);
 				formItem.add(parentCaseCategory);
@@ -196,18 +204,18 @@ public class CaseViewer extends CaseCreator {
 				section.add(formItem);
 			}
 			else {
-				Layer formItem = new Layer(Layer.DIV);
+				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
-				Label label = new Label();
+				label = new Label();
 				label.setLabel(iwrb.getLocalizedString("case_category", "Case category"));
 				formItem.add(label);
 				formItem.add(caseCategory);
 				section.add(formItem);
 			}
 
-			Layer formItem = new Layer(Layer.DIV);
+			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(iwrb.getLocalizedString("created_date", "Created date"));
 			formItem.add(label);
 			formItem.add(createdDate);
