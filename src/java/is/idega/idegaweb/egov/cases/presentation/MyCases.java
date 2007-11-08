@@ -212,6 +212,16 @@ public class MyCases extends CasesProcessor {
 			section.add(element);
 		}
 
+		if (theCase.getSubject() != null) {
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("regarding", "Regarding"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(theCase.getSubject())));
+			section.add(formItem);
+		}
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		element.setStyleClass("informationItem");

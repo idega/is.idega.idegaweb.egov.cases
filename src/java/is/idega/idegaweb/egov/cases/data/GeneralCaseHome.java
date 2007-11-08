@@ -7,6 +7,7 @@ import com.idega.block.process.data.CaseStatus;
 import javax.ejb.CreateException;
 import com.idega.data.IDOHome;
 import javax.ejb.FinderException;
+import java.sql.Date;
 import com.idega.user.data.User;
 
 public interface GeneralCaseHome extends IDOHome {
@@ -25,7 +26,7 @@ public interface GeneralCaseHome extends IDOHome {
 
 	public Collection findAllByUsers(Collection users) throws FinderException;
 
-	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException;
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException;
 
 	public int getCountByGroup(Collection groups) throws IDOException;
 

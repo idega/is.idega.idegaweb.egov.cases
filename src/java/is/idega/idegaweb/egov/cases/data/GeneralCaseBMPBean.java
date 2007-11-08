@@ -9,6 +9,7 @@ package is.idega.idegaweb.egov.cases.data;
 
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
+import java.sql.Date;
 import java.util.Collection;
 
 import javax.ejb.FinderException;
@@ -220,7 +221,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
-	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
+	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
 		Table categories = new Table(CaseCategory.class);
@@ -258,6 +259,12 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		}
 		if (anonymous != null) {
 			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseUserColumnName()), !anonymous.booleanValue()));
+		}
+		if (fromDate != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCreatedColumnName()), MatchCriteria.GREATEREQUAL, fromDate));
+		}
+		if (toDate != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCreatedColumnName()), MatchCriteria.LESSEQUAL, toDate));
 		}
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));

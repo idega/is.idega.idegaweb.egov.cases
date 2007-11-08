@@ -17,6 +17,7 @@ import is.idega.idegaweb.egov.cases.util.CaseConstants;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -201,9 +202,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) {
+	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) {
 		try {
-			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous);
+			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -304,7 +305,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -334,6 +335,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setCaseType(caseType);
 		theCase.setOwner(sender);
 		theCase.setHandler(handlerGroup);
+		theCase.setSubject(regarding);
 		theCase.setMessage(message);
 		theCase.setAttachment(attachment);
 		theCase.setType(type);

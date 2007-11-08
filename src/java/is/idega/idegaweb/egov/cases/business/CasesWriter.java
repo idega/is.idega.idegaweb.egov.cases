@@ -15,6 +15,7 @@ import is.idega.idegaweb.egov.cases.util.CaseConstants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Date;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
@@ -58,6 +59,8 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 	public static final String PARAMETER_CASE_TYPE = "prm_case_type";
 	public static final String PARAMETER_CASE_STATUS = "prm_case_status";
 	public static final String PARAMETER_ANONYMOUS = "prm_anonymous";
+	public static final String PARAMETER_FROM_DATE = "prm_from_date";
+	public static final String PARAMETER_TO_DATE = "prm_to_date";
 
 	public CasesWriter() {
 	}
@@ -107,7 +110,17 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 				anonymous = new Boolean(iwc.getParameter(PARAMETER_ANONYMOUS));
 			}
 
-			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, anonymous);
+			Date fromDate = null;
+			if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
+				fromDate = new IWTimestamp(iwc.getParameter(PARAMETER_FROM_DATE)).getDate();
+			}
+
+			Date toDate = null;
+			if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
+				toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
+			}
+
+			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, fromDate, toDate, anonymous);
 
 			this.buffer = writeXLS(iwc, cases);
 			setAsDownload(iwc, "cases.xls", this.buffer.length());
@@ -155,6 +168,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		}
 		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (30 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (150 * 256));
 
 		HSSFFont font = workbook.createFont();
@@ -195,6 +209,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 		cell = row.createCell(cellColumn++);
 		cell.setCellValue(this.iwrb.getLocalizedString("status", "Status"));
+		cell.setCellStyle(style);
+
+		cell = row.createCell(cellColumn++);
+		cell.setCellValue(this.iwrb.getLocalizedString("regarding", "Regarding"));
 		cell.setCellStyle(style);
 
 		cell = row.createCell(cellColumn++);
@@ -244,6 +262,9 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));
+
+			cell = row.createCell(cellColumn++);
+			cell.setCellValue(element.getSubject() != null ? element.getSubject() : "-");
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getMessage());

@@ -5,6 +5,13 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.31" date="2007-11-08">
+			<action dev="laddi" type="update">
+				Added possibility to fetch within specific dates in CasesFetcher.
+				Added possibility to set a subject to cases.
+			</action>
+		</release>
+		
 		<release version="1.0.30" date="2007-10-24">
 			<action dev="laddi" type="update">
 				Added extremely cool table sorter to case lists.

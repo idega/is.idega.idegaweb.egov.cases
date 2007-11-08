@@ -50,6 +50,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.business.UserSession;
 import com.idega.user.data.User;
@@ -59,6 +60,7 @@ public class CaseCreator extends ApplicationForm {
 
 	private static final String PARAMETER_ACTION = "cc_prm_action";
 
+	private static final String PARAMETER_REGARDING = "prm_regarding";
 	private static final String PARAMETER_MESSAGE = "prm_message";
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_HIDE_OTHERS = "hide_others";
@@ -243,6 +245,9 @@ public class CaseCreator extends ApplicationForm {
 		CaseType firstType = getCasesBusiness(iwc).getFirstAvailableCaseType();
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, firstType != null ? firstType.getPrimaryKey().toString() : "");
 
+		TextInput regarding = new TextInput(PARAMETER_REGARDING);
+		regarding.keepStatusOnAction(true);
+
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		// message.keepStatusOnAction(true);
@@ -333,6 +338,17 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
+		if (hasError(PARAMETER_REGARDING)) {
+			formItem.setStyleClass("hasError");
+		}
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString("regarding", "Regarding"))), regarding);
+		formItem.add(label);
+		formItem.add(regarding);
+		section.add(formItem);
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("required");
 		if (hasError(PARAMETER_MESSAGE)) {
 			formItem.setStyleClass("hasError");
 		}
@@ -392,6 +408,7 @@ public class CaseCreator extends ApplicationForm {
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
+		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 
 		ICFile attachment = null;
@@ -468,6 +485,9 @@ public class CaseCreator extends ApplicationForm {
 		if (!iwc.isParameterSet(PARAMETER_CASE_TYPE_PK)) {
 			setError(PARAMETER_CASE_TYPE_PK, this.iwrb.getLocalizedString("case_creator.type_empty", "You must select a type"));
 		}
+		if (!iwc.isParameterSet(PARAMETER_REGARDING)) {
+			setError(PARAMETER_REGARDING, this.iwrb.getLocalizedString(getPrefix() + "case_creator.regarding_empty", "You must enter what the case is regarding"));
+		}
 		if (!iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
 		}
@@ -515,14 +535,10 @@ public class CaseCreator extends ApplicationForm {
 		section.setStyleClass("formSection");
 		form.add(section);
 
-		Layer typeSpan = new Layer(Layer.SPAN);
-		typeSpan.add(new Text(type.getName()));
-
-		Layer categorySpan = new Layer(Layer.SPAN);
-		categorySpan.add(new Text(category.getLocalizedCategoryName(locale)));
-
-		Layer messageSpan = new Layer(Layer.SPAN);
-		messageSpan.add(new Text(message));
+		Span typeSpan = new Span(new Text(type.getName()));
+		Span categorySpan = new Span(new Text(category.getLocalizedCategoryName(locale)));
+		Span regardingSpan = new Span(new Text(regarding));
+		Span messageSpan = new Span(new Text(message));
 
 		if (getCasesBusiness(iwc).useTypes()) {
 			Layer formItem = new Layer(Layer.DIV);
@@ -574,6 +590,14 @@ public class CaseCreator extends ApplicationForm {
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
+		label = new Label();
+		label.setLabel(this.iwrb.getLocalizedString("regarding", "Regarding"));
+		formItem.add(label);
+		formItem.add(regardingSpan);
+		section.add(formItem);
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
 		label = new Label();
 		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "message", "Message"));
@@ -604,6 +628,7 @@ public class CaseCreator extends ApplicationForm {
 	}
 
 	private void save(IWContext iwc) throws RemoteException {
+		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
 
@@ -626,7 +651,7 @@ public class CaseCreator extends ApplicationForm {
 
 		try {
 			User user = getUser(iwc);
-			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
+			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
 
 			String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
 			if (category != null) {

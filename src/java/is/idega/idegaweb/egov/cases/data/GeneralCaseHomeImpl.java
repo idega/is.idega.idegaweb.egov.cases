@@ -6,6 +6,7 @@ import java.util.Collection;
 import com.idega.block.process.data.CaseStatus;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
+import java.sql.Date;
 import com.idega.user.data.User;
 import com.idega.data.IDOEntity;
 import com.idega.data.IDOFactory;
@@ -59,9 +60,9 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(parentCategory, category, type, status, anonymous);
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}

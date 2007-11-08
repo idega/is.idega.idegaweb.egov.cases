@@ -238,6 +238,16 @@ public class CaseViewer extends CaseCreator {
 				section.add(formItem);
 			}
 
+			if (theCase.getSubject() != null) {
+				formItem = new Layer(Layer.DIV);
+				formItem.setStyleClass("formItem");
+				label = new Label();
+				label.setLabel(iwrb.getLocalizedString("regarding", "Regarding"));
+				formItem.add(label);
+				formItem.add(new Span(new Text(theCase.getSubject())));
+				section.add(formItem);
+			}
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("informationItem");

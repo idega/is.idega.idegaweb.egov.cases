@@ -10,6 +10,7 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -28,6 +29,7 @@ import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
@@ -49,12 +51,16 @@ public class CasesFetcher extends CasesBlock {
 	private static final String PARAMETER_CASE_STATUS = "prm_instruments";
 	private static final String PARAMETER_ANONYMOUS = "prm_anonymous";
 	private static final String PARAMETER_SHOW_RESULTS = "prm_show_results";
+	private static final String PARAMETER_FROM_DATE = "prm_from_date";
+	private static final String PARAMETER_TO_DATE = "prm_to_date";
 
 	private CaseCategory parentCategory;
 	private CaseCategory category;
 	private CaseType type;
 	private CaseStatus status;
 	private Boolean anonymous;
+	private Date fromDate;
+	private Date toDate;
 
 	private Collection cases;
 
@@ -96,8 +102,16 @@ public class CasesFetcher extends CasesBlock {
 			anonymous = new Boolean(iwc.getParameter(PARAMETER_ANONYMOUS));
 		}
 
+		if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
+			fromDate = new IWTimestamp(iwc.getParameter(PARAMETER_FROM_DATE)).getDate();
+		}
+
+		if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
+			toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
+		}
+
 		if (iwc.isParameterSet(PARAMETER_SHOW_RESULTS)) {
-			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, anonymous);
+			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
 		}
 	}
 
@@ -165,6 +179,14 @@ public class CasesFetcher extends CasesBlock {
 			anonymous.keepStatusOnAction(true);
 			anonymous.setStyleClass("anonymousDropdown");
 
+			DateInput from = new DateInput(PARAMETER_FROM_DATE);
+			from.setStyleClass("dateInput");
+			from.keepStatusOnAction(true);
+
+			DateInput to = new DateInput(PARAMETER_TO_DATE);
+			to.setStyleClass("dateInput");
+			to.keepStatusOnAction(true);
+
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
@@ -212,6 +234,20 @@ public class CasesFetcher extends CasesBlock {
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.show_anonymous", "Show anonymous"), anonymous);
+			element.add(label);
+			element.add(anonymous);
+			section.add(element);
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
+			element.add(label);
+			element.add(to);
+			section.add(element);
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
 			element.add(label);
 			element.add(anonymous);
 			section.add(element);
@@ -410,6 +446,12 @@ public class CasesFetcher extends CasesBlock {
 		}
 		if (status != null) {
 			link.addParameter(CasesWriter.PARAMETER_CASE_STATUS, status.getPrimaryKey().toString());
+		}
+		if (fromDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_FROM_DATE, fromDate.toString());
+		}
+		if (toDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_TO_DATE, toDate.toString());
 		}
 		if (anonymous != null) {
 			link.addParameter(CasesWriter.PARAMETER_ANONYMOUS, anonymous.toString());
