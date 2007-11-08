@@ -240,16 +240,18 @@ public class CasesFetcher extends CasesBlock {
 
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
+			element.setStyleClass("dateInput");
 			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
 			element.add(label);
-			element.add(to);
+			element.add(from);
 			section.add(element);
 
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
+			element.setStyleClass("dateInput");
 			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
 			element.add(label);
-			element.add(anonymous);
+			element.add(to);
 			section.add(element);
 
 			SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));

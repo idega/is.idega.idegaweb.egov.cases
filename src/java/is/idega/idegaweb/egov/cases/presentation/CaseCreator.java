@@ -510,6 +510,7 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_PRIVATE);
+		form.maintainParameter(PARAMETER_REGARDING);
 		if (attachment != null) {
 			form.add(new HiddenInput(PARAMETER_ATTACHMENT_PK, attachment.getPrimaryKey().toString()));
 		}
