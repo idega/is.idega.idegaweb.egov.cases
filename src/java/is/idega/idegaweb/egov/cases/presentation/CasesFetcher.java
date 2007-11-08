@@ -179,13 +179,17 @@ public class CasesFetcher extends CasesBlock {
 			anonymous.keepStatusOnAction(true);
 			anonymous.setStyleClass("anonymousDropdown");
 
+			IWTimestamp stamp = new IWTimestamp();
+
 			DateInput from = new DateInput(PARAMETER_FROM_DATE);
 			from.setStyleClass("dateInput");
 			from.keepStatusOnAction(true);
+			from.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 
 			DateInput to = new DateInput(PARAMETER_TO_DATE);
 			to.setStyleClass("dateInput");
 			to.keepStatusOnAction(true);
+			to.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
