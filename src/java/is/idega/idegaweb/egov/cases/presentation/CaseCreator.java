@@ -350,7 +350,7 @@ public class CaseCreator extends ApplicationForm {
 		if (hasError(PARAMETER_REGARDING)) {
 			formItem.setStyleClass("hasError");
 		}
-		label = new Label(new Span(new Text(this.iwrb.getLocalizedString("regarding", "Regarding"))), regarding);
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"))), regarding);
 		formItem.add(label);
 		formItem.add(regarding);
 		section.add(formItem);
@@ -601,7 +601,7 @@ public class CaseCreator extends ApplicationForm {
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		label = new Label();
-		label.setLabel(this.iwrb.getLocalizedString("regarding", "Regarding"));
+		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"));
 		formItem.add(label);
 		formItem.add(regardingSpan);
 		section.add(formItem);
