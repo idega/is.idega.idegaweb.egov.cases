@@ -292,7 +292,7 @@ public class MyCases extends CasesProcessor {
 	
 	@Override
 	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-		Link process = new Link("edit");
+		Link process = new Link(object);
 		
 		if(theCase.getJbpmProcessInstanceId() == null) {
 			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());

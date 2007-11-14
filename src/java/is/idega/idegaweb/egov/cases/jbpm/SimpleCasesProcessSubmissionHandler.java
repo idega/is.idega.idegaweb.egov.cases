@@ -15,9 +15,9 @@ import com.idega.webface.WFUtil;
  * TODO: move all this logic to spring bean
  * 
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
- * Last modified: $Date: 2007/10/30 22:00:02 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/14 13:07:10 $ by $Author: civilis $
  */
 public class SimpleCasesProcessSubmissionHandler extends AbstractConnector implements SubmissionHandler {
     
@@ -43,9 +43,9 @@ public class SimpleCasesProcessSubmissionHandler extends AbstractConnector imple
     		//insert (post)
     	}
     	
-    	SimpleCasesProcessSubmissionBean submissionBean = (SimpleCasesProcessSubmissionBean)WFUtil.getBeanInstance("simpleCasesProcessSubmissionBean");
+    	CasesJbpmProcessManager submissionBean = (CasesJbpmProcessManager)WFUtil.getBeanInstance("casesJbpmProcessManager");
     	
-    	submissionBean.processSubmition(submission.getElement().getAttribute(FormManagerUtil.action_att), instance);
+    	submissionBean.processSubmission(submission.getElement().getAttribute(FormManagerUtil.action_att), instance);
 
     	return null;
     }

@@ -2,10 +2,11 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 
 <beans>
-	<bean id="simpleCasesProcessSubmissionBean" class="is.idega.idegaweb.egov.cases.jbpm.SimpleCasesProcessSubmissionBean" scope="singleton">
+	<bean id="casesJbpmProcessManager" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessManager" scope="singleton">
 		<property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
 		<property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
         <property name="variablesHandler" ref="process_xforms_variablesHandler" />
+        <property name="jbpmProcessManager" ref="jbpmProcessManager" />
 	</bean>
     
     <bean id="casesJbpmFormsBundleFactory" class="is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleFactory" scope="singleton">
@@ -17,13 +18,13 @@
         <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
     </bean>
     
-    <bean id="simpleCasesProcessManager" class="is.idega.idegaweb.egov.cases.jbpm.SimpleCasesProcessManager" scope="request">
+    <bean id="casesJbpmProcess" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess" scope="request">
         <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
         <property name="casesJbpmFormsBundleFactory" ref="casesJbpmFormsBundleFactory" />
         <property name="templateBundleLocation" value="resources/casesJbpmTemplates/simpleCasesProcessTemplate/" />
     </bean>
     
-    <bean id="casesJbpmProcess" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess" scope="singleton">
+    <bean id="casesJbpmFormManager" class="is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager" scope="singleton">
         <property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
         <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
         <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />

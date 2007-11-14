@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.jbpm;
+package is.idega.idegaweb.egov.cases.jbpm.form;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,41 +16,41 @@ import com.idega.presentation.IWContext;
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
  * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2007/10/30 22:00:03 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/14 13:08:16 $ by $Author: civilis $
  */
 public class CasesJbpmFormViewer extends IWBaseComponent {
 	
 	
 	public static final String PROCESS_DEFINITION_PROPERTY = "processDefinitionId";
 	public static final String PROCESS_INSTANCE_PROPERTY = "processInstanceId";
-	public static final String CASES_JBPM_PROCESS_BEAN_PROPERTY = "casesJbpmProcess";
+	public static final String CASES_JBPM_FORM_MANAGER_PROPERTY = "casesJbpmFormManager";
 	
 	private static final String FORMVIEWER_FACET = "formviewer";
 	
 	private String processDefinitionId;
 	private String processInstanceId;
-	private CasesJbpmProcess casesJbpmProcess;
+	private CasesJbpmFormManager casesJbpmFormManager;
 	
     
-	public CasesJbpmProcess getCasesJbpmProcess() {
-		return casesJbpmProcess;
+	public CasesJbpmFormManager getCasesJbpmFormManager() {
+		return casesJbpmFormManager;
 	}
 	
-	public CasesJbpmProcess getCasesJbpmProcess(FacesContext context) {
+	public CasesJbpmFormManager getCasesJbpmFormManager(FacesContext context) {
 		
-		CasesJbpmProcess casesJbpmProcess = getCasesJbpmProcess();
+		CasesJbpmFormManager casesJbpmProcess = getCasesJbpmFormManager();
 		
 		if(casesJbpmProcess == null) {
 			
-			casesJbpmProcess = getValueBinding(CASES_JBPM_PROCESS_BEAN_PROPERTY) != null ? (CasesJbpmProcess)getValueBinding(CASES_JBPM_PROCESS_BEAN_PROPERTY).getValue(context) : null;
-			setCasesJbpmProcess(casesJbpmProcess);
+			casesJbpmProcess = getValueBinding(CASES_JBPM_FORM_MANAGER_PROPERTY) != null ? (CasesJbpmFormManager)getValueBinding(CASES_JBPM_FORM_MANAGER_PROPERTY).getValue(context) : null;
+			setCasesJbpmFormManager(casesJbpmProcess);
 		}
-
+		
 		return casesJbpmProcess;
 	}
 
-	public void setCasesJbpmProcess(CasesJbpmProcess casesJbpmProcess) {
-		this.casesJbpmProcess = casesJbpmProcess;
+	public void setCasesJbpmFormManager(CasesJbpmFormManager casesJbpmProcess) {
+		this.casesJbpmFormManager = casesJbpmProcess;
 	}
 
 	public String getProcessDefinitionId() {
@@ -149,7 +149,7 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 
 		int initiatorId = IWContext.getIWContext(context).getCurrentUserId();
 		
-		Document xformsDoc = getCasesJbpmProcess(context).loadDefinitionForm(context, Long.parseLong(processDefinitionId), initiatorId);
+		Document xformsDoc = getCasesJbpmFormManager(context).loadDefinitionForm(context, Long.parseLong(processDefinitionId), initiatorId);
 		FormViewer formviewer = new FormViewer();
 		formviewer.setRendered(true);
 		formviewer.setXFormsDocument(xformsDoc);
@@ -159,7 +159,7 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 	
 	private FormViewer loadFormViewerFromInstance(FacesContext context, String processInstanceId) {
 
-		Document xformsDoc = getCasesJbpmProcess(context).loadInstanceForm(context, Long.parseLong(processInstanceId));
+		Document xformsDoc = getCasesJbpmFormManager(context).loadInstanceForm(context, Long.parseLong(processInstanceId));
 		
 		FormViewer formviewer = new FormViewer();
 		formviewer.setRendered(true);

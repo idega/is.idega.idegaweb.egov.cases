@@ -438,7 +438,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 
 	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-		Link process = new Link("edit");
+		Link process = new Link(object);
 		
 		if(theCase.getJbpmProcessInstanceId() == null || true) {
 			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());

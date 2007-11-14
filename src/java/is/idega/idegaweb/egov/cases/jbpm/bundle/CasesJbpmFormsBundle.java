@@ -26,7 +26,6 @@ import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.documentmanager.business.PersistenceManager;
 import com.idega.documentmanager.component.beans.LocalizedStringBean;
-import com.idega.documentmanager.util.FormManagerUtil;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWBundle;
 import com.idega.jbpm.data.CasesJbpmBind;
@@ -34,13 +33,14 @@ import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewFactory;
 import com.idega.jbpm.def.ViewToTask;
 import com.idega.util.CoreConstants;
+import com.idega.util.xml.XmlUtil;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/10/30 22:00:02 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/14 13:07:56 $ by $Author: civilis $
  *
  */
 public class CasesJbpmFormsBundle {
@@ -151,7 +151,7 @@ public class CasesJbpmFormsBundle {
 				);
 			
 			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(facesCtx);
-			DocumentBuilder builder = FormManagerUtil.getDocumentBuilder();
+			DocumentBuilder builder = XmlUtil.getDocumentBuilder();
 			
 			@SuppressWarnings("unchecked")
 			Collection<Task> tasks = pd.getTaskMgmtDefinition().getTasks().values();

@@ -35,7 +35,7 @@
 
   <component>
     <component-type>CasesJbpmFormViewer</component-type>
-    <component-class>is.idega.idegaweb.egov.cases.jbpm.CasesJbpmFormViewer</component-class>
+    <component-class>is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer</component-class>
     <property>
       <display-name>Process definition ID</display-name>
       <property-name>processDefinitionId</property-name>
@@ -48,8 +48,8 @@
     </property>
     <property>
       <display-name>Cases - Jbpm process</display-name>
-      <property-name>casesJbpmProcess</property-name>
-      <property-class>is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess</property-class>
+      <property-name>casesJbpmFormManager</property-name>
+      <property-class>is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager</property-class>
     </property>
     <component-extension>
       <idegaweb-info>

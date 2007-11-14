@@ -1,8 +1,10 @@
 package is.idega.idegaweb.egov.cases.jbpm;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
@@ -26,6 +28,7 @@ import com.idega.documentmanager.business.ext.SimpleCaseFormCreateDMIManager;
 import com.idega.documentmanager.business.ext.SimpleCaseFormProceedDMIManager;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.jbpm.business.ProcessManager;
 import com.idega.jbpm.exe.VariablesHandler;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
@@ -35,17 +38,29 @@ import com.idega.util.URIUtil;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2007/10/30 22:00:02 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/14 13:07:10 $ by $Author: civilis $
  */
-public class SimpleCasesProcessSubmissionBean {
+public class CasesJbpmProcessManager {
 
+	private static final String actionTakenVariableName = "string:actionTaken";
+	private static final String caseIdVariableName = "string:caseId";
+	
 	private SessionFactory sessionFactory;
 	private JbpmConfiguration jbpmConfiguration;
 	private VariablesHandler variablesHandler;
+	private ProcessManager jbpmProcessManager;
 	
-    public SessionFactory getSessionFactory() {
+    public ProcessManager getJbpmProcessManager() {
+		return jbpmProcessManager;
+	}
+
+	public void setJbpmProcessManager(ProcessManager jbpmProcessManager) {
+		this.jbpmProcessManager = jbpmProcessManager;
+	}
+
+	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
 
@@ -69,25 +84,25 @@ public class SimpleCasesProcessSubmissionBean {
 		this.variablesHandler = variablesHandler;
 	}
 
-	public void processSubmition(String action, Node instance) {
+	public void processSubmission(String action, Node instance) {
 
     	Map<String, String> parameters = new URIUtil(action).getParameters();
     	
     	if(parameters.containsKey(SimpleCaseFormCreateDMIManager.type)) {
     		
-    		processCreateProcess(parameters, instance);
+    		startProcess(parameters, instance);
     		
     	} else if(parameters.containsKey(SimpleCaseFormProceedDMIManager.type)) {
     		
-    		processProgressProcess(parameters, instance);
+    		proceedProcess(parameters, instance);
     		
     	} else {
     	
-    		Logger.getLogger(SimpleCasesProcessSubmissionBean.class.getName()).log(Level.WARNING, "Couldn't handle submission. No action associated with the submission action: "+action);
+    		Logger.getLogger(CasesJbpmProcessManager.class.getName()).log(Level.WARNING, "Couldn't handle submission. No action associated with the submission action: "+action);
     	}
     }
 	
-	private void processCreateProcess(Map<String, String> parameters, Node instance) {
+	protected void startProcess(Map<String, String> parameters, Node instance) {
 		
 		Long pdId = Long.parseLong(parameters.get(SimpleCaseFormCreateDMIManager.pdIdParam));
 		int userId = Integer.parseInt(parameters.get(SimpleCaseFormCreateDMIManager.userIdParam));
@@ -114,7 +129,7 @@ public class SimpleCasesProcessSubmissionBean {
 			User user = getUserBusiness(iwc).getUser(userId);
 			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
 			
-			getCasesBusiness(iwc).storeGeneralCase(user, caseCatId, caseTypeId, /*attachment pk*/null, "This is simple cases-jbpm-formbuilder integration example.", "type", new Long(pi.getId()).intValue(), /*isPrivate*/false, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, iwma.getBundle(PresentationObject.CORE_IW_BUNDLE_IDENTIFIER)));
+			GeneralCase genCase = getCasesBusiness(iwc).storeGeneralCase(user, caseCatId, caseTypeId, /*attachment pk*/null, "This is simple cases-jbpm-formbuilder integration example.", "type", new Long(pi.getId()).intValue(), /*isPrivate*/false, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, iwma.getBundle(PresentationObject.CORE_IW_BUNDLE_IDENTIFIER)));
 			
 			pi.setStart(new Date());
 			
@@ -127,12 +142,11 @@ public class SimpleCasesProcessSubmissionBean {
 			if(tis.size() != 1)
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
 			
-			//now we save variables values in the task and end the and end the task therefore progressing further
-			
 			TaskInstance ti = tis.iterator().next();
 			
-	    	getVariablesHandler().submit(ti.getId(), instance);
-	    	ti.end();
+			Map<String, Object> caseIdVariable = Collections.singletonMap(caseIdVariableName, (Object)genCase.getPrimaryKey().toString());
+			getJbpmProcessManager().submitVariables(caseIdVariable, ti.getId());
+			submitVariablesAndProceedProcess(ti, instance);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -142,6 +156,18 @@ public class SimpleCasesProcessSubmissionBean {
 			if(!transactionWasActive)
 				transaction.commit();
 		}
+	}
+	
+	protected void submitVariablesAndProceedProcess(TaskInstance ti, Node instance) {
+		
+    	getVariablesHandler().submit(ti.getId(), instance);
+    	
+    	String actionTaken = (String)ti.getVariable(actionTakenVariableName);
+    	
+    	if(actionTaken != null && !"".equals(actionTaken) && false)
+    		ti.end(actionTaken);
+    	else
+    		ti.end();
 	}
 	
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
@@ -162,7 +188,7 @@ public class SimpleCasesProcessSubmissionBean {
 		}
 	}
 	
-	private void processProgressProcess(Map<String, String> parameters, Node instance) {
+	protected void proceedProcess(Map<String, String> parameters, Node instance) {
 		
 		Long piId = Long.parseLong(parameters.get(SimpleCaseFormProceedDMIManager.piIdParam));
 		
@@ -179,7 +205,8 @@ public class SimpleCasesProcessSubmissionBean {
 		
 		try {
 			ProcessInstance pi = ctx.getProcessInstance(piId);
-			
+
+//			forget about parallel processing for not, using root token
 			@SuppressWarnings("unchecked")
 			Collection<TaskInstance> tis = pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken());
 			
@@ -187,14 +214,9 @@ public class SimpleCasesProcessSubmissionBean {
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
 			
 			//getCasesBusiness(iwc).handleCase((user, caseCatId, caseTypeId, /*attachment pk*/null, "This is simple cases-jbpm-formbuilder integration example.", "type", new Long(pi.getId()).intValue(), /*isPrivate*/false, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, iwma.getBundle(PresentationObject.CORE_IW_BUNDLE_IDENTIFIER)));
-			//now we save variables values in the task and end the and end the task therefore progressing further
+ 			//now we save variables values in the task and end the and end the task therefore progressing further
 			
-			TaskInstance ti = tis.iterator().next();
-			
-	    	getVariablesHandler().submit(ti.getId(), instance);
-	    	ti.end();
-			
-//			TODO: change case status here, depending on the button pressed perhaps, or status chosen from select form element.
+	    	submitVariablesAndProceedProcess(tis.iterator().next(), instance);
 			
 		} finally {
 			ctx.close();
