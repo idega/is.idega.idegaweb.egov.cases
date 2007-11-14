@@ -299,14 +299,14 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		getCaseType(caseTypePK).remove();
 	}
 	
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
-		storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, null, isPrivate, iwrb);
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, null, isPrivate, iwrb);
 	}
 
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, Integer jbpmProcessInstanceId, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, Integer jbpmProcessInstanceId, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -376,8 +376,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 				sendMessage(theCase, sender, null, subject, body);
 			}
-		}
-		catch (RemoteException e) {
+			
+			return theCase;
+		} catch (RemoteException e) {
 			throw new IBORuntimeException(e);
 		}
 	}

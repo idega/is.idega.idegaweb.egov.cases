@@ -120,12 +120,12 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 */
 	public void removeCaseType(Object caseTypePK) throws FinderException, RemoveException, RemoteException;
 
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
 	
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, Integer jbpmProcessInstanceId, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, Integer jbpmProcessInstanceId, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allocateCase
