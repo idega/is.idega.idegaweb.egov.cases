@@ -282,6 +282,9 @@ public class CaseCreator extends ApplicationForm {
 			Layer formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_CASE_TYPE_PK)) {
+				formItem.setStyleClass("hasError");
+			}
 			Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_type", "Case type"))), types);
 			formItem.add(label);
 			formItem.add(types);
@@ -294,6 +297,9 @@ public class CaseCreator extends ApplicationForm {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
+		if (hasError(PARAMETER_CASE_CATEGORY_PK)) {
+			formItem.setStyleClass("hasError");
+		}
 		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
 		formItem.add(label);
 		formItem.add(categories);
@@ -317,6 +323,9 @@ public class CaseCreator extends ApplicationForm {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_SUB_CASE_CATEGORY_PK)) {
+				formItem.setStyleClass("hasError");
+			}
 			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("sub_case_category", "Sub case category"))), subCategories);
 			formItem.add(label);
 			formItem.add(subCategories);
