@@ -23,25 +23,21 @@ import com.idega.business.IBORuntimeException;
 import com.idega.documentmanager.business.Document;
 import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
-import com.idega.documentmanager.business.ext.FormVariablesHandler;
 import com.idega.documentmanager.business.ext.SimpleCaseFormCreateDMIManager;
 import com.idega.documentmanager.business.ext.SimpleCaseFormCreateMetaInf;
 import com.idega.documentmanager.business.ext.SimpleCaseFormProceedDMIManager;
 import com.idega.documentmanager.business.ext.SimpleCaseFormProceedMetaInf;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.jbpm.data.CasesJbpmBind;
-import com.idega.jbpm.def.Variable;
-import com.idega.jbpm.def.VariableDataType;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewToTask;
 import com.idega.jbpm.exe.VariablesHandler;
-import com.idega.presentation.IWContext;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/11/14 13:08:16 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/15 14:34:36 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager {
 
@@ -59,8 +55,6 @@ public class CasesJbpmFormManager {
 		this.variablesHandler = variablesHandler;
 	}
 	
-	private static final String performerVariableName = "performerId";
-
 	public org.w3c.dom.Document loadDefinitionForm(FacesContext context, Long processDefinitionId, int initiatorId) {
 		
 		Session session = getSessionFactory().getCurrentSession();
@@ -91,10 +85,6 @@ public class CasesJbpmFormManager {
 			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
 			Document form = documentManager.openForm(formId);
 
-//			FIXME: 
-//			FormVariablesHandler formVariableHandler = form.getFormVariablesHandler();
-//			setPerformer(IWContext.getIWContext(context), formVariableHandler);
-			
 			SimpleCaseFormCreateDMIManager metaInfManager = new SimpleCaseFormCreateDMIManager();
 			form.setMetaInformationManager(metaInfManager);
 			
@@ -117,20 +107,6 @@ public class CasesJbpmFormManager {
 			if(!transactionWasActive)
 				transaction.commit();
 		}
-	}
-	
-	protected void setPerformer(IWContext iwc, FormVariablesHandler formVariableHandler) {
-		
-//		FIXME: this should be automatically populated in the form from jsf exp
-//		Variable performerVariable = formVariableHandler.getVariable(performerVariableName);
-//		
-//		if(performerVariable == null) {
-//			
-//			performerVariable = new Variable(performerVariableName, VariableDataType.STRING);
-//			formVariableHandler.createVariable(performerVariableName, performerVariable);
-//		}
-//		
-//		formVariableHandler.setVariableValue(performerVariable, String.valueOf(iwc.getCurrentUserId()));
 	}
 	
 	protected CaseStatus getInitCaseStatus(IWApplicationContext iwac) {

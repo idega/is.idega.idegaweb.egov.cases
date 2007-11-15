@@ -34,23 +34,18 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.URIUtil;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2007/11/15 14:20:11 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/15 14:34:36 $ by $Author: civilis $
  */
 public class CasesJbpmProcessManager {
 
-	private static final String actionTakenVariableName = "string:actionTaken";
-	private static final String caseIdVariableName = "string:caseId";
-	private static final String caseTypeNameVariableName = "string:caseTypeName";
-	private static final String caseCategoryNameVariableName = "string:caseCategoryName";
-	private static final String caseCreatedDateVariableName = "string:caseCreatedDateString";
-	
 	private SessionFactory sessionFactory;
 	private JbpmConfiguration jbpmConfiguration;
 	private VariablesHandler variablesHandler;
@@ -149,12 +144,12 @@ public class CasesJbpmProcessManager {
 			TaskInstance ti = tis.iterator().next();
 			
 			Map<String, Object> caseData = new HashMap<String, Object>();
-			caseData.put(caseIdVariableName, genCase.getPrimaryKey().toString());
-			caseData.put(caseTypeNameVariableName, genCase.getCaseType().getName());
-			caseData.put(caseCategoryNameVariableName, genCase.getCaseCategory().getName());
+			caseData.put(CasesJbpmProcessConstants.caseIdVariableName, genCase.getPrimaryKey().toString());
+			caseData.put(CasesJbpmProcessConstants.caseTypeNameVariableName, genCase.getCaseType().getName());
+			caseData.put(CasesJbpmProcessConstants.caseCategoryNameVariableName, genCase.getCaseCategory().getName());
 			
 			IWTimestamp created = new IWTimestamp(genCase.getCreated());
-			caseData.put(caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
+			caseData.put(CasesJbpmProcessConstants.caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
 			
 			getJbpmProcessManager().submitVariables(caseData, ti.getId());
 			submitVariablesAndProceedProcess(ti, instance);
@@ -173,9 +168,9 @@ public class CasesJbpmProcessManager {
 		
     	getVariablesHandler().submit(ti.getId(), instance);
     	
-    	String actionTaken = (String)ti.getVariable(actionTakenVariableName);
+    	String actionTaken = (String)ti.getVariable(CasesJbpmProcessConstants.actionTakenVariableName);
     	
-    	if(actionTaken != null && !"".equals(actionTaken) && false)
+    	if(actionTaken != null && !CoreConstants.EMPTY.equals(actionTaken) && false)
     		ti.end(actionTaken);
     	else
     		ti.end();

@@ -23,6 +23,7 @@ import com.idega.core.file.data.ICFile;
 import com.idega.event.IWPageEventListener;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -247,5 +248,26 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.iMyCasesPage = myCasesPage;
+	}
+	
+	@Override
+	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
+	
+		Link process = new Link(object);
+		
+		if(theCase.getJbpmProcessInstanceId() == null) {
+			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+			
+		} else {
+			
+			if(getJbpmProcessViewerPage() == null)
+				return process;
+
+			process.setPage(getJbpmProcessViewerPage());
+			process.addParameter("processInstanceId", String.valueOf(theCase.getJbpmProcessInstanceId()));
+		}
+
+		return process;
 	}
 }
