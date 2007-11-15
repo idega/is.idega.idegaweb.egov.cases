@@ -4,8 +4,8 @@ import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,18 +34,22 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 import com.idega.util.URIUtil;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/11/14 13:07:10 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/15 14:20:11 $ by $Author: civilis $
  */
 public class CasesJbpmProcessManager {
 
 	private static final String actionTakenVariableName = "string:actionTaken";
 	private static final String caseIdVariableName = "string:caseId";
+	private static final String caseTypeNameVariableName = "string:caseTypeName";
+	private static final String caseCategoryNameVariableName = "string:caseCategoryName";
+	private static final String caseCreatedDateVariableName = "string:caseCreatedDateString";
 	
 	private SessionFactory sessionFactory;
 	private JbpmConfiguration jbpmConfiguration;
@@ -144,8 +148,15 @@ public class CasesJbpmProcessManager {
 			
 			TaskInstance ti = tis.iterator().next();
 			
-			Map<String, Object> caseIdVariable = Collections.singletonMap(caseIdVariableName, (Object)genCase.getPrimaryKey().toString());
-			getJbpmProcessManager().submitVariables(caseIdVariable, ti.getId());
+			Map<String, Object> caseData = new HashMap<String, Object>();
+			caseData.put(caseIdVariableName, genCase.getPrimaryKey().toString());
+			caseData.put(caseTypeNameVariableName, genCase.getCaseType().getName());
+			caseData.put(caseCategoryNameVariableName, genCase.getCaseCategory().getName());
+			
+			IWTimestamp created = new IWTimestamp(genCase.getCreated());
+			caseData.put(caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
+			
+			getJbpmProcessManager().submitVariables(caseData, ti.getId());
 			submitVariablesAndProceedProcess(ti, instance);
 			
 		} catch (Exception e) {
