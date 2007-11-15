@@ -21,14 +21,10 @@
       <bendpoint w1="-129" h1="-23" w2="122" h2="-14"/>
     </transition>
   </node>
-  <node name="overviewCase" x="400" y="262" width="140" height="40">
-    <transition name="takeCase">
+  <node name="overviewCase" x="396" y="199" width="140" height="40">
+    <transition name="createResponse">
       <label x="5" y="-10"/>
-      <bendpoint w1="12" h1="93" w2="82" h2="-92"/>
-    </transition>
-    <transition name="allocateCase">
-      <label x="-35" y="-23"/>
-      <bendpoint w1="-51" h1="87" w2="19" h2="-98"/>
+      <bendpoint w1="-30" h1="102" w2="4" h2="-101"/>
     </transition>
   </node>
   <node name="provide more info" x="66" y="394" width="140" height="40">

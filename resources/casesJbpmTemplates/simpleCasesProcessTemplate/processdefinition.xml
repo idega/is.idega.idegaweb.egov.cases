@@ -12,7 +12,8 @@
             <variable name="string:requestMessage"></variable>
          </controller>
       </task>
-      <transition name="toOverviewCase" to="overviewCase"></transition>
+      <transition name="toOverviewCase" to="overviewCase">
+      </transition>
    </task-node>
    <task-node name="createResponse">
       <task name="createResponseTask">
@@ -21,12 +22,22 @@
             <variable name="string:responseMessage"></variable>
          </controller>
       </task>
+      <event type="node-leave">
+         <action name="handleCaseStatus" class="is.idega.idegaweb.egov.cases.jbpm.actionhandlers.CasesStatusHandler" config-type="constructor"></action>
+      </event>
       <transition name="close" to="end"></transition>
       <transition name="more info needed" to="provide more info"></transition>
    </task-node>
    <task-node name="overviewCase">
-      <transition name="takeCase" to="createResponse"></transition>
-      <transition name="allocateCase" to="createResponse"></transition>
+      <task name="overviewCaseTask">
+         <controller>
+            <variable name="string:requestMessage" access="read"></variable>
+         </controller>
+      </task>
+      <event type="node-leave">
+         <action name="handleCaseAllocation" class="is.idega.idegaweb.egov.cases.jbpm.actionhandlers.CasesAllocationHandler" config-type="constructor"></action>
+      </event>
+      <transition name="createResponse" to="createResponse"></transition>
    </task-node>
    <task-node name="provide more info">
       <transition name="" to="createResponse"></transition>
