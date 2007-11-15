@@ -4,7 +4,7 @@
     <key>
       <name>component_name</name>
       <type>java.lang.String</type>
-      <value>OpenCases</value>
+      <value>ClosedCases</value>
     </key>
     <key>
       <name>component_type</name>
