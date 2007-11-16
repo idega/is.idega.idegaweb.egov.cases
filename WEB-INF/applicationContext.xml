@@ -31,4 +31,6 @@
         <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
         <property name="variablesHandler" ref="process_xforms_variablesHandler" />
     </bean>
+    
+    <bean id="casesJbpmUtil" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmUtil" scope="singleton" />
 </beans>
