@@ -40,9 +40,9 @@ import com.idega.util.URIUtil;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2007/11/15 14:34:36 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/17 11:16:33 $ by $Author: civilis $
  */
 public class CasesJbpmProcessManager {
 
@@ -147,6 +147,7 @@ public class CasesJbpmProcessManager {
 			caseData.put(CasesJbpmProcessConstants.caseIdVariableName, genCase.getPrimaryKey().toString());
 			caseData.put(CasesJbpmProcessConstants.caseTypeNameVariableName, genCase.getCaseType().getName());
 			caseData.put(CasesJbpmProcessConstants.caseCategoryNameVariableName, genCase.getCaseCategory().getName());
+			caseData.put(CasesJbpmProcessConstants.caseStatusVariableName, genCase.getCaseStatus().getStatus());
 			
 			IWTimestamp created = new IWTimestamp(genCase.getCreated());
 			caseData.put(CasesJbpmProcessConstants.caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
@@ -212,15 +213,12 @@ public class CasesJbpmProcessManager {
 		try {
 			ProcessInstance pi = ctx.getProcessInstance(piId);
 
-//			forget about parallel processing for not, using root token
+//			forget about parallel processing, for now using root token
 			@SuppressWarnings("unchecked")
 			Collection<TaskInstance> tis = pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken());
 			
 			if(tis.size() != 1)
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
-			
-			//getCasesBusiness(iwc).handleCase((user, caseCatId, caseTypeId, /*attachment pk*/null, "This is simple cases-jbpm-formbuilder integration example.", "type", new Long(pi.getId()).intValue(), /*isPrivate*/false, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, iwma.getBundle(PresentationObject.CORE_IW_BUNDLE_IDENTIFIER)));
- 			//now we save variables values in the task and end the and end the task therefore progressing further
 			
 	    	submitVariablesAndProceedProcess(tis.iterator().next(), instance);
 			
