@@ -25,8 +25,7 @@
       <event type="node-leave">
          <action name="handleCaseStatus" class="is.idega.idegaweb.egov.cases.jbpm.actionhandlers.CasesStatusHandler" config-type="constructor"></action>
       </event>
-      <transition name="close" to="end"></transition>
-      <transition name="more info needed" to="provide more info"></transition>
+      <transition name="toStatusDecision" to="statusDecision"></transition>
    </task-node>
    <task-node name="overviewCase">
       <task name="overviewCaseTask">
@@ -39,7 +38,9 @@
       </event>
       <transition name="createResponse" to="createResponse"></transition>
    </task-node>
-   <task-node name="provide more info">
-      <transition name="" to="createResponse"></transition>
-   </task-node>
+   <node name="statusDecision">
+    <action name="handleCaseStatus" class="is.idega.idegaweb.egov.cases.jbpm.actionhandlers.StatusDecisionHandler" config-type="constructor"></action>
+      <transition name="toEnd" to="end"></transition>
+      <transition name="toCreateResponse" to="createResponse"></transition>
+   </node>
 </process-definition>
