@@ -10,12 +10,15 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager;
+import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 
 import javax.ejb.FinderException;
+import javax.faces.application.Application;
 
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
@@ -35,6 +38,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
+import com.idega.webface.WFUtil;
 
 public class CaseViewer extends CaseCreator {
 
@@ -50,6 +54,7 @@ public class CaseViewer extends CaseCreator {
 	private ICPage iBackPage;
 
 	protected void present(IWContext iwc) {
+		
 		try {
 			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
 				if (iwc.isParameterSet(PARAMETER_ACTION_REACTIVATE)) {
@@ -94,6 +99,19 @@ public class CaseViewer extends CaseCreator {
 				fe.printStackTrace();
 				throw new IBORuntimeException(fe);
 			}
+			
+			if(theCase.getJbpmProcessInstanceId() != null) {
+				
+				Application application = iwc.getApplication();
+				CasesJbpmFormViewer formviewer = (CasesJbpmFormViewer)application.createComponent(CasesJbpmFormViewer.COMPONENT_TYPE);
+				formviewer.setCasesJbpmFormManager((CasesJbpmFormManager)WFUtil.getBeanInstance("casesJbpmFormManager"));
+				formviewer.setProcessView(true);
+				formviewer.setProcessInstanceId(String.valueOf(theCase.getJbpmProcessInstanceId()));
+				
+				add(formviewer);
+				return;
+			}
+			
 			CaseCategory category = theCase.getCaseCategory();
 			CaseCategory parentCategory = category.getParent();
 			CaseStatus status = theCase.getCaseStatus();
