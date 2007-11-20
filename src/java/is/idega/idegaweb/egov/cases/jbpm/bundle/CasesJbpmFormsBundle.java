@@ -22,6 +22,7 @@ import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.taskmgmt.def.Task;
 import org.w3c.dom.Document;
 
+import com.idega.block.form.process.XFormsView;
 import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.documentmanager.business.PersistenceManager;
@@ -29,6 +30,7 @@ import com.idega.documentmanager.component.beans.LocalizedStringBean;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWBundle;
 import com.idega.jbpm.data.CasesJbpmBind;
+import com.idega.jbpm.data.ProcessViewByActor;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewFactory;
 import com.idega.jbpm.def.ViewToTask;
@@ -38,9 +40,9 @@ import com.idega.util.xml.XmlUtil;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2007/11/14 13:07:56 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/20 18:30:39 $ by $Author: civilis $
  *
  */
 public class CasesJbpmFormsBundle {
@@ -55,6 +57,8 @@ public class CasesJbpmFormsBundle {
 	private static final String propertiesFileName = "bundle.properties";
 	private static final String processDefinitionFileName = "processdefinition.xml";
 	private static final String initTaskNamePropertyKey = "init.task.name";
+	private static final String processViewCaseOwnerPropertyKey = "processView.formName.caseOwner";
+	private static final String processViewCaseHandlersPropertyKey = "processView.formName.caseHandlers";
 	
 	private ProcessDefinition processDefinition;
 	
@@ -113,7 +117,7 @@ public class CasesJbpmFormsBundle {
 	
 	public void createDefinitions(FacesContext facesCtx, IWBundle bundle, String templateBundleLocationWithinBundle, String formName, Long caseCategoryId, Long caseTypeId) throws IOException, Exception {
 		
-		if(formName == null || "".equals(formName))
+		if(formName == null || CoreConstants.EMPTY.equals(formName))
 			throw new NullPointerException("Form name not provided");
 			
 		Session session = getSessionFactory().getCurrentSession();
@@ -180,11 +184,9 @@ public class CasesJbpmFormsBundle {
 
 			session.save(bind);
 			
+			loadAndStoreProcessViewForms(properties, bundle, templateBundleLocationWithinBundle, documentManager, pd.getId(), session);
+			
 			processDefinition = pd;
-			
-		} catch (Exception e) {
-			
-			throw e;
 			
 		} finally {
 			
@@ -192,6 +194,49 @@ public class CasesJbpmFormsBundle {
 			
 			if(!transactionWasActive)
 				transaction.commit();
+		}
+	}
+	
+	private void loadAndStoreProcessViewForms(Properties properties, IWBundle bundle, String templateBundleLocationWithinBundle, DocumentManager documentManager, Long processDefinitionId, Session session) throws Exception {
+
+		DocumentBuilder builder = XmlUtil.getDocumentBuilder();
+		
+		InputStream formIs;
+		String formId;
+		ProcessViewByActor processView;
+
+//		case owner form name
+		String formName = properties.getProperty(processViewCaseOwnerPropertyKey);
+		
+		if(formName != null) {
+		
+			formIs = getResourceInputStream(bundle, templateBundleLocationWithinBundle+"forms/", formName+".xhtml");
+			formId = loadAndSaveForm(builder, documentManager, formName, formIs);
+			
+			processView = new ProcessViewByActor();
+			processView.setProcessDefinitionId(processDefinitionId);
+			processView.setViewerType(ProcessViewByActor.VIEWER_TYPE_OWNER);
+			processView.setViewType(XFormsView.VIEW_TYPE);
+			processView.setViewIdentifier(formId);
+			
+			session.save(processView);
+		}
+
+//		case handlers form name
+		formName = properties.getProperty(processViewCaseHandlersPropertyKey);
+		
+		if(formName != null) {
+		
+			formIs = getResourceInputStream(bundle, templateBundleLocationWithinBundle+"forms/", formName+".xhtml");
+			formId = loadAndSaveForm(builder, documentManager, formName, formIs);
+			
+			processView = new ProcessViewByActor();
+			processView.setProcessDefinitionId(processDefinitionId);
+			processView.setViewerType(ProcessViewByActor.VIEWER_TYPE_CASE_HANDLERS);
+			processView.setViewType(XFormsView.VIEW_TYPE);
+			processView.setViewIdentifier(formId);
+			
+			session.save(processView);
 		}
 	}
 	
