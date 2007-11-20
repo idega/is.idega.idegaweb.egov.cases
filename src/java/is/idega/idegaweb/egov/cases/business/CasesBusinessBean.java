@@ -200,8 +200,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) {
+		return getCasesByCriteria(parentCategory, category, type, status, anonymous, null);
+	}
+	
+	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, Integer jbpmProcessInstanceId) {
 		try {
-			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous);
+			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous, jbpmProcessInstanceId);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

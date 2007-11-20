@@ -69,6 +69,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByCriteria
 	 */
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws RemoteException;
+	
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByCriteria
+	 */
+	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, Integer jbpmProcessInstanceId);
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategory
