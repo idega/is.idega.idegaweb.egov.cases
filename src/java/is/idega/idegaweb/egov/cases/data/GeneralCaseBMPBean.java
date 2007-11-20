@@ -230,14 +230,20 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		return idoFindPKsByQuery(query);
 	}
-
+	
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
+		return ejbFindByCriteria(parentCategory, category, type, status, anonymous, null);
+	}
+	
+	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, Integer jbpmProcessInstanceId) throws FinderException {
+
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
 		Table categories = new Table(CaseCategory.class);
 
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName());
+		
 		try {
 			query.addJoin(table, process);
 		}
@@ -269,6 +275,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		}
 		if (anonymous != null) {
 			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseUserColumnName()), !anonymous.booleanValue()));
+		}
+		if (jbpmProcessInstanceId != null) {
+			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_JBPM_PROCESS_INSTANCE_ID), MatchCriteria.EQUALS, jbpmProcessInstanceId));
 		}
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));

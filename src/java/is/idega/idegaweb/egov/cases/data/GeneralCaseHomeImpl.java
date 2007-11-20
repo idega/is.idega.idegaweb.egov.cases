@@ -60,8 +60,12 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	}
 
 	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
+		return findByCriteria(parentCategory, category, type, status, anonymous, null);
+	}
+	
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, Integer jbpmProcessInstanceId) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(parentCategory, category, type, status, anonymous);
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(parentCategory, category, type, status, anonymous, jbpmProcessInstanceId);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
