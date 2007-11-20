@@ -43,9 +43,9 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2007/11/20 18:31:18 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/20 19:57:23 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager {
 
@@ -246,8 +246,7 @@ public class CasesJbpmFormManager {
 			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
 			Document form = documentManager.openForm(formId);
 			
-//			TODO: populate with all process variables
-			//getVariablesHandler().populate(pi.getTaskMgmtInstance().getTa, form.getSubmissionInstanceElement());
+			getVariablesHandler().populateFromProcess(processInstanceId, form.getSubmissionInstanceElement());
 			
 			return form.getXformsDocument();
 		
