@@ -11,6 +11,7 @@ import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -304,7 +305,7 @@ public class MyCases extends CasesProcessor {
 				return process;
 
 			process.setPage(getJbpmProcessViewerPage());
-			process.addParameter("processInstanceId", String.valueOf(theCase.getJbpmProcessInstanceId()));
+			process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
 		}
 
 		return process;

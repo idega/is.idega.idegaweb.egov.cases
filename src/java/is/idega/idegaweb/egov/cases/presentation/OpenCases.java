@@ -10,6 +10,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
@@ -265,7 +266,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 				return process;
 
 			process.setPage(getJbpmProcessViewerPage());
-			process.addParameter("processInstanceId", String.valueOf(theCase.getJbpmProcessInstanceId()));
+			process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
 		}
 
 		return process;

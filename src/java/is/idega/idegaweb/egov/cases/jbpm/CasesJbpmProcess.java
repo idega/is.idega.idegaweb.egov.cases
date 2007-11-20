@@ -25,13 +25,14 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.jbpm.data.CasesJbpmBind;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2007/11/14 13:07:10 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/20 18:30:49 $ by $Author: civilis $
  *
  */
 public class CasesJbpmProcess {
@@ -220,7 +221,7 @@ public class CasesJbpmProcess {
 			
 			//query from CasesJbpmBind
 			@SuppressWarnings("unchecked")			
-			List<Object[]> casesProcesses = session.getNamedQuery("casesJbpmBind.simpleCasesProcessesDefinitionsQuery").list();
+			List<Object[]> casesProcesses = session.getNamedQuery(CasesJbpmBind.SIMPLE_CASES_PROCESSES_DEFINITIONS_QUERY_NAME).list();
 			
 			if(casesProcesses == null)
 				return casesProcessesDefinitions;
