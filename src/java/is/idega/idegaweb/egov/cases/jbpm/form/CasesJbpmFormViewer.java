@@ -14,21 +14,24 @@ import com.idega.presentation.IWContext;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/11/14 13:08:16 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/20 18:32:02 $ by $Author: civilis $
  */
 public class CasesJbpmFormViewer extends IWBaseComponent {
 	
+	public static final String COMPONENT_TYPE = "CasesJbpmFormViewer";
 	
 	public static final String PROCESS_DEFINITION_PROPERTY = "processDefinitionId";
 	public static final String PROCESS_INSTANCE_PROPERTY = "processInstanceId";
 	public static final String CASES_JBPM_FORM_MANAGER_PROPERTY = "casesJbpmFormManager";
+	public static final String PROCESS_VIEW_PROPERTY = "processView";
 	
 	private static final String FORMVIEWER_FACET = "formviewer";
 	
 	private String processDefinitionId;
 	private String processInstanceId;
+	private boolean processView = false;
 	private CasesJbpmFormManager casesJbpmFormManager;
 	
     
@@ -129,12 +132,10 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 		
 		if(processDefinitionId != null)
 			formviewer = loadFormViewerFromDefinition(context, processDefinitionId);
-			
-		else if(processInstanceId != null) {
-			
+		else if(processInstanceId != null && isProcessView(context))
+			formviewer = loadFormViewerForProcessView(context, processInstanceId);
+		else if(processInstanceId != null)
 			formviewer = loadFormViewerFromInstance(context, processInstanceId);
-		}
-			
 		
 		@SuppressWarnings("unchecked")
 		Map<String, UIComponent> facets = (Map<String, UIComponent>)getFacets();
@@ -167,6 +168,16 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 		return formviewer;
 	}
 	
+	private FormViewer loadFormViewerForProcessView(FacesContext context, String processInstanceId) {
+
+		Document xformsDoc = getCasesJbpmFormManager(context).loadProcessViewForm(context, Long.parseLong(processInstanceId), IWContext.getIWContext(context).getCurrentUserId());
+		
+		FormViewer formviewer = new FormViewer();
+		formviewer.setRendered(true);
+		formviewer.setXFormsDocument(xformsDoc);
+		return formviewer;
+	}
+	
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 		
@@ -184,5 +195,36 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 	public void encodeEnd(FacesContext context) throws IOException {
 		// TODO Auto-generated method stub
 		super.encodeEnd(context);
+	}
+
+	public boolean isProcessView() {
+		return processView;
+	}
+
+	public void setProcessView(boolean processView) {
+		this.processView = processView;
+	}
+	
+	public boolean isProcessView(FacesContext context) {
+
+		boolean isProcessView = isProcessView();
+		
+		if(!isProcessView) {
+			
+			if(getValueBinding(PROCESS_VIEW_PROPERTY) != null) {
+				
+				isProcessView = (Boolean)getValueBinding(PROCESS_VIEW_PROPERTY).getValue(context);
+			} else {
+				Object requestParam = context.getExternalContext().getRequestParameterMap().get(PROCESS_VIEW_PROPERTY);
+				
+				if(requestParam instanceof Boolean)
+					isProcessView = (Boolean)isProcessView;
+				else
+					isProcessView = "1".equals(requestParam);
+			}
+			setProcessView(isProcessView);
+		}
+		
+		return isProcessView;
 	}
 }
