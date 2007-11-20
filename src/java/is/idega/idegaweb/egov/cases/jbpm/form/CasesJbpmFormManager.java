@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.cases.jbpm.form;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.util.Collection;
 
@@ -16,10 +17,12 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
+import com.idega.block.form.process.XFormsView;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.user.data.User;
 import com.idega.documentmanager.business.Document;
 import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
@@ -29,15 +32,20 @@ import com.idega.documentmanager.business.ext.SimpleCaseFormProceedDMIManager;
 import com.idega.documentmanager.business.ext.SimpleCaseFormProceedMetaInf;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.jbpm.data.CasesJbpmBind;
+import com.idega.jbpm.data.ProcessViewByActor;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewToTask;
 import com.idega.jbpm.exe.VariablesHandler;
+import com.idega.presentation.IWContext;
+import com.idega.user.business.GroupBusiness;
+import com.idega.user.business.UserBusiness;
+import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2007/11/15 14:34:36 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/20 18:31:18 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager {
 
@@ -73,7 +81,7 @@ public class CasesJbpmFormManager {
 			
 			String initTaskName = bind.getInitTaskName();
 			
-			if(initTaskName == null || "".equals(initTaskName))
+			if(initTaskName == null || CoreConstants.EMPTY.equals(initTaskName))
 				throw new NullPointerException("Init task name not found on CasesJbpmBind.");
 			
 			ProcessDefinition pd = ctx.getGraphSession().getProcessDefinition(processDefinitionId);
@@ -149,9 +157,6 @@ public class CasesJbpmFormManager {
 			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
 			Document form = documentManager.openForm(formId);
 			
-//			FormVariablesHandler formVariableHandler = form.getFormVariablesHandler();
-//			setPerformer(IWContext.getIWContext(context), formVariableHandler);
-
 			SimpleCaseFormProceedDMIManager metaInfManager = new SimpleCaseFormProceedDMIManager();
 			form.setMetaInformationManager(metaInfManager);
 			
@@ -163,6 +168,91 @@ public class CasesJbpmFormManager {
 			
 			return form.getXformsDocument();
 			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+			
+		} finally {
+			
+			ctx.close();
+			
+			if(!transactionWasActive)
+				transaction.commit();
+		}
+	}
+	
+	public org.w3c.dom.Document loadProcessViewForm(FacesContext context, Long processInstanceId, int viewerId) {
+		
+//		roles - by view type
+//		1 - owner 2 - case handler 3 - other
+//		checking in this order. 3 - other should be resolved in the same way task view bindings are resolved.
+		
+		Session session = getSessionFactory().getCurrentSession();
+		
+		Transaction transaction = session.getTransaction();
+		boolean transactionWasActive = transaction.isActive();
+		
+		if(!transactionWasActive)
+			transaction.begin();
+		
+		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
+		ctx.setSession(session);
+		
+		try {
+			ProcessInstance pi = ctx.getProcessInstance(processInstanceId);
+			Long processDefinitionId = pi.getProcessDefinition().getId();
+			
+			IWContext iwc = IWContext.getIWContext(FacesContext.getCurrentInstance());
+			
+			User viewer = getUserBusiness(iwc).getUser(viewerId);
+			
+			if(viewer == null)
+				throw new RuntimeException("userId provided not correct - no User found. userId provided: "+viewerId);
+			
+			CasesBusiness casesBusiness = getCasesBusiness(iwc);
+			
+			@SuppressWarnings("unchecked")
+			Collection<GeneralCase> genCases = casesBusiness.getCasesByCriteria(null, null, null, null, null, processInstanceId.intValue());
+			
+			if(genCases.isEmpty())
+				throw new RuntimeException("No case found by processInstanceId provided: "+processInstanceId);
+			
+			GeneralCase genCase = genCases.iterator().next();
+			
+			User owner = genCase.getOwner();
+			String formId;
+			
+			if(viewer.equals(owner)) {
+//				viewer is owner
+				ProcessViewByActor processView = ProcessViewByActor.getByViewerType(session, ProcessViewByActor.VIEWER_TYPE_OWNER, XFormsView.VIEW_TYPE, processDefinitionId);
+				formId = processView.getViewIdentifier();
+				
+			} else {
+				
+				@SuppressWarnings("unchecked")
+				Collection<User> handlers = getGroupBusiness(iwc).getUsers(genCase.getHandler());
+				
+				if(handlers.contains(viewer)) {
+//					viewer is status handler
+					ProcessViewByActor processView = ProcessViewByActor.getByViewerType(session, ProcessViewByActor.VIEWER_TYPE_CASE_HANDLERS, XFormsView.VIEW_TYPE, processDefinitionId);
+					formId = processView.getViewIdentifier();
+					
+				} else {
+//					viewer is someone from another group
+//					TODO: implement this
+					throw new IllegalStateException("User isn't case owner, and doesn't belong to case handlers group. This situation is not implemented yet");
+				}
+			}
+			
+			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
+			Document form = documentManager.openForm(formId);
+			
+//			TODO: populate with all process variables
+			//getVariablesHandler().populate(pi.getTaskMgmtInstance().getTa, form.getSubmissionInstanceElement());
+			
+			return form.getXformsDocument();
+		
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 			
@@ -211,6 +301,24 @@ public class CasesJbpmFormManager {
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
 			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+	
+	protected UserBusiness getUserBusiness(IWApplicationContext iwac) {
+		try {
+			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+	
+	protected GroupBusiness getGroupBusiness(IWApplicationContext iwac) {
+		try {
+			return (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
