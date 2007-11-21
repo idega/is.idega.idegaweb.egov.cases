@@ -19,9 +19,9 @@ import com.idega.presentation.IWContext;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2007/11/16 13:50:10 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/21 13:28:36 $ by $Author: civilis $
  *
  */
 public class CasesJbpmUtil {
@@ -33,9 +33,10 @@ public class CasesJbpmUtil {
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
 		
 		try {
+
 			Locale locale = iwc.getCurrentLocale();
 			
-			Map<String, String> caseStatuses = new HashMap<String, String>();
+			Map<String, String> caseStatuses = new HashMap<String, String>(3);
 			CaseStatus status = casesBusiness.getCaseStatusPending();
 			caseStatuses.put(status.getStatus(), casesBusiness.getLocalizedCaseStatusDescription(status, locale));
 			status = casesBusiness.getCaseStatusWaiting();
@@ -43,8 +44,10 @@ public class CasesJbpmUtil {
 			status = casesBusiness.getCaseStatusReady();
 			caseStatuses.put(status.getStatus(), casesBusiness.getLocalizedCaseStatusDescription(status, locale));
 			
-			Map<Locale, Map<String, String>> localizedCasesStatuses = new HashMap<Locale, Map<String,String>>();
-			localizedCasesStatuses.put(locale, caseStatuses);
+			Map<Locale, Map<String, String>> localizedCasesStatuses = new HashMap<Locale, Map<String,String>>(1);
+			
+//			FIXME: leave locale, when localization is fully implemented in forms.
+			localizedCasesStatuses.put(true ? new Locale("en") : locale, caseStatuses);
 			return localizedCasesStatuses;
 			
 		} catch (RemoteException e) {
