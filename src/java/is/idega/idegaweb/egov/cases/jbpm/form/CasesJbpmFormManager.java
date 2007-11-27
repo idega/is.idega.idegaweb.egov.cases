@@ -18,6 +18,7 @@ import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
 import com.idega.block.form.process.XFormsView;
+import com.idega.block.form.process.ui.ProcessFormManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -43,11 +44,11 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
- * Last modified: $Date: 2007/11/20 19:57:23 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/27 20:34:58 $ by $Author: civilis $
  */
-public class CasesJbpmFormManager {
+public class CasesJbpmFormManager implements ProcessFormManager {
 
 	private JbpmConfiguration jbpmConfiguration;
 	private SessionFactory sessionFactory;
@@ -142,6 +143,11 @@ public class CasesJbpmFormManager {
 		
 		try {
 			ProcessInstance pi = ctx.getProcessInstance(processInstanceId);
+			
+			if(pi == null) {
+				
+				pi = ctx.getTaskInstance(processInstanceId).getProcessInstance();
+			}
 			
 			@SuppressWarnings("unchecked")
 			Collection<TaskInstance> tis = pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken());

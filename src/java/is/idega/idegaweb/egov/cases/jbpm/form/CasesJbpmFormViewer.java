@@ -11,12 +11,13 @@ import org.w3c.dom.Document;
 import com.idega.block.form.presentation.FormViewer;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2007/11/20 18:32:02 $ by $Author: civilis $
+ * Last modified: $Date: 2007/11/27 20:34:58 $ by $Author: civilis $
  */
 public class CasesJbpmFormViewer extends IWBaseComponent {
 	
@@ -68,7 +69,7 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 		if(processDefinitionId == null) {
 			
 			processDefinitionId = getValueBinding(PROCESS_DEFINITION_PROPERTY) != null ? (String)getValueBinding(PROCESS_DEFINITION_PROPERTY).getValue(context) : (String)context.getExternalContext().getRequestParameterMap().get(PROCESS_DEFINITION_PROPERTY);
-			processDefinitionId = "".equals(processDefinitionId) ? null : processDefinitionId;
+			processDefinitionId = CoreConstants.EMPTY.equals(processDefinitionId) ? null : processDefinitionId;
 			setProcessDefinitionId(processDefinitionId);
 		}
 		
@@ -92,7 +93,7 @@ public class CasesJbpmFormViewer extends IWBaseComponent {
 		if(processInstanceId == null) {
 			
 			processInstanceId = getValueBinding(PROCESS_INSTANCE_PROPERTY) != null ? (String)getValueBinding(PROCESS_INSTANCE_PROPERTY).getValue(context) : (String)context.getExternalContext().getRequestParameterMap().get(PROCESS_INSTANCE_PROPERTY);
-			processInstanceId = "".equals(processInstanceId) ? null : processInstanceId;
+			processInstanceId = CoreConstants.EMPTY.equals(processInstanceId) ? null : processInstanceId;
 			setProcessInstanceId(processInstanceId);
 		}
 		
