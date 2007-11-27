@@ -15,7 +15,6 @@ import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
@@ -49,6 +48,7 @@ public class MyCases extends CasesProcessor {
 		return "myCases";
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Collection getCases(User user) throws RemoteException {
 		return getBusiness().getMyCases(user);
 	}
@@ -107,17 +107,14 @@ public class MyCases extends CasesProcessor {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 
 		if (parentCategory != null) {
-			Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
-			if (collection.isEmpty()) {
+			@SuppressWarnings("unchecked")
+			Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
+			
+			if (collection.isEmpty())
 				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
-			}
-			else {
-				Iterator iter = collection.iterator();
-				while (iter.hasNext()) {
-					CaseCategory subCategory = (CaseCategory) iter.next();
+			else
+				for (CaseCategory subCategory : collection)
 					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
-				}
-			}
 		}
 
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
@@ -244,14 +241,11 @@ public class MyCases extends CasesProcessor {
 
 		section.add(clear);
 
-		Collection logs = getCasesBusiness(iwc).getCaseLogs(theCase);
-		if (!logs.isEmpty()) {
-			Iterator iter = logs.iterator();
-			while (iter.hasNext()) {
-				CaseLog log = (CaseLog) iter.next();
+		@SuppressWarnings("unchecked")
+		Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
+		if (!logs.isEmpty())
+			for (CaseLog log : logs)
 				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
-			}
-		}
 
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
@@ -301,11 +295,17 @@ public class MyCases extends CasesProcessor {
 			
 		} else {
 			
-			if(getJbpmProcessViewerPage() == null)
-				return process;
-
-			process.setPage(getJbpmProcessViewerPage());
-			process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
+			if(getJbpmProcessViewerPage() == null) {
+				
+				process.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getJbpmProcessInstanceId()));
+				process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				process.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_ARTIFACTS_LIST);
+				
+			} else {
+			
+				process.setPage(getJbpmProcessViewerPage());
+				process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
+			}
 		}
 
 		return process;

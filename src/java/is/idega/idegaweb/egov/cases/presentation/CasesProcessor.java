@@ -20,6 +20,8 @@ import javax.ejb.FinderException;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
+import com.idega.facelets.ui.FaceletComponent;
+import com.idega.jbpm.presentation.beans.ProcessArtifactsParamsBean;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
@@ -39,14 +41,17 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
+import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
 
 	public static final String PARAMETER_ACTION = "cp_prm_action";
 
 	public static final String PARAMETER_CASE_PK = "prm_case_pk";
+	public static final String PARAMETER_PROCESS_INSTANCE_PK = "pr_inst_pk";
 	protected static final String PARAMETER_REPLY = "prm_reply";
 	protected static final String PARAMETER_STATUS = "prm_status";
 	protected static final String PARAMETER_USER = "prm_iser";
@@ -58,6 +63,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
+	public static final int ACTION_JBPM_PROCESS_ARTIFACTS_LIST = 7;
 
 	protected abstract String getBlockID();
 	
@@ -91,7 +97,44 @@ public abstract class CasesProcessor extends CasesBlock {
 			case ACTION_ALLOCATION_FORM:
 				showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 				break;
+				
+			case ACTION_JBPM_PROCESS_ARTIFACTS_LIST:
+				
+				showJbpmProcessArtifactsList(iwc);
+				break;
 		}
+	}
+	
+	public void showJbpmProcessArtifactsList(IWContext iwc) {
+		
+		String piIdParam = iwc.getParameter(PARAMETER_PROCESS_INSTANCE_PK);
+		Integer processInstanceId;
+		
+		if(piIdParam == null || CoreConstants.EMPTY.equals(piIdParam)) {
+			
+			GeneralCase theCase = null;
+			try {
+				theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
+				processInstanceId = theCase.getJbpmProcessInstanceId();
+			} catch (FinderException fe) {
+				fe.printStackTrace();
+				throw new IBORuntimeException(fe);
+			} catch (RemoteException fe) {
+				fe.printStackTrace();
+				throw new IBORuntimeException(fe);
+			}
+			
+		} else {
+			processInstanceId = Integer.parseInt(piIdParam);
+		}
+		
+		if(processInstanceId == null)
+			throw new NullPointerException("Failed to resolve process instance id");
+		
+		ProcessArtifactsParamsBean params =  (ProcessArtifactsParamsBean)WFUtil.getBeanInstance("jbpmProcessArtifactsParams");
+		params.setPiId(processInstanceId);
+		add(new FaceletComponent("/idegaweb/bundles/org.jboss.jbpm.bundle/facelets/processArtifactsList.xhtml"));
+		
 	}
 
 	private int parseAction(IWContext iwc) {
@@ -366,15 +409,13 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 		CaseCategory category = theCase.getCaseCategory();
 		Group handlerGroup = category.getHandlerGroup();
-		Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
-
+		
+		@SuppressWarnings("unchecked")
+		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
 
-		Iterator iter = handlers.iterator();
-		while (iter.hasNext()) {
-			User handler = (User) iter.next();
+		for (User handler : handlers)
 			users.addMenuElement(handler.getPrimaryKey().toString(), handler.getName());
-		}
 
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
@@ -456,6 +497,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		return process;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected abstract Collection getCases(User user) throws RemoteException;
 
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
