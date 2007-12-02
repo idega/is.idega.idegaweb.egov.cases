@@ -262,11 +262,15 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			
 		} else {
 			
-			if(getJbpmProcessViewerPage() == null)
-				return process;
-
-			process.setPage(getJbpmProcessViewerPage());
-			process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
+			if(getJbpmProcessViewerPage() == null) {
+				process.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getJbpmProcessInstanceId()));
+				process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+				process.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_ARTIFACTS_LIST);
+			} else {
+			
+				process.setPage(getJbpmProcessViewerPage());
+				process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
+			}
 		}
 
 		return process;

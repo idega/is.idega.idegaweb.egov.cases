@@ -44,9 +44,9 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  *
- * Last modified: $Date: 2007/11/27 20:34:58 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/02 11:53:06 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager implements ProcessFormManager {
 
@@ -128,6 +128,44 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 		}
 	}
 	
+	public org.w3c.dom.Document loadTaskInstanceForm(FacesContext context, Long taskInstanceId) {
+		
+		Session session = getSessionFactory().getCurrentSession();
+		
+		Transaction transaction = session.getTransaction();
+		boolean transactionWasActive = transaction.isActive();
+		
+		if(!transactionWasActive)
+			transaction.begin();
+		
+		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
+		ctx.setSession(session);
+		
+		try {
+			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
+			
+			View view = getViewToTaskBinder().getView(taskInstance.getTask().getId());
+			String formId = view.getViewId();
+			
+			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
+			Document form = documentManager.openForm(formId);
+			
+			getVariablesHandler().populate(taskInstance.getId(), form.getSubmissionInstanceElement());
+			
+			return form.getXformsDocument();
+		
+		} catch(RuntimeException e) {
+			throw e;
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			ctx.close();
+			
+			if(!transactionWasActive)
+				transaction.commit();
+		}
+	}
+	
 	public org.w3c.dom.Document loadInstanceForm(FacesContext context, Long processInstanceId) {
 		
 		Session session = getSessionFactory().getCurrentSession();
@@ -143,11 +181,6 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 		
 		try {
 			ProcessInstance pi = ctx.getProcessInstance(processInstanceId);
-			
-			if(pi == null) {
-				
-				pi = ctx.getTaskInstance(processInstanceId).getProcessInstance();
-			}
 			
 			@SuppressWarnings("unchecked")
 			Collection<TaskInstance> tis = pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken());
