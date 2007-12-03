@@ -10,7 +10,6 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
@@ -24,7 +23,6 @@ import com.idega.core.file.data.ICFile;
 import com.idega.event.IWPageEventListener;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -249,30 +247,5 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.iMyCasesPage = myCasesPage;
-	}
-	
-	@Override
-	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-	
-		Link process = new Link(object);
-		
-		if(theCase.getJbpmProcessInstanceId() == null) {
-			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-			
-		} else {
-			
-			if(getJbpmProcessViewerPage() == null) {
-				process.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getJbpmProcessInstanceId()));
-				process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-				process.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_ARTIFACTS_LIST);
-			} else {
-			
-				process.setPage(getJbpmProcessViewerPage());
-				process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
-			}
-		}
-
-		return process;
 	}
 }

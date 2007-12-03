@@ -12,8 +12,10 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.ejb.FinderException;
 
@@ -63,7 +65,8 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	public static final int ACTION_JBPM_PROCESS_ARTIFACTS_LIST = 7;
+	protected static final int ACTION_JBPM_PROCESS_ARTIFACTS_LIST = 7;
+	protected static final int ACTION_JBPM_PROCESS_TASKS_LIST = 8;
 
 	protected abstract String getBlockID();
 	
@@ -102,6 +105,11 @@ public abstract class CasesProcessor extends CasesBlock {
 				
 				showJbpmProcessArtifactsList(iwc);
 				break;
+				
+			case ACTION_JBPM_PROCESS_TASKS_LIST:
+				
+				showJbpmTasksList(iwc);
+				break;
 		}
 	}
 	
@@ -134,6 +142,40 @@ public abstract class CasesProcessor extends CasesBlock {
 		ProcessArtifactsParamsBean params =  (ProcessArtifactsParamsBean)WFUtil.getBeanInstance("jbpmProcessArtifactsParams");
 		params.setPiId(processInstanceId);
 		add(new FaceletComponent("/idegaweb/bundles/org.jboss.jbpm.bundle/facelets/processArtifactsList.xhtml"));
+		
+	}
+	
+	public void showJbpmTasksList(IWContext iwc) {
+		
+		String piIdParam = iwc.getParameter(PARAMETER_PROCESS_INSTANCE_PK);
+		Integer processInstanceId;
+		
+		if(piIdParam == null || CoreConstants.EMPTY.equals(piIdParam)) {
+			
+			GeneralCase theCase = null;
+			try {
+				theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
+				processInstanceId = theCase.getJbpmProcessInstanceId();
+			} catch (FinderException fe) {
+				fe.printStackTrace();
+				throw new IBORuntimeException(fe);
+			} catch (RemoteException fe) {
+				fe.printStackTrace();
+				throw new IBORuntimeException(fe);
+			}
+			
+		} else {
+			processInstanceId = Integer.parseInt(piIdParam);
+		}
+		
+		if(processInstanceId == null)
+			throw new NullPointerException("Failed to resolve process instance id");
+		
+		ProcessArtifactsParamsBean params =  (ProcessArtifactsParamsBean)WFUtil.getBeanInstance("jbpmProcessArtifactsParams");
+		params.setPiId(processInstanceId);
+		
+		System.out.println("task list");
+		add(new FaceletComponent("/idegaweb/bundles/org.jboss.jbpm.bundle/facelets/processTasksList.xhtml"));
 		
 	}
 
@@ -284,7 +326,18 @@ public abstract class CasesProcessor extends CasesBlock {
 			}
 			cell.setStyleClass("view");
 			
-			cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
+			if(theCase.getJbpmProcessInstanceId() == null) {
+			
+				cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
+			} else {
+				
+				List<Link> links = getProcessLinks(theCase);
+				
+				if(links != null)
+					for (Link link : links)
+						cell.add(link);
+			}
+			
 
 			if (showCheckBoxes) {
 				CheckBox box = new CheckBox(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
@@ -481,20 +534,39 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
 		Link process = new Link(object);
 		
-		if(theCase.getJbpmProcessInstanceId() == null || true) {
-			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-			
-		} else {
-			
-			if(getJbpmProcessViewerPage() == null)
-				return process;
+		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
 
-			process.setPage(getJbpmProcessViewerPage());
-			process.addParameter("processInstanceId", String.valueOf(theCase.getJbpmProcessInstanceId()));
-		}
 
 		return process;
+	}
+	
+	protected List<Link> getProcessLinks(GeneralCase theCase) {
+		
+		if(theCase.getJbpmProcessInstanceId() == null)
+			return null;
+		
+		List<Link> links = new ArrayList<Link>();
+		
+//		artifacts list
+		Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case artifacts")));
+		
+		process.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getJbpmProcessInstanceId()));
+		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+		process.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_ARTIFACTS_LIST);
+		
+		links.add(process);
+
+//		tasks list
+		process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View tasks")));
+		
+		process.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getJbpmProcessInstanceId()));
+		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+		process.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_TASKS_LIST);
+		
+		links.add(process);
+		
+		return links;
 	}
 
 	@SuppressWarnings("unchecked")

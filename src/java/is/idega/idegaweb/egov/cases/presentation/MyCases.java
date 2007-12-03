@@ -11,7 +11,6 @@ import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -23,7 +22,6 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.PresentationObject;
 import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
@@ -283,31 +281,5 @@ public class MyCases extends CasesProcessor {
 
 	protected boolean showCheckBox() {
 		return false;
-	}
-	
-	@Override
-	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-		Link process = new Link(object);
-		
-		if(theCase.getJbpmProcessInstanceId() == null) {
-			process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-			process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-			
-		} else {
-			
-			if(getJbpmProcessViewerPage() == null) {
-				
-				process.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getJbpmProcessInstanceId()));
-				process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-				process.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_ARTIFACTS_LIST);
-				
-			} else {
-			
-				process.setPage(getJbpmProcessViewerPage());
-				process.addParameter(CasesJbpmFormViewer.PROCESS_INSTANCE_PROPERTY, String.valueOf(theCase.getJbpmProcessInstanceId()));
-			}
-		}
-
-		return process;
 	}
 }
