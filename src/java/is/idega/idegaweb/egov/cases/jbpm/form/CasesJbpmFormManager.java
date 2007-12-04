@@ -41,9 +41,9 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  *
- * Last modified: $Date: 2007/12/04 18:49:03 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/04 19:38:14 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager implements ViewManager {
 
@@ -76,6 +76,7 @@ public class CasesJbpmFormManager implements ViewManager {
 		ctx.setSession(session);
 		
 		try {
+//			TODO: make this generic bind
 			CasesJbpmBind bind = (CasesJbpmBind)session.load(CasesJbpmBind.class, processDefinitionId);
 			
 			String initTaskName = bind.getInitTaskName();
@@ -88,6 +89,7 @@ public class CasesJbpmFormManager implements ViewManager {
 			
 			View view = getViewToTaskBinder().getView(initTask.getId());
 			
+//			move this to protected method setupInitView(view:View):void
 			Map<String, String> parameters = new HashMap<String, String>(4);
 			
 			parameters.put(CasesJbpmProcessConstants.userIdActionVariableName, String.valueOf(initiatorId));
@@ -97,6 +99,7 @@ public class CasesJbpmFormManager implements ViewManager {
 			parameters.put(CasesJbpmProcessConstants.startProcessActionVariableName, "1");
 			
 			((XFormsView)view).addParameters(parameters);
+//			--
 			
 			return view;
 		
