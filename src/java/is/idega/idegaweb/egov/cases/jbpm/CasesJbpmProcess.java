@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
@@ -26,13 +28,14 @@ import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.jbpm.data.CasesJbpmBind;
+import com.idega.util.CoreConstants;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2007/11/20 18:30:49 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/04 14:04:20 $ by $Author: civilis $
  *
  */
 public class CasesJbpmProcess {
@@ -87,7 +90,11 @@ public class CasesJbpmProcess {
 			
 			FacesContext ctx = FacesContext.getCurrentInstance();
 			IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
-			casesJbpmFormsBundle.createDefinitions(ctx, iwma.getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER), getTemplateBundleLocation(), getFormName(), Long.parseLong(getCaseCategory()), Long.parseLong(getCaseType()));
+			Map<String, String> parameters = new HashMap<String, String>(2);
+			parameters.put("caseCategory", getCaseCategory());
+			parameters.put("caseType", getCaseType());
+			
+			casesJbpmFormsBundle.createDefinitions(ctx, iwma.getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER), getTemplateBundleLocation(), getFormName(), parameters);
 			
 		} catch (IOException e) {
 			setMessage("IO Exception occured");
@@ -101,7 +108,7 @@ public class CasesJbpmProcess {
 	}
 	
 	public String getMessage() {
-		return message == null ? "" : message;
+		return message == null ? CoreConstants.EMPTY : message;
 	}
 
 	public void setMessage(String message) {

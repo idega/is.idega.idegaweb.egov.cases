@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
@@ -24,39 +22,38 @@ import org.w3c.dom.Node;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
-import com.idega.documentmanager.business.ext.SimpleCaseFormCreateDMIManager;
-import com.idega.documentmanager.business.ext.SimpleCaseFormProceedDMIManager;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.jbpm.business.ProcessManager;
+import com.idega.jbpm.exe.Converter;
 import com.idega.jbpm.exe.VariablesHandler;
+import com.idega.jbpm.exe.ViewManager;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
-import com.idega.util.URIUtil;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
- * Last modified: $Date: 2007/11/17 11:16:33 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/04 14:04:20 $ by $Author: civilis $
  */
-public class CasesJbpmProcessManager {
+public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 
 	private SessionFactory sessionFactory;
 	private JbpmConfiguration jbpmConfiguration;
 	private VariablesHandler variablesHandler;
-	private ProcessManager jbpmProcessManager;
+	private ViewManager viewManager;
+	private Converter converter;
 	
-    public ProcessManager getJbpmProcessManager() {
-		return jbpmProcessManager;
+	public Converter getConverter() {
+		return converter;
 	}
 
-	public void setJbpmProcessManager(ProcessManager jbpmProcessManager) {
-		this.jbpmProcessManager = jbpmProcessManager;
+	public void setConverter(Converter converter) {
+		this.converter = converter;
 	}
 
 	public SessionFactory getSessionFactory() {
@@ -83,30 +80,12 @@ public class CasesJbpmProcessManager {
 		this.variablesHandler = variablesHandler;
 	}
 
-	public void processSubmission(String action, Node instance) {
-
-    	Map<String, String> parameters = new URIUtil(action).getParameters();
-    	
-    	if(parameters.containsKey(SimpleCaseFormCreateDMIManager.type)) {
-    		
-    		startProcess(parameters, instance);
-    		
-    	} else if(parameters.containsKey(SimpleCaseFormProceedDMIManager.type)) {
-    		
-    		proceedProcess(parameters, instance);
-    		
-    	} else {
-    	
-    		Logger.getLogger(CasesJbpmProcessManager.class.getName()).log(Level.WARNING, "Couldn't handle submission. No action associated with the submission action: "+action);
-    	}
-    }
-	
-	protected void startProcess(Map<String, String> parameters, Node instance) {
+	public void startProcess(Map<String, String> parameters, Object submissionData) {
 		
-		Long pdId = Long.parseLong(parameters.get(SimpleCaseFormCreateDMIManager.pdIdParam));
-		int userId = Integer.parseInt(parameters.get(SimpleCaseFormCreateDMIManager.userIdParam));
-		Long caseCatId = Long.parseLong(parameters.get(SimpleCaseFormCreateDMIManager.caseCategoryIdParam));
-		Long caseTypeId = Long.parseLong(parameters.get(SimpleCaseFormCreateDMIManager.caseTypeParam));
+		Long pdId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.processDefinitionIdActionVariableName));
+		int userId = Integer.parseInt(parameters.get(CasesJbpmProcessConstants.userIdActionVariableName));
+		Long caseCatId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseCategoryIdActionVariableName));
+		Long caseTypeId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseTypeActionVariableName));
 		
 		SessionFactory sessionFactory = getSessionFactory();
 		
@@ -152,8 +131,8 @@ public class CasesJbpmProcessManager {
 			IWTimestamp created = new IWTimestamp(genCase.getCreated());
 			caseData.put(CasesJbpmProcessConstants.caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
 			
-			getJbpmProcessManager().submitVariables(caseData, ti.getId());
-			submitVariablesAndProceedProcess(ti, instance);
+			getVariablesHandler().submitVariables(caseData, ti.getId());
+			submitVariablesAndProceedProcess(ti, (Node)submissionData);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -167,7 +146,7 @@ public class CasesJbpmProcessManager {
 	
 	protected void submitVariablesAndProceedProcess(TaskInstance ti, Node instance) {
 		
-    	getVariablesHandler().submit(ti.getId(), instance);
+		getVariablesHandler().submitVariables(getConverter().convert(instance), ti.getId());
     	
     	String actionTaken = (String)ti.getVariable(CasesJbpmProcessConstants.actionTakenVariableName);
     	
@@ -195,9 +174,9 @@ public class CasesJbpmProcessManager {
 		}
 	}
 	
-	protected void proceedProcess(Map<String, String> parameters, Node instance) {
+	public void proceedProcess(Map<String, String> parameters, Object submissionData) {
 		
-		Long piId = Long.parseLong(parameters.get(SimpleCaseFormProceedDMIManager.piIdParam));
+		Long piId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.processInstanceIdActionVariableName));
 		
 		SessionFactory sessionFactory = getSessionFactory();
 		
@@ -220,7 +199,7 @@ public class CasesJbpmProcessManager {
 			if(tis.size() != 1)
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
 			
-	    	submitVariablesAndProceedProcess(tis.iterator().next(), instance);
+	    	submitVariablesAndProceedProcess(tis.iterator().next(), (Node)submissionData);
 			
 		} finally {
 			ctx.close();
@@ -228,5 +207,13 @@ public class CasesJbpmProcessManager {
 			if(!transactionWasActive)
 				transaction.commit();
 		}
+	}
+	
+	public void setViewManager(ViewManager viewManager) {
+		this.viewManager = viewManager;
+	}
+
+	public ViewManager getViewManager() {
+		return viewManager;
 	}
 }

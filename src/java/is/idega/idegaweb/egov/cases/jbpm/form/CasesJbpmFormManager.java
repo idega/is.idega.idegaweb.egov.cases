@@ -1,9 +1,11 @@
 package is.idega.idegaweb.egov.cases.jbpm.form;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessConstants;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
@@ -13,42 +15,33 @@ import org.hibernate.Transaction;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
-import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.graph.exe.Token;
 import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
 import com.idega.block.form.process.XFormsView;
-import com.idega.block.form.process.ui.ProcessFormManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
-import com.idega.core.user.data.User;
-import com.idega.documentmanager.business.Document;
-import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
-import com.idega.documentmanager.business.ext.SimpleCaseFormCreateDMIManager;
-import com.idega.documentmanager.business.ext.SimpleCaseFormCreateMetaInf;
-import com.idega.documentmanager.business.ext.SimpleCaseFormProceedDMIManager;
-import com.idega.documentmanager.business.ext.SimpleCaseFormProceedMetaInf;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.jbpm.data.CasesJbpmBind;
-import com.idega.jbpm.data.ProcessViewByActor;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewToTask;
 import com.idega.jbpm.exe.VariablesHandler;
-import com.idega.presentation.IWContext;
+import com.idega.jbpm.exe.ViewManager;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  *
- * Last modified: $Date: 2007/12/02 11:53:06 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/04 14:04:36 $ by $Author: civilis $
  */
-public class CasesJbpmFormManager implements ProcessFormManager {
+public class CasesJbpmFormManager implements ViewManager {
 
 	private JbpmConfiguration jbpmConfiguration;
 	private SessionFactory sessionFactory;
@@ -64,7 +57,7 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 		this.variablesHandler = variablesHandler;
 	}
 	
-	public org.w3c.dom.Document loadDefinitionForm(FacesContext context, Long processDefinitionId, int initiatorId) {
+	public View loadInitView(FacesContext context, Long processDefinitionId, int initiatorId) {
 		
 		Session session = getSessionFactory().getCurrentSession();
 		
@@ -89,23 +82,21 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 			Task initTask = pd.getTaskMgmtDefinition().getTask(initTaskName);
 			
 			View view = getViewToTaskBinder().getView(initTask.getId());
-			String formId = view.getViewId();
-
-			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
-			Document form = documentManager.openForm(formId);
-
-			SimpleCaseFormCreateDMIManager metaInfManager = new SimpleCaseFormCreateDMIManager();
-			form.setMetaInformationManager(metaInfManager);
 			
-			SimpleCaseFormCreateMetaInf metaInf = new SimpleCaseFormCreateMetaInf();
-			metaInf.setInitiatorId(String.valueOf(initiatorId));
-			metaInf.setProcessDefinitionId(String.valueOf(processDefinitionId));
-			metaInf.setCaseCategoryId(String.valueOf(bind.getCasesCategoryId()));
-			metaInf.setCaseTypeId(String.valueOf(bind.getCasesTypeId()));
-			metaInfManager.update(metaInf);
+			Map<String, String> parameters = new HashMap<String, String>(4);
 			
-			return form.getXformsDocument();
+			parameters.put(CasesJbpmProcessConstants.userIdActionVariableName, String.valueOf(initiatorId));
+			parameters.put(CasesJbpmProcessConstants.processDefinitionIdActionVariableName, String.valueOf(initiatorId));
+			parameters.put(CasesJbpmProcessConstants.caseCategoryIdActionVariableName, String.valueOf(bind.getCasesCategoryId()));
+			parameters.put(CasesJbpmProcessConstants.caseTypeActionVariableName, String.valueOf(bind.getCasesTypeId()));
+			parameters.put(CasesJbpmProcessConstants.startProcessActionVariableName, "1");
 			
+			((XFormsView)view).addParameters(parameters);
+			
+			return view;
+		
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 			
@@ -128,7 +119,7 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 		}
 	}
 	
-	public org.w3c.dom.Document loadTaskInstanceForm(FacesContext context, Long taskInstanceId) {
+	public View loadTaskInstanceView(FacesContext context, Long taskInstanceId) {
 		
 		Session session = getSessionFactory().getCurrentSession();
 		
@@ -145,14 +136,9 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
 			
 			View view = getViewToTaskBinder().getView(taskInstance.getTask().getId());
-			String formId = view.getViewId();
+			view.populate(getVariablesHandler().populateVariables(taskInstance.getId()));
 			
-			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
-			Document form = documentManager.openForm(formId);
-			
-			getVariablesHandler().populate(taskInstance.getId(), form.getSubmissionInstanceElement());
-			
-			return form.getXformsDocument();
+			return view;
 		
 		} catch(RuntimeException e) {
 			throw e;
@@ -166,7 +152,8 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 		}
 	}
 	
-	public org.w3c.dom.Document loadInstanceForm(FacesContext context, Long processInstanceId) {
+	/*
+	 public org.w3c.dom.Document loadInstanceForm(FacesContext context, Long processInstanceId) {
 		
 		Session session = getSessionFactory().getCurrentSession();
 		
@@ -218,7 +205,56 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 				transaction.commit();
 		}
 	}
+	*/
 	
+	public View loadProcessInstanceView(FacesContext context, Token token) {
+		
+		Session session = getSessionFactory().getCurrentSession();
+		
+		Transaction transaction = session.getTransaction();
+		boolean transactionWasActive = transaction.isActive();
+		
+		if(!transactionWasActive)
+			transaction.begin();
+		
+		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
+		ctx.setSession(session);
+		
+		try {
+			
+			@SuppressWarnings("unchecked")
+			Collection<TaskInstance> tis = token.getProcessInstance().getTaskMgmtInstance().getUnfinishedTasks(token);
+			
+			if(tis.size() != 1)
+				throw new RuntimeException("Fatal: simple cases process definition not correct. Node comprehends no or more than 1 task . Total: "+tis.size()+". Token: "+token);
+			
+			TaskInstance taskInstance = tis.iterator().next();
+			
+			View view = getViewToTaskBinder().getView(taskInstance.getTask().getId());
+			
+			Map<String, String> parameters = new HashMap<String, String>(1);
+			parameters.put(CasesJbpmProcessConstants.processInstanceIdActionVariableName, String.valueOf(token.getProcessInstance().getId()));
+			parameters.put(CasesJbpmProcessConstants.proceedProcessActionVariableName, "1");
+			
+			((XFormsView)view).addParameters(parameters);
+			
+			view.populate(getVariablesHandler().populateVariables(taskInstance.getId()));
+			
+			return view;
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+			
+		} finally {
+			
+			ctx.close();
+			
+			if(!transactionWasActive)
+				transaction.commit();
+		}
+	}
+	
+	/*
 	public org.w3c.dom.Document loadProcessViewForm(FacesContext context, Long processInstanceId, int viewerId) {
 		
 //		roles - by view type
@@ -302,6 +338,7 @@ public class CasesJbpmFormManager implements ProcessFormManager {
 				transaction.commit();
 		}
 	}
+	*/
 
 	public JbpmConfiguration getJbpmConfiguration() {
 		return jbpmConfiguration;

@@ -10,16 +10,15 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager;
-import is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormViewer;
+import is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessManager;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.ejb.FinderException;
 import javax.faces.application.Application;
 
+import com.idega.block.form.process.ui.ProcessFormViewer;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
@@ -103,8 +102,8 @@ public class CaseViewer extends CaseCreator {
 			if(theCase.getJbpmProcessInstanceId() != null) {
 				
 				Application application = iwc.getApplication();
-				CasesJbpmFormViewer formviewer = (CasesJbpmFormViewer)application.createComponent(CasesJbpmFormViewer.COMPONENT_TYPE);
-				formviewer.setCasesJbpmFormManager((CasesJbpmFormManager)WFUtil.getBeanInstance("casesJbpmFormManager"));
+				ProcessFormViewer formviewer = (ProcessFormViewer)application.createComponent(ProcessFormViewer.COMPONENT_TYPE);
+				formviewer.setProcess((CasesJbpmProcessManager)WFUtil.getBeanInstance("casesJbpmProcessManager"));
 				formviewer.setProcessView(true);
 				formviewer.setProcessInstanceId(String.valueOf(theCase.getJbpmProcessInstanceId()));
 				
@@ -234,15 +233,13 @@ public class CaseViewer extends CaseCreator {
 			clear.setStyleClass("Clear");
 			section.add(clear);
 
-			Collection logs = getCasesBusiness(iwc).getCaseLogs(theCase);
+			@SuppressWarnings("unchecked")
+			Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
+			
 			if (!logs.isEmpty()) {
-				Iterator iter = logs.iterator();
-				while (iter.hasNext()) {
-					CaseLog log = (CaseLog) iter.next();
+				for (CaseLog log : logs)
 					form.add(getHandlerLayer(iwc, iwrb, theCase, log));
-				}
-			}
-			else {
+			} else {
 				Layer handler = new Layer(Layer.SPAN);
 				if (user != null) {
 					handler.add(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale(), true)));

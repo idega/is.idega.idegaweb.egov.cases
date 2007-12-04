@@ -24,6 +24,12 @@
         <property name="templateBundleLocation" value="resources/casesJbpmTemplates/simpleCasesProcessTemplate/" />
     </bean>
     
+    <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess" scope="request">
+        <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
+        <property name="casesJbpmFormsBundleFactory" ref="casesJbpmFormsBundleFactory" />
+        <property name="templateBundleLocation" value="resources/casesJbpmTemplates/nestCommitteeGateway/" />
+    </bean>
+    
     <bean id="casesJbpmFormManager" class="is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager" scope="singleton">
         <property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
         <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />

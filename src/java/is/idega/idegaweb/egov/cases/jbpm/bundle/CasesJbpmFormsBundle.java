@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -26,11 +25,11 @@ import com.idega.block.form.process.XFormsView;
 import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.documentmanager.business.PersistenceManager;
-import com.idega.documentmanager.component.beans.LocalizedStringBean;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWBundle;
 import com.idega.jbpm.data.CasesJbpmBind;
 import com.idega.jbpm.data.ProcessViewByActor;
+import com.idega.jbpm.def.ProcessBundle;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewFactory;
 import com.idega.jbpm.def.ViewToTask;
@@ -40,12 +39,12 @@ import com.idega.util.xml.XmlUtil;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2007/11/20 18:30:39 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/04 14:04:37 $ by $Author: civilis $
  *
  */
-public class CasesJbpmFormsBundle {
+public class CasesJbpmFormsBundle implements ProcessBundle {
 
 	private DocumentManagerFactory documentManagerFactory;
 	private PersistenceManager persistenceManager;
@@ -115,7 +114,7 @@ public class CasesJbpmFormsBundle {
 	
 	public void createDefinitions(InputStream is) { throw new UnsupportedOperationException("Not implemented yet"); }
 	
-	public void createDefinitions(FacesContext facesCtx, IWBundle bundle, String templateBundleLocationWithinBundle, String formName, Long caseCategoryId, Long caseTypeId) throws IOException, Exception {
+	protected void createDefinitions(FacesContext facesCtx, IWBundle bundle, String templateBundleLocationWithinBundle, String formName, Long caseCategoryId, Long caseTypeId) throws IOException, Exception {
 		
 		if(formName == null || CoreConstants.EMPTY.equals(formName))
 			throw new NullPointerException("Form name not provided");
@@ -164,7 +163,7 @@ public class CasesJbpmFormsBundle {
 			for (Task task : tasks) {
 				
 				InputStream formIs = getResourceInputStream(bundle, templateBundleLocationWithinBundle+"forms/", task.getName()+".xhtml");
-				String formId = loadAndSaveForm(builder, documentManager, formName+" - "+task.getName(), formIs);
+				String formId = loadAndSaveForm(builder, documentManager, formIs);
 			
 				View view = getViewFactory().createView();
 				view.setViewId(formId);
@@ -197,6 +196,34 @@ public class CasesJbpmFormsBundle {
 		}
 	}
 	
+	public static final String caseCategoryIdParameter = "caseCategoryId";
+	public static final String caseTypeIdParameter = "caseTypeId";
+	
+	public void createDefinitions(FacesContext facesCtx, IWBundle bundle,
+			String templateBundleLocationWithinBundle, String formName,
+			Object parameters) throws IOException {
+
+		@SuppressWarnings("unchecked")
+		Map<String, String> params = (Map<String, String>)parameters;
+
+		String caseCategoryId = params.get(caseCategoryIdParameter);
+		String caseTypeId = params.get(caseTypeIdParameter);
+		
+		if(caseCategoryId == null || CoreConstants.EMPTY.equals(caseCategoryId) || caseTypeId == null || CoreConstants.EMPTY.equals(caseTypeId))
+			throw new IllegalArgumentException(new StringBuilder("Either not provided: \ncaseCategoryId: ").append(caseCategoryId).append(CoreConstants.NEWLINE).append("caseTypeId: ").append(caseTypeId).toString());
+		
+		try {
+			createDefinitions(facesCtx, bundle, templateBundleLocationWithinBundle, formName, Long.parseLong(caseCategoryId), Long.parseLong(caseTypeId));
+		
+		} catch (IOException e) {
+			throw e;
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	private void loadAndStoreProcessViewForms(Properties properties, IWBundle bundle, String templateBundleLocationWithinBundle, DocumentManager documentManager, Long processDefinitionId, Session session) throws Exception {
 
 		DocumentBuilder builder = XmlUtil.getDocumentBuilder();
@@ -211,7 +238,7 @@ public class CasesJbpmFormsBundle {
 		if(formName != null) {
 		
 			formIs = getResourceInputStream(bundle, templateBundleLocationWithinBundle+"forms/", formName+".xhtml");
-			formId = loadAndSaveForm(builder, documentManager, formName, formIs);
+			formId = loadAndSaveForm(builder, documentManager, formIs);
 			
 			processView = new ProcessViewByActor();
 			processView.setProcessDefinitionId(processDefinitionId);
@@ -228,7 +255,7 @@ public class CasesJbpmFormsBundle {
 		if(formName != null) {
 		
 			formIs = getResourceInputStream(bundle, templateBundleLocationWithinBundle+"forms/", formName+".xhtml");
-			formId = loadAndSaveForm(builder, documentManager, formName, formIs);
+			formId = loadAndSaveForm(builder, documentManager, formIs);
 			
 			processView = new ProcessViewByActor();
 			processView.setProcessDefinitionId(processDefinitionId);
@@ -257,22 +284,12 @@ public class CasesJbpmFormsBundle {
 		return bundle.getResourceInputStream(pathWithinBundle + fileName);
 	}
 	
-	private String loadAndSaveForm(DocumentBuilder builder, DocumentManager documentManager, String formName, InputStream formIs) throws Exception {
+	private String loadAndSaveForm(DocumentBuilder builder, DocumentManager documentManager, InputStream formIs) throws Exception {
 		
 		Document xformXml = builder.parse(formIs);
-		PersistenceManager persistenceManager = getPersistenceManager();
-		
-		String formId = persistenceManager.generateFormId(formName);
-		com.idega.documentmanager.business.Document form = documentManager.openForm(xformXml, formId);
-		
-		LocalizedStringBean title = form.getFormTitle();
-		
-		for (Locale titleLocale : title.getLanguagesKeySet())
-			title.setString(titleLocale, formName);
-		
-		form.setFormTitle(title);
+		com.idega.documentmanager.business.Document form = documentManager.openFormAndGenerateId(xformXml);
 		form.save();
 		
-		return formId;
+		return form.getId();
 	}
 }
