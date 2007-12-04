@@ -5,6 +5,7 @@ import is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessConstants;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
@@ -27,7 +28,10 @@ import com.idega.business.IBORuntimeException;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.jbpm.data.CasesJbpmBind;
+import com.idega.jbpm.data.ViewTaskBind;
 import com.idega.jbpm.def.View;
+import com.idega.jbpm.def.ViewCreator;
+import com.idega.jbpm.def.ViewFactory;
 import com.idega.jbpm.def.ViewToTask;
 import com.idega.jbpm.exe.VariablesHandler;
 import com.idega.jbpm.exe.ViewManager;
@@ -37,9 +41,9 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  *
- * Last modified: $Date: 2007/12/04 14:04:36 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/04 18:49:03 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager implements ViewManager {
 
@@ -48,6 +52,7 @@ public class CasesJbpmFormManager implements ViewManager {
 	private DocumentManagerFactory documentManagerFactory;
 	private ViewToTask viewToTaskBinder;
 	private VariablesHandler variablesHandler;
+	private ViewCreator viewCreator;
 	
 	public VariablesHandler getVariablesHandler() {
 		return variablesHandler;
@@ -135,7 +140,29 @@ public class CasesJbpmFormManager implements ViewManager {
 		try {
 			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
 			
-			View view = getViewToTaskBinder().getView(taskInstance.getTask().getId());
+			List<ViewTaskBind> viewTaskBinds = ViewTaskBind.getViewTaskBindsByTaskId(session, taskInstance.getTask().getId());
+			
+			if(viewTaskBinds.isEmpty())
+				throw new RuntimeException("No view bind to task found for task by id: "+taskInstance.getTask().getId());
+			
+			View view = null;
+			
+			for (ViewTaskBind viewTaskBind : viewTaskBinds) {
+				
+//				we prefer xforms view here
+				if(viewTaskBind.getViewType().equals(XFormsView.VIEW_TYPE)) {
+					ViewFactory viewFactory = getViewCreator().getViewFactory(viewTaskBind.getViewType());
+					view = viewFactory.getView(viewTaskBind.getViewIdentifier(), !taskInstance.hasEnded());
+				}
+			}
+			
+//			no xforms view found, taking anything
+			if(view == null) {
+				ViewTaskBind bind = viewTaskBinds.iterator().next();
+				ViewFactory viewFactory = getViewCreator().getViewFactory(bind.getViewType());
+				view = viewFactory.getView(bind.getViewIdentifier(), !taskInstance.hasEnded());
+			}
+			
 			view.populate(getVariablesHandler().populateVariables(taskInstance.getId()));
 			
 			return view;
@@ -398,5 +425,13 @@ public class CasesJbpmFormManager implements ViewManager {
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
+	}
+
+	public ViewCreator getViewCreator() {
+		return viewCreator;
+	}
+
+	public void setViewCreator(ViewCreator viewCreator) {
+		this.viewCreator = viewCreator;
 	}
 }
