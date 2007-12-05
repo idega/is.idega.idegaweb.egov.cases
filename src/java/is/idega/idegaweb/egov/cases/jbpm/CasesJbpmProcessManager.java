@@ -17,7 +17,6 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
-import org.w3c.dom.Node;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -25,6 +24,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.jbpm.exe.Converter;
+import com.idega.jbpm.exe.ProcessConstants;
 import com.idega.jbpm.exe.VariablesHandler;
 import com.idega.jbpm.exe.ViewManager;
 import com.idega.presentation.IWContext;
@@ -36,9 +36,9 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  *
- * Last modified: $Date: 2007/12/04 14:04:20 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/05 10:36:15 $ by $Author: civilis $
  */
 public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 
@@ -82,7 +82,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 
 	public void startProcess(Map<String, String> parameters, Object submissionData) {
 		
-		Long pdId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.processDefinitionIdActionVariableName));
+		Long processDefinitionId = Long.parseLong(parameters.get(ProcessConstants.PROCESS_DEFINITION_ID));
 		int userId = Integer.parseInt(parameters.get(CasesJbpmProcessConstants.userIdActionVariableName));
 		Long caseCatId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseCategoryIdActionVariableName));
 		Long caseTypeId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseTypeActionVariableName));
@@ -100,7 +100,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		
 		try {
 			
-			ProcessDefinition pd = ctx.getGraphSession().getProcessDefinition(pdId);
+			ProcessDefinition pd = ctx.getGraphSession().getProcessDefinition(processDefinitionId);
 			ProcessInstance pi = new ProcessInstance(pd);
 			
 			IWContext iwc = IWContext.getIWContext(FacesContext.getCurrentInstance());
@@ -120,7 +120,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 			if(tis.size() != 1)
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
 			
-			TaskInstance ti = tis.iterator().next();
+			TaskInstance taskInstance = tis.iterator().next();
 			
 			Map<String, Object> caseData = new HashMap<String, Object>();
 			caseData.put(CasesJbpmProcessConstants.caseIdVariableName, genCase.getPrimaryKey().toString());
@@ -131,8 +131,8 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 			IWTimestamp created = new IWTimestamp(genCase.getCreated());
 			caseData.put(CasesJbpmProcessConstants.caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
 			
-			getVariablesHandler().submitVariables(caseData, ti.getId());
-			submitVariablesAndProceedProcess(ti, (Node)submissionData);
+			getVariablesHandler().submitVariables(caseData, taskInstance.getId());
+			submitVariablesAndProceedProcess(taskInstance, submissionData);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -144,7 +144,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		}
 	}
 	
-	protected void submitVariablesAndProceedProcess(TaskInstance ti, Node instance) {
+	protected void submitVariablesAndProceedProcess(TaskInstance ti, Object instance) {
 		
 		getVariablesHandler().submitVariables(getConverter().convert(instance), ti.getId());
     	
@@ -174,9 +174,9 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		}
 	}
 	
-	public void proceedProcess(Map<String, String> parameters, Object submissionData) {
+	public void submitTaskInstance(Map<String, String> parameters, Object submissionData) {
 		
-		Long piId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.processInstanceIdActionVariableName));
+		Long taskInstanceId = Long.parseLong(parameters.get(ProcessConstants.TASK_INSTANCE_ID));
 		
 		SessionFactory sessionFactory = getSessionFactory();
 		
@@ -190,16 +190,8 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		ctx.setSession(sessionFactory.getCurrentSession());
 		
 		try {
-			ProcessInstance pi = ctx.getProcessInstance(piId);
-
-//			forget about parallel processing, for now using root token
-			@SuppressWarnings("unchecked")
-			Collection<TaskInstance> tis = pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken());
-			
-			if(tis.size() != 1)
-				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
-			
-	    	submitVariablesAndProceedProcess(tis.iterator().next(), (Node)submissionData);
+			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
+	    	submitVariablesAndProceedProcess(taskInstance, submissionData);
 			
 		} finally {
 			ctx.close();

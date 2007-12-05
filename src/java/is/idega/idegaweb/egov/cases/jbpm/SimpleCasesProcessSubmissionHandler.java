@@ -11,6 +11,7 @@ import org.chiba.xml.xforms.exception.XFormsException;
 import org.w3c.dom.Node;
 
 import com.idega.documentmanager.util.FormManagerUtil;
+import com.idega.jbpm.exe.ProcessConstants;
 import com.idega.util.URIUtil;
 import com.idega.webface.WFUtil;
 
@@ -18,17 +19,14 @@ import com.idega.webface.WFUtil;
  * TODO: move all this logic to spring bean
  * 
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  *
- * Last modified: $Date: 2007/12/04 14:04:20 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/05 10:36:15 $ by $Author: civilis $
  */
 public class SimpleCasesProcessSubmissionHandler extends AbstractConnector implements SubmissionHandler {
     
-    /**
-     * TODO: write javadoc
-     */
 	@SuppressWarnings("unchecked")
-    public Map submit(Submission submission, Node instance) throws XFormsException {
+    public Map submit(Submission submission, Node submissionInstance) throws XFormsException {
 		
     	//method - post, replace - none
     	if (!submission.getReplace().equalsIgnoreCase("none"))
@@ -46,15 +44,15 @@ public class SimpleCasesProcessSubmissionHandler extends AbstractConnector imple
     		//insert (post)
     	}
     	
-    	CasesJbpmProcessManager submissionBean = (CasesJbpmProcessManager)WFUtil.getBeanInstance("casesJbpmProcessManager");
+    	com.idega.jbpm.exe.Process process = (com.idega.jbpm.exe.Process)WFUtil.getBeanInstance("casesJbpmProcessManager");
     	String action = submission.getElement().getAttribute(FormManagerUtil.action_att);
     	Map<String, String> parameters = new URIUtil(action).getParameters();
     	
-    	if(parameters.containsKey(CasesJbpmProcessConstants.startProcessActionVariableName)) {
-    		submissionBean.startProcess(parameters, instance);
+    	if(parameters.containsKey(ProcessConstants.PROCESS_DEFINITION_ID)) {
+    		process.startProcess(parameters, submissionInstance);
     		
-    	} else if(parameters.containsKey(CasesJbpmProcessConstants.proceedProcessActionVariableName)) {
-    		submissionBean.proceedProcess(parameters, instance);
+    	} else if(parameters.containsKey(ProcessConstants.TASK_INSTANCE_ID)) {
+    		process.submitTaskInstance(parameters, submissionInstance);
     		
     	} else {
     	

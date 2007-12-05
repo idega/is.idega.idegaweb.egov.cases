@@ -33,6 +33,7 @@ import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewCreator;
 import com.idega.jbpm.def.ViewFactory;
 import com.idega.jbpm.def.ViewToTask;
+import com.idega.jbpm.exe.ProcessConstants;
 import com.idega.jbpm.exe.VariablesHandler;
 import com.idega.jbpm.exe.ViewManager;
 import com.idega.user.business.GroupBusiness;
@@ -41,9 +42,9 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  *
- * Last modified: $Date: 2007/12/04 19:38:14 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/05 10:36:15 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager implements ViewManager {
 
@@ -92,13 +93,12 @@ public class CasesJbpmFormManager implements ViewManager {
 //			move this to protected method setupInitView(view:View):void
 			Map<String, String> parameters = new HashMap<String, String>(4);
 			
+			parameters.put(ProcessConstants.PROCESS_DEFINITION_ID, String.valueOf(processDefinitionId));
 			parameters.put(CasesJbpmProcessConstants.userIdActionVariableName, String.valueOf(initiatorId));
-			parameters.put(CasesJbpmProcessConstants.processDefinitionIdActionVariableName, String.valueOf(initiatorId));
 			parameters.put(CasesJbpmProcessConstants.caseCategoryIdActionVariableName, String.valueOf(bind.getCasesCategoryId()));
 			parameters.put(CasesJbpmProcessConstants.caseTypeActionVariableName, String.valueOf(bind.getCasesTypeId()));
-			parameters.put(CasesJbpmProcessConstants.startProcessActionVariableName, "1");
 			
-			((XFormsView)view).addParameters(parameters);
+			view.addParameters(parameters);
 //			--
 			
 			return view;
@@ -114,16 +114,6 @@ public class CasesJbpmFormManager implements ViewManager {
 			
 			if(!transactionWasActive)
 				transaction.commit();
-		}
-	}
-	
-	protected CaseStatus getInitCaseStatus(IWApplicationContext iwac) {
-		
-		try {
-			return getCasesBusiness(iwac).getCaseStatusWaiting();
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 	
@@ -166,6 +156,10 @@ public class CasesJbpmFormManager implements ViewManager {
 				view = viewFactory.getView(bind.getViewIdentifier(), !taskInstance.hasEnded());
 			}
 			
+			Map<String, String> parameters = new HashMap<String, String>(1);
+			parameters.put(ProcessConstants.TASK_INSTANCE_ID, String.valueOf(taskInstance.getId()));
+			view.addParameters(parameters);
+			
 			view.populate(getVariablesHandler().populateVariables(taskInstance.getId()));
 			
 			return view;
@@ -181,61 +175,6 @@ public class CasesJbpmFormManager implements ViewManager {
 				transaction.commit();
 		}
 	}
-	
-	/*
-	 public org.w3c.dom.Document loadInstanceForm(FacesContext context, Long processInstanceId) {
-		
-		Session session = getSessionFactory().getCurrentSession();
-		
-		Transaction transaction = session.getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
-		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
-		ctx.setSession(session);
-		
-		try {
-			ProcessInstance pi = ctx.getProcessInstance(processInstanceId);
-			
-			@SuppressWarnings("unchecked")
-			Collection<TaskInstance> tis = pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken());
-			
-			if(tis.size() != 1)
-				throw new RuntimeException("Fatal: simple cases process definition not correct. Node comprehends no or more than 1 task . Total: "+tis.size()+". Token: "+pi.getRootToken());
-			
-			TaskInstance ti = tis.iterator().next();
-			
-			View view = getViewToTaskBinder().getView(ti.getTask().getId());
-			String formId = view.getViewId();
-			
-			DocumentManager documentManager = getDocumentManagerFactory().newDocumentManager(context);
-			Document form = documentManager.openForm(formId);
-			
-			SimpleCaseFormProceedDMIManager metaInfManager = new SimpleCaseFormProceedDMIManager();
-			form.setMetaInformationManager(metaInfManager);
-			
-			SimpleCaseFormProceedMetaInf metaInf = new SimpleCaseFormProceedMetaInf();
-			metaInf.setProcessInstanceId(String.valueOf(processInstanceId));
-			metaInfManager.update(metaInf);
-			
-			getVariablesHandler().populate(ti.getId(), form.getSubmissionInstanceElement());
-			
-			return form.getXformsDocument();
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-			
-		} finally {
-			
-			ctx.close();
-			
-			if(!transactionWasActive)
-				transaction.commit();
-		}
-	}
-	*/
 	
 	public View loadProcessInstanceView(FacesContext context, Token token) {
 		
@@ -255,19 +194,17 @@ public class CasesJbpmFormManager implements ViewManager {
 			@SuppressWarnings("unchecked")
 			Collection<TaskInstance> tis = token.getProcessInstance().getTaskMgmtInstance().getUnfinishedTasks(token);
 			
-			if(tis.size() != 1)
-				throw new RuntimeException("Fatal: simple cases process definition not correct. Node comprehends no or more than 1 task . Total: "+tis.size()+". Token: "+token);
+			if(tis.size() == 0)
+				throw new RuntimeException("No unfinished task instances on token: "+token);
 			
 			TaskInstance taskInstance = tis.iterator().next();
 			
 			View view = getViewToTaskBinder().getView(taskInstance.getTask().getId());
 			
 			Map<String, String> parameters = new HashMap<String, String>(1);
-			parameters.put(CasesJbpmProcessConstants.processInstanceIdActionVariableName, String.valueOf(token.getProcessInstance().getId()));
-			parameters.put(CasesJbpmProcessConstants.proceedProcessActionVariableName, "1");
+			parameters.put(ProcessConstants.TASK_INSTANCE_ID, String.valueOf(taskInstance.getId()));
 			
-			((XFormsView)view).addParameters(parameters);
-			
+			view.addParameters(parameters);
 			view.populate(getVariablesHandler().populateVariables(taskInstance.getId()));
 			
 			return view;
@@ -436,5 +373,15 @@ public class CasesJbpmFormManager implements ViewManager {
 
 	public void setViewCreator(ViewCreator viewCreator) {
 		this.viewCreator = viewCreator;
+	}
+	
+	protected CaseStatus getInitCaseStatus(IWApplicationContext iwac) {
+		
+		try {
+			return getCasesBusiness(iwac).getCaseStatusWaiting();
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
