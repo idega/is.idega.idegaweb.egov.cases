@@ -45,7 +45,6 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
 import com.lowagie.text.Document;
-import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
@@ -116,7 +115,6 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 			String title = iwrb.getLocalizedString("case_overview", "Case overview");
 			Paragraph cTitle = new Paragraph(title, titleFont);
-			cTitle.setAlignment(Element.ALIGN_CENTER);
 			document.setPageCount(1);
 			document.add(cTitle);
 			document.add(new Phrase(""));
@@ -125,7 +123,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 			PdfPTable table = new PdfPTable(2);
 			table.setWidths(widths);
 			table.getDefaultCell().setBorder(0);
-			table.getDefaultCell().setPaddingBottom(6);
+			table.getDefaultCell().setPaddingBottom(8);
 
 			CaseCategory category = theCase.getCaseCategory();
 			CaseCategory parentCategory = category.getParent();
