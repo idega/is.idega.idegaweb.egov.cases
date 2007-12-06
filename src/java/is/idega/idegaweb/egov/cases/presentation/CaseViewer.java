@@ -18,7 +18,6 @@ import java.util.Collection;
 import javax.ejb.FinderException;
 import javax.faces.application.Application;
 
-import com.idega.block.form.process.ui.ProcessFormViewer;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
@@ -26,6 +25,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.jbpm.presentation.ProcessViewer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -102,12 +102,12 @@ public class CaseViewer extends CaseCreator {
 			if(theCase.getJbpmProcessInstanceId() != null) {
 				
 				Application application = iwc.getApplication();
-				ProcessFormViewer formviewer = (ProcessFormViewer)application.createComponent(ProcessFormViewer.COMPONENT_TYPE);
-				formviewer.setProcess((CasesJbpmProcessManager)WFUtil.getBeanInstance("casesJbpmProcessManager"));
-				formviewer.setProcessView(true);
-				formviewer.setProcessInstanceId(String.valueOf(theCase.getJbpmProcessInstanceId()));
+				ProcessViewer viewer = (ProcessViewer)application.createComponent(ProcessViewer.COMPONENT_TYPE);
+				viewer.setProcess((com.idega.jbpm.exe.Process)WFUtil.getBeanInstance("casesJbpmProcessManager"));
+				viewer.setProcessView(true);
+				viewer.setProcessInstanceId(String.valueOf(theCase.getJbpmProcessInstanceId()));
 				
-				add(formviewer);
+				add(viewer);
 				return;
 			}
 			

@@ -33,9 +33,9 @@ import com.idega.util.CoreConstants;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
- * Last modified: $Date: 2007/12/04 14:04:20 $ by $Author: civilis $
+ * Last modified: $Date: 2007/12/06 13:25:21 $ by $Author: civilis $
  *
  */
 public class CasesJbpmProcess {
@@ -91,8 +91,8 @@ public class CasesJbpmProcess {
 			FacesContext ctx = FacesContext.getCurrentInstance();
 			IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
 			Map<String, String> parameters = new HashMap<String, String>(2);
-			parameters.put("caseCategory", getCaseCategory());
-			parameters.put("caseType", getCaseType());
+			parameters.put(CasesJbpmFormsBundle.caseCategoryIdParameter, getCaseCategory());
+			parameters.put(CasesJbpmFormsBundle.caseTypeIdParameter, getCaseType());
 			
 			casesJbpmFormsBundle.createDefinitions(ctx, iwma.getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER), getTemplateBundleLocation(), getFormName(), parameters);
 			

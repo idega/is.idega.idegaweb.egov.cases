@@ -141,7 +141,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		
 		ProcessArtifactsParamsBean params =  (ProcessArtifactsParamsBean)WFUtil.getBeanInstance("jbpmProcessArtifactsParams");
 		params.setPiId(processInstanceId);
-		add(new FaceletComponent("/idegaweb/bundles/org.jboss.jbpm.bundle/facelets/processArtifactsList.xhtml"));
+		add(new FaceletComponent("/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/facelets/casesProcessArtifactsList.xhtml"));
 		
 	}
 	
@@ -174,9 +174,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		ProcessArtifactsParamsBean params =  (ProcessArtifactsParamsBean)WFUtil.getBeanInstance("jbpmProcessArtifactsParams");
 		params.setPiId(processInstanceId);
 		
-		System.out.println("task list");
-		add(new FaceletComponent("/idegaweb/bundles/org.jboss.jbpm.bundle/facelets/processTasksList.xhtml"));
-		
+		add(new FaceletComponent("/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/facelets/casesProcessTasksList.xhtml"));
 	}
 
 	private int parseAction(IWContext iwc) {

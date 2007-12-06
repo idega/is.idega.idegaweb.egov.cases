@@ -2,12 +2,23 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
 
 <beans>
+
 	<bean id="casesJbpmProcessManager" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessManager" scope="singleton">
 		<property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
 		<property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
-        <property name="variablesHandler" ref="process_xforms_variablesHandler" />
-        <property name="jbpmProcessManager" ref="jbpmProcessManager" />
+        <property name="variablesHandler" ref="jbpmProcessVariablesHandler" />
+        <property name="viewManager" ref="casesJbpmFormManager" />
+        <property name="converter" ref="process_xforms_converter" />
 	</bean>
+    
+    <bean id="casesJbpmFormManager" class="is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager" scope="singleton">
+        <property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
+        <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
+        <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
+        <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
+        <property name="variablesHandler" ref="jbpmProcessVariablesHandler" />
+        <property name="viewCreator" ref="jbpmViewCreator" />
+    </bean>
     
     <bean id="casesJbpmFormsBundleFactory" class="is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleFactory" scope="singleton">
         <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
@@ -30,13 +41,11 @@
         <property name="templateBundleLocation" value="resources/casesJbpmTemplates/nestCommitteeGateway/" />
     </bean>
     
-    <bean id="casesJbpmFormManager" class="is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager" scope="singleton">
+    <bean id="casesJbpmUtil" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmUtil" scope="singleton" />
+    
+    <bean id="casesJbpmProcessArtifacts" class="com.idega.jbpm.exe.ProcessArtifacts" scope="session">
         <property name="jbpmConfiguration" ref="defaultJbpmConfiguration" />
         <property name="sessionFactory" ref="idega_jbpmDSHibernateSessionFactory" />
-        <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
-        <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
-        <property name="variablesHandler" ref="process_xforms_variablesHandler" />
+        <property name="process" ref="casesJbpmProcessManager" />
     </bean>
-    
-    <bean id="casesJbpmUtil" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmUtil" scope="singleton" />
 </beans>
