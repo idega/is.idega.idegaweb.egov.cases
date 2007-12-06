@@ -176,6 +176,8 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 				table.addCell(new Phrase(""));
 				table.addCell(new Phrase(""));
+				table.addCell(new Phrase(""));
+				table.addCell(new Phrase(""));
 			}
 
 			table.addCell(new Phrase(iwrb.getLocalizedString("case_nr", "Case nr."), labelFont));
