@@ -7,6 +7,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CaseWriter;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -28,6 +29,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
+import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -336,6 +338,12 @@ public class CaseViewer extends CaseCreator {
 				bottom.add(home);
 			}
 
+			if (!iwc.getCurrentUser().equals(owner)) {
+				Link pdf = getDownloadButtonLink(iwrb.getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
+				pdf.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+				bottom.add(pdf);
+			}
+
 			if (status.equals(getCasesBusiness(iwc).getCaseStatusInactive()) || status.equals(getCasesBusiness(iwc).getCaseStatusReady())) {
 				Link next = getButtonLink(iwrb.getLocalizedString(getPrefix() + "reactivate_case", "Reactivate case"));
 				next.addParameter(PARAMETER_ACTION_REACTIVATE, Boolean.TRUE.toString());
@@ -351,6 +359,10 @@ public class CaseViewer extends CaseCreator {
 				bottom.add(next);
 			}
 			else if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc) && (status.equals(getCasesBusiness(iwc).getCaseStatusPending()) || status.equals(getCasesBusiness(iwc).getCaseStatusWaiting()))) {
+				Link pdf = getDownloadButtonLink(iwrb.getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
+				pdf.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+				bottom.add(pdf);
+
 				Link next = getButtonLink(iwrb.getLocalizedString("send_reminder", "Send reminder"));
 				next.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_SEND_REMINDER));
 				next.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
@@ -493,6 +505,31 @@ public class CaseViewer extends CaseCreator {
 		link.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		link.setStyleClass("homeButton");
 		bottom.add(link);
+	}
+
+	protected Link getDownloadButtonLink(String text, Class mediaWriterClass) {
+		Layer all = new Layer(Layer.SPAN);
+		all.setStyleClass("buttonSpan");
+
+		Layer left = new Layer(Layer.SPAN);
+		left.setStyleClass("left");
+		all.add(left);
+
+		Layer middle = new Layer(Layer.SPAN);
+		middle.setStyleClass("middle");
+		middle.add(new Text(text));
+		all.add(middle);
+
+		Layer right = new Layer(Layer.SPAN);
+		right.setStyleClass("right");
+		all.add(right);
+
+		DownloadLink link = new DownloadLink(all);
+		link.setStyleClass("button");
+		link.setMediaWriterClass(mediaWriterClass);
+		link.setTarget(Link.TARGET_BLANK_WINDOW);
+
+		return link;
 	}
 
 	protected ICPage getHomePage() {
