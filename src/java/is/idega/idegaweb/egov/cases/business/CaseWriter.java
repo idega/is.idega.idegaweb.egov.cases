@@ -130,49 +130,55 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 			CaseCategory category = theCase.getCaseCategory();
 			CaseCategory parentCategory = category.getParent();
 			CaseType type = theCase.getCaseType();
-			User user = getCasesBusiness(iwc).getLastModifier(theCase);
-			Address address = getUserBusiness(iwc).getUsersMainAddress(user);
+			User user = theCase.getOwner();
+			Address address = user != null ? getUserBusiness(iwc).getUsersMainAddress(user) : null;
 			PostalCode postal = null;
 			if (address != null) {
 				postal = address.getPostalCode();
 			}
 			Phone phone = null;
-			try {
-				phone = getUserBusiness(iwc).getUsersHomePhone(user);
-			}
-			catch (NoPhoneFoundException e) {
-				//No phone found...
+			if (user != null) {
+				try {
+					phone = getUserBusiness(iwc).getUsersHomePhone(user);
+				}
+				catch (NoPhoneFoundException e) {
+					//No phone found...
+				}
 			}
 			Email email = null;
-			try {
-				email = getUserBusiness(iwc).getUsersMainEmail(user);
-			}
-			catch (NoEmailFoundException e) {
-				//No email found...
+			if (user != null) {
+				try {
+					email = getUserBusiness(iwc).getUsersMainEmail(user);
+				}
+				catch (NoEmailFoundException e) {
+					//No email found...
+				}
 			}
 
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
 
-			table.addCell(new Phrase(iwrb.getLocalizedString("name", "Name"), labelFont));
-			table.addCell(new Phrase(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(locale), textFont));
+			if (user != null) {
+				table.addCell(new Phrase(iwrb.getLocalizedString("name", "Name"), labelFont));
+				table.addCell(new Phrase(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(locale), textFont));
 
-			table.addCell(new Phrase(iwrb.getLocalizedString("personal_id", "Personal ID"), labelFont));
-			table.addCell(new Phrase(PersonalIDFormatter.format(user.getPersonalID(), locale), textFont));
+				table.addCell(new Phrase(iwrb.getLocalizedString("personal_id", "Personal ID"), labelFont));
+				table.addCell(new Phrase(PersonalIDFormatter.format(user.getPersonalID(), locale), textFont));
 
-			table.addCell(new Phrase(iwrb.getLocalizedString("address", "Address"), labelFont));
-			table.addCell(new Phrase(address != null ? address.getStreetAddress() : "-", textFont));
+				table.addCell(new Phrase(iwrb.getLocalizedString("address", "Address"), labelFont));
+				table.addCell(new Phrase(address != null ? address.getStreetAddress() : "-", textFont));
 
-			table.addCell(new Phrase(iwrb.getLocalizedString("zip_code", "Postal code"), labelFont));
-			table.addCell(new Phrase(postal != null ? postal.getPostalAddress() : "-", textFont));
+				table.addCell(new Phrase(iwrb.getLocalizedString("zip_code", "Postal code"), labelFont));
+				table.addCell(new Phrase(postal != null ? postal.getPostalAddress() : "-", textFont));
 
-			table.addCell(new Phrase(iwrb.getLocalizedString("home_phone", "Home phone"), labelFont));
-			table.addCell(new Phrase(phone != null ? phone.getNumber() : "-", textFont));
+				table.addCell(new Phrase(iwrb.getLocalizedString("home_phone", "Home phone"), labelFont));
+				table.addCell(new Phrase(phone != null ? phone.getNumber() : "-", textFont));
 
-			table.addCell(new Phrase(iwrb.getLocalizedString("email", "Email"), labelFont));
-			table.addCell(new Phrase(email != null ? email.getEmailAddress() : "-", textFont));
+				table.addCell(new Phrase(iwrb.getLocalizedString("email", "Email"), labelFont));
+				table.addCell(new Phrase(email != null ? email.getEmailAddress() : "-", textFont));
 
-			table.addCell(new Phrase(""));
-			table.addCell(new Phrase(""));
+				table.addCell(new Phrase(""));
+				table.addCell(new Phrase(""));
+			}
 
 			table.addCell(new Phrase(iwrb.getLocalizedString("case_nr", "Case nr."), labelFont));
 			table.addCell(new Phrase(theCase.getPrimaryKey().toString(), textFont));
