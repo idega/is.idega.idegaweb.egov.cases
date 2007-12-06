@@ -115,9 +115,9 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 			String title = iwrb.getLocalizedString("case_overview", "Case overview");
 			Paragraph cTitle = new Paragraph(title, titleFont);
+			cTitle.setSpacingAfter(24);
 			document.setPageCount(1);
 			document.add(cTitle);
-			document.add(new Phrase(""));
 
 			int[] widths = { 25, 75 };
 			PdfPTable table = new PdfPTable(2);
