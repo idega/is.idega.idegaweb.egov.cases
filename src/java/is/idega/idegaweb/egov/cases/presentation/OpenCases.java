@@ -7,6 +7,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CaseWriter;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -220,17 +221,21 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		back.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		bottom.add(back);
 
+		Link pdf = getDownloadButtonLink(getResourceBundle().getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
+		pdf.addParameter(getBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+		bottom.add(pdf);
+
 		if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
-			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
-			next.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
-			next.maintainParameter(PARAMETER_CASE_PK, iwc);
-			bottom.add(next);
+			Link allocate = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
+			allocate.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
+			allocate.maintainParameter(PARAMETER_CASE_PK, iwc);
+			bottom.add(allocate);
 		}
 
-		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ? getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
-		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
-		next.setToFormSubmit(form);
-		bottom.add(next);
+		Link takeCase = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ? getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
+		takeCase.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
+		takeCase.setToFormSubmit(form);
+		bottom.add(takeCase);
 
 		add(form);
 	}

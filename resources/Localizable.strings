@@ -124,6 +124,7 @@ edit_category=Edit category
 email=E-mail
 failed_to_save=FAILED TO SAVE THE CATEGORY\!
 false=false
+fetch_pdf=Fetch PDF
 handle_overview=Handle overview
 handler=Handler
 handler_group=Handler group

@@ -5,7 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>eGov General Cases</name>
   <artifactId>is.idega.idegaweb.egov.cases</artifactId>
-  <currentVersion>1.0.31</currentVersion>
+  <currentVersion>1.0.32</currentVersion>
   <inceptionYear>2005</inceptionYear>
   <shortDescription>eGov General Cases</shortDescription>
   <versions>
@@ -169,6 +169,11 @@
       <name>1.0.31</name>
       <tag>EGOV_CASES_1_0_31</tag>
     </version>
+    <version>
+      <id>1.0.32</id>
+      <name>1.0.32</name>
+      <tag>EGOV_CASES_1_0_32</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
@@ -226,6 +231,13 @@
       <type>jar</type>
       <url>http://jakarta.apache.org/poi/</url>
       <properties/>
+    </dependency>
+    <dependency>
+      <groupId>itextpdf</groupId>
+      <artifactId>itext-paulo</artifactId>
+      <version>139</version>
+      <type>jar</type>
+      <url>http://ws.apache.org/axis</url>
     </dependency>
     <dependency>
       <groupId>bundles</groupId>

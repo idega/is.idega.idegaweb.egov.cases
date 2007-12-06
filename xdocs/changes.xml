@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.32" date="2007-12-06">
+			<action dev="laddi" type="update">
+				Added 'Fetch PDF' button to overview in OpenCases to fetch a PDF version of the selected case.
+			</action>
+		</release>
+		
 		<release version="1.0.31" date="2007-11-08">
 			<action dev="laddi" type="update">
 				Added possibility to fetch within specific dates in CasesFetcher.
