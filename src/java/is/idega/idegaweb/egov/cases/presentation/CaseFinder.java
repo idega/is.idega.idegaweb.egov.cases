@@ -245,12 +245,13 @@ public class CaseFinder extends CasesBlock {
 				boolean addProcessLink = false;
 				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 				if (this.openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
+					process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 					process.setPage(this.openCasesPage);
 					addProcessLink = true;
 				}
 				else if (this.myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) && (handler != null && handler.equals(iwc.getCurrentUser()))) {
+					process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 					process.setPage(this.myCasesPage);
 					addProcessLink = true;
 				}
