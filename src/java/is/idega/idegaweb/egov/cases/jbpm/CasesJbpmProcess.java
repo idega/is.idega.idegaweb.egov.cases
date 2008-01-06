@@ -3,8 +3,7 @@ package is.idega.idegaweb.egov.cases.jbpm;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundle;
-import is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleFactory;
+import is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleManager;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.io.IOException;
@@ -18,29 +17,24 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.jbpm.data.CasesJbpmBind;
+import com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmDao;
+import com.idega.jbpm.def.ProcessBundleManager;
 import com.idega.util.CoreConstants;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  *
- * Last modified: $Date: 2007/12/06 13:25:21 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
  *
  */
 public class CasesJbpmProcess {
-	
-	private CasesJbpmFormsBundleFactory casesJbpmFormsBundleFactory;
 	
 	private String formName;
 	private String message;
@@ -52,7 +46,8 @@ public class CasesJbpmProcess {
 	private String chosenProcessInstanceId;
 
 	private String templateBundleLocation;
-	private SessionFactory sessionFactory;
+	private ProcessBundleManager processBundleManager;
+	private CasesJbpmDao casesJbpmDao;
 	
 	private List<SelectItem> casesTypes = new ArrayList<SelectItem>();
 	private List<SelectItem> casesCategories = new ArrayList<SelectItem>();
@@ -84,17 +79,14 @@ public class CasesJbpmProcess {
 			return null;
 		}
 			
-			
 		try {
-			CasesJbpmFormsBundle casesJbpmFormsBundle = getCasesJbpmFormsBundleFactory().newCasesJbpmFormsBundle();
-			
 			FacesContext ctx = FacesContext.getCurrentInstance();
 			IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
 			Map<String, String> parameters = new HashMap<String, String>(2);
-			parameters.put(CasesJbpmFormsBundle.caseCategoryIdParameter, getCaseCategory());
-			parameters.put(CasesJbpmFormsBundle.caseTypeIdParameter, getCaseType());
+			parameters.put(CasesJbpmFormsBundleManager.caseCategoryIdParameter, getCaseCategory());
+			parameters.put(CasesJbpmFormsBundleManager.caseTypeIdParameter, getCaseType());
 			
-			casesJbpmFormsBundle.createDefinitions(ctx, iwma.getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER), getTemplateBundleLocation(), getFormName(), parameters);
+			getProcessBundleManager().createBundle(ctx, iwma.getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER), getTemplateBundleLocation(), getFormName(), parameters);
 			
 		} catch (IOException e) {
 			setMessage("IO Exception occured");
@@ -217,18 +209,8 @@ public class CasesJbpmProcess {
 		casesProcessesDefinitions.clear();
 		addDefaultSelectItem(casesProcessesDefinitions);
 		
-		Session session = getSessionFactory().getCurrentSession();
-		Transaction transaction = session.getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
 		try {
-			
-			//query from CasesJbpmBind
-			@SuppressWarnings("unchecked")			
-			List<Object[]> casesProcesses = session.getNamedQuery(CasesJbpmBind.SIMPLE_CASES_PROCESSES_DEFINITIONS_QUERY_NAME).list();
+			List<Object[]> casesProcesses = getCasesJbpmDao().getSimpleProcessDefinitions();
 			
 			if(casesProcesses == null)
 				return casesProcessesDefinitions;
@@ -250,10 +232,6 @@ public class CasesJbpmProcess {
 			casesProcessesDefinitions.clear();
 			return casesProcessesDefinitions;
 			
-		} finally {
-		
-			if(!transactionWasActive)
-				transaction.commit();
 		}
 	}
 
@@ -298,29 +276,28 @@ public class CasesJbpmProcess {
 		
 		setChosenProcessInstanceId(getProcessInstanceId());
 	}
-
-	public CasesJbpmFormsBundleFactory getCasesJbpmFormsBundleFactory() {
-		return casesJbpmFormsBundleFactory;
-	}
-
-	public void setCasesJbpmFormsBundleFactory(
-			CasesJbpmFormsBundleFactory casesJbpmFormsBundleFactory) {
-		this.casesJbpmFormsBundleFactory = casesJbpmFormsBundleFactory;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
+	
 	public String getTemplateBundleLocation() {
 		return templateBundleLocation;
 	}
 
 	public void setTemplateBundleLocation(String templateBundleLocation) {
 		this.templateBundleLocation = templateBundleLocation;
+	}
+
+	public ProcessBundleManager getProcessBundleManager() {
+		return processBundleManager;
+	}
+
+	public void setProcessBundleManager(ProcessBundleManager processBundleManager) {
+		this.processBundleManager = processBundleManager;
+	}
+
+	public CasesJbpmDao getCasesJbpmDao() {
+		return casesJbpmDao;
+	}
+
+	public void setCasesJbpmDao(CasesJbpmDao casesJbpmDao) {
+		this.casesJbpmDao = casesJbpmDao;
 	}
 }

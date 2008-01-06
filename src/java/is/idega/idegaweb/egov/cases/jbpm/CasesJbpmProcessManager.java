@@ -10,9 +10,6 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -23,6 +20,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.jbpm.IdegaJbpmContext;
 import com.idega.jbpm.exe.Converter;
 import com.idega.jbpm.exe.ProcessConstants;
 import com.idega.jbpm.exe.VariablesHandler;
@@ -36,40 +34,31 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  *
- * Last modified: $Date: 2007/12/05 10:36:15 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
  */
 public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 
-	private SessionFactory sessionFactory;
-	private JbpmConfiguration jbpmConfiguration;
 	private VariablesHandler variablesHandler;
 	private ViewManager viewManager;
 	private Converter converter;
+	private IdegaJbpmContext idegaJbpmContext;
 	
 	public Converter getConverter() {
 		return converter;
 	}
 
+	public IdegaJbpmContext getIdegaJbpmContext() {
+		return idegaJbpmContext;
+	}
+
+	public void setIdegaJbpmContext(IdegaJbpmContext idegaJbpmContext) {
+		this.idegaJbpmContext = idegaJbpmContext;
+	}
+
 	public void setConverter(Converter converter) {
 		this.converter = converter;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
-	public JbpmConfiguration getJbpmConfiguration() {
-		return jbpmConfiguration;
-	}
-
-	public void setJbpmConfiguration(JbpmConfiguration jbpmConfiguration) {
-		this.jbpmConfiguration = jbpmConfiguration;
 	}
 
 	public VariablesHandler getVariablesHandler() {
@@ -87,16 +76,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		Long caseCatId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseCategoryIdActionVariableName));
 		Long caseTypeId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseTypeActionVariableName));
 		
-		SessionFactory sessionFactory = getSessionFactory();
-		
-		Transaction transaction = sessionFactory.getCurrentSession().getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
-		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
-		ctx.setSession(sessionFactory.getCurrentSession());
+		JbpmContext ctx = getIdegaJbpmContext().createJbpmContext();
 		
 		try {
 			
@@ -138,9 +118,6 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 			throw new RuntimeException(e);
 		} finally {
 			ctx.close();
-			
-			if(!transactionWasActive)
-				transaction.commit();
 		}
 	}
 	
@@ -178,16 +155,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		
 		Long taskInstanceId = Long.parseLong(parameters.get(ProcessConstants.TASK_INSTANCE_ID));
 		
-		SessionFactory sessionFactory = getSessionFactory();
-		
-		Transaction transaction = sessionFactory.getCurrentSession().getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
-		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
-		ctx.setSession(sessionFactory.getCurrentSession());
+		JbpmContext ctx = getIdegaJbpmContext().createJbpmContext();
 		
 		try {
 			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
@@ -195,9 +163,6 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 			
 		} finally {
 			ctx.close();
-			
-			if(!transactionWasActive)
-				transaction.commit();
 		}
 	}
 	

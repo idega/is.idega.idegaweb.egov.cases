@@ -10,10 +10,6 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.Token;
@@ -27,8 +23,10 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.idegaweb.IWApplicationContext;
-import com.idega.jbpm.data.CasesJbpmBind;
+import com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmBind;
+import com.idega.jbpm.IdegaJbpmContext;
 import com.idega.jbpm.data.ViewTaskBind;
+import com.idega.jbpm.data.dao.JbpmBindsDao;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewCreator;
 import com.idega.jbpm.def.ViewFactory;
@@ -40,21 +38,30 @@ import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.util.CoreConstants;
 
+
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  *
- * Last modified: $Date: 2007/12/05 10:36:15 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
  */
 public class CasesJbpmFormManager implements ViewManager {
 
-	private JbpmConfiguration jbpmConfiguration;
-	private SessionFactory sessionFactory;
 	private DocumentManagerFactory documentManagerFactory;
 	private ViewToTask viewToTaskBinder;
 	private VariablesHandler variablesHandler;
 	private ViewCreator viewCreator;
+	private JbpmBindsDao jbpmBindsDao;
+	private IdegaJbpmContext idegaJbpmContext;
 	
+	public JbpmBindsDao getJbpmBindsDao() {
+		return jbpmBindsDao;
+	}
+
+	public void setJbpmBindsDao(JbpmBindsDao jbpmBindsDao) {
+		this.jbpmBindsDao = jbpmBindsDao;
+	}
+
 	public VariablesHandler getVariablesHandler() {
 		return variablesHandler;
 	}
@@ -65,20 +72,11 @@ public class CasesJbpmFormManager implements ViewManager {
 	
 	public View loadInitView(FacesContext context, Long processDefinitionId, int initiatorId) {
 		
-		Session session = getSessionFactory().getCurrentSession();
-		
-		Transaction transaction = session.getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
-		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
-		ctx.setSession(session);
+		JbpmContext ctx = getIdegaJbpmContext().createJbpmContext();
 		
 		try {
 //			TODO: make this generic bind
-			CasesJbpmBind bind = (CasesJbpmBind)session.load(CasesJbpmBind.class, processDefinitionId);
+			CasesJbpmBind bind = getJbpmBindsDao().find(CasesJbpmBind.class, processDefinitionId);
 			
 			String initTaskName = bind.getInitTaskName();
 			
@@ -111,29 +109,17 @@ public class CasesJbpmFormManager implements ViewManager {
 		} finally {
 			
 			ctx.close();
-			
-			if(!transactionWasActive)
-				transaction.commit();
 		}
 	}
 	
 	public View loadTaskInstanceView(FacesContext context, Long taskInstanceId) {
 		
-		Session session = getSessionFactory().getCurrentSession();
-		
-		Transaction transaction = session.getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
-		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
-		ctx.setSession(session);
+		JbpmContext ctx = getIdegaJbpmContext().createJbpmContext();
 		
 		try {
 			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
 			
-			List<ViewTaskBind> viewTaskBinds = ViewTaskBind.getViewTaskBindsByTaskId(session, taskInstance.getTask().getId());
+			List<ViewTaskBind> viewTaskBinds = getJbpmBindsDao().getViewTaskBindsByTaskId(taskInstance.getTask().getId());
 			
 			if(viewTaskBinds.isEmpty())
 				throw new RuntimeException("No view bind to task found for task by id: "+taskInstance.getTask().getId());
@@ -170,27 +156,12 @@ public class CasesJbpmFormManager implements ViewManager {
 			throw new RuntimeException(e);
 		} finally {
 			ctx.close();
-			
-			if(!transactionWasActive)
-				transaction.commit();
 		}
 	}
 	
 	public View loadProcessInstanceView(FacesContext context, Token token) {
 		
-		Session session = getSessionFactory().getCurrentSession();
-		
-		Transaction transaction = session.getTransaction();
-		boolean transactionWasActive = transaction.isActive();
-		
-		if(!transactionWasActive)
-			transaction.begin();
-		
-		JbpmContext ctx = getJbpmConfiguration().createJbpmContext();
-		ctx.setSession(session);
-		
 		try {
-			
 			@SuppressWarnings("unchecked")
 			Collection<TaskInstance> tis = token.getProcessInstance().getTaskMgmtInstance().getUnfinishedTasks(token);
 			
@@ -212,12 +183,6 @@ public class CasesJbpmFormManager implements ViewManager {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 			
-		} finally {
-			
-			ctx.close();
-			
-			if(!transactionWasActive)
-				transaction.commit();
 		}
 	}
 	
@@ -228,7 +193,7 @@ public class CasesJbpmFormManager implements ViewManager {
 //		1 - owner 2 - case handler 3 - other
 //		checking in this order. 3 - other should be resolved in the same way task view bindings are resolved.
 		
-		Session session = getSessionFactory().getCurrentSession();
+		Session session = getHibernateResources().getGlobalSessionFactory().getCurrentSession();
 		
 		Transaction transaction = session.getTransaction();
 		boolean transactionWasActive = transaction.isActive();
@@ -307,22 +272,6 @@ public class CasesJbpmFormManager implements ViewManager {
 	}
 	*/
 
-	public JbpmConfiguration getJbpmConfiguration() {
-		return jbpmConfiguration;
-	}
-
-	public void setJbpmConfiguration(JbpmConfiguration jbpmConfiguration) {
-		this.jbpmConfiguration = jbpmConfiguration;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
 	public DocumentManagerFactory getDocumentManagerFactory() {
 		return documentManagerFactory;
 	}
@@ -383,5 +332,13 @@ public class CasesJbpmFormManager implements ViewManager {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public IdegaJbpmContext getIdegaJbpmContext() {
+		return idegaJbpmContext;
+	}
+
+	public void setIdegaJbpmContext(IdegaJbpmContext idegaJbpmContext) {
+		this.idegaJbpmContext = idegaJbpmContext;
 	}
 }
