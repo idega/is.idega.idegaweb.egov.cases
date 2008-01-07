@@ -5,6 +5,14 @@
 	</properties>
 	
 	<body>
+	
+		<release version="1.0.33" date="2008-01-07">
+			<action dev="tryggvil" type="fix">
+				Adding OpenCases and ClosedCases components
+			</action>
+		</release>
+		
+	
 		<release version="1.0.32" date="2007-12-06">
 			<action dev="laddi" type="update">
 				Added 'Fetch PDF' button to overview in OpenCases to fetch a PDF version of the selected case.
