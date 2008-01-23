@@ -148,7 +148,7 @@ public class CaseViewer extends CaseCreator {
 			CaseStatus status = theCase.getCaseStatus();
 			CaseType type = theCase.getCaseType();
 			ICFile attachment = theCase.getAttachment();
-			User user = getCasesBusiness(iwc).getLastModifier(theCase);
+			User user = theCase.getHandledBy();
 			User owner = theCase.getOwner();
 			if (user != null && user.equals(owner)) {
 				user = null;
@@ -379,10 +379,6 @@ public class CaseViewer extends CaseCreator {
 				bottom.add(next);
 			}
 			else if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc) && (status.equals(getCasesBusiness(iwc).getCaseStatusPending()) || status.equals(getCasesBusiness(iwc).getCaseStatusWaiting()))) {
-				Link pdf = getDownloadButtonLink(iwrb.getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
-				pdf.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
-				bottom.add(pdf);
-
 				Link sendReminder = getButtonLink(iwrb.getLocalizedString("send_reminder", "Send reminder"));
 				sendReminder.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_SEND_REMINDER));
 				sendReminder.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
