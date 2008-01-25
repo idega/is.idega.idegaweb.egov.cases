@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.jbpm;
+package is.idega.idegaweb.egov.cases.bpm;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -21,10 +21,9 @@ import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.jbpm.IdegaJbpmContext;
-import com.idega.jbpm.exe.Converter;
-import com.idega.jbpm.exe.ProcessConstants;
+import com.idega.jbpm.def.View;
+import com.idega.jbpm.exe.ProcessManager;
 import com.idega.jbpm.exe.VariablesHandler;
-import com.idega.jbpm.exe.ViewManager;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.user.business.UserBusiness;
@@ -34,31 +33,21 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
  */
-public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
+public class CasesBpmProcessManager implements ProcessManager {
 
 	private VariablesHandler variablesHandler;
-	private ViewManager viewManager;
-	private Converter converter;
 	private IdegaJbpmContext idegaJbpmContext;
 	
-	public Converter getConverter() {
-		return converter;
-	}
-
 	public IdegaJbpmContext getIdegaJbpmContext() {
 		return idegaJbpmContext;
 	}
 
 	public void setIdegaJbpmContext(IdegaJbpmContext idegaJbpmContext) {
 		this.idegaJbpmContext = idegaJbpmContext;
-	}
-
-	public void setConverter(Converter converter) {
-		this.converter = converter;
 	}
 
 	public VariablesHandler getVariablesHandler() {
@@ -69,9 +58,10 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		this.variablesHandler = variablesHandler;
 	}
 
-	public void startProcess(Map<String, String> parameters, Object submissionData) {
+	public void startProcess(long processDefinitionId, View view) {
 		
-		Long processDefinitionId = Long.parseLong(parameters.get(ProcessConstants.PROCESS_DEFINITION_ID));
+		Map<String, String> parameters = view.resolveParameters();
+		
 		int userId = Integer.parseInt(parameters.get(CasesJbpmProcessConstants.userIdActionVariableName));
 		Long caseCatId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseCategoryIdActionVariableName));
 		Long caseTypeId = Long.parseLong(parameters.get(CasesJbpmProcessConstants.caseTypeActionVariableName));
@@ -112,7 +102,7 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 			caseData.put(CasesJbpmProcessConstants.caseCreatedDateVariableName, created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT));
 			
 			getVariablesHandler().submitVariables(caseData, taskInstance.getId());
-			submitVariablesAndProceedProcess(taskInstance, submissionData);
+			submitVariablesAndProceedProcess(taskInstance, view.resolveVariables());
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -121,9 +111,9 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		}
 	}
 	
-	protected void submitVariablesAndProceedProcess(TaskInstance ti, Object instance) {
+	protected void submitVariablesAndProceedProcess(TaskInstance ti, Map<String, Object> variables) {
 		
-		getVariablesHandler().submitVariables(getConverter().convert(instance), ti.getId());
+		getVariablesHandler().submitVariables(variables, ti.getId());
     	
     	String actionTaken = (String)ti.getVariable(CasesJbpmProcessConstants.actionTakenVariableName);
     	
@@ -151,26 +141,16 @@ public class CasesJbpmProcessManager implements com.idega.jbpm.exe.Process {
 		}
 	}
 	
-	public void submitTaskInstance(Map<String, String> parameters, Object submissionData) {
-		
-		Long taskInstanceId = Long.parseLong(parameters.get(ProcessConstants.TASK_INSTANCE_ID));
+	public void submitTaskInstance(long taskInstanceId, View view) {
 		
 		JbpmContext ctx = getIdegaJbpmContext().createJbpmContext();
 		
 		try {
 			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
-	    	submitVariablesAndProceedProcess(taskInstance, submissionData);
+	    	submitVariablesAndProceedProcess(taskInstance, view.resolveVariables());
 			
 		} finally {
 			ctx.close();
 		}
-	}
-	
-	public void setViewManager(ViewManager viewManager) {
-		this.viewManager = viewManager;
-	}
-
-	public ViewManager getViewManager() {
-		return viewManager;
 	}
 }

@@ -1,12 +1,12 @@
-package is.idega.idegaweb.egov.cases.jbpm.actionhandlers;
+package is.idega.idegaweb.egov.cases.bpm.actionhandlers;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
+import is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcessConstants;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessConstants;
 
 import org.jbpm.graph.def.ActionHandler;
 import org.jbpm.graph.exe.ExecutionContext;
@@ -22,9 +22,9 @@ import com.idega.user.data.User;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2007/11/15 14:34:36 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:54 $ by $Author: civilis $
  */
 public class CasesStatusHandler implements ActionHandler {
 

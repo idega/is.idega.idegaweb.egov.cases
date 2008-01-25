@@ -1,9 +1,9 @@
-package is.idega.idegaweb.egov.cases.jbpm;
+package is.idega.idegaweb.egov.cases.bpm;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleManager;
+import is.idega.idegaweb.egov.cases.bpm.bundle.CasesJbpmFormsBundleManager;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.io.IOException;
@@ -22,16 +22,16 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmDao;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmDao;
 import com.idega.jbpm.def.ProcessBundleManager;
 import com.idega.util.CoreConstants;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
  *
  */
 public class CasesJbpmProcess {

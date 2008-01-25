@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.jbpm.bundle;
+package is.idega.idegaweb.egov.cases.bpm.bundle;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import com.idega.jbpm.def.View;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:56 $ by $Author: civilis $
  *
  */
 public class CasesJbpmFormsBundle implements ProcessBundle {

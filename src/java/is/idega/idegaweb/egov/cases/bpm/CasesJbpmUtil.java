@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.jbpm;
+package is.idega.idegaweb.egov.cases.bpm;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -19,9 +19,9 @@ import com.idega.presentation.IWContext;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2007/11/21 13:28:36 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
  *
  */
 public class CasesJbpmUtil {

@@ -10,13 +10,11 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessManager;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
 
 import javax.ejb.FinderException;
-import javax.faces.application.Application;
 
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
@@ -25,7 +23,6 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.jbpm.presentation.ProcessViewer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -37,7 +34,6 @@ import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
-import com.idega.webface.WFUtil;
 
 public class CaseViewer extends CaseCreator {
 
@@ -101,13 +97,7 @@ public class CaseViewer extends CaseCreator {
 			
 			if(theCase.getJbpmProcessInstanceId() != null) {
 				
-				Application application = iwc.getApplication();
-				ProcessViewer viewer = (ProcessViewer)application.createComponent(ProcessViewer.COMPONENT_TYPE);
-				viewer.setProcess((com.idega.jbpm.exe.Process)WFUtil.getBeanInstance("casesJbpmProcessManager"));
-				viewer.setProcessView(true);
-				viewer.setProcessInstanceId(String.valueOf(theCase.getJbpmProcessInstanceId()));
-				
-				add(viewer);
+//				TODO: show bpm view
 				return;
 			}
 			

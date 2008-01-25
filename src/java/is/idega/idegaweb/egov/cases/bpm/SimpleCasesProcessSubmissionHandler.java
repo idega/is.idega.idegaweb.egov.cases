@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.jbpm;
+package is.idega.idegaweb.egov.cases.bpm;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -19,9 +19,9 @@ import com.idega.webface.WFUtil;
  * TODO: move all this logic to spring bean
  * 
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2007/12/05 10:36:15 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
  */
 public class SimpleCasesProcessSubmissionHandler extends AbstractConnector implements SubmissionHandler {
     
@@ -44,19 +44,19 @@ public class SimpleCasesProcessSubmissionHandler extends AbstractConnector imple
     		//insert (post)
     	}
     	
-    	com.idega.jbpm.exe.Process process = (com.idega.jbpm.exe.Process)WFUtil.getBeanInstance("casesJbpmProcessManager");
+    	com.idega.jbpm.exe.BPMFactory bpmFactory = (com.idega.jbpm.exe.BPMFactory)WFUtil.getBeanInstance("bpmFactory");
     	String action = submission.getElement().getAttribute(FormManagerUtil.action_att);
     	Map<String, String> parameters = new URIUtil(action).getParameters();
     	
     	if(parameters.containsKey(ProcessConstants.PROCESS_DEFINITION_ID)) {
-    		process.startProcess(parameters, submissionInstance);
+    		//bpmFactory.startProcess(parameters, submissionInstance);
     		
     	} else if(parameters.containsKey(ProcessConstants.TASK_INSTANCE_ID)) {
-    		process.submitTaskInstance(parameters, submissionInstance);
+    		//bpmFactory.submitTaskInstance(parameters, submissionInstance);
     		
     	} else {
     	
-    		Logger.getLogger(CasesJbpmProcessManager.class.getName()).log(Level.WARNING, "Couldn't handle submission. No action associated with the submission action: "+action);
+    		Logger.getLogger(CasesBpmProcessManager.class.getName()).log(Level.WARNING, "Couldn't handle submission. No action associated with the submission action: "+action);
     	}
 
     	return null;

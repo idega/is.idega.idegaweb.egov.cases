@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.jbpm.bundle;
+package is.idega.idegaweb.egov.cases.bpm.bundle;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +23,8 @@ import com.idega.documentmanager.business.DocumentManager;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.documentmanager.business.PersistenceManager;
 import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmBind;
-import com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmDao;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmBind;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmDao;
 import com.idega.jbpm.IdegaJbpmContext;
 
 import com.idega.jbpm.data.ProcessViewByActor;
@@ -39,9 +39,9 @@ import com.idega.util.xml.XmlUtil;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:56 $ by $Author: civilis $
  *
  */
 public class CasesJbpmFormsBundleManager implements ProcessBundleManager {

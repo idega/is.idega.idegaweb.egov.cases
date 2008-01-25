@@ -1,9 +1,8 @@
-package is.idega.idegaweb.egov.cases.jbpm.form;
+package is.idega.idegaweb.egov.cases.bpm.form;
 
+import is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcessConstants;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessConstants;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import javax.faces.context.FacesContext;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
-import org.jbpm.graph.exe.Token;
 import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
@@ -23,10 +21,10 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.idegaweb.IWApplicationContext;
-import com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmBind;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmBind;
 import com.idega.jbpm.IdegaJbpmContext;
 import com.idega.jbpm.data.ViewTaskBind;
-import com.idega.jbpm.data.dao.JbpmBindsDao;
+import com.idega.jbpm.data.dao.BpmBindsDAO;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewCreator;
 import com.idega.jbpm.def.ViewFactory;
@@ -41,24 +39,24 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/06 17:00:42 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/25 15:23:54 $ by $Author: civilis $
  */
-public class CasesJbpmFormManager implements ViewManager {
+public class CasesBpmViewManager implements ViewManager {
 
 	private DocumentManagerFactory documentManagerFactory;
 	private ViewToTask viewToTaskBinder;
 	private VariablesHandler variablesHandler;
 	private ViewCreator viewCreator;
-	private JbpmBindsDao jbpmBindsDao;
+	private BpmBindsDAO jbpmBindsDao;
 	private IdegaJbpmContext idegaJbpmContext;
 	
-	public JbpmBindsDao getJbpmBindsDao() {
+	public BpmBindsDAO getJbpmBindsDao() {
 		return jbpmBindsDao;
 	}
 
-	public void setJbpmBindsDao(JbpmBindsDao jbpmBindsDao) {
+	public void setJbpmBindsDao(BpmBindsDAO jbpmBindsDao) {
 		this.jbpmBindsDao = jbpmBindsDao;
 	}
 
@@ -96,7 +94,7 @@ public class CasesJbpmFormManager implements ViewManager {
 			parameters.put(CasesJbpmProcessConstants.caseCategoryIdActionVariableName, String.valueOf(bind.getCasesCategoryId()));
 			parameters.put(CasesJbpmProcessConstants.caseTypeActionVariableName, String.valueOf(bind.getCasesTypeId()));
 			
-			view.addParameters(parameters);
+			view.populateParameters(parameters);
 //			--
 			
 			return view;
@@ -144,9 +142,8 @@ public class CasesJbpmFormManager implements ViewManager {
 			
 			Map<String, String> parameters = new HashMap<String, String>(1);
 			parameters.put(ProcessConstants.TASK_INSTANCE_ID, String.valueOf(taskInstance.getId()));
-			view.addParameters(parameters);
-			
-			view.populate(getVariablesHandler().populateVariables(taskInstance.getId()));
+			view.populateParameters(parameters);
+			view.populateVariables(getVariablesHandler().populateVariables(taskInstance.getId()));
 			
 			return view;
 		
@@ -159,6 +156,9 @@ public class CasesJbpmFormManager implements ViewManager {
 		}
 	}
 	
+	/*
+	Remove
+	 
 	public View loadProcessInstanceView(FacesContext context, Token token) {
 		
 		try {
@@ -185,6 +185,7 @@ public class CasesJbpmFormManager implements ViewManager {
 			
 		}
 	}
+	*/
 	
 	/*
 	public org.w3c.dom.Document loadProcessViewForm(FacesContext context, Long processInstanceId, int viewerId) {

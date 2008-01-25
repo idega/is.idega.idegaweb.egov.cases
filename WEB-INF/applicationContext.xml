@@ -4,15 +4,13 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="casesJbpmProcessManager" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcessManager" scope="singleton">
+	<bean id="casesBpmProcessManager" class="is.idega.idegaweb.egov.cases.bpm.CasesBpmProcessManager" scope="singleton">
     
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
         <property name="variablesHandler" ref="jbpmProcessVariablesHandler" />
-        <property name="viewManager" ref="casesJbpmFormManager" />
-        <property name="converter" ref="process_xforms_converter" />
 	</bean>
     
-    <bean id="casesJbpmFormManager" class="is.idega.idegaweb.egov.cases.jbpm.form.CasesJbpmFormManager" scope="singleton">
+    <bean id="casesBpmViewManager" class="is.idega.idegaweb.egov.cases.bpm.form.CasesBpmViewManager" scope="singleton">
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
         <property name="jbpmBindsDao" ref="jbpmBindsDao" />
         <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
@@ -21,7 +19,7 @@
         <property name="viewCreator" ref="jbpmViewCreator" />
     </bean>
     
-    <bean id="casesJbpmFormsBundleManager" class="is.idega.idegaweb.egov.cases.jbpm.bundle.CasesJbpmFormsBundleManager" scope="singleton">
+    <bean id="casesJbpmFormsBundleManager" class="is.idega.idegaweb.egov.cases.bpm.bundle.CasesJbpmFormsBundleManager" scope="singleton">
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
         <property name="casesJbpmDao" ref="casesJbpmDao" />
         <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
@@ -30,23 +28,28 @@
         <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
     </bean>
     
-    <bean id="casesJbpmProcess" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess" scope="request">
+    <bean id="casesJbpmProcess" class="is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcess" scope="request">
         <property name="processBundleManager" ref="casesJbpmFormsBundleManager" />
         <property name="casesJbpmDao" ref="casesJbpmDao" />
         <property name="templateBundleLocation" value="resources/casesJbpmTemplates/simpleCasesProcessTemplate/" />
     </bean>
     
-    <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmProcess" scope="request">
+    <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcess" scope="request">
         <property name="processBundleManager" ref="casesJbpmFormsBundleManager" />
         <property name="templateBundleLocation" value="resources/casesJbpmTemplates/nestCommitteeGateway/" />
     </bean>
     
-    <bean id="casesJbpmUtil" class="is.idega.idegaweb.egov.cases.jbpm.CasesJbpmUtil" scope="singleton" />
+    <bean id="casesJbpmUtil" class="is.idega.idegaweb.egov.cases.bpm.CasesJbpmUtil" scope="singleton" />
     
+    <!-- TODO: -->
     <bean id="casesJbpmProcessArtifacts" class="com.idega.jbpm.exe.ProcessArtifacts" scope="session">
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
-        <property name="process" ref="casesJbpmProcessManager" />
     </bean>
     
-    <bean id="casesJbpmDao" class="com.idega.idegaweb.egov.cases.jbpm.data.CasesJbpmDaoImpl" scope="singleton" />
+    <bean id="casesJbpmDao" class="com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmDaoImpl" scope="singleton" />
+    
+    <bean id="casesBPMManagersCreator" class="is.idega.idegaweb.egov.cases.bpm.CasesBPMManagersCreator" scope="singleton">
+        <property name="processManager" ref="casesBpmProcessManager" />
+        <property name="viewManager" ref="casesBpmViewManager" />
+    </bean>
 </beans>
