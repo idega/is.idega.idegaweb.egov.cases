@@ -39,9 +39,9 @@ import com.idega.util.xml.XmlUtil;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2008/01/25 15:23:56 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/26 09:45:37 $ by $Author: civilis $
  *
  */
 public class CasesJbpmFormsBundleManager implements ProcessBundleManager {
@@ -142,7 +142,7 @@ public class CasesJbpmFormsBundleManager implements ProcessBundleManager {
 				InputStream formIs = bundle.getResourceInputStream(new StringBuilder(templateBundleLocationWithinBundle).append("forms/").append(task.getName().toLowerCase().replaceAll(CoreConstants.SPACE, CoreConstants.UNDER)).append(".xhtml").toString());
 				String formId = loadAndSaveForm(builder, documentManager, formIs);
 			
-				View view = getViewFactory().getViewNoLoad(formId);
+				View view = getViewFactory().getView(formId, true);
 				viewsAndTaskToBind.put(view, task);
 			}
 			

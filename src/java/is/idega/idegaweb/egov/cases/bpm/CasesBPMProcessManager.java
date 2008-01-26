@@ -13,6 +13,7 @@ import javax.faces.context.FacesContext;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
 import com.idega.business.IBOLookup;
@@ -35,9 +36,9 @@ import com.idega.util.IWTimestamp;
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
  * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/26 09:45:37 $ by $Author: civilis $
  */
-public class CasesBpmProcessManager implements ProcessManager {
+public class CasesBPMProcessManager implements ProcessManager {
 
 	private VariablesHandler variablesHandler;
 	private IdegaJbpmContext idegaJbpmContext;
@@ -91,6 +92,8 @@ public class CasesBpmProcessManager implements ProcessManager {
 				throw new RuntimeException("Fatal: simple cases process definition not correct. First task node comprehends no or more than 1 task . Total: "+tis.size());
 			
 			TaskInstance taskInstance = tis.iterator().next();
+//			pi.getTaskMgmtInstance().createStartTaskInstance()
+			
 			
 			Map<String, Object> caseData = new HashMap<String, Object>();
 			caseData.put(CasesJbpmProcessConstants.caseIdVariableName, genCase.getPrimaryKey().toString());
