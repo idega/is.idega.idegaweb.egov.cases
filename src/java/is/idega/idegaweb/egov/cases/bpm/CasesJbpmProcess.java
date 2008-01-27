@@ -3,8 +3,6 @@ package is.idega.idegaweb.egov.cases.bpm;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.bpm.bundle.CasesJbpmFormsBundleManager;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -29,9 +27,9 @@ import com.idega.util.CoreConstants;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/27 13:11:23 $ by $Author: civilis $
  *
  */
 public class CasesJbpmProcess {
@@ -83,10 +81,10 @@ public class CasesJbpmProcess {
 			FacesContext ctx = FacesContext.getCurrentInstance();
 			IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
 			Map<String, String> parameters = new HashMap<String, String>(2);
-			parameters.put(CasesJbpmFormsBundleManager.caseCategoryIdParameter, getCaseCategory());
-			parameters.put(CasesJbpmFormsBundleManager.caseTypeIdParameter, getCaseType());
+//			parameters.put(CasesBPMProcessBundleManager.caseCategoryIdParameter, getCaseCategory());
+//			parameters.put(CasesBPMProcessBundleManager.caseTypeIdParameter, getCaseType());
 			
-			getProcessBundleManager().createBundle(ctx, iwma.getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER), getTemplateBundleLocation(), getFormName(), parameters);
+			getProcessBundleManager().createBundle(null, getFormName());
 			
 		} catch (IOException e) {
 			setMessage("IO Exception occured");
