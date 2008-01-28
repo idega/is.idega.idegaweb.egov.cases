@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.bpm.form;
 import is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcessConstants;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,41 +24,40 @@ import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmBind;
 import com.idega.jbpm.IdegaJbpmContext;
-import com.idega.jbpm.data.ViewTaskBind;
 import com.idega.jbpm.data.dao.BpmBindsDAO;
 import com.idega.jbpm.def.View;
 import com.idega.jbpm.def.ViewCreator;
-import com.idega.jbpm.def.ViewFactory;
 import com.idega.jbpm.def.ViewToTask;
+import com.idega.jbpm.exe.BPMFactory;
 import com.idega.jbpm.exe.ProcessConstants;
 import com.idega.jbpm.exe.VariablesHandler;
 import com.idega.jbpm.exe.ViewManager;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
-import com.idega.util.CoreConstants;
 
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
  * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/25 15:23:54 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/28 07:43:27 $ by $Author: civilis $
  */
-public class CasesBpmViewManager implements ViewManager {
+public class CasesBPMViewManager implements ViewManager {
 
 	private DocumentManagerFactory documentManagerFactory;
 	private ViewToTask viewToTaskBinder;
 	private VariablesHandler variablesHandler;
 	private ViewCreator viewCreator;
-	private BpmBindsDAO jbpmBindsDao;
+	private BpmBindsDAO bpmBindsDAO;
 	private IdegaJbpmContext idegaJbpmContext;
+	private BPMFactory bpmFactory;
 	
-	public BpmBindsDAO getJbpmBindsDao() {
-		return jbpmBindsDao;
+	public BpmBindsDAO getBpmBindsDAO() {
+		return bpmBindsDAO;
 	}
 
-	public void setJbpmBindsDao(BpmBindsDAO jbpmBindsDao) {
-		this.jbpmBindsDao = jbpmBindsDao;
+	public void setBpmBindsDAO(BpmBindsDAO bpmBindsDAO) {
+		this.bpmBindsDAO = bpmBindsDAO;
 	}
 
 	public VariablesHandler getVariablesHandler() {
@@ -74,17 +74,22 @@ public class CasesBpmViewManager implements ViewManager {
 		
 		try {
 //			TODO: make this generic bind
-			CasesJbpmBind bind = getJbpmBindsDao().find(CasesJbpmBind.class, processDefinitionId);
+			CasesJbpmBind bind = getBpmBindsDAO().find(CasesJbpmBind.class, processDefinitionId);
 			
-			String initTaskName = bind.getInitTaskName();
+			//String initTaskName = bind.getInitTaskName();
 			
-			if(initTaskName == null || CoreConstants.EMPTY.equals(initTaskName))
-				throw new NullPointerException("Init task name not found on CasesJbpmBind.");
+//			if(initTaskName == null || CoreConstants.EMPTY.equals(initTaskName))
+//				throw new NullPointerException("Init task name not found on CasesJbpmBind.");
 			
 			ProcessDefinition pd = ctx.getGraphSession().getProcessDefinition(processDefinitionId);
-			Task initTask = pd.getTaskMgmtDefinition().getTask(initTaskName);
 			
-			View view = getViewToTaskBinder().getView(initTask.getId());
+//			Task initTask = pd.getTaskMgmtDefinition().getTask(initTaskName);
+			Task initTask = pd.getTaskMgmtDefinition().getStartTask();
+			
+			System.out.println("start task: "+initTask);
+			
+//			View view = getViewToTaskBinder().getView(initTask.getId());
+			View view = getBpmFactory().getView(initTask.getId(), true);
 			
 //			move this to protected method setupInitView(view:View):void
 			Map<String, String> parameters = new HashMap<String, String>(4);
@@ -117,6 +122,7 @@ public class CasesBpmViewManager implements ViewManager {
 		try {
 			TaskInstance taskInstance = ctx.getTaskInstance(taskInstanceId);
 			
+			/*
 			List<ViewTaskBind> viewTaskBinds = getJbpmBindsDao().getViewTaskBindsByTaskId(taskInstance.getTask().getId());
 			
 			if(viewTaskBinds.isEmpty())
@@ -139,6 +145,11 @@ public class CasesBpmViewManager implements ViewManager {
 				ViewFactory viewFactory = getViewCreator().getViewFactory(bind.getViewType());
 				view = viewFactory.getView(bind.getViewIdentifier(), !taskInstance.hasEnded());
 			}
+			*/
+			
+			List<String> preferred = new ArrayList<String>(1);
+			preferred.add(XFormsView.VIEW_TYPE);
+			View view = getBpmFactory().getView(taskInstance.getTask().getId(), true, preferred);
 			
 			Map<String, String> parameters = new HashMap<String, String>(1);
 			parameters.put(ProcessConstants.TASK_INSTANCE_ID, String.valueOf(taskInstance.getId()));
@@ -341,5 +352,13 @@ public class CasesBpmViewManager implements ViewManager {
 
 	public void setIdegaJbpmContext(IdegaJbpmContext idegaJbpmContext) {
 		this.idegaJbpmContext = idegaJbpmContext;
+	}
+
+	public BPMFactory getBpmFactory() {
+		return bpmFactory;
+	}
+
+	public void setBpmFactory(BPMFactory bpmFactory) {
+		this.bpmFactory = bpmFactory;
 	}
 }

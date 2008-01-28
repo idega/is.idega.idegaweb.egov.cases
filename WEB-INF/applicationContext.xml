@@ -10,13 +10,18 @@
         <property name="variablesHandler" ref="jbpmProcessVariablesHandler" />
 	</bean>
     
-    <bean id="casesBpmViewManager" class="is.idega.idegaweb.egov.cases.bpm.form.CasesBpmViewManager" scope="singleton">
+    <bean id="casesBpmViewManager" class="is.idega.idegaweb.egov.cases.bpm.form.CasesBPMViewManager" scope="singleton">
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
-        <property name="jbpmBindsDao" ref="jbpmBindsDao" />
+        <property name="bpmBindsDAO" ref="bpmBindsDAO" />
+        <!--  
         <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
+        -->
         <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
         <property name="variablesHandler" ref="jbpmProcessVariablesHandler" />
+        <!--  
         <property name="viewCreator" ref="jbpmViewCreator" />
+        -->
+        <property name="bpmFactory" ref="bpmFactory" />
     </bean>
     
     <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcess" scope="request">
