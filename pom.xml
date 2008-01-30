@@ -3,12 +3,12 @@
   <parent>
     <groupId>com.idega.block.egov</groupId>
     <artifactId>com.idega.block.egov</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2-SNAPSHOT</version>
   </parent>
   <name>eGov General Cases</name>
   <groupId>com.idega.block.egov</groupId>
   <artifactId>is.idega.idegaweb.egov.cases</artifactId>
-  <version>4.0.1</version>
+  <version>4.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <inceptionYear>2005</inceptionYear>
   <description>eGov General Cases</description>
@@ -18,9 +18,8 @@
     <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
     <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection> 
      -->
-    <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
-    <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection>
-    <tag>com_idega_block_egov_super-4_0_1</tag>
+    <connection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.egov/is.idega.idegaweb.egov.cases/</connection>
+    <developerConnection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.egov/is.idega.idegaweb.egov.cases/</developerConnection>
   </scm>
   <developers>
     <developer>
