@@ -1,5 +1,6 @@
-package is.idega.idegaweb.egov.cases.bpm;
+package is.idega.idegaweb.egov.cases.bpm.presentation;
 
+import is.idega.idegaweb.egov.cases.bpm.bundle.CasesBPMProcessBundle;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
@@ -8,9 +9,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
@@ -20,19 +19,20 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmDao;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesBPMDAO;
+import com.idega.jbpm.def.ProcessBundle;
 import com.idega.jbpm.def.ProcessBundleManager;
 import com.idega.util.CoreConstants;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/27 13:11:23 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
  *
  */
-public class CasesJbpmProcess {
+public class CasesBPMCreateProcess {
 	
 	private String formName;
 	private String message;
@@ -45,7 +45,8 @@ public class CasesJbpmProcess {
 
 	private String templateBundleLocation;
 	private ProcessBundleManager processBundleManager;
-	private CasesJbpmDao casesJbpmDao;
+	private CasesBPMDAO casesBPMDAO;
+	private ProcessBundle processBundle;
 	
 	private List<SelectItem> casesTypes = new ArrayList<SelectItem>();
 	private List<SelectItem> casesCategories = new ArrayList<SelectItem>();
@@ -78,13 +79,17 @@ public class CasesJbpmProcess {
 		}
 			
 		try {
-			FacesContext ctx = FacesContext.getCurrentInstance();
-			IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
-			Map<String, String> parameters = new HashMap<String, String>(2);
-//			parameters.put(CasesBPMProcessBundleManager.caseCategoryIdParameter, getCaseCategory());
-//			parameters.put(CasesBPMProcessBundleManager.caseTypeIdParameter, getCaseType());
+			Long caseCategoryId = new Long(getCaseCategory());
+			Long caseTypeId = new Long(getCaseType());
 			
-			getProcessBundleManager().createBundle(null, getFormName());
+			if(!(getProcessBundle() instanceof CasesBPMProcessBundle))
+				throw new IllegalArgumentException(getClass().getName()+" supports only CasesBPMProcessBundle instance as process bundle argument.");
+			
+			CasesBPMProcessBundle bundle = (CasesBPMProcessBundle)getProcessBundle();
+			bundle.setTemplateBundleLocationWithinBundle(getTemplateBundleLocation());
+			bundle.setCaseMetaInf(caseCategoryId, caseTypeId);
+			
+			getProcessBundleManager().createBundle(bundle, getFormName());
 			
 		} catch (IOException e) {
 			setMessage("IO Exception occured");
@@ -208,7 +213,7 @@ public class CasesJbpmProcess {
 		addDefaultSelectItem(casesProcessesDefinitions);
 		
 		try {
-			List<Object[]> casesProcesses = getCasesJbpmDao().getSimpleProcessDefinitions();
+			List<Object[]> casesProcesses = getCasesBPMDAO().getSimpleProcessDefinitions();
 			
 			if(casesProcesses == null)
 				return casesProcessesDefinitions;
@@ -291,11 +296,19 @@ public class CasesJbpmProcess {
 		this.processBundleManager = processBundleManager;
 	}
 
-	public CasesJbpmDao getCasesJbpmDao() {
-		return casesJbpmDao;
+	public ProcessBundle getProcessBundle() {
+		return processBundle;
 	}
 
-	public void setCasesJbpmDao(CasesJbpmDao casesJbpmDao) {
-		this.casesJbpmDao = casesJbpmDao;
+	public void setProcessBundle(ProcessBundle processBundle) {
+		this.processBundle = processBundle;
+	}
+
+	public CasesBPMDAO getCasesBPMDAO() {
+		return casesBPMDAO;
+	}
+
+	public void setCasesBPMDAO(CasesBPMDAO casesBPMDAO) {
+		this.casesBPMDAO = casesBPMDAO;
 	}
 }

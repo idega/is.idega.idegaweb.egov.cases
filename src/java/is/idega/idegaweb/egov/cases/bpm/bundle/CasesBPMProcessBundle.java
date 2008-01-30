@@ -16,6 +16,8 @@ import org.jbpm.graph.def.ProcessDefinition;
 import com.idega.documentmanager.business.DocumentManagerFactory;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesBPMBind;
+import com.idega.idegaweb.egov.cases.bpm.data.CasesBPMDAO;
 import com.idega.jbpm.def.ProcessBundle;
 import com.idega.jbpm.def.ViewResource;
 import com.idega.util.CoreConstants;
@@ -23,9 +25,9 @@ import com.idega.util.CoreConstants;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
- * Last modified: $Date: 2008/01/27 13:11:23 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
  * 
  */
 public class CasesBPMProcessBundle implements ProcessBundle {
@@ -39,6 +41,11 @@ public class CasesBPMProcessBundle implements ProcessBundle {
 	private List<ViewResource> viewResources;
 	private String templateBundleLocationWithinBundle;
 	private DocumentManagerFactory documentManagerFactory;
+	private CasesBPMDAO casesBPMDAO;
+	
+	private Long caseCategoryId;
+	private Long caseTypeId;
+	
 
 	public DocumentManagerFactory getDocumentManagerFactory() {
 		return documentManagerFactory;
@@ -130,5 +137,31 @@ public class CasesBPMProcessBundle implements ProcessBundle {
 	public void setTemplateBundleLocationWithinBundle(
 			String templateBundleLocationWithinBundle) {
 		this.templateBundleLocationWithinBundle = templateBundleLocationWithinBundle;
+	}
+	
+	public void configure(ProcessDefinition pd) {
+
+		if(caseCategoryId != null && caseTypeId != null) {
+		
+			CasesBPMBind bind = new CasesBPMBind();
+			bind.setCasesCategoryId(caseCategoryId);
+			bind.setCasesTypeId(caseTypeId);
+			bind.setProcDefId(pd.getId());
+			//bind.setInitTaskName(initTaskName);
+			getCasesBPMDAO().persist(bind);
+		}
+	}
+
+	public CasesBPMDAO getCasesBPMDAO() {
+		return casesBPMDAO;
+	}
+
+	public void setCasesBPMDAO(CasesBPMDAO casesBPMDAO) {
+		this.casesBPMDAO = casesBPMDAO;
+	}
+	
+	public void setCaseMetaInf(Long caseCategoryId, Long caseTypeId) {
+		this.caseCategoryId = caseCategoryId;
+		this.caseTypeId = caseTypeId;
 	}
 }

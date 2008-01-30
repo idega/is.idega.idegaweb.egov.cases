@@ -8,11 +8,11 @@ import com.idega.core.persistence.GenericDao;
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
  * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
  */
-public interface CasesJbpmDao extends GenericDao {
+public interface CasesBPMDAO extends GenericDao {
 
-	public abstract List<CasesJbpmBind> getAllCasesJbpmBinds();
+	public abstract List<CasesBPMBind> getAllCasesJbpmBinds();
 	
 	public abstract List<Object[]> getSimpleProcessDefinitions();
 }

@@ -24,9 +24,10 @@
         <property name="bpmFactory" ref="bpmFactory" />
     </bean>
     
-    <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.bpm.CasesJbpmProcess" scope="request">
+    <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.bpm.presentation.CasesBPMCreateProcess" scope="request">
         <property name="processBundleManager" ref="casesProcessBundleManager" />
-        <property name="casesJbpmDao" ref="casesJbpmDao" />
+        <property name="processBundle" ref="casesBPMProcessBundle" />
+        <property name="casesBPMDAO" ref="casesBPMDAO" />
         <property name="templateBundleLocation" value="resources/casesJbpmTemplates/nestCommitteeGateway/" />
     </bean>
     
@@ -37,7 +38,7 @@
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
     </bean>
     
-    <bean id="casesJbpmDao" class="com.idega.idegaweb.egov.cases.bpm.data.CasesJbpmDaoImpl" scope="singleton" />
+    <bean id="casesBPMDAO" class="com.idega.idegaweb.egov.cases.bpm.data.CasesBPMDAOImpl" scope="singleton" />
     
     <bean id="casesBPMManagersCreator" class="is.idega.idegaweb.egov.cases.bpm.CasesBPMManagersCreator" scope="singleton">
         <property name="processManager" ref="casesBpmProcessManager" />
@@ -48,5 +49,10 @@
         
         <property name="idegaJbpmContext" ref="idegaJbpmContext" />
         <property name="viewToTaskBinder" ref="process_xforms_viewToTask" />
+    </bean>
+    
+    <bean id="casesBPMProcessBundle" class="is.idega.idegaweb.egov.cases.bpm.bundle.CasesBPMProcessBundle">
+        <property name="documentManagerFactory" ref="xformsDocumentManagerFact" />
+        <property name="casesBPMDAO" ref="casesBPMDAO" />
     </bean>
 </beans>

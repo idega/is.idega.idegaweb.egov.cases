@@ -14,17 +14,17 @@ import javax.persistence.Table;
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
  * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/01/25 15:23:55 $ by $Author: civilis $
+ * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
  */
 @Entity
 @Table(name="CASES_JBPM_BINDINGS")
 @NamedQueries(
 		{
-			@NamedQuery(name="casesJbpmBind.simpleCasesProcessesDefinitionsQuery", query="select pd.id, pd.name from org.jbpm.graph.def.ProcessDefinition pd, CasesJbpmBind cb where pd.id = cb.procDefId"),
-			@NamedQuery(name="casesJbpmBind.getAllQuery", query="from CasesJbpmBind")
+			@NamedQuery(name=CasesBPMBind.SIMPLE_CASES_PROCESSES_DEFINITIONS_QUERY_NAME, query="select pd.id, pd.name from org.jbpm.graph.def.ProcessDefinition pd, CasesBPMBind cb where pd.id = cb.procDefId"),
+			@NamedQuery(name=CasesBPMBind.SIMPLE_CASES_GET_ALL_QUERY_NAME, query="from CasesBPMBind")
 		}
 )
-public class CasesJbpmBind implements Serializable {
+public class CasesBPMBind implements Serializable {
 	
 	private static final long serialVersionUID = -3222584305636229751L;
 	
@@ -60,7 +60,7 @@ public class CasesJbpmBind implements Serializable {
 		this.casesTypeId = casesTypeId;
 	}
 
-	public CasesJbpmBind() { }
+	public CasesBPMBind() { }
 
 	public Long getProcDefId() {
 		return procDefId;
