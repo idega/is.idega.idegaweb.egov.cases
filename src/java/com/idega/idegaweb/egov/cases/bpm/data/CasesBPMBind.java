@@ -12,24 +12,24 @@ import javax.persistence.Table;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/01 12:20:03 $ by $Author: civilis $
  */
 @Entity
 @Table(name="CASES_JBPM_BINDINGS")
 @NamedQueries(
 		{
-			@NamedQuery(name=CasesBPMBind.SIMPLE_CASES_PROCESSES_DEFINITIONS_QUERY_NAME, query="select pd.id, pd.name from org.jbpm.graph.def.ProcessDefinition pd, CasesBPMBind cb where pd.id = cb.procDefId"),
-			@NamedQuery(name=CasesBPMBind.SIMPLE_CASES_GET_ALL_QUERY_NAME, query="from CasesBPMBind")
+			@NamedQuery(name=CasesBPMBind.CASES_PROCESSES_DEFINITIONS_QUERY_NAME, query="select pd.id, pd.name from org.jbpm.graph.def.ProcessDefinition pd, CasesBPMBind cb where pd.id = cb.procDefId"),
+			@NamedQuery(name=CasesBPMBind.CASES_PROCESSES_GET_ALL_QUERY_NAME, query="from CasesBPMBind")
 		}
 )
 public class CasesBPMBind implements Serializable {
 	
 	private static final long serialVersionUID = -3222584305636229751L;
 	
-	public static final String SIMPLE_CASES_PROCESSES_DEFINITIONS_QUERY_NAME = "casesJbpmBind.simpleCasesProcessesDefinitionsQuery";
-	public static final String SIMPLE_CASES_GET_ALL_QUERY_NAME = "casesJbpmBind.getAllQuery";
+	public static final String CASES_PROCESSES_DEFINITIONS_QUERY_NAME = "CasesBPMBind.simpleCasesProcessesDefinitionsQuery";
+	public static final String CASES_PROCESSES_GET_ALL_QUERY_NAME = "CasesBPMBind.getAllQuery";
 
 	@Id
 	@Column(name="process_definition_id")

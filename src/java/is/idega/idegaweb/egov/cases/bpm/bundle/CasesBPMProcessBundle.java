@@ -20,21 +20,23 @@ import com.idega.idegaweb.egov.cases.bpm.data.CasesBPMBind;
 import com.idega.idegaweb.egov.cases.bpm.data.CasesBPMDAO;
 import com.idega.jbpm.def.ProcessBundle;
 import com.idega.jbpm.def.ViewResource;
-import com.idega.util.CoreConstants;
 
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
- * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/01 12:20:03 $ by $Author: civilis $
  * 
  */
 public class CasesBPMProcessBundle implements ProcessBundle {
 
 	private static final String propertiesFileName = "bundle.properties";
 	private static final String processDefinitionFileName = "processdefinition.xml";
-	private static final String formsPath = "forms";
+	private static final String formsPath = "forms/";
+	private static final String dotRegExp = "\\.";
+	private static final String taskPrefix = "task";
+	
 	private static final String XFFileNamePropertyPostfix = ".view.xforms.file_name";
 
 	private IWBundle bundle;
@@ -81,8 +83,7 @@ public class CasesBPMProcessBundle implements ProcessBundle {
 				throw new IllegalStateException(
 						"No templateBundleLocationWithinBundle set");
 
-			String formsPathWithin = templateBundleLocationWithinBundle
-					+ formsPath;
+			String formsPathWithin = templateBundleLocationWithinBundle	+ formsPath;
 
 			InputStream propertiesIs = bundle
 					.getResourceInputStream(templateBundleLocationWithinBundle
@@ -95,8 +96,12 @@ public class CasesBPMProcessBundle implements ProcessBundle {
 
 				if (taskName.equals(entry.getValue())) {
 
-					String taskIdentifier = ((String) entry.getKey())
-							.split(CoreConstants.DOT)[0];
+					String key = (String) entry.getKey();
+					
+					if(!key.startsWith(taskPrefix))
+						continue;
+					
+					String taskIdentifier = key.split(dotRegExp)[0];
 					String fileName = properties.getProperty(taskIdentifier
 							+ XFFileNamePropertyPostfix);
 

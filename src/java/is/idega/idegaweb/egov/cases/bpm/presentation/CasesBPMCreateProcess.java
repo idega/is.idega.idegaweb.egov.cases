@@ -27,19 +27,19 @@ import com.idega.util.CoreConstants;
 /**
  * 
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2008/01/30 14:32:16 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/01 12:20:03 $ by $Author: civilis $
  *
  */
 public class CasesBPMCreateProcess {
 	
-	private String formName;
+	private String processName;
 	private String message;
 	private String caseCategory;
 	private String caseType;
 	private String processDefinitionId;
-	private String processInstanceId;
+	//private String processInstanceId;
 	private String chosenProcessDefinitionId;
 	private String chosenProcessInstanceId;
 
@@ -52,17 +52,9 @@ public class CasesBPMCreateProcess {
 	private List<SelectItem> casesCategories = new ArrayList<SelectItem>();
 	private List<SelectItem> casesProcessesDefinitions = new ArrayList<SelectItem>();
 
-	public String getFormName() {
-		return formName;
-	}
-
-	public void setFormName(String formName) {
-		this.formName = formName;
-	}
-	
-	public String createNewSimpleProcess() {
+	public String createNewCaseProcess() {
 		
-		if(getFormName() == null || getFormName().equals("")) {
+		if(getProcessName() == null || getProcessName().equals(CoreConstants.EMPTY)) {
 		
 			setMessage("Form name not set");
 			return null;
@@ -89,7 +81,7 @@ public class CasesBPMCreateProcess {
 			bundle.setTemplateBundleLocationWithinBundle(getTemplateBundleLocation());
 			bundle.setCaseMetaInf(caseCategoryId, caseTypeId);
 			
-			getProcessBundleManager().createBundle(bundle, getFormName());
+			getProcessBundleManager().createBundle(bundle, getProcessName());
 			
 		} catch (IOException e) {
 			setMessage("IO Exception occured");
@@ -201,19 +193,19 @@ public class CasesBPMCreateProcess {
 		
 		SelectItem item = new SelectItem();
 		
-		item.setValue("");
+		item.setValue(CoreConstants.EMPTY);
 		item.setLabel("No selection");
 		
 		selectItems.add(item);
 	}
 	
-	public List<SelectItem> getSimpleCasesProcessesDefinitions() {
+	public List<SelectItem> getCasesProcessesDefinitions() {
 
 		casesProcessesDefinitions.clear();
 		addDefaultSelectItem(casesProcessesDefinitions);
 		
 		try {
-			List<Object[]> casesProcesses = getCasesBPMDAO().getSimpleProcessDefinitions();
+			List<Object[]> casesProcesses = getCasesBPMDAO().getCasesProcessDefinitions();
 			
 			if(casesProcesses == null)
 				return casesProcessesDefinitions;
@@ -246,6 +238,7 @@ public class CasesBPMCreateProcess {
 		this.processDefinitionId = processDefinitionId;
 	}
 
+	/*
 	public String getProcessInstanceId() {
 		return processInstanceId;
 	}
@@ -253,6 +246,7 @@ public class CasesBPMCreateProcess {
 	public void setProcessInstanceId(String processInstanceId) {
 		this.processInstanceId = processInstanceId;
 	}
+	*/
 
 	public String getChosenProcessDefinitionId() {
 		return chosenProcessDefinitionId;
@@ -270,15 +264,18 @@ public class CasesBPMCreateProcess {
 		this.chosenProcessInstanceId = chosenProcessInstanceId;
 	}
 	
-	public void showProcessInitationForm() {
+	public void showProcessInitiationView() {
 	
+		System.out.println("xxxxxxxxxxxxxxxx");
 		setChosenProcessDefinitionId(getProcessDefinitionId());
 	}
 	
+	/*
 	public void showProcessProgressForm() {
 		
 		setChosenProcessInstanceId(getProcessInstanceId());
 	}
+	 */
 	
 	public String getTemplateBundleLocation() {
 		return templateBundleLocation;
@@ -310,5 +307,13 @@ public class CasesBPMCreateProcess {
 
 	public void setCasesBPMDAO(CasesBPMDAO casesBPMDAO) {
 		this.casesBPMDAO = casesBPMDAO;
+	}
+
+	public String getProcessName() {
+		return processName;
+	}
+
+	public void setProcessName(String processName) {
+		this.processName = processName;
 	}
 }

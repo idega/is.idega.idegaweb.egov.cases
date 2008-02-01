@@ -24,7 +24,7 @@
         <property name="bpmFactory" ref="bpmFactory" />
     </bean>
     
-    <bean id="nestJbpmProcess" class="is.idega.idegaweb.egov.cases.bpm.presentation.CasesBPMCreateProcess" scope="request">
+    <bean id="casesBPMCreateProcess" class="is.idega.idegaweb.egov.cases.bpm.presentation.CasesBPMCreateProcess" scope="request">
         <property name="processBundleManager" ref="casesProcessBundleManager" />
         <property name="processBundle" ref="casesBPMProcessBundle" />
         <property name="casesBPMDAO" ref="casesBPMDAO" />
