@@ -18,8 +18,8 @@
     <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
     <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection> 
      -->
-    <connection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.egov/is.idega.idegaweb.egov.cases/</connection>
-    <developerConnection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.egov/is.idega.idegaweb.egov.cases/</developerConnection>
+    <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
+    <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection>
   </scm>
   <developers>
     <developer>
@@ -54,32 +54,6 @@
     <dependency>
       <groupId>com.idega.block.egov</groupId>
       <artifactId>is.idega.idegaweb.egov.message</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.addon</groupId>
-  	  <artifactId>org.jboss.jbpm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.addon</groupId>
-  	  <artifactId>com.idega.documentmanager</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.addon</groupId>
-      <artifactId>com.idega.block.form</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.addon</groupId>
-      <artifactId>org.chiba.web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.platform</groupId>
-      <artifactId>com.idega.facelets</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>poi</groupId>
-      <artifactId>poi</artifactId>
-      <version>${poi-poi-version}</version>
-      <type>jar</type>
     </dependency>
   </dependencies>
 </project>
