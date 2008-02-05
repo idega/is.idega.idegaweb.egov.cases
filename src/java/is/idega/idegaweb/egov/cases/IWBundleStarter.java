@@ -24,10 +24,6 @@ public class IWBundleStarter implements IWBundleStartable {
 		GlobalIncludeManager.getInstance().addBundleStyleSheet(CaseConstants.IW_BUNDLE_IDENTIFIER, "/style/case.css");
 		CaseCodeManager.getInstance().addCaseBusinessForCode(CaseConstants.CASE_CODE_KEY, CasesBusiness.class);
 		registerCaseChangeListener(starterBundle);
-		
-		System.out.println("asdasd ______________________________________");
-		CasesViewManager viewManager = CasesViewManager.getInstance(starterBundle.getApplication());
-		viewManager.initializeStandardNodes(starterBundle);
 	}
 
 	public void stop(IWBundle starterBundle) {
