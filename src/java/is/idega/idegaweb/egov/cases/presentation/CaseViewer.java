@@ -95,7 +95,7 @@ public class CaseViewer extends CaseCreator {
 				throw new IBORuntimeException(fe);
 			}
 			
-			if(theCase.getJbpmProcessInstanceId() != null) {
+			if(theCase.getCaseHandler() != null) {
 				
 //				TODO: show bpm view
 				return;

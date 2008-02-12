@@ -8,8 +8,11 @@
 package is.idega.idegaweb.egov.cases.data;
 
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
+
 import java.util.Collection;
+
 import javax.ejb.FinderException;
+
 import com.idega.block.process.data.AbstractCaseBMPBean;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
@@ -38,7 +41,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
-	private static final String COLUMN_JBPM_PROCESS_INSTANCE_ID = "jbpm_proc_inst_id";
+	private static final String COLUMN_CASE_HANDLER = "case_handler";
 
 	/*
 	 * (non-Javadoc)
@@ -69,7 +72,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
 		addAttribute(COLUMN_TYPE, "Type", String.class);
 		addAttribute(COLUMN_IS_PRIVATE, "Is private", Boolean.class);
-		addAttribute(COLUMN_JBPM_PROCESS_INSTANCE_ID, "JBPM process instance id", Integer.class);
+		addAttribute(COLUMN_CASE_HANDLER, "Case handler", String.class);
 
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -82,8 +85,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return getStringColumnValue(COLUMN_MESSAGE);
 	}
 	
-	public Integer getJbpmProcessInstanceId() {
-		return getIntegerColumnValue(COLUMN_JBPM_PROCESS_INSTANCE_ID);
+	public String getCaseHandler() {
+		return getStringColumnValue(COLUMN_CASE_HANDLER);
 	}
 
 	public String getReply() {
@@ -128,8 +131,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		setColumn(COLUMN_MESSAGE, message);
 	}
 	
-	public void setJbpmProcessInstanceId(Integer pid) {
-		setColumn(COLUMN_JBPM_PROCESS_INSTANCE_ID, pid);
+	public void setCaseHandler(String handler) {
+		setColumn(COLUMN_CASE_HANDLER, handler);
 	}
 
 	public void setReply(String reply) {
@@ -235,7 +238,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return ejbFindByCriteria(parentCategory, category, type, status, anonymous, null);
 	}
 	
-	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, Integer jbpmProcessInstanceId) throws FinderException {
+	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseHandler) throws FinderException {
 
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
@@ -276,8 +279,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		if (anonymous != null) {
 			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseUserColumnName()), !anonymous.booleanValue()));
 		}
-		if (jbpmProcessInstanceId != null) {
-			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_JBPM_PROCESS_INSTANCE_ID), MatchCriteria.EQUALS, jbpmProcessInstanceId));
+		if (caseHandler != null) {
+			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_HANDLER), MatchCriteria.EQUALS, caseHandler));
 		}
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));

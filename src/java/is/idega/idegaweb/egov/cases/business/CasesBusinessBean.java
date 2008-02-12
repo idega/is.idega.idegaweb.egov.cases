@@ -203,9 +203,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return getCasesByCriteria(parentCategory, category, type, status, anonymous, null);
 	}
 	
-	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, Integer jbpmProcessInstanceId) {
+	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseHandler) {
 		try {
-			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous, jbpmProcessInstanceId);
+			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous, caseHandler);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -310,7 +310,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, Integer jbpmProcessInstanceId, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseHandler, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -345,8 +345,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setType(type);
 		theCase.setAsPrivate(isPrivate);
 		
-		if(jbpmProcessInstanceId != null)
-			theCase.setJbpmProcessInstanceId(jbpmProcessInstanceId);
+		if(caseHandler != null)
+			theCase.setCaseHandler(caseHandler);
 		
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group) null);
 
