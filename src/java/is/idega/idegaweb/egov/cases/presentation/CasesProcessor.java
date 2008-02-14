@@ -7,21 +7,22 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CaseHandlersProvider;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
-import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
@@ -44,13 +45,13 @@ import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
+import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
 
 	public static final String PARAMETER_ACTION = "cp_prm_action";
 
 	public static final String PARAMETER_CASE_PK = "prm_case_pk";
-	public static final String PARAMETER_PROCESS_INSTANCE_PK = "pr_inst_pk";
 	protected static final String PARAMETER_REPLY = "prm_reply";
 	protected static final String PARAMETER_STATUS = "prm_status";
 	protected static final String PARAMETER_USER = "prm_iser";
@@ -62,12 +63,10 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	protected static final int ACTION_BPM_PROCESS_ASSETS = 7;
+	public static final int ACTION_CASE_HANDLER_INVOLVED = 7;
 
 	protected abstract String getBlockID();
 	
-	private ICPage jbpmProcessViewerPage;
-
 	protected void present(IWContext iwc) throws Exception {
 		switch (parseAction(iwc)) {
 			case ACTION_VIEW:
@@ -97,47 +96,43 @@ public abstract class CasesProcessor extends CasesBlock {
 				showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 				break;
 				
-			case ACTION_BPM_PROCESS_ASSETS:
-				showBPMProcessAssets(iwc);
+			case ACTION_CASE_HANDLER_INVOLVED:
+				showCaseHandlerView(iwc);
 				break;
+			default:
+				showList(iwc);
 		}
 	}
 	
-	public void showBPMProcessAssets(IWContext iwc) {
+	public void showCaseHandlerView(IWContext iwc) {
 		
-		String piIdParam = iwc.getParameter(PARAMETER_PROCESS_INSTANCE_PK);
-		/*
-		Integer processInstanceId;
-		
-		if(piIdParam == null || CoreConstants.EMPTY.equals(piIdParam)) {
+		try {
 			
-			GeneralCase theCase = null;
-			try {
-				theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
-				processInstanceId = theCase.getCaseHandler();
-			} catch (FinderException fe) {
-				fe.printStackTrace();
-				throw new IBORuntimeException(fe);
-			} catch (RemoteException fe) {
-				fe.printStackTrace();
-				throw new IBORuntimeException(fe);
+			GeneralCase theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
+			String caseHandlerType = theCase.getCaseHandler();
+			
+			if(caseHandlerType == null || CoreConstants.EMPTY.equals(caseHandlerType)) {
+				Logger.getLogger(getClassName()).log(Level.SEVERE, "ACTION_CASE_HANDLER_INVOLVED parameter provided, but not case handler type found in the case bean.");
+				return;
 			}
 			
-		} else {
-			processInstanceId = Integer.parseInt(piIdParam);
+			CaseHandler caseHandler = getCaseHandlersProvider().getCaseHandler(caseHandlerType);
+			
+			if(caseHandler == null) {
+				
+				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handler found for case handler type provided: "+caseHandlerType);
+				return;
+			}
+			
+			add(caseHandler.getView(theCase));
+			
+		} catch (FinderException fe) {
+			fe.printStackTrace();
+			throw new IBORuntimeException(fe);
+		} catch (RemoteException fe) {
+			fe.printStackTrace();
+			throw new IBORuntimeException(fe);
 		}
-		
-		if(processInstanceId == null)
-			throw new NullPointerException("Failed to resolve process instance id");
-		
-		*/
-		//iwc.getApplication().createComponent(COMPONENT_TYPE)
-		
-		/*
-		ProcessArtifactsParamsBean params =  (ProcessArtifactsParamsBean)WFUtil.getBeanInstance("jbpmProcessArtifactsParams");
-		params.setPiId(processInstanceId);
-		add(new FaceletComponent("/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/facelets/casesProcessArtifactsList.xhtml"));
-		*/
 	}
 
 	private int parseAction(IWContext iwc) {
@@ -242,9 +237,6 @@ public abstract class CasesProcessor extends CasesBlock {
 			if (status.equals(getCasesBusiness(iwc).getCaseStatusReview())) {
 				row.setStyleClass("isReview");
 			}
-			if(theCase.getCaseHandler() != null) {
-				row.setStyleClass("bpmCase");
-			}
 
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
@@ -293,15 +285,20 @@ public abstract class CasesProcessor extends CasesBlock {
 			if(theCase.getCaseHandler() == null) {
 			
 				cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
+				
 			} else {
 				
-				List<Link> links = getBPMCaseLinks(theCase);
+				CaseHandler caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseHandler());
 				
-				if(links != null)
-					for (Link link : links)
-						cell.add(link);
+				if(caseHandler != null) {
+				
+					List<Link> links = caseHandler.getCaseLinks(theCase);
+					
+					if(links != null)
+						for (Link link : links)
+							cell.add(link);
+				}
 			}
-			
 
 			if (showCheckBoxes) {
 				CheckBox box = new CheckBox(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
@@ -504,34 +501,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		return process;
 	}
 	
-	protected List<Link> getBPMCaseLinks(GeneralCase theCase) {
-		
-		if(theCase.getCaseHandler() == null)
-			return null;
-		
-		List<Link> links = new ArrayList<Link>();
-		
-		Link link = new Link(getBundle().getImage("images/folder-open3-16x16.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "Open BPM process")));
-		
-		link.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getCaseHandler()));
-		link.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-		link.addParameter(PARAMETER_ACTION, ACTION_BPM_PROCESS_ASSETS);
-		
-		links.add(link);
-
-		/*
-		link = new Link(getBundle().getImage("images/folder-exec-16x16.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "Take BPM process to My Cases")));
-		
-		link.addParameter(PARAMETER_PROCESS_INSTANCE_PK, String.valueOf(theCase.getBPMProcessInstanceId()));
-		link.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-		link.addParameter(PARAMETER_ACTION, ACTION_JBPM_PROCESS_TASKS_LIST);
-		
-		links.add(link);
-		*/
-		
-		return links;
-	}
-
 	@SuppressWarnings("unchecked")
 	protected abstract Collection getCases(User user) throws RemoteException;
 
@@ -540,12 +509,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
 	protected abstract boolean showCheckBox();
-
-	public ICPage getJbpmProcessViewerPage() {
-		return jbpmProcessViewerPage;
-	}
-
-	public void setJbpmProcessViewerPage(ICPage jbpmProcessViewerPage) {
-		this.jbpmProcessViewerPage = jbpmProcessViewerPage;
+	
+	public CaseHandlersProvider getCaseHandlersProvider() {
+		
+		return (CaseHandlersProvider)WFUtil.getBeanInstance(CaseHandlersProvider.beanIdentifier);
 	}
 }

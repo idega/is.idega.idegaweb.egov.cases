@@ -17,11 +17,13 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2008/02/12 14:36:11 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/14 15:51:00 $ by $Author: civilis $
  */
 public class CaseHandlersProvider implements ApplicationListener, ApplicationContextAware {
+	
+	public static final String beanIdentifier = "casesHandlersProvider";
 	
 	private ApplicationContext applicationContext;
 	private Map<String, String> caseHandlersTypesBeanIdentifiers;
@@ -30,6 +32,9 @@ public class CaseHandlersProvider implements ApplicationListener, ApplicationCon
 		
 		if(handlerType == null || CoreConstants.EMPTY.equals(handlerType))
 			throw new IllegalArgumentException("No or empty handlerType provided");
+		
+		if(!getCaseHandlersTypesBeanIdentifiers().containsKey(handlerType))
+			throw new IllegalArgumentException("No case handler bound to handler type provided: "+handlerType);
 		
 		String beanIdentifier = getCaseHandlersTypesBeanIdentifiers().get(handlerType);
 		return (CaseHandler)getApplicationContext().getBean(beanIdentifier);
