@@ -11,7 +11,9 @@ import is.idega.idegaweb.egov.cases.business.CaseHandlersProvider;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseHandlerState;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,6 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
@@ -63,44 +67,71 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	public static final int ACTION_CASE_HANDLER_INVOLVED = 7;
+	public static final int SHOW_CASE_HANDLER = 7;
+	
+	private static final String caseHandlerFacet = "caseHandler";
 
 	protected abstract String getBlockID();
 	
+	@Override
 	protected void present(IWContext iwc) throws Exception {
-		switch (parseAction(iwc)) {
-			case ACTION_VIEW:
-				showList(iwc);
-				break;
+	}
+	
+	protected void display(IWContext iwc) throws Exception {
 
-			case ACTION_PROCESS:
-				
-				showProcessor(iwc, iwc.getParameter(PARAMETER_CASE_PK));
-				break;
-
-			case ACTION_SAVE:
-				save(iwc);
-				showList(iwc);
-				break;
-
-			case ACTION_MULTI_PROCESS_FORM:
-				showMultiProcessForm(iwc);
-				break;
-
-			case ACTION_MULTI_PROCESS:
-				multiProcess(iwc);
-				showList(iwc);
-				break;
-
-			case ACTION_ALLOCATION_FORM:
-				showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
-				break;
-				
-			case ACTION_CASE_HANDLER_INVOLVED:
-				showCaseHandlerView(iwc);
-				break;
-			default:
-				showList(iwc);
+		CaseHandlerState caseHandlerState = (CaseHandlerState)WFUtil.getBeanInstance(CaseHandlerState.beanIdentifier);
+		
+		if(!caseHandlerState.getShowCaseHandler()) {
+			
+			switch (parseAction(iwc)) {
+			
+				case ACTION_VIEW:
+					showList(iwc);
+					break;
+	
+				case ACTION_PROCESS:
+					
+					showProcessor(iwc, iwc.getParameter(PARAMETER_CASE_PK));
+					break;
+	
+				case ACTION_SAVE:
+					save(iwc);
+					showList(iwc);
+					break;
+	
+				case ACTION_MULTI_PROCESS_FORM:
+					showMultiProcessForm(iwc);
+					break;
+	
+				case ACTION_MULTI_PROCESS:
+					multiProcess(iwc);
+					showList(iwc);
+					break;
+	
+				case ACTION_ALLOCATION_FORM:
+					showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
+					break;
+					
+				case SHOW_CASE_HANDLER:
+					showCaseHandlerView(iwc);
+					break;
+				default:
+					showList(iwc);
+			}
+		}
+	}
+	
+	@Override
+	public void encodeBegin(FacesContext fc) throws IOException {
+		super.encodeBegin(fc);
+		
+		try {
+			display(IWContext.getIWContext(fc));
+		
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			Logger.getLogger(getClassName()).log(Level.SEVERE, "Exception while displaying CasesProcessor", e);
 		}
 	}
 	
@@ -124,7 +155,12 @@ public abstract class CasesProcessor extends CasesBlock {
 				return;
 			}
 			
-			add(caseHandler.getView(theCase));
+			CaseHandlerState caseHandlerState = (CaseHandlerState)WFUtil.getBeanInstance(CaseHandlerState.beanIdentifier);
+			caseHandlerState.setCaseId(new Integer(String.valueOf(theCase.getPrimaryKey())));
+			caseHandlerState.setShowCaseHandler(true);
+			
+			UIComponent view = caseHandler.getView(theCase);
+			getFacets().put(caseHandlerFacet, view);
 			
 		} catch (FinderException fe) {
 			fe.printStackTrace();
@@ -134,7 +170,20 @@ public abstract class CasesProcessor extends CasesBlock {
 			throw new IBORuntimeException(fe);
 		}
 	}
-
+	
+	@Override
+	public void encodeChildren(FacesContext context) throws IOException {
+		super.encodeChildren(context);
+		
+		CaseHandlerState caseHandlerState = (CaseHandlerState)WFUtil.getBeanInstance(CaseHandlerState.beanIdentifier);
+		
+		if(caseHandlerState.getShowCaseHandler()) {
+			
+			UIComponent facet = getFacet(caseHandlerFacet);
+			renderChild(context, facet);
+		}
+	}
+	
 	private int parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_ACTION)) {
 			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
