@@ -29,6 +29,8 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 public class ClosedCases extends CasesProcessor {
+	
+	public final String TYPE = "ClosedCases";
 
 	protected String getBlockID() {
 		return "closedCases";
@@ -235,5 +237,10 @@ public class ClosedCases extends CasesProcessor {
 
 	protected boolean showCheckBox() {
 		return false;
+	}
+	
+	@Override
+	protected String getCasesProcessorType() {
+		return TYPE;
 	}
 }

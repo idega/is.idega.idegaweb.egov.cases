@@ -34,6 +34,8 @@ import com.idega.util.IWTimestamp;
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	private ICPage iMyCasesPage;
+	
+	public final String TYPE = "OpenCases";
 
 	protected String getBlockID() {
 		return "openCases";
@@ -247,5 +249,10 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.iMyCasesPage = myCasesPage;
+	}
+
+	@Override
+	protected String getCasesProcessorType() {
+		return TYPE;
 	}
 }

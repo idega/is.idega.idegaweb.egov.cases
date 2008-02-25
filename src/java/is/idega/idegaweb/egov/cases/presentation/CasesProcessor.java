@@ -159,7 +159,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			caseHandlerState.setCaseId(new Integer(String.valueOf(theCase.getPrimaryKey())));
 			caseHandlerState.setShowCaseHandler(true);
 			
-			UIComponent view = caseHandler.getView(theCase);
+			UIComponent view = caseHandler.getView(iwc, theCase);
 			getFacets().put(caseHandlerFacet, view);
 			
 		} catch (FinderException fe) {
@@ -272,6 +272,16 @@ public abstract class CasesProcessor extends CasesBlock {
 			CaseType type = theCase.getCaseType();
 			User owner = theCase.getOwner();
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
+			
+			CaseHandler caseHandler;
+			
+			if(theCase.getCaseHandler() != null)
+				caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseHandler());
+			else 
+				caseHandler = null;
+			
+			if(caseHandler != null && !caseHandler.isDisplayedInList(theCase))
+				continue;
 
 			row = group.createRow();
 			if (iRow == 1) {
@@ -331,22 +341,17 @@ public abstract class CasesProcessor extends CasesBlock {
 			}
 			cell.setStyleClass("view");
 			
-			if(theCase.getCaseHandler() == null) {
+			if(caseHandler == null) {
 			
 				cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
 				
 			} else {
 				
-				CaseHandler caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseHandler());
+				List<Link> links = caseHandler.getCaseLinks(theCase);
 				
-				if(caseHandler != null) {
-				
-					List<Link> links = caseHandler.getCaseLinks(theCase);
-					
-					if(links != null)
-						for (Link link : links)
-							cell.add(link);
-				}
+				if(links != null)
+					for (Link link : links)
+						cell.add(link);
 			}
 
 			if (showCheckBoxes) {
@@ -554,6 +559,8 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract Collection getCases(User user) throws RemoteException;
 
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
+	
+	protected abstract String getCasesProcessorType();
 
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
