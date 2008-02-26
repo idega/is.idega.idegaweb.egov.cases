@@ -7,6 +7,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -21,6 +22,8 @@ import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
 import com.idega.event.IWPageEventListener;
+import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
@@ -28,6 +31,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
+import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
@@ -35,7 +39,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	private ICPage iMyCasesPage;
 	
-	public final String TYPE = "OpenCases";
+	public static final String TYPE = "OpenCases";
 
 	protected String getBlockID() {
 		return "openCases";
@@ -60,10 +64,33 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	}
 
 	@Override
-	protected Collection getCases(User user) throws RemoteException {
-		boolean isCaseSuperAdmin = getIWApplicationContext().getIWMainApplication().getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, getIWUserContext());
-		Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
-		return getBusiness().getOpenCases(!isCaseSuperAdmin ? groups : null);
+	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
+
+		Collection<GeneralCase> cases = super.getCases(user);
+		Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getBusiness(), null);
+		
+		if(cases != null)
+			openCases.addAll(cases);
+		
+		return openCases;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Collection<GeneralCase> getOpenCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) throws RemoteException {
+		
+		boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+		
+		Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
+		Collection<GeneralCase> openCases;
+		
+		if(caseHandlers == null) {
+		
+			openCases = casesBusiness.getOpenCases(!isCaseSuperAdmin ? groups : null);
+		} else {
+			
+			openCases = casesBusiness.getOpenCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
+		}
+		return openCases;
 	}
 
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {

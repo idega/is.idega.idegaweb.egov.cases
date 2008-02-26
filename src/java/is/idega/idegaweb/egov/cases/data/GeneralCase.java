@@ -1,10 +1,9 @@
 package is.idega.idegaweb.egov.cases.data;
 
-
-import com.idega.core.file.data.ICFile;
 import com.idega.block.process.data.Case;
-import com.idega.user.data.User;
+import com.idega.core.file.data.ICFile;
 import com.idega.data.IDOEntity;
+import com.idega.user.data.User;
 
 public interface GeneralCase extends IDOEntity, Case {
 

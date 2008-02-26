@@ -49,16 +49,22 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getOpenCases
 	 */
 	public Collection getOpenCases(Collection groups) throws RemoteException;
+	
+	public Collection getOpenCases(Collection groups, String[] caseHandlers) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getMyCases
 	 */
 	public Collection getMyCases(User handler) throws RemoteException;
+	
+	public Collection getMyCases(User handler, String[] caseHandlers) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getClosedCases
 	 */
 	public Collection getClosedCases(Collection groups) throws RemoteException;
+	
+	public Collection getClosedCases(Collection groups, String[] caseHandlers) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByUsers

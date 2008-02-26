@@ -31,9 +31,17 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses) throws FinderException {
+	/**
+	 * 
+	 * @param groups
+	 * @param statuses
+	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @return
+	 * @throws FinderException
+	 */
+	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses, String[] caseHandlers) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByGroupAndStatuses(groups, statuses);
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByGroupAndStatuses(groups, statuses, caseHandlers);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
@@ -45,9 +53,17 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException {
+	/**
+	 * 
+	 * @param handler
+	 * @param statuses
+	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @return
+	 * @throws FinderException
+	 */
+	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses, String[] caseHandlers) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByHandlerAndStatuses(handler, statuses);
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByHandlerAndStatuses(handler, statuses, caseHandlers);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}

@@ -42,7 +42,7 @@ public class MyCases extends CasesProcessor {
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	
-	public final String TYPE = "MyCases";
+	public static final String TYPE = "MyCases";
 	
 	protected String getBlockID() {
 		return "myCases";
@@ -50,7 +50,14 @@ public class MyCases extends CasesProcessor {
 
 	@SuppressWarnings("unchecked")
 	protected Collection getCases(User user) throws RemoteException {
-		return getBusiness().getMyCases(user);
+		
+		Collection<GeneralCase> cases = super.getCases(user);
+		Collection<GeneralCase> myCases = getBusiness().getMyCases(user);
+		
+		if(cases != null)
+			myCases.addAll(cases);
+		
+		return myCases;
 	}
 
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {

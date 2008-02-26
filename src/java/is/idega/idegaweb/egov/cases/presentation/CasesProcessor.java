@@ -212,7 +212,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		column.setSpan(1);
 		column.setWidth("12");
 
-		@SuppressWarnings("unchecked")
 		Collection<GeneralCase> cases = getCases(iwc.getCurrentUser());
 
 		TableRowGroup group = table.createHeaderRowGroup();
@@ -555,8 +554,26 @@ public abstract class CasesProcessor extends CasesBlock {
 		return process;
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected abstract Collection getCases(User user) throws RemoteException;
+	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
+		
+		List<CaseHandler> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
+		Collection<GeneralCase> cases = null;
+		
+		for (CaseHandler handler : caseHandlers) {
+			
+			Collection<GeneralCase> cazes = handler.getCases(user, getCasesProcessorType());
+			
+			if(cazes != null) {
+				
+				if(cases == null)
+					cases = cazes;
+				else
+					cases.addAll(cazes);
+			}
+		}
+		
+		return cases;
+	}
 
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
 	

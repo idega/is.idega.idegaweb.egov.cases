@@ -157,9 +157,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public Collection getOpenCases(Collection groups) {
+		
+		return getOpenCases(groups, new String[] {});
+	}
+	
+	public Collection getOpenCases(Collection groups, String[] caseHandlers) {
+		
 		try {
 			String[] statuses = { getCaseStatusOpen().getStatus(), getCaseStatusReview().getStatus() };
-			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses);
+			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses, caseHandlers);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -168,9 +174,14 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public Collection getMyCases(User handler) {
+		
+		return getMyCases(handler, new String[] {});
+	}
+	
+	public Collection getMyCases(User handler, String[] caseHandlers) {
 		try {
 			String[] statuses = { getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus() };
-			return getGeneralCaseHome().findAllByHandlerAndStatuses(handler, statuses);
+			return getGeneralCaseHome().findAllByHandlerAndStatuses(handler, statuses, caseHandlers);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -179,9 +190,14 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public Collection getClosedCases(Collection groups) {
+		
+		return getClosedCases(groups, new String[] {});
+	}
+	
+	public Collection getClosedCases(Collection groups, String[] caseHandlers) {
 		try {
 			String[] statuses = { getCaseStatusInactive().getStatus(), getCaseStatusReady().getStatus() };
-			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses);
+			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses, caseHandlers);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

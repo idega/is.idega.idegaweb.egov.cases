@@ -17,11 +17,27 @@ public interface GeneralCaseHome extends IDOHome {
 
 	public Collection findAllByGroup(Collection groups) throws FinderException;
 
-	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses) throws FinderException;
+	/**
+	 * 
+	 * @param groups
+	 * @param statuses
+	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @return
+	 * @throws FinderException
+	 */
+	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses, String[] caseHandlers) throws FinderException;
 
 	public Collection findAllByHandler(User handler) throws FinderException;
 
-	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException;
+	/**
+	 * 
+	 * @param handler
+	 * @param statuses
+	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @return
+	 * @throws FinderException
+	 */
+	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses, String[] caseHandlers) throws FinderException;
 
 	public Collection findAllByUsers(Collection users) throws FinderException;
 

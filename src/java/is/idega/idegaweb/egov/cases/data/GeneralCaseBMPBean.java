@@ -165,10 +165,18 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 	// Finders
 	public Collection ejbFindAllByGroup(Collection groups) throws FinderException {
-		return ejbFindAllByGroupAndStatuses(groups, null);
+		return ejbFindAllByGroupAndStatuses(groups, null, null);
 	}
 
-	public Collection ejbFindAllByGroupAndStatuses(Collection groups, String[] statuses) throws FinderException {
+	/**
+	 * 
+	 * @param groups
+	 * @param statuses
+	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @return
+	 * @throws FinderException
+	 */
+	public Collection ejbFindAllByGroupAndStatuses(Collection groups, String[] statuses, String[] caseHandlers) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
 
@@ -187,15 +195,35 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		if (statuses != null) {
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}
+		
+		if (caseHandlers != null) {
+			
+			if(caseHandlers.length == 0) {
+				
+				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_HANDLER)));
+				
+			} else {
+			
+				query.addCriteria(new InCriteria(table.getColumn(COLUMN_CASE_HANDLER), caseHandlers));
+			}
+		}
 
 		return idoFindPKsByQuery(query);
 	}
 
 	public Collection ejbFindAllByHandler(User handler) throws FinderException {
-		return ejbFindAllByHandlerAndStatuses(handler, null);
+		return ejbFindAllByHandlerAndStatuses(handler, null, null);
 	}
 
-	public Collection ejbFindAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException {
+	/**
+	 * 
+	 * @param handler
+	 * @param statuses
+	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @return
+	 * @throws FinderException
+	 */
+	public Collection ejbFindAllByHandlerAndStatuses(User handler, String[] statuses, String[] caseHandlers) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
 
@@ -211,6 +239,18 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_HANDLER), MatchCriteria.EQUALS, handler));
 		if (statuses != null) {
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
+		}
+		
+		if (caseHandlers != null) {
+			
+			if(caseHandlers.length == 0) {
+				
+				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_HANDLER)));
+				
+			} else {
+			
+				query.addCriteria(new InCriteria(table.getColumn(COLUMN_CASE_HANDLER), caseHandlers));
+			}
 		}
 
 		return idoFindPKsByQuery(query);

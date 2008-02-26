@@ -2,7 +2,9 @@ package is.idega.idegaweb.egov.cases.business;
 
 import is.idega.idegaweb.egov.cases.presentation.CaseHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,9 +19,9 @@ import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
- * Last modified: $Date: 2008/02/14 15:51:00 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/26 15:02:22 $ by $Author: civilis $
  */
 public class CaseHandlersProvider implements ApplicationListener, ApplicationContextAware {
 	
@@ -38,6 +40,21 @@ public class CaseHandlersProvider implements ApplicationListener, ApplicationCon
 		
 		String beanIdentifier = getCaseHandlersTypesBeanIdentifiers().get(handlerType);
 		return (CaseHandler)getApplicationContext().getBean(beanIdentifier);
+	}
+	
+	public List<CaseHandler> getCaseHandlers() {
+		
+		List<CaseHandler> handlers = new ArrayList<CaseHandler>(caseHandlersTypesBeanIdentifiers.size());
+		
+		for (String handlerIdentifier : caseHandlersTypesBeanIdentifiers.values()) {
+			
+			CaseHandler handler = (CaseHandler)getApplicationContext().getBean(handlerIdentifier);
+			
+			if(handler != null)
+				handlers.add(handler);
+		}
+		
+		return handlers;
 	}
 	
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
