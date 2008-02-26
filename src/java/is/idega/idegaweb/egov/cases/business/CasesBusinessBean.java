@@ -326,7 +326,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseHandler, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -361,8 +361,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setType(type);
 		theCase.setAsPrivate(isPrivate);
 		
-		if(caseHandler != null)
-			theCase.setCaseHandler(caseHandler);
+		if(caseManagerType != null)
+			theCase.setCaseManagerType(caseManagerType);
 		
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group) null);
 

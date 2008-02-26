@@ -95,9 +95,9 @@ public class CaseViewer extends CaseCreator {
 				throw new IBORuntimeException(fe);
 			}
 			
-			if(theCase.getCaseHandler() != null) {
+			if(theCase.getCaseManagerType() != null) {
 				
-//				TODO: show bpm view
+//				TODO: show bpm view (where is this used)
 				return;
 			}
 			

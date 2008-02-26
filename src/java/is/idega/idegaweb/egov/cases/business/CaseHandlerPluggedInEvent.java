@@ -1,27 +1,28 @@
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.presentation.CaseHandler;
 
 import org.springframework.context.ApplicationEvent;
 
+import com.idega.block.process.business.CaseManager;
+
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
- * Last modified: $Date: 2008/02/12 14:36:11 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/26 17:58:27 $ by $Author: civilis $
  */
 public class CaseHandlerPluggedInEvent extends ApplicationEvent {
 
 	private static final long serialVersionUID = 2033689951503691347L;
-	private CaseHandler caseHandler;
+	private CaseManager caseHandler;
 
 	public CaseHandlerPluggedInEvent(Object source) {
         super(source);
         
-        caseHandler = (CaseHandler)source;
+        caseHandler = (CaseManager)source;
     }
 
-	public CaseHandler getCaseHandler() {
+	public CaseManager getCaseHandler() {
 		return caseHandler;
 	}
 }

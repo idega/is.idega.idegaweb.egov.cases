@@ -1,6 +1,5 @@
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.presentation.CaseHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,13 +14,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
+import com.idega.block.process.business.CaseManager;
 import com.idega.util.CoreConstants;
 
 /**
  * @author <a href="mailto:civilis@idega.com">Vytautas Čivilis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
- * Last modified: $Date: 2008/02/26 15:02:22 $ by $Author: civilis $
+ * Last modified: $Date: 2008/02/26 17:58:28 $ by $Author: civilis $
  */
 public class CaseHandlersProvider implements ApplicationListener, ApplicationContextAware {
 	
@@ -30,7 +30,7 @@ public class CaseHandlersProvider implements ApplicationListener, ApplicationCon
 	private ApplicationContext applicationContext;
 	private Map<String, String> caseHandlersTypesBeanIdentifiers;
 	
-	public CaseHandler getCaseHandler(String handlerType) {
+	public CaseManager getCaseHandler(String handlerType) {
 		
 		if(handlerType == null || CoreConstants.EMPTY.equals(handlerType))
 			throw new IllegalArgumentException("No or empty handlerType provided");
@@ -39,16 +39,16 @@ public class CaseHandlersProvider implements ApplicationListener, ApplicationCon
 			throw new IllegalArgumentException("No case handler bound to handler type provided: "+handlerType);
 		
 		String beanIdentifier = getCaseHandlersTypesBeanIdentifiers().get(handlerType);
-		return (CaseHandler)getApplicationContext().getBean(beanIdentifier);
+		return (CaseManager)getApplicationContext().getBean(beanIdentifier);
 	}
 	
-	public List<CaseHandler> getCaseHandlers() {
+	public List<CaseManager> getCaseHandlers() {
 		
-		List<CaseHandler> handlers = new ArrayList<CaseHandler>(caseHandlersTypesBeanIdentifiers.size());
+		List<CaseManager> handlers = new ArrayList<CaseManager>(caseHandlersTypesBeanIdentifiers.size());
 		
 		for (String handlerIdentifier : caseHandlersTypesBeanIdentifiers.values()) {
 			
-			CaseHandler handler = (CaseHandler)getApplicationContext().getBean(handlerIdentifier);
+			CaseManager handler = (CaseManager)getApplicationContext().getBean(handlerIdentifier);
 			
 			if(handler != null)
 				handlers.add(handler);
@@ -61,7 +61,7 @@ public class CaseHandlersProvider implements ApplicationListener, ApplicationCon
 		
 		if(applicationEvent instanceof CaseHandlerPluggedInEvent) {
 			
-			CaseHandler caseHandler = ((CaseHandlerPluggedInEvent)applicationEvent).getCaseHandler();
+			CaseManager caseHandler = ((CaseHandlerPluggedInEvent)applicationEvent).getCaseHandler();
 			
 			String beanIdentifier = caseHandler.getBeanIdentifier();
 			

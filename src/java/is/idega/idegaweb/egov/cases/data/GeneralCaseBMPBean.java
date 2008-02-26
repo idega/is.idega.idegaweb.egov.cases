@@ -41,7 +41,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
-	private static final String COLUMN_CASE_HANDLER = "case_handler";
 
 	/*
 	 * (non-Javadoc)
@@ -72,7 +71,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
 		addAttribute(COLUMN_TYPE, "Type", String.class);
 		addAttribute(COLUMN_IS_PRIVATE, "Is private", Boolean.class);
-		addAttribute(COLUMN_CASE_HANDLER, "Case handler", String.class);
 
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -85,10 +83,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return getStringColumnValue(COLUMN_MESSAGE);
 	}
 	
-	public String getCaseHandler() {
-		return getStringColumnValue(COLUMN_CASE_HANDLER);
-	}
-
 	public String getReply() {
 		String reply = getStringColumnValue(COLUMN_REPLY);
 
@@ -131,10 +125,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		setColumn(COLUMN_MESSAGE, message);
 	}
 	
-	public void setCaseHandler(String handler) {
-		setColumn(COLUMN_CASE_HANDLER, handler);
-	}
-
 	public void setReply(String reply) {
 		setColumn(COLUMN_REPLY, reply);
 	}
@@ -172,11 +162,11 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	 * 
 	 * @param groups
 	 * @param statuses
-	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @param caseManagerType - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
 	 * @return
 	 * @throws FinderException
 	 */
-	public Collection ejbFindAllByGroupAndStatuses(Collection groups, String[] statuses, String[] caseHandlers) throws FinderException {
+	public Collection ejbFindAllByGroupAndStatuses(Collection groups, String[] statuses, String[] caseManagerType) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
 
@@ -196,15 +186,15 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}
 		
-		if (caseHandlers != null) {
+		if (caseManagerType != null) {
 			
-			if(caseHandlers.length == 0) {
+			if(caseManagerType.length == 0) {
 				
-				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_HANDLER)));
+				query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName())));
 				
 			} else {
 			
-				query.addCriteria(new InCriteria(table.getColumn(COLUMN_CASE_HANDLER), caseHandlers));
+				query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName()), caseManagerType));
 			}
 		}
 
@@ -219,11 +209,11 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	 * 
 	 * @param handler
 	 * @param statuses
-	 * @param caseHandlers - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
+	 * @param caseManagerType - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
 	 * @return
 	 * @throws FinderException
 	 */
-	public Collection ejbFindAllByHandlerAndStatuses(User handler, String[] statuses, String[] caseHandlers) throws FinderException {
+	public Collection ejbFindAllByHandlerAndStatuses(User handler, String[] statuses, String[] caseManagerType) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
 
@@ -241,15 +231,15 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}
 		
-		if (caseHandlers != null) {
+		if (caseManagerType != null) {
 			
-			if(caseHandlers.length == 0) {
+			if(caseManagerType.length == 0) {
 				
-				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_HANDLER)));
+				query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName())));
 				
 			} else {
 			
-				query.addCriteria(new InCriteria(table.getColumn(COLUMN_CASE_HANDLER), caseHandlers));
+				query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName()), caseManagerType));
 			}
 		}
 
@@ -278,7 +268,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return ejbFindByCriteria(parentCategory, category, type, status, anonymous, null);
 	}
 	
-	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseHandler) throws FinderException {
+	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseManagerType) throws FinderException {
 
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
@@ -319,8 +309,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		if (anonymous != null) {
 			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseUserColumnName()), !anonymous.booleanValue()));
 		}
-		if (caseHandler != null) {
-			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_HANDLER), MatchCriteria.EQUALS, caseHandler));
+		if (caseManagerType != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName()), MatchCriteria.EQUALS, caseManagerType));
 		}
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));

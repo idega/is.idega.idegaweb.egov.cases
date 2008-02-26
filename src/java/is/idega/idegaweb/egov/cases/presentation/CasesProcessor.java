@@ -25,6 +25,7 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
+import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
@@ -140,14 +141,14 @@ public abstract class CasesProcessor extends CasesBlock {
 		try {
 			
 			GeneralCase theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
-			String caseHandlerType = theCase.getCaseHandler();
+			String caseHandlerType = theCase.getCaseManagerType();
 			
 			if(caseHandlerType == null || CoreConstants.EMPTY.equals(caseHandlerType)) {
 				Logger.getLogger(getClassName()).log(Level.SEVERE, "ACTION_CASE_HANDLER_INVOLVED parameter provided, but not case handler type found in the case bean.");
 				return;
 			}
 			
-			CaseHandler caseHandler = getCaseHandlersProvider().getCaseHandler(caseHandlerType);
+			CaseManager caseHandler = getCaseHandlersProvider().getCaseHandler(caseHandlerType);
 			
 			if(caseHandler == null) {
 				
@@ -272,10 +273,10 @@ public abstract class CasesProcessor extends CasesBlock {
 			User owner = theCase.getOwner();
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
 			
-			CaseHandler caseHandler;
+			CaseManager caseHandler;
 			
-			if(theCase.getCaseHandler() != null)
-				caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseHandler());
+			if(theCase.getCaseManagerType() != null)
+				caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
 			else 
 				caseHandler = null;
 			
@@ -556,12 +557,13 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
 		
-		List<CaseHandler> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
+		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
 		Collection<GeneralCase> cases = null;
 		
-		for (CaseHandler handler : caseHandlers) {
+		for (CaseManager handler : caseHandlers) {
 			
-			Collection<GeneralCase> cazes = handler.getCases(user, getCasesProcessorType());
+			@SuppressWarnings("unchecked")
+			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, getCasesProcessorType());
 			
 			if(cazes != null) {
 				
