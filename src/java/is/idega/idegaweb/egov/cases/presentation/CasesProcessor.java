@@ -7,11 +7,9 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.CaseHandlersProvider;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseHandlerState;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -26,7 +24,10 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
 import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.presentation.UserCases;
+import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -56,21 +57,21 @@ public abstract class CasesProcessor extends CasesBlock {
 
 	public static final String PARAMETER_ACTION = "cp_prm_action";
 
-	public static final String PARAMETER_CASE_PK = "prm_case_pk";
+	public static final String PARAMETER_CASE_PK = UserCases.PARAMETER_CASE_PK;
 	protected static final String PARAMETER_REPLY = "prm_reply";
 	protected static final String PARAMETER_STATUS = "prm_status";
 	protected static final String PARAMETER_USER = "prm_iser";
 	protected static final String PARAMETER_MESSAGE = "prm_message";
 
-	protected static final int ACTION_VIEW = 1;
+	protected static final int ACTION_VIEW = UserCases.ACTION_VIEW;
 	public static final int ACTION_PROCESS = 2;
 	protected static final int ACTION_SAVE = 3;
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	public static final int SHOW_CASE_HANDLER = 7;
+	public static final int SHOW_CASE_HANDLER = UserCases.SHOW_CASE_HANDLER;
 	
-	private static final String caseHandlerFacet = "caseHandler";
+	private static final String caseManagerFacet = "caseManager";
 
 	protected abstract String getBlockID();
 	
@@ -80,7 +81,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	protected void display(IWContext iwc) throws Exception {
 
-		CaseHandlerState caseHandlerState = (CaseHandlerState)WFUtil.getBeanInstance(CaseHandlerState.beanIdentifier);
+		CaseManagerState caseHandlerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
 		
 		if(!caseHandlerState.getShowCaseHandler()) {
 			
@@ -144,7 +145,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			String caseHandlerType = theCase.getCaseManagerType();
 			
 			if(caseHandlerType == null || CoreConstants.EMPTY.equals(caseHandlerType)) {
-				Logger.getLogger(getClassName()).log(Level.SEVERE, "ACTION_CASE_HANDLER_INVOLVED parameter provided, but not case handler type found in the case bean.");
+				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handlerType resolved from case, though showCaseHandlerView method was called");
 				return;
 			}
 			
@@ -156,12 +157,12 @@ public abstract class CasesProcessor extends CasesBlock {
 				return;
 			}
 			
-			CaseHandlerState caseHandlerState = (CaseHandlerState)WFUtil.getBeanInstance(CaseHandlerState.beanIdentifier);
+			CaseManagerState caseHandlerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
 			caseHandlerState.setCaseId(new Integer(String.valueOf(theCase.getPrimaryKey())));
 			caseHandlerState.setShowCaseHandler(true);
 			
 			UIComponent view = caseHandler.getView(iwc, theCase);
-			getFacets().put(caseHandlerFacet, view);
+			getFacets().put(caseManagerFacet, view);
 			
 		} catch (FinderException fe) {
 			fe.printStackTrace();
@@ -176,11 +177,11 @@ public abstract class CasesProcessor extends CasesBlock {
 	public void encodeChildren(FacesContext context) throws IOException {
 		super.encodeChildren(context);
 		
-		CaseHandlerState caseHandlerState = (CaseHandlerState)WFUtil.getBeanInstance(CaseHandlerState.beanIdentifier);
+		CaseManagerState caseHandlerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
 		
 		if(caseHandlerState.getShowCaseHandler()) {
 			
-			UIComponent facet = getFacet(caseHandlerFacet);
+			UIComponent facet = getFacet(caseManagerFacet);
 			renderChild(context, facet);
 		}
 	}
@@ -279,9 +280,6 @@ public abstract class CasesProcessor extends CasesBlock {
 				caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
 			else 
 				caseHandler = null;
-			
-			if(caseHandler != null && !caseHandler.isDisplayedInList(theCase))
-				continue;
 
 			row = group.createRow();
 			if (iRow == 1) {
@@ -585,8 +583,8 @@ public abstract class CasesProcessor extends CasesBlock {
 
 	protected abstract boolean showCheckBox();
 	
-	public CaseHandlersProvider getCaseHandlersProvider() {
+	public CaseManagersProvider getCaseHandlersProvider() {
 		
-		return (CaseHandlersProvider)WFUtil.getBeanInstance(CaseHandlersProvider.beanIdentifier);
+		return (CaseManagersProvider)WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
 	}
 }
