@@ -140,28 +140,29 @@ public abstract class CasesProcessor extends CasesBlock {
 	public void showCaseHandlerView(IWContext iwc) {
 		
 		try {
-			
 			GeneralCase theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
-			String caseHandlerType = theCase.getCaseManagerType();
+			String caseManagerType = theCase.getCaseManagerType();
 			
-			if(caseHandlerType == null || CoreConstants.EMPTY.equals(caseHandlerType)) {
+			if(caseManagerType == null || CoreConstants.EMPTY.equals(caseManagerType)) {
 				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handlerType resolved from case, though showCaseHandlerView method was called");
 				return;
 			}
 			
-			CaseManager caseHandler = getCaseHandlersProvider().getCaseHandler(caseHandlerType);
+			CaseManager caseManager = getCaseHandlersProvider().getCaseHandler(caseManagerType);
 			
-			if(caseHandler == null) {
+			if(caseManager == null) {
 				
-				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handler found for case handler type provided: "+caseHandlerType);
+				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handler found for case handler type provided: "+caseManagerType);
 				return;
 			}
 			
-			CaseManagerState caseHandlerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
-			caseHandlerState.setCaseId(new Integer(String.valueOf(theCase.getPrimaryKey())));
-			caseHandlerState.setShowCaseHandler(true);
+			CaseManagerState caseManagerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
+			caseManagerState.setCaseId(new Integer(String.valueOf(theCase.getPrimaryKey())));
+			caseManagerState.setShowCaseHandler(true);
+			caseManagerState.setFullView(true);
+			caseManagerState.setInCasesComponent(true);
 			
-			UIComponent view = caseHandler.getView(iwc, theCase);
+			UIComponent view = caseManager.getView(iwc, theCase);
 			getFacets().put(caseManagerFacet, view);
 			
 		} catch (FinderException fe) {
