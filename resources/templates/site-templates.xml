@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-templates>
+
+	<site name="My pages - User" site-category="eBusiness">
+		<structure>
+			<page name="My page" type="text">
+				<page name="My cases" type="cases">
+					<page name="Case overview" type="caseOverview"/>
+					<page name="Message" type="messageViewer"/>
+				</page>
+				<page name="Create case" type="createCase"/>
+				<page name="User properties" type="userProperties"/>
+				<page name="Change password" type="changePassword"/>
+			</page>
+		</structure>
+	</site>
+
+	<site name="My pages - Case admin" site-category="eBusiness">
+		<structure>
+			<page name="My page" type="text">
+				<page name="Administration" type="administration">
+					<page name="Open cases" type="openCases"/>
+					<page name="My cases" type="myCases"/>
+					<page name="Closed cases" type="closedCases"/>
+					<page name="Find cases" type="findCases">
+						<page name="Case overview" type="caseOverview"/>
+					</page>
+					<page name="Cases overview" type="casesOverview">
+						<page name="Case overview" type="caseOverview"/>
+					</page>
+				</page>
+				<page name="Messages" type="messages">
+					<page name="Message" type="messageViewer"/>
+				</page>
+				<page name="User properties" type="userProperties"/>
+				<page name="Change password" type="changePassword"/>
+			</page>
+		</structure>
+	</site>
+	
+</site-templates>
