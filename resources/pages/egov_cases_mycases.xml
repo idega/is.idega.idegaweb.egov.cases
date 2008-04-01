@@ -9,7 +9,7 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
-    	<module id="" class="com.idega.presentation.Heading1">
+    	<module id="" class="com.idega.presentation.text.Heading1">
       		<property>
         		<name>:method:1:implied:void:setText:java.lang.String:</name>
         		<value>My cases</value>
