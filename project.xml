@@ -184,6 +184,11 @@
       <name>1.0.34</name>
       <tag>EGOV_CASES_1_0_34</tag>
     </version>
+    <version>
+      <id>1.0.35</id>
+      <name>1.0.35</name>
+      <tag>EGOV_CASES_1_0_35</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
