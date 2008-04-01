@@ -5,6 +5,12 @@
 	</properties>
 	
 	<body>
+
+		<release version="1.0.35" date="2008-04-01">
+			<action dev="palli" type="update">
+				Added new stuff for RR cases.
+			</action>
+		</release>
 	
 		<release version="1.0.34" date="2008-01-23">
 			<action dev="laddi" type="update">

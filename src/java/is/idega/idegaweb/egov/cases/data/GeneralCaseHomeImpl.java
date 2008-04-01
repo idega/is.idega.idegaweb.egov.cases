@@ -12,7 +12,6 @@ import com.idega.data.IDOEntity;
 import com.idega.data.IDOFactory;
 
 public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
-
 	public Class getEntityInterfaceClass() {
 		return GeneralCase.class;
 	}
@@ -27,28 +26,34 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 
 	public Collection findAllByGroup(Collection groups) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByGroup(groups);
+		Collection ids = ((GeneralCaseBMPBean) entity)
+				.ejbFindAllByGroup(groups);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses) throws FinderException {
+	public Collection findAllByGroupAndStatuses(Collection groups,
+			String[] statuses) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByGroupAndStatuses(groups, statuses);
+		Collection ids = ((GeneralCaseBMPBean) entity)
+				.ejbFindAllByGroupAndStatuses(groups, statuses);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
 	public Collection findAllByHandler(User handler) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByHandler(handler);
+		Collection ids = ((GeneralCaseBMPBean) entity)
+				.ejbFindAllByHandler(handler);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses) throws FinderException {
+	public Collection findAllByHandlerAndStatuses(User handler,
+			String[] statuses) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindAllByHandlerAndStatuses(handler, statuses);
+		Collection ids = ((GeneralCaseBMPBean) entity)
+				.ejbFindAllByHandlerAndStatuses(handler, statuses);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
@@ -60,23 +65,31 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
+	public Collection findByCriteria(CaseCategory parentCategory,
+			CaseCategory category, CaseType type, CaseStatus status,
+			Date fromDate, Date toDate, Boolean anonymous)
+			throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(
+				parentCategory, category, type, status, fromDate, toDate,
+				anonymous);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
 	public int getCountByGroup(Collection groups) throws IDOException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		int theReturn = ((GeneralCaseBMPBean) entity).ejbHomeGetCountByGroup(groups);
+		int theReturn = ((GeneralCaseBMPBean) entity)
+				.ejbHomeGetCountByGroup(groups);
 		this.idoCheckInPooledEntity(entity);
 		return theReturn;
 	}
 
-	public int getCountByGroupAndStatuses(Collection groups, String[] statuses) throws IDOException {
+	public int getCountByGroupAndStatuses(Collection groups, String[] statuses)
+			throws IDOException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		int theReturn = ((GeneralCaseBMPBean) entity).ejbHomeGetCountByGroupAndStatuses(groups, statuses);
+		int theReturn = ((GeneralCaseBMPBean) entity)
+				.ejbHomeGetCountByGroupAndStatuses(groups, statuses);
 		this.idoCheckInPooledEntity(entity);
 		return theReturn;
 	}

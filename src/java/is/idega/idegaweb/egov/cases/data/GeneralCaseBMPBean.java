@@ -40,6 +40,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
+	private static final String COLUMN_IS_ANONYMOUS = "is_anonymous";
+	private static final String COLUMN_PRIORITY = "priority";
+	private static final String COLUMN_TITLE = "title";
+	private static final String COLUMN_REPLY_TYPE = "reply_type";
 
 	/*
 	 * (non-Javadoc)
@@ -70,7 +74,11 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
 		addAttribute(COLUMN_TYPE, "Type", String.class);
 		addAttribute(COLUMN_IS_PRIVATE, "Is private", Boolean.class);
-
+		addAttribute(COLUMN_IS_ANONYMOUS, "Is anonymous", Boolean.class);
+		addAttribute(COLUMN_PRIORITY, "Priority", String.class);
+		addAttribute(COLUMN_TITLE, "Title", String.class);
+		addAttribute(COLUMN_REPLY_TYPE, "Reply type", String.class);
+		
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
@@ -119,6 +127,22 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return getBooleanColumnValue(COLUMN_IS_PRIVATE, false);
 	}
 
+	public boolean isAnonymous() {
+		return getBooleanColumnValue(COLUMN_IS_ANONYMOUS, false);
+	}
+	
+	public String getPriority() {
+		return getStringColumnValue(COLUMN_PRIORITY);
+	}
+	
+	public String getTitle() {
+		return getStringColumnValue(COLUMN_TITLE);
+	}
+	
+	public String getReplyType() {
+		return getStringColumnValue(COLUMN_REPLY_TYPE);
+	}
+	
 	// Setters
 	public void setMessage(String message) {
 		setColumn(COLUMN_MESSAGE, message);
@@ -150,6 +174,22 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 	public void setAsPrivate(boolean isPrivate) {
 		setColumn(COLUMN_IS_PRIVATE, isPrivate);
+	}
+
+	public void setAsAnonymous(boolean isAnonymous) {
+		setColumn(COLUMN_IS_ANONYMOUS, isAnonymous);
+	}
+	
+	public void setPriority(String priority) {
+		setColumn(COLUMN_PRIORITY, priority);
+	}
+	
+	public void setTitle(String title) {
+		setColumn(COLUMN_TITLE, title);
+	}
+	
+	public void setReplyType(String replyType) {
+		setColumn(COLUMN_REPLY_TYPE, replyType);
 	}
 
 	// Finders
@@ -221,6 +261,18 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
+	public Collection ejbFindAllByMessage(String message) throws FinderException {
+		Table table = new Table(this);
+		Table process = new Table(Case.class);
+
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName(), true);
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_MESSAGE), MatchCriteria.LIKE, "%" + message + "%"));
+
+		return idoFindPKsByQuery(query);
+	}
+
+	
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);

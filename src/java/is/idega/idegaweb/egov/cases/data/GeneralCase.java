@@ -7,7 +7,6 @@ import com.idega.user.data.User;
 import com.idega.data.IDOEntity;
 
 public interface GeneralCase extends IDOEntity, Case {
-
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getCaseCodeKey
 	 */
@@ -59,6 +58,26 @@ public interface GeneralCase extends IDOEntity, Case {
 	public boolean isPrivate();
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#isAnonymous
+	 */
+	public boolean isAnonymous();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getPriority
+	 */
+	public String getPriority();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getTitle
+	 */
+	public String getTitle();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getReplyType
+	 */
+	public String getReplyType();
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setMessage
 	 */
 	public void setMessage(String message);
@@ -97,4 +116,24 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAsPrivate
 	 */
 	public void setAsPrivate(boolean isPrivate);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAsAnonymous
+	 */
+	public void setAsAnonymous(boolean isAnonymous);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setPriority
+	 */
+	public void setPriority(String priority);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setTitle
+	 */
+	public void setTitle(String title);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setReplyType
+	 */
+	public void setReplyType(String replyType);
 }

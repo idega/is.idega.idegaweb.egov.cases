@@ -58,28 +58,28 @@ import com.idega.util.FileUtil;
 
 public class CaseCreator extends ApplicationForm {
 
-	private static final String PARAMETER_ACTION = "cc_prm_action";
+	protected static final String PARAMETER_ACTION = "cc_prm_action";
 
-	private static final String PARAMETER_REGARDING = "prm_regarding";
-	private static final String PARAMETER_MESSAGE = "prm_message";
-	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
-	private static final String PARAMETER_HIDE_OTHERS = "hide_others";
-	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
-	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-	private static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
-	private static final String PARAMETER_PRIVATE = "prm_private";
+	protected static final String PARAMETER_REGARDING = "prm_regarding";
+	protected static final String PARAMETER_MESSAGE = "prm_message";
+	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
+	protected static final String PARAMETER_HIDE_OTHERS = "hide_others";
+	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
+	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
+	protected static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
+	protected static final String PARAMETER_PRIVATE = "prm_private";
 
-	private static final int ACTION_PHASE_1 = 1;
-	private static final int ACTION_OVERVIEW = 2;
-	private static final int ACTION_SAVE = 3;
+	protected static final int ACTION_PHASE_1 = 1;
+	protected static final int ACTION_OVERVIEW = 2;
+	protected static final int ACTION_SAVE = 3;
 
-	private String iType;
+	protected String iType;
 
-	private IWResourceBundle iwrb;
-	private boolean iUseSessionUser = false;
-	private boolean iUseAnonymous = false;
+	protected IWResourceBundle iwrb;
+	protected boolean iUseSessionUser = false;
+	protected boolean iUseAnonymous = false;
 
-	private Collection iCategories;
+	protected Collection iCategories;
 
 	public String getBundleIdentifier() {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
@@ -119,7 +119,8 @@ public class CaseCreator extends ApplicationForm {
 		return ACTION_PHASE_1;
 	}
 
-	private void showPhaseOne(IWContext iwc) throws RemoteException {
+	protected void showPhaseOne(IWContext iwc) throws RemoteException {
+		System.out.println("CaseCreator: ShowPhaseOne");
 		User user = getUser(iwc);
 		Locale locale = iwc.getCurrentLocale();
 		boolean hideOtherCategories = "true".equalsIgnoreCase(iwc.getParameter(PARAMETER_HIDE_OTHERS));
@@ -411,7 +412,7 @@ public class CaseCreator extends ApplicationForm {
 		add(form);
 	}
 
-	private void showOverview(IWContext iwc) throws RemoteException {
+	protected void showOverview(IWContext iwc) throws RemoteException {
 		Locale locale = iwc.getCurrentLocale();
 
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
@@ -637,7 +638,7 @@ public class CaseCreator extends ApplicationForm {
 		add(form);
 	}
 
-	private void save(IWContext iwc) throws RemoteException {
+	protected void save(IWContext iwc) throws RemoteException {
 		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
@@ -732,7 +733,7 @@ public class CaseCreator extends ApplicationForm {
 		}
 	}
 
-	private User getUser(IWContext iwc) throws RemoteException {
+	protected User getUser(IWContext iwc) throws RemoteException {
 		if (this.iUseAnonymous) {
 			return null;
 		}
