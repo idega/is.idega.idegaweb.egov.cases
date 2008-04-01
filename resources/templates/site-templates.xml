@@ -19,6 +19,8 @@
 		<structure>
 			<page name="My page" type="text">
 				<page name="Administration" type="administration">
+					<page name="Case type editor" type="caseTypeEditor"/>
+					<page name="Case category editor" type="caseCategoryEditor"/>
 					<page name="Open cases" type="openCases"/>
 					<page name="My cases" type="myCases"/>
 					<page name="Closed cases" type="closedCases"/>

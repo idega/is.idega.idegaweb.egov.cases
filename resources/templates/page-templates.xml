@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page-templates>
-	<page name="Create case" type="createCase" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/create.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_casecreator.xml"></page>	
+	<page name="Create case" type="createCase" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/createCase.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_casecreator.xml"></page>	
 
 	<page name="Case overview" type="caseOverview" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/caseOverview.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_caseoverview.xml"></page>	
 
@@ -13,5 +13,9 @@
 	<page name="Find cases" type="findCases" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/findCases.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_findcases.xml"></page>	
 
 	<page name="Cases overview" type="casesOverview" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/casesOverview.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_casesoverview.xml"></page>	
+
+	<page name="Case type editor" type="caseTypeEditor" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/caseTypeEditor.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_casetypeeditor.xml"></page>	
+
+	<page name="Case category editor" type="caseCategoryEditor" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/caseCategoryEditor.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_casecategoryeditor.xml"></page>	
 
 </page-templates>
