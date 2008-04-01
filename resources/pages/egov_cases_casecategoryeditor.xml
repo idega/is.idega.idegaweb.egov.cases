@@ -9,6 +9,18 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
+    	<module id="" class="com.idega.presentation.Heading1">
+      		<property>
+        		<name>:method:1:implied:void:setText:java.lang.String:</name>
+        		<value>Case category editor</value>
+        		<type>java.lang.String</type>
+      		</property>
+      		<property>
+        		<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+        		<value>heading</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
     	<module id="" class="is.idega.idegaweb.egov.cases.presentation.CaseCategoryEditor" />
     </region>
     <region id="toolbar" label="toolbar">
