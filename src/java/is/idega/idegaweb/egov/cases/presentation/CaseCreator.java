@@ -7,12 +7,12 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
-import java.awt.TextArea;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
@@ -21,7 +21,39 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
 
-import sun.misc.FormattedFloatingDecimal.Form;
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
+import com.idega.business.IBORuntimeException;
+import com.idega.core.accesscontrol.business.NotLoggedOnException;
+import com.idega.core.builder.data.ICPage;
+import com.idega.core.file.data.ICFile;
+import com.idega.core.file.data.ICFileHome;
+import com.idega.data.IDOLookup;
+import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.IWUserContext;
+import com.idega.io.UploadFile;
+import com.idega.presentation.IWContext;
+import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
+import com.idega.presentation.text.Heading1;
+import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Paragraph;
+import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.CheckBox;
+import com.idega.presentation.ui.DropdownMenu;
+import com.idega.presentation.ui.FileInput;
+import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.Label;
+import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.util.SelectorUtility;
+import com.idega.user.business.UserSession;
+import com.idega.user.data.User;
+import com.idega.util.FileUtil;
 
 public class CaseCreator extends ApplicationForm {
 
