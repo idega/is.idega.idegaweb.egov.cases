@@ -6,6 +6,12 @@
 	
 	<body>
 
+		<release version="1.0.36" date="2008-04-03">
+			<action dev="palli" type="fix">
+				Fixed name property for OpenCases and ClosedCases.
+			</action>
+		</release>
+
 		<release version="1.0.35" date="2008-04-01">
 			<action dev="palli" type="update">
 				Added new stuff for RR cases.
