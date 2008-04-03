@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
-  <page type="articles">
+  <page type="casesOverview">
   	<region id="content" label="content">
   		<module id="" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
       		<property>
@@ -12,7 +12,7 @@
     	<module id="" class="com.idega.presentation.text.Heading1">
       		<property>
         		<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
-        		<value>heading</value>
+        		<value>header</value>
         		<type>java.lang.String</type>
       		</property>
       		<property>
