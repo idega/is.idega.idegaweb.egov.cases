@@ -346,7 +346,7 @@ public abstract class CasesProcessor extends CasesBlock {
 				
 			} else {
 				
-				List<Link> links = caseHandler.getCaseLinks(theCase);
+				List<Link> links = caseHandler.getCaseLinks(theCase, getCasesProcessorType());
 				
 				if(links != null)
 					for (Link link : links)
