@@ -65,6 +65,14 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
+	public Collection findAllByMessage(String message) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((GeneralCaseBMPBean) entity)
+				.ejbFindAllByMessage(message);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
 	public Collection findByCriteria(CaseCategory parentCategory,
 			CaseCategory category, CaseType type, CaseStatus status,
 			Date fromDate, Date toDate, Boolean anonymous)

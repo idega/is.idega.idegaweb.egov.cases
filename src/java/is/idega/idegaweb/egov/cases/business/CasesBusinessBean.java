@@ -201,6 +201,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			return new ArrayList();
 		}
 	}
+	
+	public Collection getCasesByMessage(String message) {
+		try {
+			return getGeneralCaseHome().findAllByMessage(message);
+		}
+		catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList();
+		}
+	}	
 
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) {
 		try {
@@ -305,7 +315,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -376,6 +386,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		catch (RemoteException e) {
 			throw new IBORuntimeException(e);
 		}
+		
+		return theCase;
 	}
 
 	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) {

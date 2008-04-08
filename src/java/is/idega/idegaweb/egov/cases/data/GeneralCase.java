@@ -73,9 +73,19 @@ public interface GeneralCase extends IDOEntity, Case {
 	public String getTitle();
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getReplyType
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getWantReply
 	 */
-	public String getReplyType();
+	public String getWantReply();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getWantReplyEmail
+	 */
+	public String getWantReplyEmail();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getWantReplyPhone
+	 */
+	public String getWantReplyPhone();
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setMessage
@@ -133,7 +143,17 @@ public interface GeneralCase extends IDOEntity, Case {
 	public void setTitle(String title);
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setReplyType
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setWantReply
 	 */
-	public void setReplyType(String replyType);
+	public void setWantReply(String wantReply);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setWantReplyEmail
+	 */
+	public void setWantReplyEmail(String wantReplyEmail);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setWantReplyPhone
+	 */
+	public void setWantReplyPhone(String wantReplyPhone);
 }

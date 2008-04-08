@@ -185,13 +185,7 @@ public class CaseFinder extends CasesBlock {
 			}
 		} 
 		else if (iwc.isParameterSet(PARAMETER_TEXT)) {
-			try {
-				Collection users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_PERSONAL_ID), false);
-				cases.addAll(getBusiness().getCasesByUsers(users));
-			}
-			catch (FinderException fe) {
-				fe.printStackTrace();
-			}
+			cases.addAll(getBusiness().getCasesByMessage(iwc.getParameter(PARAMETER_PERSONAL_ID)));
 		} 
 		
 

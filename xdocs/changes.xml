@@ -5,6 +5,11 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.37" date="2008-04-08">
+			<action dev="palli" type="update">
+				Added new fields to bean. Save case now returns the case. Fixed find by text.
+			</action>
+		</release>
 
 		<release version="1.0.36" date="2008-04-03">
 			<action dev="palli" type="fix">

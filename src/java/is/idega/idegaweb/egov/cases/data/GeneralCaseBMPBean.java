@@ -43,7 +43,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_IS_ANONYMOUS = "is_anonymous";
 	private static final String COLUMN_PRIORITY = "priority";
 	private static final String COLUMN_TITLE = "title";
-	private static final String COLUMN_REPLY_TYPE = "reply_type";
+	private static final String COLUMN_WANT_REPLY = "want_reply";
+	private static final String COLUMN_WANT_REPLY_EMAIL = "want_reply_email";
+	private static final String COLUMN_WANT_REPLY_PHONE = "want_reply_phone";
 
 	/*
 	 * (non-Javadoc)
@@ -77,7 +79,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_IS_ANONYMOUS, "Is anonymous", Boolean.class);
 		addAttribute(COLUMN_PRIORITY, "Priority", String.class);
 		addAttribute(COLUMN_TITLE, "Title", String.class);
-		addAttribute(COLUMN_REPLY_TYPE, "Reply type", String.class);
+		addAttribute(COLUMN_WANT_REPLY, "Want reply", String.class);
+		addAttribute(COLUMN_WANT_REPLY_EMAIL, "Email reply", String.class);
+		addAttribute(COLUMN_WANT_REPLY_PHONE, "Phone reply", String.class);
 		
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -139,10 +143,18 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return getStringColumnValue(COLUMN_TITLE);
 	}
 	
-	public String getReplyType() {
-		return getStringColumnValue(COLUMN_REPLY_TYPE);
+	public String getWantReply() {
+		return getStringColumnValue(COLUMN_WANT_REPLY);
 	}
-	
+
+	public String getWantReplyEmail() {
+		return getStringColumnValue(COLUMN_WANT_REPLY_EMAIL);
+	}
+
+	public String getWantReplyPhone() {
+		return getStringColumnValue(COLUMN_WANT_REPLY_PHONE);
+	}
+
 	// Setters
 	public void setMessage(String message) {
 		setColumn(COLUMN_MESSAGE, message);
@@ -188,8 +200,16 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		setColumn(COLUMN_TITLE, title);
 	}
 	
-	public void setReplyType(String replyType) {
-		setColumn(COLUMN_REPLY_TYPE, replyType);
+	public void setWantReply(String wantReply) {
+		setColumn(COLUMN_WANT_REPLY, wantReply);
+	}
+
+	public void setWantReplyEmail(String wantReplyEmail) {
+		setColumn(COLUMN_WANT_REPLY_EMAIL, wantReplyEmail);
+	}
+
+	public void setWantReplyPhone(String wantReplyPhone) {
+		setColumn(COLUMN_WANT_REPLY_PHONE, wantReplyPhone);
 	}
 
 	// Finders

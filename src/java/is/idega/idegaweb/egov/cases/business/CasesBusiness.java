@@ -22,7 +22,6 @@ import com.idega.business.IBOService;
 import javax.ejb.RemoveException;
 
 public interface CasesBusiness extends IBOService, CaseBusiness {
-
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getAttachment
 	 */
@@ -31,22 +30,26 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseDescription
 	 */
-	public String getLocalizedCaseDescription(Case theCase, Locale locale) throws RemoteException;
+	public String getLocalizedCaseDescription(Case theCase, Locale locale)
+			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseStatusDescription
 	 */
-	public String getLocalizedCaseStatusDescription(CaseStatus status, Locale locale) throws RemoteException;
+	public String getLocalizedCaseStatusDescription(CaseStatus status,
+			Locale locale) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseStatusDescription
 	 */
-	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) throws RemoteException;
+	public String getLocalizedCaseStatusDescription(Case theCase,
+			CaseStatus status, Locale locale) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getGeneralCase
 	 */
-	public GeneralCase getGeneralCase(Object casePK) throws FinderException, RemoteException;
+	public GeneralCase getGeneralCase(Object casePK) throws FinderException,
+			RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getOpenCases
@@ -69,14 +72,23 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Collection getCasesByUsers(Collection users) throws RemoteException;
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByMessage
+	 */
+	public Collection getCasesByMessage(String message) throws RemoteException;
+
+	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByCriteria
 	 */
-	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws RemoteException;
+	public Collection getCasesByCriteria(CaseCategory parentCategory,
+			CaseCategory category, CaseType type, CaseStatus status,
+			Date fromDate, Date toDate, Boolean anonymous)
+			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategory
 	 */
-	public CaseCategory getCaseCategory(Object caseCategoryPK) throws FinderException, RemoteException;
+	public CaseCategory getCaseCategory(Object caseCategoryPK)
+			throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getAllCaseCategories
@@ -91,7 +103,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
 	 */
-	public Collection getSubCategories(CaseCategory category) throws RemoteException;
+	public Collection getSubCategories(CaseCategory category)
+			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseLogs
@@ -101,12 +114,14 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#removeCaseCategory
 	 */
-	public void removeCaseCategory(Object caseCategoryPK) throws FinderException, RemoveException, RemoteException;
+	public void removeCaseCategory(Object caseCategoryPK)
+			throws FinderException, RemoveException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseType
 	 */
-	public CaseType getCaseType(Object caseTypePK) throws FinderException, RemoteException;
+	public CaseType getCaseType(Object caseTypePK) throws FinderException,
+			RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseTypes
@@ -121,72 +136,94 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#removeCaseType
 	 */
-	public void removeCaseType(Object caseTypePK) throws FinderException, RemoveException, RemoteException;
+	public void removeCaseType(Object caseTypePK) throws FinderException,
+			RemoveException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
-	public void storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK,
+			Object caseTypePK, Object attachmentPK, String regarding,
+			String message, String type, boolean isPrivate,
+			IWResourceBundle iwrb) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allocateCase
 	 */
-	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) throws RemoteException;
+	public void allocateCase(GeneralCase theCase, Object caseCategoryPK,
+			Object caseTypePK, User user, String message, User performer,
+			IWContext iwc) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#handleCase
 	 */
-	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, IWContext iwc) throws FinderException, RemoteException;
+	public void handleCase(Object casePK, Object caseCategoryPK,
+			Object caseTypePK, String status, User performer, String reply,
+			IWContext iwc) throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#handleCase
 	 */
-	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) throws RemoteException;
+	public void handleCase(GeneralCase theCase, CaseCategory category,
+			CaseType type, String status, User performer, String reply,
+			IWContext iwc) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
-	public void takeCase(Object casePK, User performer, IWContext iwc) throws FinderException, RemoteException;
+	public void takeCase(Object casePK, User performer, IWContext iwc)
+			throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
-	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) throws RemoteException;
+	public void takeCase(GeneralCase theCase, User performer, IWContext iwc)
+			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
-	public void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges) throws RemoteException;
+	public void takeCase(GeneralCase theCase, User user, IWContext iwc,
+			User performer, boolean hasChanges) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reactivateCase
 	 */
-	public void reactivateCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException, RemoteException;
+	public void reactivateCase(GeneralCase theCase, User performer,
+			IWContext iwc) throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reviewCase
 	 */
-	public void reviewCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException, RemoteException;
+	public void reviewCase(GeneralCase theCase, User performer, IWContext iwc)
+			throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#sendReminder
 	 */
-	public void sendReminder(GeneralCase theCase, User receiver, User sender, String message, IWContext iwc) throws RemoteException;
+	public void sendReminder(GeneralCase theCase, User receiver, User sender,
+			String message, IWContext iwc) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseCategory
 	 */
-	public CaseCategory storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int localeId, int order) throws FinderException, CreateException, RemoteException;
+	public CaseCategory storeCaseCategory(Object caseCategoryPK,
+			Object parentCaseCategoryPK, String name, String description,
+			Object groupPK, int localeId, int order) throws FinderException,
+			CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseType
 	 */
-	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException, RemoteException;
+	public void storeCaseType(Object caseTypePK, String name,
+			String description, int order) throws FinderException,
+			CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
 	 */
-	public Map getSubCategories(String categoryPK, String country) throws RemoteException;
+	public Map getSubCategories(String categoryPK, String country)
+			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getUsers
