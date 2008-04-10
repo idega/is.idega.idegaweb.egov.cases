@@ -11,7 +11,6 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>/com.idega.block.form/WEB-INF/applicationContext.xml</config>
 				<config>/org.jboss.jbpm/WEB-INF/applicationContext.xml</config>
 			</configs>
 		</configSet>
