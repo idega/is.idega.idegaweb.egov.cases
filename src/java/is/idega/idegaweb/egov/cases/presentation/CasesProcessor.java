@@ -58,9 +58,12 @@ public abstract class CasesProcessor extends CasesBlock {
 	public static final String PARAMETER_ACTION = "cp_prm_action";
 
 	public static final String PARAMETER_CASE_PK = UserCases.PARAMETER_CASE_PK;
+	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
+	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
+	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	protected static final String PARAMETER_REPLY = "prm_reply";
 	protected static final String PARAMETER_STATUS = "prm_status";
-	protected static final String PARAMETER_USER = "prm_iser";
+	protected static final String PARAMETER_USER = "prm_user";
 	protected static final String PARAMETER_MESSAGE = "prm_message";
 
 	protected static final int ACTION_VIEW = UserCases.ACTION_VIEW;
