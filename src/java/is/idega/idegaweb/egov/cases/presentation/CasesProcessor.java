@@ -278,12 +278,12 @@ public abstract class CasesProcessor extends CasesBlock {
 			User owner = theCase.getOwner();
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
 			
-			CaseManager caseHandler;
+			CaseManager caseManager;
 			
 			if(theCase.getCaseManagerType() != null)
-				caseHandler = getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
+				caseManager = getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
 			else 
-				caseHandler = null;
+				caseManager = null;
 
 			row = group.createRow();
 			if (iRow == 1) {
@@ -302,7 +302,18 @@ public abstract class CasesProcessor extends CasesBlock {
 			cell = row.createCell();
 			cell.setStyleClass("firstColumn");
 			cell.setStyleClass("caseNumber");
-			cell.add(new Text(theCase.getPrimaryKey().toString()));
+			
+			String caseIdentifier;
+			
+			if(caseManager != null)
+				caseIdentifier = caseManager.getProcessIdentifier(theCase);
+			else
+				caseIdentifier = null;
+			
+			if(caseIdentifier != null)
+				cell.add(new Text(caseIdentifier));
+			else
+				cell.add(new Text(theCase.getPrimaryKey().toString()));
 
 			cell = row.createCell();
 			cell.setStyleClass("sender");
@@ -343,13 +354,13 @@ public abstract class CasesProcessor extends CasesBlock {
 			}
 			cell.setStyleClass("view");
 			
-			if(caseHandler == null) {
+			if(caseManager == null) {
 			
 				cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
 				
 			} else {
 				
-				List<Link> links = caseHandler.getCaseLinks(theCase, getCasesProcessorType());
+				List<Link> links = caseManager.getCaseLinks(theCase, getCasesProcessorType());
 				
 				if(links != null)
 					for (Link link : links)
