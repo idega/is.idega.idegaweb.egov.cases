@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.ejb.FinderException;
@@ -45,29 +47,30 @@ import com.idega.presentation.text.Text;
 import com.idega.user.data.User;
 import com.idega.util.database.ConnectionBroker;
 
-
 public class CasesStatistics extends CasesBlock {
-	
+
 	private String visibleStatuses = null;
 
 	protected void present(IWContext iwc) throws Exception {
-		
+
 		boolean useSubCats = super.getCasesBusiness(iwc).useSubCategories();
 		boolean useTypes = super.getCasesBusiness(iwc).useTypes();
-		
+
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		Collection statuses = null;
 		if (visibleStatuses == null) {
 			statuses = getBusiness().getCaseStatuses();
-		} else {
+		}
+		else {
 			statuses = new ArrayList();
 			StringTokenizer tok = new StringTokenizer(visibleStatuses, ",");
 			while (tok.hasMoreTokens()) {
 				String status = tok.nextToken().trim();
 				try {
-				CaseStatus cStat = getCaseStatusHome().findByPrimaryKey(status);
-				statuses.add(cStat);
-				} catch (FinderException f) {
+					CaseStatus cStat = getCaseStatusHome().findByPrimaryKey(status);
+					statuses.add(cStat);
+				}
+				catch (FinderException f) {
 					f.printStackTrace();
 				}
 			}
@@ -80,32 +83,41 @@ public class CasesStatistics extends CasesBlock {
 
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");
-		
+
 		Heading1 heading = new Heading1(iwrb.getLocalizedString("case.statistics", "Case statistics"));
 		section.add(heading);
 
 		Collection coll = getResults(iwc, useSubCats, -1);
-		addResults(null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_category", "Cases by category"), useSubCats, false, 0);
+		addResults(null, null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_category", "Cases by category"), useSubCats, false, 0);
 		section.add(clearLayer);
 
 		coll = getResultsUsers(iwc);
-		addResults(null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"), false, false, 0);
+		addResults(null, null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"), false, false, 0);
 		section.add(clearLayer);
-		
+
 		if (useTypes) {
 			coll = getResultsCode(iwc);
-			addResults(null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"), false, false, 0);
+			addResults(null, null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"), false, false, 0);
 			section.add(clearLayer);
 		}
-		
+
 	}
 
-	private int addResults(Table2 table, TableRowGroup group, IWContext iwc, IWResourceBundle iwrb, Layer section, Collection coll, Collection statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow) {
+	private int addResults(Map totals, Table2 table, TableRowGroup group, IWContext iwc, IWResourceBundle iwrb, Layer section, Collection coll, Collection statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow) {
+		if (totals == null) {
+			totals = new LinkedHashMap();
+
+			Iterator statIter = statuses.iterator();
+			while (statIter.hasNext()) {
+				CaseStatus status = (CaseStatus) statIter.next();
+				totals.put(status, new Integer(0));
+			}
+		}
 
 		if (table == null) {
 			Heading2 heading2 = new Heading2(header);
 			section.add(heading2);
-			
+
 			table = new Table2();
 			table.setWidth("100%");
 			table.setCellpadding(0);
@@ -113,7 +125,7 @@ public class CasesStatistics extends CasesBlock {
 			table.setStyleClass("adminTable");
 			table.setStyleClass("ruler");
 			section.add(table);
-			
+
 			TableColumnGroup columnGroup = table.createColumnGroup();
 			TableColumn column = columnGroup.createColumn();
 			column.setSpan(3);
@@ -127,22 +139,26 @@ public class CasesStatistics extends CasesBlock {
 			cell.setStyleClass("firstColumn");
 			cell.setStyleClass("name");
 			cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
-			
+
 			Iterator statIter = statuses.iterator();
 			CaseStatus status;
 			while (statIter.hasNext()) {
 				status = (CaseStatus) statIter.next();
 				cell = row.createHeaderCell();
 				cell.setStyleClass(status.getStatus());
-				cell.add(new Text(iwrb.getLocalizedString("case_status_key."+status.getStatus(), status.getStatus())));
+				cell.add(new Text(iwrb.getLocalizedString("case_status_key." + status.getStatus(), status.getStatus())));
 			}
+
+			cell = row.createHeaderCell();
+			cell.setStyleClass("total");
 			cell.setStyleClass("lastColumn");
+			cell.add(new Text(iwrb.getLocalizedString("total", "Total")));
 
 			group = table.createBodyRowGroup();
 		}
-		
+
 		Iterator iter = coll.iterator();
-		
+
 		while (iter.hasNext()) {
 			++iRow;
 			Result res = (Result) iter.next();
@@ -152,17 +168,44 @@ public class CasesStatistics extends CasesBlock {
 				subCats = getResults(iwc, true, res.getID());
 				hasSubCats = subCats != null && !subCats.isEmpty();
 			}
-			addResultToTable(statuses, group, iRow, res, isSubCategory, !hasSubCats);
+			addResultToTable(totals, statuses, group, iRow, res, isSubCategory, !hasSubCats);
 			if (hasSubCats) {
-				iRow = addResults(table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow);
+				iRow = addResults(totals, table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow);
 			}
 		}
-		
+
+		if (!isSubCategory) {
+			group = table.createFooterRowGroup();
+			TableRow row = group.createRow();
+
+			TableCell2 cell = row.createCell();
+			cell.setStyleClass("total");
+			cell.setStyleClass("firstColumn");
+			cell.add(new Text(iwrb.getLocalizedString("total", "Total")));
+
+			int total = 0;
+
+			iter = totals.keySet().iterator();
+			while (iter.hasNext()) {
+				CaseStatus status = (CaseStatus) iter.next();
+				Integer statusTotal = (Integer) totals.get(status);
+				total += statusTotal.intValue();
+
+				cell = row.createCell();
+				cell.setStyleClass(status.getStatus());
+				cell.add(new Text(statusTotal.toString()));
+			}
+
+			cell = row.createCell();
+			cell.setStyleClass("total");
+			cell.setStyleClass("lastColumn");
+			cell.add(new Text(String.valueOf(total)));
+		}
+
 		return iRow;
 	}
 
-
-	private void addResultToTable(Collection statuses, TableRowGroup group, int iRow, Result res, boolean isSubCategory, boolean showNumbers) {
+	private void addResultToTable(Map totals, Collection statuses, TableRowGroup group, int iRow, Result res, boolean isSubCategory, boolean showNumbers) {
 		TableRow row;
 		TableCell2 cell;
 		Iterator statIter;
@@ -174,6 +217,7 @@ public class CasesStatistics extends CasesBlock {
 		cell = row.createCell();
 		cell.add(new Text(res.getName()));
 		cell.setStyleClass("firstColumn");
+		int totalValue = 0;
 		while (statIter.hasNext()) {
 			status = (CaseStatus) statIter.next();
 			Integer value = (Integer) map.get(status.getStatus());
@@ -181,16 +225,31 @@ public class CasesStatistics extends CasesBlock {
 			if (value != null) {
 				val = value.intValue();
 			}
+			totalValue += val;
+
 			cell = row.createCell();
 			cell.setStyleClass(status.getStatus());
 			if (showNumbers) {
 				cell.add(new Text(String.valueOf(val)));
-			} else {
+			}
+			else {
 				cell.add(Text.getNonBrakingSpace());
 			}
 			cell.setHorizontalAlignment(Table2.HORIZONTAL_ALIGNMENT_CENTER);
+
+			Integer total = (Integer) totals.get(status);
+			totals.put(status, new Integer(total.intValue() + val));
 		}
+
+		cell = row.createCell();
+		cell.setStyleClass("total");
 		cell.setStyleClass("lastColumn");
+		if (showNumbers) {
+			cell.add(new Text(String.valueOf(totalValue)));
+		}
+		else {
+			cell.add(Text.getNonBrakingSpace());
+		}
 
 		if (iRow % 2 == 0) {
 			row.setStyleClass("evenRow");
@@ -203,27 +262,26 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 	}
-	
-	
+
 	private Collection getResults(IWContext iwc, boolean useSubCats, int parentID) {
 		Handler handler = new CategoryHandler();
 		return getResults(iwc, handler, useSubCats, parentID);
 	}
-	
+
 	private Collection getResultsUsers(IWContext iwc) {
 		Handler handler = new UserHandler();
 		return getResults(iwc, handler, false, -1);
 	}
-	
+
 	private Collection getResultsCode(IWContext iwc) {
 		Handler handler = new CaseTypeHandler();
 		return getResults(iwc, handler, false, -1);
 	}
-	
+
 	public void setVisibleStatuses(String statuses) {
 		this.visibleStatuses = statuses;
 	}
-	
+
 	protected CaseStatusHome getCaseStatusHome() {
 		try {
 			return (CaseStatusHome) IDOLookup.getHome(CaseStatus.class);
@@ -232,7 +290,7 @@ public class CasesStatistics extends CasesBlock {
 			throw new IBORuntimeException(ile);
 		}
 	}
-	
+
 	private Collection getResults(IWContext iwc, Handler handler, boolean useSubCats, int parentID) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -244,23 +302,27 @@ public class CasesStatistics extends CasesBlock {
 			stmt = conn.createStatement();
 
 			rs = stmt.executeQuery(handler.getSQL(useSubCats, parentID));
-			
+
 			results.addAll(handler.getResults(iwc, rs));
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if (rs != null) {
 				try {
 					rs.close();
-				} catch (SQLException e) {
+				}
+				catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
 			if (stmt != null) {
 				try {
 					stmt.close();
-				} catch (SQLException e) {
+				}
+				catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
@@ -268,60 +330,59 @@ public class CasesStatistics extends CasesBlock {
 				ConnectionBroker.freeConnection(conn);
 			}
 		}
-		
+
 		return results;
 	}
-	
+
 	private class Result {
-	
+
 		private int id;
 		private String name = null;
 		private int count = 0;
 		private HashMap statusMap;
-		
+
 		public Result(int id, String name, HashMap statusMap) {
 			this.id = id;
 			this.name = name;
 			this.statusMap = statusMap;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public int getCount() {
 			return count;
 		}
-		
+
 		public HashMap getStatusMap() {
 			return statusMap;
 		}
-		
-		public int getID(){
+
+		public int getID() {
 			return id;
 		}
 	}
-	
+
 	private interface Handler {
+
 		public String getSQL(boolean useSubCats, int parentID);
-		public Collection getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException ;
+
+		public Collection getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException;
 	}
-	
-	protected class CategoryHandler implements Handler{
-		
+
+	protected class CategoryHandler implements Handler {
+
 		public String getSQL(boolean useSubCats, int parentID) {
-			StringBuffer buff = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
-					.append("from comm_case_category cc ")
-					.append("left join comm_case c on c.case_category = cc.comm_case_category_id ")
-					.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
-					if (useSubCats && parentID > -1) {
-						buff.append("where cc.parent_category = ").append(parentID);
-					} else {
-						buff.append("where cc.parent_category is null");
-					}
-					buff.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ")
-					.append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
-			
+			StringBuffer buff = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ").append("from comm_case_category cc ").append("left join comm_case c on c.case_category = cc.comm_case_category_id ").append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
+			if (useSubCats && parentID > -1) {
+				buff.append("where cc.parent_category = ").append(parentID);
+			}
+			else {
+				buff.append("where cc.parent_category is null");
+			}
+			buff.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ").append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
+
 			return buff.toString();
 		}
 
@@ -341,11 +402,11 @@ public class CasesStatistics extends CasesBlock {
 				statuses.put(caseStatus, new Integer(count));
 
 				prevID = catID;
-				
+
 			}
 			// ADDING THE LAST ONE
 			addResult(iwc, results, prevID, statuses);
-			
+
 			return results;
 		}
 
@@ -356,18 +417,13 @@ public class CasesStatistics extends CasesBlock {
 				results.add(res);
 			}
 		}
-	
+
 	}
 
-	protected class UserHandler implements Handler{
-		
+	protected class UserHandler implements Handler {
+
 		public String getSQL(boolean useSubCats, int parentID) {
-			return "select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
-					"from comm_case c " +
-					"left join comm_case_category cc on c.case_category = cc.comm_case_category_id " +
-					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
-					"where c.handler is not null " +
-					"group by c.handler, p.case_status";
+			return "select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " + "from comm_case c " + "left join comm_case_category cc on c.case_category = cc.comm_case_category_id " + "left join proc_case p on p.proc_case_id = c.comm_case_id " + "where c.handler is not null " + "group by c.handler, p.case_status";
 		}
 
 		public Collection getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
@@ -386,11 +442,11 @@ public class CasesStatistics extends CasesBlock {
 				statuses.put(caseStatus, new Integer(count));
 
 				prevID = handID;
-				
+
 			}
 			// ADDING THE LAST ONE
 			addResult(iwc, results, prevID, statuses);
-			
+
 			return results;
 		}
 
@@ -401,17 +457,13 @@ public class CasesStatistics extends CasesBlock {
 				results.add(res);
 			}
 		}
-	
+
 	}
 
-	protected class CaseTypeHandler implements Handler{
-		
+	protected class CaseTypeHandler implements Handler {
+
 		public String getSQL(boolean useSubCats, int parentID) {
-			return "select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
-					"from comm_case c " +
-					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
-					"group by p.case_status, c.case_type " +
-					"order by case_type";
+			return "select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " + "from comm_case c " + "left join proc_case p on p.proc_case_id = c.comm_case_id " + "group by p.case_status, c.case_type " + "order by case_type";
 		}
 
 		public Collection getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
@@ -430,11 +482,11 @@ public class CasesStatistics extends CasesBlock {
 				statuses.put(caseStatus, new Integer(count));
 
 				prevID = handID;
-				
+
 			}
 			// ADDING THE LAST ONE
 			addResult(iwc, results, prevID, statuses);
-			
+
 			return results;
 		}
 
@@ -445,7 +497,7 @@ public class CasesStatistics extends CasesBlock {
 				results.add(res);
 			}
 		}
-	
+
 	}
-	
+
 }
