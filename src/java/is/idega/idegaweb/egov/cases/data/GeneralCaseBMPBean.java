@@ -82,7 +82,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_WANT_REPLY, "Want reply", String.class);
 		addAttribute(COLUMN_WANT_REPLY_EMAIL, "Email reply", String.class);
 		addAttribute(COLUMN_WANT_REPLY_PHONE, "Phone reply", String.class);
-		
+
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
@@ -134,15 +134,15 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	public boolean isAnonymous() {
 		return getBooleanColumnValue(COLUMN_IS_ANONYMOUS, false);
 	}
-	
+
 	public String getPriority() {
 		return getStringColumnValue(COLUMN_PRIORITY);
 	}
-	
+
 	public String getTitle() {
 		return getStringColumnValue(COLUMN_TITLE);
 	}
-	
+
 	public String getWantReply() {
 		return getStringColumnValue(COLUMN_WANT_REPLY);
 	}
@@ -191,15 +191,15 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	public void setAsAnonymous(boolean isAnonymous) {
 		setColumn(COLUMN_IS_ANONYMOUS, isAnonymous);
 	}
-	
+
 	public void setPriority(String priority) {
 		setColumn(COLUMN_PRIORITY, priority);
 	}
-	
+
 	public void setTitle(String title) {
 		setColumn(COLUMN_TITLE, title);
 	}
-	
+
 	public void setWantReply(String wantReply) {
 		setColumn(COLUMN_WANT_REPLY, wantReply);
 	}
@@ -283,7 +283,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 	public Collection ejbFindAllByMessage(String message) throws FinderException {
 		Table table = new Table(this);
-		Table process = new Table(Case.class);
 
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName(), true);
@@ -292,7 +291,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
-	
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);

@@ -47,15 +47,15 @@ import com.idega.util.text.Name;
 
 public class CaseViewer extends CaseCreator {
 
-	public static final String PARAMETER_ACTION = "cp_prm_action";
+	//public static final String PARAMETER_ACTION = "cp_prm_action";
 
 	public static final String PARAMETER_ACTION_REACTIVATE = "prm_action_reactivate";
 	public static final String PARAMETER_ACTION_REVIEW = "prm_action_review";
-	public static final String PARAMETER_MESSAGE = "prm_message";
+	//public static final String PARAMETER_MESSAGE = "prm_message";
 
-	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
-	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
-	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
+	//private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
+	//private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
+	//private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	private static final String PARAMETER_USER = "prm_user";
 
 	private static final int ACTION_VIEW = 1;
