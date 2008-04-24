@@ -5,6 +5,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
 import is.idega.idegaweb.egov.cases.business.CasesWriter;
+import is.idega.idegaweb.egov.cases.business.CasesWriterExtended;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -441,6 +442,34 @@ public class CasesFetcher extends CasesBlock {
 		link.setStyleClass("xls");
 		link.setTarget(Link.TARGET_NEW_WINDOW);
 		link.setMediaWriterClass(CasesWriter.class);
+		if (parentCategory != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, parentCategory.getPrimaryKey().toString());
+		}
+		if (category != null) {
+			link.addParameter(CasesWriter.PARAMETER_SUB_CASE_CATEGORY, category.getPrimaryKey().toString());
+		}
+		if (type != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_TYPE, type.getPrimaryKey().toString());
+		}
+		if (status != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_STATUS, status.getPrimaryKey().toString());
+		}
+		if (fromDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_FROM_DATE, fromDate.toString());
+		}
+		if (toDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_TO_DATE, toDate.toString());
+		}
+		if (anonymous != null) {
+			link.addParameter(CasesWriter.PARAMETER_ANONYMOUS, anonymous.toString());
+		}
+
+		layer.add(link);
+
+		link = new DownloadLink(getBundle().getImage("xls.gif"));
+		link.setStyleClass("xls");
+		link.setTarget(Link.TARGET_NEW_WINDOW);
+		link.setMediaWriterClass(CasesWriterExtended.class);
 		if (parentCategory != null) {
 			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, parentCategory.getPrimaryKey().toString());
 		}

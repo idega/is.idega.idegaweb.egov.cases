@@ -50,9 +50,9 @@ import com.idega.util.text.Name;
 
 public class CasesWriter extends DownloadWriter implements MediaWritable {
 
-	private MemoryFileBuffer buffer = null;
-	private Locale locale;
-	private IWResourceBundle iwrb;
+	protected MemoryFileBuffer buffer = null;
+	protected Locale locale;
+	protected IWResourceBundle iwrb;
 
 	public static final String PARAMETER_CASE_CATEGORY = "prm_case_category";
 	public static final String PARAMETER_SUB_CASE_CATEGORY = "prm_sub_case_category";
@@ -276,7 +276,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		return buffer;
 	}
 
-	private CasesBusiness getBusiness(IWApplicationContext iwac) {
+	protected CasesBusiness getBusiness(IWApplicationContext iwac) {
 		try {
 			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		}
