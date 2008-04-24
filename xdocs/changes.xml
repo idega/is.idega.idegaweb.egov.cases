@@ -5,6 +5,13 @@
 	</properties>
 	
 	<body>
+		<release version="1.0.38" date="2008-04-23">
+			<action dev="laddi" type="update">
+				Added totals to statistics.
+				Added new Excel sheet type to CasesFetcher.
+			</action>
+		</release>
+
 		<release version="1.0.37" date="2008-04-08">
 			<action dev="palli" type="update">
 				Added new fields to bean. Save case now returns the case. Fixed find by text.

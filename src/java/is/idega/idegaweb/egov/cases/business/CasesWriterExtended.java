@@ -42,8 +42,8 @@ public class CasesWriterExtended extends CasesWriter {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
 		HSSFSheet sheet = workbook.createSheet(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_fetcher.statistics", "Statistics"), 30));
-		sheet.setColumnWidth((short) 0, (short) (30 * 256));
-		sheet.setColumnWidth((short) 1, (short) (200 * 256));
+		sheet.setColumnWidth((short) 0, (short) (38 * 256));
+		sheet.setColumnWidth((short) 1, (short) (85 * 256));
 
 		HSSFFont font = workbook.createFont();
 		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
@@ -53,6 +53,7 @@ public class CasesWriterExtended extends CasesWriter {
 		style.setFont(font);
 		HSSFCellStyle style2 = workbook.createCellStyle();
 		style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);
 		style2.setWrapText(true);
 		HSSFCellStyle style3 = workbook.createCellStyle();
 		style3.setBorderBottom(HSSFCellStyle.BORDER_THIN);
@@ -133,7 +134,7 @@ public class CasesWriterExtended extends CasesWriter {
 			cell.setCellValue(this.iwrb.getLocalizedString("status", "Status"));
 			cell.setCellStyle(style);
 
-			cell = row.createCell((short) 0);
+			cell = row.createCell((short) 1);
 			cell.setCellValue(getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));
 
 			row = sheet.createRow(cellRow++);

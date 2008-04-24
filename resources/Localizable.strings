@@ -239,6 +239,7 @@ suggestion.view_case=View suggestion
 take_case=Take case
 take_over_case=Take over case
 timestamp=Timestamp
+total=Total
 true=true
 type_editor.help=Help for creating/editing types
 view=View
