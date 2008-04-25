@@ -169,13 +169,17 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		}
 		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (30 * 256));
-		sheet.setColumnWidth(cellColumn++, (short) (150 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (50 * 256));
 
 		HSSFFont font = workbook.createFont();
 		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		font.setFontHeightInPoints((short) 12);
 		HSSFCellStyle style = workbook.createCellStyle();
 		style.setFont(font);
+
+		HSSFCellStyle style2 = workbook.createCellStyle();
+		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);
+		style2.setWrapText(true);
 
 		int cellRow = 0;
 		cellColumn = 0;
@@ -233,17 +237,21 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getPrimaryKey().toString());
+			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(created.getLocaleDateAndTime(locale, IWTimestamp.SHORT, IWTimestamp.SHORT));
+			cell.setCellStyle(style2);
 
 			if (user != null) {
 				Name name = new Name(user.getFirstName(), user.getMiddleName(), user.getLastName());
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(name.getName(locale));
+				cell.setCellStyle(style2);
 
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(PersonalIDFormatter.format(user.getPersonalID(), locale));
+				cell.setCellStyle(style2);
 			}
 			else {
 				cell = row.createCell(cellColumn++);
@@ -254,20 +262,25 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(category.getLocalizedCategoryName(locale));
+			cell.setCellStyle(style2);
 
 			if (getBusiness(iwc).useTypes()) {
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(type.getName());
+				cell.setCellStyle(style2);
 			}
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));
+			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getSubject() != null ? element.getSubject() : "-");
+			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getMessage());
+			cell.setCellStyle(style2);
 		}
 
 		workbook.write(mos);
