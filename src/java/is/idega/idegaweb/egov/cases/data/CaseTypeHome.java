@@ -15,4 +15,6 @@ public interface CaseTypeHome extends IDOHome {
 	public Collection findAll() throws FinderException;
 
 	public CaseType findFirstType() throws FinderException;
+	
+	public Collection<CaseType> findByName(String typeName) throws FinderException;
 }

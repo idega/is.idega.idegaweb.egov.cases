@@ -137,6 +137,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseHandler, boolean isPrivate, IWResourceBundle iwrb) throws CreateException, RemoteException;
+	
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allocateCase
@@ -181,7 +183,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeCaseType
 	 */
-	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException, RemoteException;
+	public CaseType storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#canDeleteCase
@@ -212,4 +214,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allowAttachments
 	 */
 	public boolean allowAttachments() throws RemoteException;
+	
+	public Collection<CaseCategory> getCaseCategoriesByName(String name) throws RemoteException;
+	
+	public Collection<CaseType> getCaseTypesByName(String name) throws RemoteException;
 }

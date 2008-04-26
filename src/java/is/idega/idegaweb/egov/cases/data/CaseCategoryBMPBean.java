@@ -126,6 +126,16 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		return idoFindPKsByQuery(query);
 	}
 	
+	public Collection ejbFindAllByName(String categoryName) throws FinderException {
+		Table table = new Table(this);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_NAME), MatchCriteria.EQUALS, categoryName));
+		
+		return idoFindPKsByQuery(query);
+	}
+	
 	public Collection ejbFindAllSubCategories(CaseCategory category) throws FinderException {
 		Table table = new Table(this);
 		

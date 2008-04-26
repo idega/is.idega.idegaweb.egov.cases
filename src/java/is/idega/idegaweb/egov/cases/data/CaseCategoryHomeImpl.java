@@ -40,4 +40,12 @@ public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<CaseCategory> findByName(String typeName) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((CaseCategoryBMPBean) entity).ejbFindAllByName(typeName);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
 }

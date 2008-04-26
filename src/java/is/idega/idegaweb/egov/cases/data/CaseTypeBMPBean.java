@@ -12,6 +12,7 @@ package is.idega.idegaweb.egov.cases.data;
 import java.util.Collection;
 import javax.ejb.FinderException;
 import com.idega.data.GenericEntity;
+import com.idega.data.query.MatchCriteria;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
 
@@ -81,5 +82,15 @@ public class CaseTypeBMPBean extends GenericEntity  implements CaseType{
 		query.addOrder(table, COLUMN_ORDER, true);
 		
 		return idoFindOnePKByQuery(query);
+	}
+	
+	public Collection ejbFindAllByName(String typeName) throws FinderException {
+		Table table = new Table(this);
+		
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_NAME), MatchCriteria.EQUALS, typeName));
+		
+		return idoFindPKsByQuery(query);
 	}
 }

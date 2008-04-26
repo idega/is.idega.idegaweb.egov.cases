@@ -27,6 +27,7 @@ import java.util.Locale;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
+import javax.faces.context.FacesContext;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
@@ -35,14 +36,19 @@ import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextHome;
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
+import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
+import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
@@ -242,6 +248,24 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			return new ArrayList();
 		}
 	}
+	
+	public Collection<CaseCategory> getCaseCategoriesByName(String name) {
+		try {
+			return getCaseCategoryHome().findByName(name);
+		} catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList<CaseCategory>(0);
+		}
+	}
+	
+	public Collection<CaseType> getCaseTypesByName(String name) {
+		try {
+			return getCaseTypeHome().findByName(name);
+		} catch (FinderException fe) {
+			fe.printStackTrace();
+			return new ArrayList<CaseType>(0);
+		}
+	}
 
 	public Collection getCaseCategories() {
 		try {
@@ -322,11 +346,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
 		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, null, isPrivate, iwrb);
 	}
+	
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+		
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, true);
+	}
 
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -365,42 +394,46 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			theCase.setCaseManagerType(caseManagerType);
 		
 		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group) null);
-
-		try {
-			String prefix = (type != null ? type + "." : "");
-
-			String subject = iwrb.getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
-			String body = null;
-			if (sender != null) {
-				Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
-
-				Object[] arguments = { name.getName(locale), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
-				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
-			}
-			else {
-				Object[] arguments = { iwrb.getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
-				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
-			}
-
-			Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
-			Iterator iter = handlers.iterator();
-			while (iter.hasNext()) {
-				User handler = (User) iter.next();
-				sendMessage(theCase, handler, sender, subject, body);
-			}
-
-			if (sender != null) {
-				Object[] arguments2 = { theCase.getCaseCategory().getLocalizedCategoryName(locale) };
-				subject = iwrb.getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
-				body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
-
-				sendMessage(theCase, sender, null, subject, body);
-			}
+		
+		if(sendMessages) {
 			
-			return theCase;
-		} catch (RemoteException e) {
-			throw new IBORuntimeException(e);
+			try {
+				String prefix = (type != null ? type + "." : "");
+
+				String subject = iwrb.getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
+				String body = null;
+				if (sender != null) {
+					Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
+
+					Object[] arguments = { name.getName(locale), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
+					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+				}
+				else {
+					Object[] arguments = { iwrb.getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
+					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+				}
+
+				Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+				Iterator iter = handlers.iterator();
+				while (iter.hasNext()) {
+					User handler = (User) iter.next();
+					sendMessage(theCase, handler, sender, subject, body);
+				}
+
+				if (sender != null) {
+					Object[] arguments2 = { theCase.getCaseCategory().getLocalizedCategoryName(locale) };
+					subject = iwrb.getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
+					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
+
+					sendMessage(theCase, sender, null, subject, body);
+				}
+				
+			} catch (RemoteException e) {
+				throw new IBORuntimeException(e);
+			}
 		}
+		
+		return theCase;
 	}
 
 	public void allocateCase(GeneralCase theCase, User user, String message, User performer, IWContext iwc) {
@@ -635,8 +668,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	}
 
-	public void storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException {
-		CaseType type = null;
+	public CaseType storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException {
+		CaseType type;
 		if (caseTypePK != null) {
 			type = getCaseType(caseTypePK);
 		}
@@ -650,6 +683,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			type.setOrder(order);
 		}
 		type.store();
+		
+		return type;
 	}
 
 	private void sendMessage(GeneralCase theCase, User receiver, User sender, String subject, String body) {
@@ -683,5 +718,62 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	public boolean allowAttachments() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_ATTACHMENTS, false);
+	}
+	
+	public Object[] createDefaultCaseTypesForDefaultGroupIfNotExist(String caseCategoryName, String caseCategoryDescription, String caseTypeName, String caseTypeDescription, String caseCategoryHandlersGroupName, String caseCategoryHandlersGroupDescription) throws FinderException, CreateException, RemoteException {
+		
+		Collection<CaseCategory> caseCategories = getCaseCategoriesByName(caseCategoryName);
+		Collection<CaseType> caseTypes = getCaseTypesByName(caseTypeName);
+		
+		CaseCategory caseCategory;
+		CaseType caseType;
+		
+		if(caseCategories == null || caseCategories.isEmpty()) {
+			
+			GroupBusiness groupBusiness = getGroupBusiness();
+			
+			@SuppressWarnings("unchecked")
+			Collection<Group> caseHandlersGroups = groupBusiness.getGroupsByGroupName(caseCategoryHandlersGroupName);
+			Group caseHandlersGroup;
+			
+			if(caseHandlersGroups == null || caseHandlersGroups.isEmpty()) {
+
+				caseHandlersGroup = groupBusiness.createGroup(caseCategoryHandlersGroupName, caseCategoryHandlersGroupDescription);
+			} else
+				caseHandlersGroup = caseHandlersGroups.iterator().next();
+			
+			int localeId = ICLocaleBusiness.getLocaleId(new Locale("en"));
+			caseCategory = storeCaseCategory(null, null, caseCategoryName, caseCategoryDescription, caseHandlersGroup, localeId, -1);
+		} else {
+			caseCategory = caseCategories.iterator().next();
+		}
+		
+		if(caseTypes == null || caseTypes.isEmpty()) {
+	
+			caseType = storeCaseType(null, caseTypeName, caseTypeDescription, -1);
+			
+		} else {
+			caseType = caseTypes.iterator().next();
+		}
+		
+		return new Object[] {caseCategory, caseType}; 
+	}
+	
+	protected GroupBusiness getGroupBusiness() {
+		
+		try {
+			FacesContext fctx = FacesContext.getCurrentInstance();
+			IWApplicationContext iwac;
+			
+			if(fctx == null)
+				iwac = IWMainApplication.getDefaultIWApplicationContext();
+			else
+				iwac = IWMainApplication.getIWMainApplication(fctx).getIWApplicationContext();
+			
+			return (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
 	}
 }

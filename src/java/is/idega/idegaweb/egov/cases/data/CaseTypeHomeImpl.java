@@ -34,4 +34,12 @@ public class CaseTypeHomeImpl extends IDOFactory implements CaseTypeHome {
 		this.idoCheckInPooledEntity(entity);
 		return this.findByPrimaryKey(pk);
 	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<CaseType> findByName(String typeName) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((CaseTypeBMPBean) entity).ejbFindAllByName(typeName);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
 }
