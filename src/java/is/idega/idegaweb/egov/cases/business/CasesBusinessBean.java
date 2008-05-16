@@ -83,7 +83,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	private GeneralCaseHome getGeneralCaseHome() {
+	public GeneralCaseHome getGeneralCaseHome() {
 		try {
 			return (GeneralCaseHome) IDOLookup.getHome(GeneralCase.class);
 		}

@@ -6,6 +6,8 @@ import com.idega.presentation.IWContext;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.block.process.data.Case;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
+
 import javax.ejb.CreateException;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.user.data.User;
@@ -44,6 +46,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getGeneralCase
 	 */
 	public GeneralCase getGeneralCase(Object casePK) throws FinderException, RemoteException;
+	
+	public abstract GeneralCaseHome getGeneralCaseHome();
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getOpenCases
