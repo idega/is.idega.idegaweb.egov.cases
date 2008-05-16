@@ -48,4 +48,6 @@ public interface GeneralCaseHome extends IDOHome {
 	public int getCountByGroup(Collection groups) throws IDOException;
 
 	public int getCountByGroupAndStatuses(Collection groups, String[] statuses) throws IDOException;
+	
+	public abstract Collection<GeneralCase> findAllByIds(Collection<Integer> ids) throws FinderException;
 }

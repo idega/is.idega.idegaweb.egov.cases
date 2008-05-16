@@ -74,6 +74,10 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
+	
+	public Collection<GeneralCase> findAllByIds(Collection<Integer> ids) throws FinderException {
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
 
 	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
 		return findByCriteria(parentCategory, category, type, status, anonymous, null);
