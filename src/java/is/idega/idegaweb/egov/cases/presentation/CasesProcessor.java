@@ -48,7 +48,6 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
@@ -72,7 +71,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	public static final int SHOW_CASE_HANDLER = UserCases.SHOW_CASE_HANDLER;
+	//public static final int SHOW_CASE_HANDLER = UserCases.SHOW_CASE_HANDLER;
 	
 	private static final String caseManagerFacet = "caseManager";
 
@@ -117,9 +116,9 @@ public abstract class CasesProcessor extends CasesBlock {
 					showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 					break;
 					
-				case SHOW_CASE_HANDLER:
-					showCaseHandlerView(iwc);
-					break;
+//				case SHOW_CASE_HANDLER:
+//					showCaseHandlerView(iwc);
+//					break;
 				default:
 					showList(iwc);
 			}
@@ -140,6 +139,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
+	/*
 	public void showCaseHandlerView(IWContext iwc) {
 		
 		try {
@@ -176,6 +176,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			throw new IBORuntimeException(fe);
 		}
 	}
+	*/
 	
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
