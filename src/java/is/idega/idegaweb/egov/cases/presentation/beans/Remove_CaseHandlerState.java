@@ -7,10 +7,10 @@ import java.io.Serializable;
  * @author <a href="civilis@idega.com">Vytautas Čivilis</a>
  * @version $Revision: 1.1 $
  *
- * Last modified: $Date: 2008/02/14 21:31:56 $ by $Author: civilis $
+ * Last modified: $Date: 2008/05/24 10:22:53 $ by $Author: civilis $
  *
  */
-public class CaseHandlerState implements Serializable {
+public class Remove_CaseHandlerState implements Serializable {
 
 	private static final long serialVersionUID = 7995176049178489211L;
 
