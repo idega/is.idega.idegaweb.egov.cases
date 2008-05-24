@@ -66,3 +66,121 @@ ul.legend li.isReview {
 div.info div#phone, div.info div#email {
 	float: right;
 }
+
+div.casesListHeadersContainer {
+	width: 100%;
+	border: 1px solid #D7D7D7;
+	color: #595A54;
+	font-weight: bold;
+	padding: 3px;
+	text-align:left;
+	background-color: #C0E0FC;
+}
+
+div.casesListHeadersContainerItem {
+	float: left;
+}
+
+div.casesListHeadersContainerItemToggler {
+	width: 5%;
+}
+div.casesListBodyContainerItemToggler {
+	width: 5%;
+}
+
+div.casesListHeadersContainerItemCaseNumber {
+	width: 20%;
+}
+div.casesListBodyContainerItemCaseNumber {
+	width: 20%;
+}
+
+div.casesListHeadersContainerItemSender {
+	width: 15%;
+}
+div.casesListBodyContainerItemSender {
+	width: 15%;
+}
+
+div.casesListHeadersContainerItemDescription {
+	width: 27%;
+}
+div.casesListBodyContainerItemDescription {
+	width: 27%;
+}
+
+div.casesListHeadersContainerItemCaseType {
+	width: 12%;
+}
+div.casesListBodyContainerItemCaseType {
+	width: 12%;
+}
+
+div.casesListHeadersContainerItemCreatedDate {
+	width: 15%;
+}
+div.casesListBodyContainerItemCreationDate {
+	width: 15%;
+}
+
+div.casesListHeadersContainerItemStatus {
+	width: 15%;
+}
+div.casesListBodyContainerItemStatus {
+	width: 15%;
+}
+
+div.casesListHeadersContainerItemHandler {
+	width: 10%;
+}
+div.casesListBodyContainerItemHandler {
+	width: 10%;
+}
+
+div.casesListHeadersContainerItemMultiHandle {
+	width: 3%;
+}
+div.casesListBodyContainerItemMultiHandle {
+	width: 3%;
+}
+
+div.casesListBodyContainer {
+}
+
+div.casesListCaseContainer {
+	width: 100%;
+}
+
+div.casesListBodyContainerItem {
+	float: left;
+}
+
+div.expand {
+	background: transparent url(../edit.png) no-repeat scroll left top;
+	cursor: pointer;
+}
+div.expanded {
+	background: transparent url(../edit_expanded.png) no-repeat scroll left top;
+	cursor: pointer;
+}
+
+img.downloadCaseAsPdfStyle {
+}
+
+img.downloadCaseAsPdfStyle:hover {
+	cursor: pointer;
+}
+
+img.caseProcessResourceAccessRightsStyle {
+	height: 16px;
+	width: 16px;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle {
+	z-index: 1000;
+	position: absolute;
+	display: none;
+	border: 1px solid #D7D7D7;
+	padding: 3px;
+	background-color: #fff;
+}
