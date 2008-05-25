@@ -203,6 +203,7 @@ function initEmailsGrid(piId, customerView, hasRightChangeRights) {
 function initFormsGrid(piId, customerView, hasRightChangeRights) {
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
+		params.rightsChanger = hasRightChangeRights;
 		BPMProcessAssets.getProcessDocumentsList(params, {
 			callback: function(result) {
 				callback(result);
@@ -216,6 +217,7 @@ function initFormsGrid(piId, customerView, hasRightChangeRights) {
 	
     var namesForColumns = new Array();
     namesForColumns.push(CASE_GRID_STRING_FORM_NAME);
+    namesForColumns.push("Submitted by");
 	namesForColumns.push(CASE_GRID_STRING_DATE);
 	namesForColumns.push(CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF);	//	TODO: check if need to download document in PDF
 	if (hasRightChangeRights) {
@@ -223,6 +225,7 @@ function initFormsGrid(piId, customerView, hasRightChangeRights) {
 	}
 	var modelForColumns = new Array();
 	modelForColumns.push({name:'name',index:'name'});
+	modelForColumns.push({name:'submittedByName',index:'submittedByName'});
 	modelForColumns.push({name:'submittedDate',index:'submittedDate'});
 	modelForColumns.push({name:'downloadAsPdf',index:'downloadAsPdf'});
 	if (hasRightChangeRights) {
