@@ -445,7 +445,7 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, s
 	});
 }
 
-function setAccessRightsForBpmRelatedResource(id, processId, taskId, sameRightsSetterId) {
+function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, sameRightsSetterId) {
 	var element = document.getElementById(id);
 	if (element == null) {
 		return false;
@@ -460,7 +460,7 @@ function setAccessRightsForBpmRelatedResource(id, processId, taskId, sameRightsS
 		}
 	}
 	
-	BPMProcessAssets.setAccessRightsForProcessResource(element.name, processId, taskId, canAccess, setSameRightsForAttachments);
+	BPMProcessAssets.setAccessRightsForProcessResource(element.name, taskInstanceId, canAccess, setSameRightsForAttachments);
 }
 
 function closeAccessRightsSetterBox() {
