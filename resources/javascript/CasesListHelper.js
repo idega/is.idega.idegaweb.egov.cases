@@ -17,6 +17,8 @@ var CASE_GRID_STRING_SUBMITTED_BY = 'Submitted by';
 var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
 var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
 
+var GRID_WITH_SUBGRID_ID_PREFIX = '_tableForProcessInstanceGrid_';
+
 function initializeCasesList(caseToOpenId) {
 	DWREngine.setErrorHandler(function() {
 		closeAllLoadingMessages();
@@ -135,6 +137,30 @@ function continueInitializeCasesList(caseToOpenId) {
 	}
 }
 
+function openAllAttachmentsForCase(table) {
+	if (table == null) {
+		return false;
+	}
+
+	var subGridsOpeners = jQuery('td.subGridOpener', table);
+	if (subGridsOpeners == null || subGridsOpeners.length == 0) {
+		return false;
+	}
+	
+	var subGridOpener = null;
+	var parameterValue = null;
+	var openOnLoadPar = 'opened_on_load';
+	for (var j = 0; j < subGridsOpeners.length; j++) {
+		subGridOpener = jQuery(subGridsOpeners[j]);
+		
+		parameterValue = subGridOpener.attr(openOnLoadPar);
+		if (parameterValue == null || parameterValue == '') {
+			subGridOpener.attr(openOnLoadPar, 'true');
+			subGridOpener.click();
+		}
+	}
+}
+
 function initializeCaseGrids(caseId, customerView) {
 	CasesEngine.getProcessInstanceId(caseId, {
 		callback: function(piId) {
@@ -189,6 +215,8 @@ function initEmailsGrid(caseId, piId, customerView, hasRightChangeRights) {
 		BPMProcessAssets.getProcessEmailsList(params, {
 			callback: function(result) {
 				callback(result);
+
+				openAllAttachmentsForCase(jQuery('#' + params.identifier + GRID_WITH_SUBGRID_ID_PREFIX + piId));
 			}
 		});
 	};
@@ -226,6 +254,8 @@ function initFormsGrid(caseId, piId, customerView, hasRightChangeRights) {
 		BPMProcessAssets.getProcessDocumentsList(params, {
 			callback: function(result) {
 				callback(result);
+				
+				openAllAttachmentsForCase(jQuery('#' + params.identifier + GRID_WITH_SUBGRID_ID_PREFIX + piId));
 			}
 		});
 	};
@@ -298,6 +328,7 @@ function setBPMProcessForPreview(caseId, taskInstanceId) {
 function initCaseGrid(piId, customerView, tableClassName, populatingFunction, subGridForThisGrid, namesForColumns, modelForColumns, onSelectRowFunction, rightsChanger) {
 	var params = new JQGridParams();
 	
+	params.identifier = tableClassName;
 	params.rightsChanger = rightsChanger;
 	
 	params.populateFromFunction = populatingFunction;
@@ -319,7 +350,7 @@ function initCaseGrid(piId, customerView, tableClassName, populatingFunction, su
 		params.subGridRowExpanded = null;
 	}
 	else {
-		jQuery(table).attr('id', 'tableForTaskInstance_' + piId);
+		jQuery(table).attr('id', params.identifier + GRID_WITH_SUBGRID_ID_PREFIX + piId);
 		params.subGrid = true;
 		params.subGridRowExpanded = subGridForThisGrid;
 	}

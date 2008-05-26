@@ -52,14 +52,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private CasesBusiness casesBusiness = null;
 	
-	public UIComponent getCasesList(IWContext iwc, String caseProcessorType, String prefix, boolean showCheckBoxes) {
-		Layer container = new Layer();
-		
-		IWBundle bundle = getBundle(iwc);
+	private String caseContainerStyle = "casesListCaseContainer";
+	private String bodyItem = "casesListBodyContainerItem";
+	private String oldBodyItem = "old_" + bodyItem;
+	private String lastRowStyle = "lastRow";
+	
+	private Layer createHeader(IWContext iwc, Layer container, String prefix, int totalCases, boolean showCheckBoxes) {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
-		CasesBusiness casesBusiness = getCasesBusiness(iwc);
-		if (casesBusiness == null) {
-			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list", "Sorry, error occurred - can not generate cases list.")));
+		if (totalCases < 1) {
+			container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
 			return container;
 		}
 		
@@ -81,15 +82,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Description
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
 
-		//	Type
-//		if (getBusiness().useTypes()) {
-//			Layer typeContainer = new Layer();
-//			headers.add(typeContainer);
-//			typeContainer.setStyleClass(headerItem);
-//			typeContainer.setStyleClass("casesListHeaderItemCaseType");
-//			typeContainer.add(new Text(iwrb.getLocalizedString("case_type", "Case type")));
-//		}
-
 		//	Creation date
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("created_date", "Created date")), headerItem, "CreatedDate");
 
@@ -99,13 +91,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Toggler - controller
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("view", "View")), headerItem, "Toggler");
 
-		//	Handler
-//		Layer handlerContainer = new Layer();
-//		headers.add(handlerContainer);
-//		handlerContainer.setStyleClass(headerItem);
-//		handlerContainer.setStyleClass("casesListHeaderItemHandler");
-//		handlerContainer.add(new Text(iwrb.getLocalizedString("handler", "Handler")));
-
 		//	Handle case
 		if (showCheckBoxes) {
 			addLayerToCasesList(headers, Text.getNonBrakingSpace(), headerItem, "MultiHandle");
@@ -113,27 +98,148 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		headers.add(new CSSSpacer());
 		
-		Collection<GeneralCase> cases = null;
-		try {
-			cases = casesBusiness.getCases(iwc.getCurrentUser(), caseProcessorType);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		if (cases ==  null || cases.isEmpty()) {
-			container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
-			return container;
-		}
-		
+		return casesContainer;
+	}
+	
+	private Layer createBody(Layer casesContainer) {
 		Layer casesBodyContainer = new Layer();
 		casesContainer.add(casesBodyContainer);
 		casesBodyContainer.setStyleClass("casesListBodyContainer");
+		return casesBodyContainer;
+	}
+	
+	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, String prefix, boolean showCheckBoxes,
+			boolean isPrivate, int rowsCounter) {
+		Layer caseContainer = new Layer();
+		casesBodyContainer.add(caseContainer);
+		caseContainer.setStyleClass(caseContainerStyle);
+		
+		CaseStatus status = theCase.getCaseStatus();
+		User owner = theCase.getOwner();
+		IWTimestamp created = new IWTimestamp(theCase.getCreated());
+		
+		CaseManager caseManager = null;
+		if (theCase.getCaseManagerType() != null) {
+			caseManager = getCasesBusiness(iwc).getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
+		}
+//		if (rowsCounter % 2 == 0) {
+//			caseManager = null;
+//		}
+		
+		if (rowsCounter == 0) {
+			caseContainer.setStyleClass("firstRow");
+		}
+
+		if (isPrivate) {
+			caseContainer.setStyleClass("isPrivate");
+		}
+		if (status != null && caseStatusReview != null) {
+			if (status.equals(caseStatusReview)) {
+				caseContainer.setStyleClass("isReview");
+			}
+		}
+		
+		//	Number
+		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
+		String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
+		numberContainer.setStyleClass("firstColumn");
+		numberContainer.add(new Text(caseIdentifier));
+
+		//	Sender
+		Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
+		senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
+				owner.getLastName()).getName(l)));
+		
+		//	Description
+		Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
+		String subject = theCase.getSubject();
+		descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
+
+		//	Creation date
+		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
+		creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
+
+		//	Status
+		String localizedStatus = null;
+		try {
+			localizedStatus = getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, l);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
+
+		//	Controller
+		Layer customerView = null;
+		UIComponent childForContainer = null;
+		if (caseManager == null) {
+			childForContainer = getProcessLink(getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString(prefix + "view_case", "View case")),
+					theCase);
+		}
+		else {
+			childForContainer = Text.getNonBrakingSpace(10);
+		}
+		Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, caseManager == null ? oldBodyItem : bodyItem, "Toggler");
+		if (caseManager != null) {
+			togglerContainer.setStyleClass("expand");
+			togglerContainer.setMarkupAttribute("caseid", theCase.getPrimaryKey().toString());
+			customerView = new Layer();
+			togglerContainer.setMarkupAttribute("customerviewid", customerView.getId());
+		}
+		
+		//	Handle case
+		if (showCheckBoxes) {
+			CheckBox box = new CheckBox(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+
+			Layer multiHandleContainer = addLayerToCasesList(caseContainer, box, bodyItem, "MultiHandle");
+			multiHandleContainer.setStyleClass("lastColumn");
+		}
+
+		if (rowsCounter % 2 == 0) {
+			caseContainer.setStyleClass("evenRow");
+		}
+		else {
+			caseContainer.setStyleClass("oddRow");
+		}
+		
+		caseContainer.add(new CSSSpacer());
+		
+		if (customerView != null) {
+			caseContainer.add(customerView);
+			customerView.setStyleAttribute("display", "none");
+		}
+	
+		return caseContainer;
+	}
+	
+	public UIComponent getCasesList(IWContext iwc, String caseProcessorType, String prefix, boolean showCheckBoxes) {			
+		Layer container = new Layer();
+
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		CasesBusiness casesBusiness = getCasesBusiness(iwc);
+		if (casesBusiness == null) {
+			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list", "Sorry, error occurred - can not generate cases list.")));
+			return container;
+		}
+		
+		Collection<GeneralCase> cases = null;
+		try {
+			cases = casesBusiness.getCases(iwc. getCurrentUser(), caseProcessorType);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		int totalCases = (cases == null || cases.isEmpty()) ? 0 : cases.size();
+		
+		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, showCheckBoxes);
+		
+		if (totalCases < 1) {
+			return container;
+		}
+		
+		Layer casesBodyContainer = createBody(casesContainer);
 		
 		int rowsCounter = 0;
 		Layer caseContainer = null;
 		Locale l = iwc.getCurrentLocale();
-		String caseContainerStyle = "casesListCaseContainer";
-		String bodyItem = "casesListBodyContainerItem";
-		String oldBodyItem = "old_" + bodyItem;
 		CaseStatus caseStatusReview = null;
 		try {
 			caseStatusReview = casesBusiness.getCaseStatusReview();
@@ -141,122 +247,50 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			e.printStackTrace();
 		}
 		for(GeneralCase theCase: cases) {			
-			caseContainer = new Layer();
-			casesBodyContainer.add(caseContainer);
-			caseContainer.setStyleClass(caseContainerStyle);
-			
-			CaseStatus status = theCase.getCaseStatus();
-			User owner = theCase.getOwner();
-			IWTimestamp created = new IWTimestamp(theCase.getCreated());
-			
-			CaseManager caseManager = null;
-			if (theCase.getCaseManagerType() != null) {
-				caseManager = casesBusiness.getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
-			}
-//			if (rowsCounter % 2 == 0) {
-//				caseManager = null;
-//			}
-			
-			if (rowsCounter == 0) {
-				caseContainer.setStyleClass("firstRow");
-			}
-
-			if (theCase.isPrivate()) {
-				caseContainer.setStyleClass("isPrivate");
-			}
-			if (status != null && caseStatusReview != null) {
-				if (status.equals(caseStatusReview)) {
-					caseContainer.setStyleClass("isReview");
-				}
-			}
-			
-			//	Number
-			Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
-			String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
-			numberContainer.setStyleClass("firstColumn");
-			numberContainer.add(new Text(caseIdentifier));
-
-			//	Sender
-			Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
-			senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(l)));
-
-			//	Type
-//			if (getBusiness().useTypes()) {
-//				Layer typeContainer = new Layer();
-//				caseContainer.add(typeContainer);
-//				typeContainer.setStyleClass(bodyItem);
-//				typeContainer.setStyleClass("casesListBodyItemCaseType");
-//				typeContainer.add(new Text(type.getName()));
-//			}
-			
-			//	Description
-			Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
-			String subject = theCase.getSubject();
-			descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
-
-			//	Creation date
-			Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
-			creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
-
-			//	Status
-			String localizedStatus = null;
-			try {
-				localizedStatus = casesBusiness.getLocalizedCaseStatusDescription(theCase, status, l);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
-
-			//	Controller
-			Layer customerView = null;
-			UIComponent childForContainer = null;
-			if (caseManager == null) {
-				childForContainer = getProcessLink(bundle.getImage("edit.png", iwrb.getLocalizedString(prefix + "view_case", "View case")), theCase);
-			}
-			else {
-				childForContainer = Text.getNonBrakingSpace(10);
-			}
-			Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, caseManager == null ? oldBodyItem : bodyItem, "Toggler");
-			if (caseManager != null) {
-				togglerContainer.setStyleClass("expand");
-				togglerContainer.setMarkupAttribute("caseid", theCase.getPrimaryKey().toString());
-				customerView = new Layer();
-				togglerContainer.setMarkupAttribute("customerviewid", customerView.getId());
-			}
-			
-			//	Handler
-//			User handler = theCase.getHandledBy();
-//			handlerContainer = new Layer();
-//			caseContainer.add(handlerContainer);
-//			handlerContainer.setStyleClass(bodyItem);
-//			handlerContainer.setStyleClass("casesListBodyItemHandler");
-//			handlerContainer.add(handler == null ? new Text(CoreConstants.MINUS) : new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(l)));
-
-			//	Handle case
-			if (showCheckBoxes) {
-				CheckBox box = new CheckBox(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-
-				Layer multiHandleContainer = addLayerToCasesList(caseContainer, box, bodyItem, "MultiHandle");
-				multiHandleContainer.setStyleClass("lastColumn");
-			}
-
-			if (rowsCounter % 2 == 0) {
-				caseContainer.setStyleClass("evenRow");
-			}
-			else {
-				caseContainer.setStyleClass("oddRow");
-			}
+			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, showCheckBoxes, theCase.isPrivate(), rowsCounter);
 			rowsCounter++;
-			
-			caseContainer.add(new CSSSpacer());
-			
-			if (customerView != null) {
-				caseContainer.add(customerView);
-				customerView.setStyleAttribute("display", "none");
-			}
 		}
-		caseContainer.setStyleClass("lastRow");
+		caseContainer.setStyleClass(lastRowStyle);
 		
+		return container;
+	}
+	
+	//	TODO: test this
+	public UIComponent getCasesList(IWContext iwc, Collection<Case> cases, String prefix) {
+		Layer container = new Layer();
+
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		CasesBusiness casesBusiness = getCasesBusiness(iwc);
+		if (casesBusiness == null) {
+			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list", "Sorry, error occurred - can not generate cases list.")));
+			return container;
+		}
+		
+		int totalCases = (cases == null || cases.isEmpty()) ? 0 : cases.size();
+		
+		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, false);
+		
+		if (totalCases < 1) {
+			return container;
+		}
+		
+		Layer casesBodyContainer = createBody(casesContainer);
+		
+		int rowsCounter = 0;
+		Layer caseContainer = null;
+		Locale l = iwc.getCurrentLocale();
+		CaseStatus caseStatusReview = null;
+		try {
+			caseStatusReview = casesBusiness.getCaseStatusReview();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		for(Case theCase: cases) {			
+			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, false, false, rowsCounter);
+			rowsCounter++;
+		}
+		caseContainer.setStyleClass(lastRowStyle);
+
 		return container;
 	}
 	
