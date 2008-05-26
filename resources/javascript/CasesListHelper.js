@@ -12,6 +12,7 @@ var CASE_GRID_STRING_FILE_NAME = 'File name';
 var CASE_GRID_STRING_CHANGE_ACCESS_RIGHTS = 'Change access rights';
 var CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = 'Download document';
 var CASE_GRID_STRING_FILE_SIZE = 'File size';
+var CASE_GRID_STRING_SUBMITTED_BY = 'Submitted by';
 
 var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
 var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
@@ -35,7 +36,7 @@ function initializeCasesList() {
 }
 
 function setCasesListLocalizations(data) {
-	if (data == null || data.length < 16) {
+	if (data == null || data.length < 17) {
 		return false;
 	}
 	
@@ -53,10 +54,11 @@ function setCasesListLocalizations(data) {
 	CASE_GRID_STRING_FORM_NAME = data[11];
 	CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = data[12];
 	CASE_GRID_STRING_FILE_SIZE = data[13];
+	CASE_GRID_STRING_SUBMITTED_BY = data[14];
 	
 	//	Other info
-	CASE_ATTACHEMENT_LINK_STYLE_CLASS = data[14];
-	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[15];
+	CASE_ATTACHEMENT_LINK_STYLE_CLASS = data[15];
+	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[16];
 }
 
 function continueInitializeCasesList() {
@@ -217,7 +219,7 @@ function initFormsGrid(piId, customerView, hasRightChangeRights) {
 	
     var namesForColumns = new Array();
     namesForColumns.push(CASE_GRID_STRING_FORM_NAME);
-    namesForColumns.push("Submitted by");
+    namesForColumns.push(CASE_GRID_STRING_SUBMITTED_BY);
 	namesForColumns.push(CASE_GRID_STRING_DATE);
 	namesForColumns.push(CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF);	//	TODO: check if need to download document in PDF
 	if (hasRightChangeRights) {
@@ -266,8 +268,6 @@ function initTasksGrid(caseId, piId, customerView, hasRightChangeRights) {
 	}
 	
 	var onSelectRowFunction = function(rowId) {
-		//	TODO: generate preview
-		
 		/*var link = jQuery('a.processResourceViewerStyleClass');
 		if (link == null || link.length == 0) {
 			return false;
@@ -275,7 +275,10 @@ function initTasksGrid(caseId, piId, customerView, hasRightChangeRights) {
 		var newHref = link.attr('href') + '&prm_case_pk=' + caseId + '&cp_prm_action=2';
 		link.attr('href', newHref);
 		link.click();*/
-		//setCurrentWindowToDownloadCaseResource('&prm_case_pk=' + caseId + '&cp_prm_action=2', 'processResourceViewerStyleClass')
+		
+		jQuery('#state_viewSelected').attr('value', rowId);
+		//jQuery('form.mainCasesListForm').submit();
+		setCurrentWindowToDownloadCaseResource('&prm_case_pk=' + caseId + '&taskInstanceId=' + rowId + '&cp_prm_action=8&bpm_reosurce_type=task', 'processResourceViewerStyleClass');
 		
 		/*showLoadingMessage('');
 		BPMProcessAssets.getViewDisplay(rowId, {

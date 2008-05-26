@@ -68,17 +68,24 @@ div.info div#phone, div.info div#email {
 }
 
 div.casesListHeadersContainer {
-	width: 100%;
-	border: 1px solid #D7D7D7;
+	border-top: 1px solid #D7D7D7;
+	border-bottom: 1px solid #D7D7D7;
 	color: #595A54;
 	font-weight: bold;
 	padding: 3px;
 	text-align:left;
 	background-color: #C0E0FC;
+	overflow: hidden;
 }
 
-div.casesListHeadersContainerItem {
+div.casesListHeadersContainerItem, div.casesListCaseContainer div {
 	float: left;
+}
+
+div.casesListCaseContainer {
+	overflow: hidden;
+	padding: 3px;
+	border-bottom: 1px solid #D7D7D7;
 }
 
 div.casesListHeadersContainerItemToggler {
