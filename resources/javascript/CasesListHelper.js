@@ -18,10 +18,17 @@ var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
 var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
 
 function initializeCasesList(caseToOpenId) {
-	/*DWREngine.setErrorHandler(function() {	//	TODO: uncomment
+	DWREngine.setErrorHandler(function() {
 		closeAllLoadingMessages();
-		//	TODO: close 'Loading...' for grids
-	});*/
+		
+		var loadingLabels = jQuery('div.loading');
+		if (loadingLabels == null || loadingLabels.length == 0) {
+			return false;
+		}
+		for (var i = 0; i < loadingLabels.length; i++) {
+			jQuery(loadingLabels[i]).css('display', 'none');
+		}
+	});
 	
 	var jQGridInclude = new JQGridInclude();
 	jQGridInclude.SUBGRID = true;
