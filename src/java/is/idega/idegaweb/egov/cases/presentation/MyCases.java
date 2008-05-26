@@ -48,15 +48,15 @@ public class MyCases extends CasesProcessor {
 		return "myCases";
 	}
 
-	@SuppressWarnings("unchecked")
-	protected Collection getCases(User user) throws RemoteException {
+	@Override
+	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
+		Collection<GeneralCase> cases = getCasesBusiness().getCases(user, getCasesProcessorType());
+		Collection<GeneralCase> myCases = getCasesBusiness().getMyCases(user);
 		
-		Collection<GeneralCase> cases = super.getCases(user);
-		Collection<GeneralCase> myCases = getBusiness().getMyCases(user);
-		
-		if(cases != null)
+		if (cases != null) {
 			myCases.addAll(cases);
-		
+		}
+			
 		return myCases;
 	}
 
@@ -71,7 +71,7 @@ public class MyCases extends CasesProcessor {
 
 		GeneralCase theCase = null;
 		try {
-			theCase = getBusiness().getGeneralCase(casePK);
+			theCase = getCasesBusiness().getGeneralCase(casePK);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -103,7 +103,7 @@ public class MyCases extends CasesProcessor {
 		clear.setStyleClass("Clear");
 
 		SelectorUtility util = new SelectorUtility();
-		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getBusiness().getCaseCategories(), "getName");
+		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness().getCaseCategories(), "getName");
 		categories.keepStatusOnAction(true);
 		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
 		categories.setStyleClass("caseCategoryDropdown");
@@ -124,7 +124,7 @@ public class MyCases extends CasesProcessor {
 					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 		}
 
-		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getBusiness().getCaseTypes(), "getName");
+		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness().getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
 		types.setSelectedElement(type.getPrimaryKey().toString());
 		types.setStyleClass("caseTypeDropdown");
@@ -132,9 +132,9 @@ public class MyCases extends CasesProcessor {
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
 
 		DropdownMenu statuses = new DropdownMenu(PARAMETER_STATUS);
-		statuses.addMenuElement(getBusiness().getCaseStatusPending().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
-		statuses.addMenuElement(getBusiness().getCaseStatusWaiting().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
-		statuses.addMenuElement(getBusiness().getCaseStatusReady().getStatus(), getBusiness().getLocalizedCaseStatusDescription(theCase, getBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
+		statuses.addMenuElement(getCasesBusiness().getCaseStatusPending().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(theCase, getCasesBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
+		statuses.addMenuElement(getCasesBusiness().getCaseStatusWaiting().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(theCase, getCasesBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
+		statuses.addMenuElement(getCasesBusiness().getCaseStatusReady().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(theCase, getCasesBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
 		statuses.setSelectedElement(theCase.getStatus());
 		statuses.setStyleClass("caseStatusDropdown");
 
@@ -148,7 +148,7 @@ public class MyCases extends CasesProcessor {
 		reply.setStyleClass("textarea");
 		reply.keepStatusOnAction(true);
 
-		if (getBusiness().useTypes()) {
+		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
@@ -281,7 +281,7 @@ public class MyCases extends CasesProcessor {
 		String reply = iwc.getParameter(PARAMETER_REPLY);
 
 		try {
-			getBusiness().handleCase(casePK, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, status, iwc.getCurrentUser(), reply, iwc);
+			getCasesBusiness().handleCase(casePK, subCaseCategoryPK != null ? subCaseCategoryPK : caseCategoryPK, caseTypePK, status, iwc.getCurrentUser(), reply, iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

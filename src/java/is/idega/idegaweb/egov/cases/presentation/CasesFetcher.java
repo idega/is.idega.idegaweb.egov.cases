@@ -120,7 +120,7 @@ public class CasesFetcher extends CasesBlock {
 			section.add(helpLayer);
 
 			SelectorUtility util = new SelectorUtility();
-			DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY), getBusiness().getCaseCategories(), "getName");
+			DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY), getCasesBusiness().getCaseCategories(), "getName");
 			categories.keepStatusOnAction(true);
 			categories.setStyleClass("caseCategoryDropdown");
 			categories.setMenuElementFirst("", "");
@@ -144,16 +144,16 @@ public class CasesFetcher extends CasesBlock {
 				subCategories.setMenuElementFirst("", "");
 			}
 
-			DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE), getBusiness().getCaseTypes(), "getName");
+			DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE), getCasesBusiness().getCaseTypes(), "getName");
 			types.keepStatusOnAction(true);
 			types.setStyleClass("caseTypeDropdown");
 			types.setMenuElementFirst("", "");
 
 			DropdownMenu statuses = new DropdownMenu(PARAMETER_CASE_STATUS);
-			statuses.addMenuElement(getBusiness().getCaseStatusOpen().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusOpen(), iwc.getCurrentLocale()));
-			statuses.addMenuElement(getBusiness().getCaseStatusPending().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
-			statuses.addMenuElement(getBusiness().getCaseStatusWaiting().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
-			statuses.addMenuElement(getBusiness().getCaseStatusReady().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
+			statuses.addMenuElement(getCasesBusiness().getCaseStatusOpen().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusOpen(), iwc.getCurrentLocale()));
+			statuses.addMenuElement(getCasesBusiness().getCaseStatusPending().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
+			statuses.addMenuElement(getCasesBusiness().getCaseStatusWaiting().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
+			statuses.addMenuElement(getCasesBusiness().getCaseStatusReady().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
 			statuses.keepStatusOnAction(true);
 			statuses.setStyleClass("caseStatusDropdown");
 			statuses.setMenuElementFirst("", "");
@@ -172,7 +172,7 @@ public class CasesFetcher extends CasesBlock {
 			element.add(categories);
 			section.add(element);
 
-			if (getBusiness().useSubCategories()) {
+			if (getCasesBusiness().useSubCategories()) {
 				try {
 					RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
 					rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
@@ -193,7 +193,7 @@ public class CasesFetcher extends CasesBlock {
 				section.add(element);
 			}
 
-			if (getBusiness().useTypes()) {
+			if (getCasesBusiness().useTypes()) {
 				element = new Layer(Layer.DIV);
 				element.setStyleClass("formItem");
 				label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);

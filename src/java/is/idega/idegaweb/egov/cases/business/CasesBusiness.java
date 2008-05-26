@@ -1,24 +1,27 @@
 package is.idega.idegaweb.egov.cases.business;
 
-import com.idega.block.process.business.CaseBusiness;
-import com.idega.core.file.data.ICFile;
-import com.idega.presentation.IWContext;
-import com.idega.idegaweb.IWResourceBundle;
-import com.idega.block.process.data.Case;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 
-import javax.ejb.CreateException;
-import com.idega.block.process.data.CaseStatus;
-import com.idega.user.data.User;
-import is.idega.idegaweb.egov.cases.data.CaseType;
 import java.rmi.RemoteException;
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import java.util.Locale;
 import java.util.Collection;
+import java.util.Locale;
+
+import javax.ejb.CreateException;
 import javax.ejb.FinderException;
-import com.idega.business.IBOService;
 import javax.ejb.RemoveException;
+
+import com.idega.block.process.business.CaseBusiness;
+import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.data.Case;
+import com.idega.block.process.data.CaseStatus;
+import com.idega.business.IBOService;
+import com.idega.core.file.data.ICFile;
+import com.idega.idegaweb.IWResourceBundle;
+import com.idega.presentation.IWContext;
+import com.idega.user.data.User;
 
 public interface CasesBusiness extends IBOService, CaseBusiness {
 
@@ -59,9 +62,9 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getMyCases
 	 */
-	public Collection getMyCases(User handler) throws RemoteException;
+	public Collection<GeneralCase> getMyCases(User handler) throws RemoteException;
 	
-	public Collection getMyCases(User handler, String[] caseHandlers) throws RemoteException;
+	public Collection<GeneralCase> getMyCases(User handler, String[] caseHandlers) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getClosedCases
@@ -223,4 +226,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Collection<CaseCategory> getCaseCategoriesByName(String name) throws RemoteException;
 	
 	public Collection<CaseType> getCaseTypesByName(String name) throws RemoteException;
+	
+	public Collection<GeneralCase> getCases(User user, String casesProcessorType) throws RemoteException;
+	
+	public CaseManagersProvider getCaseHandlersProvider();
 }

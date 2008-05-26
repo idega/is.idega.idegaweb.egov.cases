@@ -146,7 +146,7 @@ public class CaseFinder extends CasesBlock {
 		Collection cases = new ArrayList();
 		if (iwc.isParameterSet(PARAMETER_CASE_NUMBER)) {
 			try {
-				GeneralCase theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_NUMBER));
+				GeneralCase theCase = getCasesBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_NUMBER));
 				cases.add(theCase);
 			}
 			catch (FinderException fe) {
@@ -156,7 +156,7 @@ public class CaseFinder extends CasesBlock {
 		else if (iwc.isParameterSet(PARAMETER_NAME)) {
 			try {
 				Collection users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_NAME), false);
-				cases.addAll(getBusiness().getCasesByUsers(users));
+				cases.addAll(getCasesBusiness().getCasesByUsers(users));
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();
@@ -165,7 +165,7 @@ public class CaseFinder extends CasesBlock {
 		else if (iwc.isParameterSet(PARAMETER_PERSONAL_ID)) {
 			try {
 				Collection users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_PERSONAL_ID), false);
-				cases.addAll(getBusiness().getCasesByUsers(users));
+				cases.addAll(getCasesBusiness().getCasesByUsers(users));
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();
@@ -199,7 +199,7 @@ public class CaseFinder extends CasesBlock {
 			cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
 
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
-			if (getBusiness().useTypes()) {
+			if (getCasesBusiness().useTypes()) {
 				row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
 			}
 			row.createHeaderCell().add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
@@ -246,16 +246,16 @@ public class CaseFinder extends CasesBlock {
 				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
-				if (this.openCasesPage != null && status.equals(getBusiness().getCaseStatusOpen())) {
+				if (this.openCasesPage != null && status.equals(getCasesBusiness().getCaseStatusOpen())) {
 					process.setPage(this.openCasesPage);
 					addProcessLink = true;
 				}
-				else if (this.myCasesPage != null && (status.equals(getBusiness().getCaseStatusPending()) || status.equals(getBusiness().getCaseStatusWaiting())) && (handler != null && handler.equals(iwc.getCurrentUser()))) {
+				else if (this.myCasesPage != null && (status.equals(getCasesBusiness().getCaseStatusPending()) || status.equals(getCasesBusiness().getCaseStatusWaiting())) && (handler != null && handler.equals(iwc.getCurrentUser()))) {
 					process.setPage(this.myCasesPage);
 					addProcessLink = true;
 				}
 				else if (this.viewCasesPage != null) {
-					process.addParameter(getBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+					process.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 					process.setPage(this.viewCasesPage);
 					addProcessLink = true;
 				}
@@ -271,13 +271,13 @@ public class CaseFinder extends CasesBlock {
 					row.createCell().add(new Text("-"));
 				}
 
-				if (getBusiness().useTypes()) {
+				if (getCasesBusiness().useTypes()) {
 					row.createCell().add(new Text(type.getName()));
 				}
 
 				row.createCell().add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
-				row.createCell().add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
+				row.createCell().add(new Text(getCasesBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
 
 				if (handler != null) {
 					row.createCell().add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));

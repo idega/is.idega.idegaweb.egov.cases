@@ -41,6 +41,7 @@ import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
@@ -229,10 +230,10 @@ public abstract class CasesBlock extends Block {
 
 	protected String getPrefix() {
 		if (getType() != null) {
-			return getType() + ".";
+			return getType() + CoreConstants.DOT;
 		}
 		else {
-			return "";
+			return CoreConstants.EMPTY;
 		}
 	}
 
@@ -286,7 +287,7 @@ public abstract class CasesBlock extends Block {
 		return this.iwrb;
 	}
 
-	protected CasesBusiness getBusiness() {
+	protected CasesBusiness getCasesBusiness() {
 		return this.business;
 	}
 

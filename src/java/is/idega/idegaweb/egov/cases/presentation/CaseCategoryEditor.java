@@ -155,7 +155,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		column.setSpan(2);
 		column.setWidth("12");
 
-		Collection categories = getBusiness().getCaseCategories();
+		Collection categories = getCasesBusiness().getCaseCategories();
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -194,8 +194,8 @@ public class CaseCategoryEditor extends CasesBlock {
 			CaseCategory category = (CaseCategory) iter.next();
 			addCategoryToTable(group, category, iRow++, !iter.hasNext(), false, locale);
 			
-			if (getBusiness().useSubCategories()) {
-				Collection subCategories = getBusiness().getSubCategories(category);
+			if (getCasesBusiness().useSubCategories()) {
+				Collection subCategories = getCasesBusiness().getSubCategories(category);
 				Iterator iterator = subCategories.iterator();
 				
 				int iSubRow = 1;
@@ -314,7 +314,7 @@ public class CaseCategoryEditor extends CasesBlock {
 
 		if (caseCategoryPK != null) {
 			try {
-				CaseCategory category = getBusiness().getCaseCategory(caseCategoryPK);
+				CaseCategory category = getCasesBusiness().getCaseCategory(caseCategoryPK);
 				CaseCategory parent = category.getParent();
 				Group group = category.getHandlerGroup();
 				
@@ -442,7 +442,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		}
 		
 		try {
-			CaseCategory category = getBusiness().storeCaseCategory(caseCategoryPK, parentCaseCategoryPK, name, description, groupPK, localeId, order);
+			CaseCategory category = getCasesBusiness().storeCaseCategory(caseCategoryPK, parentCaseCategoryPK, name, description, groupPK, localeId, order);
 			iwc.setSessionAttribute(PARAMETER_CASE_CATEGORY_PK,category.getPrimaryKey());
 			return true;
 		}
@@ -458,7 +458,7 @@ public class CaseCategoryEditor extends CasesBlock {
 	private void removeCategory(IWContext iwc) throws RemoteException {
 		String caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		try {
-			getBusiness().removeCaseCategory(caseCategoryPK);
+			getCasesBusiness().removeCaseCategory(caseCategoryPK);
 		}
 		catch (RemoveException re) {
 			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_category_failed", "You can't remove a case category that already has cases connected to it."));

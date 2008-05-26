@@ -10,13 +10,11 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.presentation.beans.GeneralCaseProcessorViewBuilder;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,24 +22,16 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
-import com.idega.block.process.business.CaseManager;
-import com.idega.block.process.business.CaseManagersProvider;
-import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
-import com.idega.block.web2.business.Web2Business;
+import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
 import com.idega.business.SpringBeanLookup;
-import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.IWResourceBundle;
-import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.PresentationObject;
-import com.idega.presentation.text.Heading5;
+import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
-import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
@@ -49,11 +39,6 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
-import com.idega.util.CoreUtil;
-import com.idega.util.IWTimestamp;
-import com.idega.util.PresentationUtil;
-import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
@@ -76,6 +61,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
 	//public static final int SHOW_CASE_HANDLER = UserCases.SHOW_CASE_HANDLER;
+	protected static final int ACTION_BPM_PROCESS = 8;
 	
 	private static final String caseManagerFacet = "caseManager";
 
@@ -123,6 +109,11 @@ public abstract class CasesProcessor extends CasesBlock {
 //				case SHOW_CASE_HANDLER:
 //					showCaseHandlerView(iwc);
 //					break;
+				
+				case ACTION_BPM_PROCESS:
+					showProcessorForBpm(iwc);
+					break;
+				
 				default:
 					showList(iwc);
 			}
@@ -422,267 +413,9 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
-	private void addWeb2Stuff(IWContext iwc, Layer container) {
-		Web2Business web2Business = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
-		
-		List<String> scripts = new ArrayList<String>();
-		try {
-			scripts.add(web2Business.getBundleURIToJQueryLib());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		scripts.add(web2Business.getBundleURIToJQGrid());
-		IWBundle bundle = getBundle(iwc);
-		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
-		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
-		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
-		scripts.add("/dwr/interface/CasesEngine.js");
-		scripts.add("/dwr/interface/BPMProcessAssets.js");
-	
-		List<String> css = new ArrayList<String>();
-		css.add(web2Business.getBundleURIToJQGridStyles());
-		
-		String initAction = "initializeCasesList();";
-		if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
-			container.add(PresentationUtil.getJavaScriptSourceLines(scripts));
-			container.add(PresentationUtil.getStyleSheetsSourceLines(css));
-			container.add(PresentationUtil.getJavaScriptAction(initAction));
-		}
-		else {
-			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-			PresentationUtil.addStyleSheetsToHeader(iwc, css);
-			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(document).ready(function() {"+initAction+"});");
-		}
-	}
-	
 	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
-		Layer container = new Layer();
-		form.add(container);
-		
-		IWResourceBundle iwrb = getResourceBundle(iwc);
-		
-		addWeb2Stuff(iwc, container);
-		
-		Layer casesContainer = new Layer();
-		container.add(casesContainer);
-		Layer headers = new Layer();
-		casesContainer.add(headers);
-		headers.setStyleClass("casesListHeadersContainer");
-		String headerItem = "casesListHeadersContainerItem";
-		
-//		Layer togglerContainer = new Layer();
-//		headers.add(togglerContainer);
-//		togglerContainer.setStyleClass(headerItem);
-//		togglerContainer.setStyleClass("casesListHeaderItemToggler");
-//		togglerContainer.add(Text.getNonBrakingSpace(10));
-
-		//	Number
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(getPrefix() + "case_nr", "Case nr.")), headerItem, "CaseNumber");
-//		Layer numberContainer = new Layer();
-//		headers.add(numberContainer);
-//		numberContainer.setStyleClass(headerItem);
-//		numberContainer.setStyleClass("casesListHeaderItemCaseNumber");
-//		numberContainer.add();
-
-		//	Sender
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
-//		Layer senderContainer = new Layer();
-//		headers.add(senderContainer);
-//		senderContainer.setStyleClass(headerItem);
-//		senderContainer.setStyleClass("casesListHeaderItemSender");
-//		senderContainer.add(new Text(iwrb.getLocalizedString("sender", "Sender")));
-		
-		//	Description
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
-
-		//	Type
-//		if (getBusiness().useTypes()) {
-//			Layer typeContainer = new Layer();
-//			headers.add(typeContainer);
-//			typeContainer.setStyleClass(headerItem);
-//			typeContainer.setStyleClass("casesListHeaderItemCaseType");
-//			typeContainer.add(new Text(iwrb.getLocalizedString("case_type", "Case type")));
-//		}
-
-		//	Creation date
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("created_date", "Created date")), headerItem, "CreatedDate");
-//		Layer creationDateContainer = new Layer();
-//		headers.add(creationDateContainer);
-//		creationDateContainer.setStyleClass(headerItem);
-//		creationDateContainer.setStyleClass("casesListHeaderItemCreatedDate");
-//		creationDateContainer.add(new Text(iwrb.getLocalizedString("created_date", "Created date")));
-
-		//	Status
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
-//		Layer statusContainer = new Layer();
-//		headers.add(statusContainer);
-//		statusContainer.setStyleClass(headerItem);
-//		statusContainer.setStyleClass("casesListHeaderItemStatus");
-//		statusContainer.add(new Text(iwrb.getLocalizedString("status", "Status")));
-		
-		//	Toggler - controller
-		addLayerToCasesList(headers, new Text(getResourceBundle().getLocalizedString("view", "View")), headerItem, "Toggler");
-
-		//	Handler
-//		Layer handlerContainer = new Layer();
-//		headers.add(handlerContainer);
-//		handlerContainer.setStyleClass(headerItem);
-//		handlerContainer.setStyleClass("casesListHeaderItemHandler");
-//		handlerContainer.add(new Text(iwrb.getLocalizedString("handler", "Handler")));
-
-		//	Handle case
-		if (showCheckBoxes) {
-			addLayerToCasesList(headers, Text.getNonBrakingSpace(), headerItem, "MultiHandle");
-		}
-		
-		headers.add(new CSSSpacer());
-		
-		Collection<GeneralCase> cases = getCases(iwc.getCurrentUser());
-		if (cases ==  null || cases.isEmpty()) {
-			container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
-			return;
-		}
-		
-		Layer casesBodyContainer = new Layer();
-		casesContainer.add(casesBodyContainer);
-		casesBodyContainer.setStyleClass("casesListBodyContainer");
-		
-		int rowsCounter = 0;
-		Layer caseContainer = null;
-		Locale l = iwc.getCurrentLocale();
-		String caseContainerStyle = "casesListCaseContainer";
-		String bodyItem = "casesListBodyContainerItem";
-		for(GeneralCase theCase: cases) {			
-			caseContainer = new Layer();
-			casesBodyContainer.add(caseContainer);
-			caseContainer.setStyleClass(caseContainerStyle);
-			
-			CaseStatus status = theCase.getCaseStatus();
-			User owner = theCase.getOwner();
-			IWTimestamp created = new IWTimestamp(theCase.getCreated());
-			
-			CaseManager caseManager = null;
-			if (theCase.getCaseManagerType() != null) {
-				caseManager = getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
-			}
-//			if (rowsCounter % 2 == 0) {	//	TODO: remove this
-//				caseManager = null;
-//			}
-			
-			if (rowsCounter == 0) {
-				caseContainer.setStyleClass("firstRow");
-			}
-
-			if (theCase.isPrivate()) {
-				caseContainer.setStyleClass("isPrivate");
-			}
-			if (status.equals(getCasesBusiness(iwc).getCaseStatusReview())) {
-				caseContainer.setStyleClass("isReview");
-			}
-			
-			//	Number
-			Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
-			String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
-			numberContainer.setStyleClass("firstColumn");
-			numberContainer.add(new Text(caseIdentifier));
-
-			//	Sender
-			Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
-			senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(l)));
-
-			//	Type
-//			if (getBusiness().useTypes()) {
-//				Layer typeContainer = new Layer();
-//				caseContainer.add(typeContainer);
-//				typeContainer.setStyleClass(bodyItem);
-//				typeContainer.setStyleClass("casesListBodyItemCaseType");
-//				typeContainer.add(new Text(type.getName()));
-//			}
-			
-			//	Description
-			Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
-			String subject = theCase.getSubject();
-			descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
-
-			//	Creation date
-			Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
-			creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
-
-			//	Status
-			addLayerToCasesList(caseContainer, new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, l)), bodyItem, "Status");
-//			statusContainer = new Layer();
-//			caseContainer.add(statusContainer);
-//			statusContainer.setStyleClass(bodyItem);
-//			statusContainer.setStyleClass("casesListBodyItemStatus");
-//			statusContainer.add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, l)));
-
-			//	Controller
-			Layer customerView = null;
-			UIComponent childForContainer = null;
-			if (caseManager == null) {
-				childForContainer = getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase);
-			}
-			else {
-				childForContainer = Text.getNonBrakingSpace(10);
-			}
-			Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, caseManager == null ? null : bodyItem, "Toggler");
-			if (caseManager != null) {
-				togglerContainer.setStyleClass("expand");
-				togglerContainer.setMarkupAttribute("caseid", theCase.getPrimaryKey().toString());
-				customerView = new Layer();
-				togglerContainer.setMarkupAttribute("customerviewid", customerView.getId());
-			}
-			
-			//	Handler
-//			User handler = theCase.getHandledBy();
-//			handlerContainer = new Layer();
-//			caseContainer.add(handlerContainer);
-//			handlerContainer.setStyleClass(bodyItem);
-//			handlerContainer.setStyleClass("casesListBodyItemHandler");
-//			handlerContainer.add(handler == null ? new Text(CoreConstants.MINUS) : new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(l)));
-
-			//	Handle case
-			if (showCheckBoxes) {
-				CheckBox box = new CheckBox(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-
-				Layer multiHandleContainer = addLayerToCasesList(caseContainer, box, bodyItem, "MultiHandle");
-				multiHandleContainer.setStyleClass("lastColumn");
-			}
-
-			if (rowsCounter % 2 == 0) {
-				caseContainer.setStyleClass("evenRow");
-			}
-			else {
-				caseContainer.setStyleClass("oddRow");
-			}
-			rowsCounter++;
-			
-			caseContainer.add(new CSSSpacer());
-			
-			if (customerView != null) {
-				caseContainer.add(customerView);
-				customerView.setStyleAttribute("display", "none");
-			}
-		}
-		caseContainer.setStyleClass("lastRow");
-	}
-	
-	private Layer addLayerToCasesList(Layer container, UIComponent child, String defaultStyleClass, String suffixForStyleClass) {
-		Layer layer = new Layer();
-		container.add(layer);
-		
-		if (defaultStyleClass != null) {
-			layer.setStyleClass(defaultStyleClass);
-			if (suffixForStyleClass != null) {
-				layer.setStyleClass(defaultStyleClass + suffixForStyleClass);
-			}
-		}
-		
-		if (child != null) {
-			layer.add(child);
-		}
-		
-		return layer;
+		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
+		form.add(listBuilder.getCasesList(iwc, getCasesProcessorType(), getPrefix(), showCheckBoxes));
 	}
 
 	protected void showMultiProcessForm(IWContext iwc) throws RemoteException {
@@ -704,9 +437,9 @@ public abstract class CasesProcessor extends CasesBlock {
 		section.add(helpLayer);
 
 		DropdownMenu statuses = new DropdownMenu(PARAMETER_STATUS);
-		statuses.addMenuElement(getBusiness().getCaseStatusReady().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
-		statuses.addMenuElement(getBusiness().getCaseStatusWaiting().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
-		statuses.addMenuElement(getBusiness().getCaseStatusPending().getStatus(), getBusiness().getLocalizedCaseStatusDescription(getBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
+		statuses.addMenuElement(getCasesBusiness().getCaseStatusReady().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusReady(), iwc.getCurrentLocale()));
+		statuses.addMenuElement(getCasesBusiness().getCaseStatusWaiting().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusWaiting(), iwc.getCurrentLocale()));
+		statuses.addMenuElement(getCasesBusiness().getCaseStatusPending().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(getCasesBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
 
 		TextArea reply = new TextArea(PARAMETER_REPLY);
 		reply.setStyleClass("textarea");
@@ -766,7 +499,7 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		GeneralCase theCase = null;
 		try {
-			theCase = getBusiness().getGeneralCase(casePK);
+			theCase = getCasesBusiness().getGeneralCase(casePK);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -843,37 +576,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 
-	protected Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-		Link process = new Link(object);
-		
-		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-
-		return process;
-	}
-	
-	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		
-		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
-		Collection<GeneralCase> cases = null;
-		
-		for (CaseManager handler : caseHandlers) {
-			
-			@SuppressWarnings("unchecked")
-			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, getCasesProcessorType());
-			
-			if(cazes != null) {
-				
-				if(cases == null)
-					cases = cazes;
-				else
-					cases.addAll(cazes);
-			}
-		}
-		
-		return cases;
-	}
-
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
 	
 	protected abstract String getCasesProcessorType();
@@ -882,8 +584,33 @@ public abstract class CasesProcessor extends CasesBlock {
 
 	protected abstract boolean showCheckBox();
 	
-	public CaseManagersProvider getCaseHandlersProvider() {
+	protected abstract Collection<GeneralCase> getCases(User user) throws RemoteException;
+	
+	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {	//	TODO: finish	
+		Form form = new Form();
+		add(form);
+		form.maintainParameter(PARAMETER_CASE_PK);
+
+		GeneralCaseProcessorViewBuilder processorView = (GeneralCaseProcessorViewBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCaseProcessorViewBuilder.SPRING_BEAN_IDENTIFIER);
+		UIComponent view = null;
+		try {
+			view = processorView.getCaseProcessorView(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (view == null) {
+			view = new Heading3(getResourceBundle(iwc).getLocalizedString("cases_list.can_not_get_case_view", "Sorry, error occurred - can not generate case processor view."));
+		}
+		form.add(view);
+		/*
+		HtmlTag div = (HtmlTag)iwc.getApplication().createComponent(HtmlTag.COMPONENT_TYPE);
+		div.setValue("div");
+		form.add(div);
 		
-		return (CaseManagersProvider)WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
+		FaceletComponent facelet = (FaceletComponent)iwc.getApplication().createComponent(FaceletComponent.COMPONENT_TYPE);
+		facelet.setFaceletURI("/idegaweb/bundles/is.idega.idegaweb.egov.bpm.bundle/facelets/UICasesBPMAssetView.xhtml");
+		div.getChildren().add(facelet);
+		div.setValueBinding("rendered", iwc.getApplication().createValueBinding("#{casesBPMAssetsState.assetViewRendered}"));
+		*/
 	}
 }

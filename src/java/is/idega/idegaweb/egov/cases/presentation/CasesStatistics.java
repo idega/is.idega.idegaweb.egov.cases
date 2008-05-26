@@ -58,7 +58,7 @@ public class CasesStatistics extends CasesBlock {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		Collection statuses = null;
 		if (visibleStatuses == null) {
-			statuses = getBusiness().getCaseStatuses();
+			statuses = getCasesBusiness().getCaseStatuses();
 		} else {
 			statuses = new ArrayList();
 			StringTokenizer tok = new StringTokenizer(visibleStatuses, ",");
@@ -440,7 +440,7 @@ public class CasesStatistics extends CasesBlock {
 
 		private void addResult(IWContext iwc, Collection results, int prevID, HashMap statuses) throws FinderException, RemoteException {
 			if (prevID > -1) {
-				CaseType type = getBusiness().getCaseType(new Integer(prevID));
+				CaseType type = getCasesBusiness().getCaseType(new Integer(prevID));
 				Result res = new Result(prevID, type.getName(), statuses);
 				results.add(res);
 			}

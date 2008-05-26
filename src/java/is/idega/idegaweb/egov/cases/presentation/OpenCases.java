@@ -65,13 +65,13 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	@Override
 	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-
-		Collection<GeneralCase> cases = super.getCases(user);
-		Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getBusiness(), null);
+		Collection<GeneralCase> cases = getCasesBusiness().getCases(user, getCasesProcessorType());
+		Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
 		
-		if(cases != null)
+		if (cases != null) {
 			openCases.addAll(cases);
-		
+		}
+			
 		return openCases;
 	}
 
@@ -107,7 +107,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 		GeneralCase theCase = null;
 		try {
-			theCase = getBusiness().getGeneralCase(casePK);
+			theCase = getCasesBusiness().getGeneralCase(casePK);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -147,7 +147,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
-		if (getBusiness().useTypes()) {
+		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			Label label = new Label();
@@ -240,7 +240,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			bottom.add(next);
 		}
 
-		Link next = getButtonLink(theCase.getCaseStatus().equals(getBusiness().getCaseStatusPending()) ? getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
+		Link next = getButtonLink(theCase.getCaseStatus().equals(getCasesBusiness().getCaseStatusPending()) ? getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		next.setToFormSubmit(form);
 		bottom.add(next);

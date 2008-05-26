@@ -41,14 +41,15 @@ public class ClosedCases extends CasesProcessor {
 		return "closedCases";
 	}
 
-	protected Collection getCases(User user) throws RemoteException {
+	@Override
+	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
+		Collection<GeneralCase> cases = getCasesBusiness(getIWApplicationContext()).getCases(user, getCasesProcessorType());
+		Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
 		
-		Collection<GeneralCase> cases = super.getCases(user);
-		Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getBusiness(), null);
-		
-		if(cases != null)
+		if (cases != null) {
 			closedCases.addAll(cases);
-		
+		}
+			
 		return closedCases;
 	}
 
@@ -61,7 +62,7 @@ public class ClosedCases extends CasesProcessor {
 
 		GeneralCase theCase = null;
 		try {
-			theCase = getBusiness().getGeneralCase(casePK);
+			theCase = getCasesBusiness().getGeneralCase(casePK);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
@@ -112,7 +113,7 @@ public class ClosedCases extends CasesProcessor {
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
-		if (getBusiness().useTypes()) {
+		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			Label label = new Label();
@@ -239,7 +240,7 @@ public class ClosedCases extends CasesProcessor {
 		Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
 
 		try {
-			getBusiness().reactivateCase(casePK, iwc.getCurrentUser(), iwc);
+			getCasesBusiness().reactivateCase(casePK, iwc.getCurrentUser(), iwc);
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

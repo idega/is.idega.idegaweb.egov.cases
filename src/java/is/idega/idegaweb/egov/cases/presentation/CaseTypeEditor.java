@@ -106,7 +106,7 @@ public class CaseTypeEditor extends CasesBlock {
 		column = columnGroup.createColumn();
 		column.setSpan(2);
 
-		Collection types = getBusiness().getCaseTypes();
+		Collection types = getCasesBusiness().getCaseTypes();
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -198,7 +198,7 @@ public class CaseTypeEditor extends CasesBlock {
 
 		if (caseTypePK != null) {
 			try {
-				CaseType type = getBusiness().getCaseType(caseTypePK);
+				CaseType type = getCasesBusiness().getCaseType(caseTypePK);
 				
 				name.setContent(type.getName());
 				if (type.getDescription() != null) {
@@ -272,7 +272,7 @@ public class CaseTypeEditor extends CasesBlock {
 		}
 		
 		try {
-			getBusiness().storeCaseType(caseTypePK, name, description, order);
+			getCasesBusiness().storeCaseType(caseTypePK, name, description, order);
 			return true;
 		}
 		catch (FinderException e) {
@@ -287,7 +287,7 @@ public class CaseTypeEditor extends CasesBlock {
 	private void removeType(IWContext iwc) throws RemoteException {
 		String caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		try {
-			getBusiness().removeCaseType(caseTypePK);
+			getCasesBusiness().removeCaseType(caseTypePK);
 		}
 		catch (RemoveException re) {
 			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_type_failed", "You can't remove a case type that already has cases connected to it."));
