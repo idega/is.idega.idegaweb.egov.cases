@@ -128,8 +128,8 @@ function initializeCaseGrids(caseId, customerView) {
 			BPMProcessAssets.hasUserRolesEditorRights(piId, {
 				callback: function(hasRightChangeRights) {
 					initTasksGrid(caseId, piId, customerView, hasRightChangeRights);
-					initFormsGrid(piId, customerView, hasRightChangeRights);
-					initEmailsGrid(piId, customerView, hasRightChangeRights);
+					initFormsGrid(caseId, piId, customerView, hasRightChangeRights);
+					initEmailsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initContactsGrid(piId, customerView, hasRightChangeRights);
 				}
 			});
@@ -165,7 +165,7 @@ function initContactsGrid(piId, customerView, hasRightChangeRights) {
 	initCaseGrid(piId, customerView, 'caseContacts', populatingFunction, null, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
 }
 
-function initEmailsGrid(piId, customerView, hasRightChangeRights) {
+function initEmailsGrid(caseId, piId, customerView, hasRightChangeRights) {
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
 
@@ -196,13 +196,13 @@ function initEmailsGrid(piId, customerView, hasRightChangeRights) {
 	}
 	
 	var onSelectRowFunction = function(rowId) {
-		//	TODO: generate preview
+		setBPMProcessForPreview(caseId, rowId);
 	};
 	
 	initCaseGrid(piId, customerView, 'caseEmails', populatingFunction, subGridFunction, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
 }
 
-function initFormsGrid(piId, customerView, hasRightChangeRights) {
+function initFormsGrid(caseId, piId, customerView, hasRightChangeRights) {
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
 		params.rightsChanger = hasRightChangeRights;
@@ -235,7 +235,7 @@ function initFormsGrid(piId, customerView, hasRightChangeRights) {
 	}
 	
 	var onSelectRowFunction = function(rowId) {
-		//	TODO: generate preview
+		setBPMProcessForPreview(caseId, rowId);
 	};
 	
 	initCaseGrid(piId, customerView, 'caseForms', populatingFunction, subGridFunction, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
@@ -268,29 +268,14 @@ function initTasksGrid(caseId, piId, customerView, hasRightChangeRights) {
 	}
 	
 	var onSelectRowFunction = function(rowId) {
-		/*var link = jQuery('a.processResourceViewerStyleClass');
-		if (link == null || link.length == 0) {
-			return false;
-		}
-		var newHref = link.attr('href') + '&prm_case_pk=' + caseId + '&cp_prm_action=2';
-		link.attr('href', newHref);
-		link.click();*/
-		
-		jQuery('#state_viewSelected').attr('value', rowId);
-		//jQuery('form.mainCasesListForm').submit();
-		setCurrentWindowToDownloadCaseResource('&prm_case_pk=' + caseId + '&taskInstanceId=' + rowId + '&cp_prm_action=8&bpm_reosurce_type=task', 'processResourceViewerStyleClass');
-		
-		/*showLoadingMessage('');
-		BPMProcessAssets.getViewDisplay(rowId, {
-			callback: function(component) {
-				closeAllLoadingMessages();
-				
-				insertNodesToContainer(component, document.getElementById('content'));
-			}
-		});*/
+		setBPMProcessForPreview(caseId, rowId);
 	};
 	
 	initCaseGrid(piId, customerView, 'caseTasks', populatingFunction, null, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
+}
+
+function setBPMProcessForPreview(caseId, taskInstanceId) {
+	changeWindowLocationHref('prm_case_pk=' + caseId + '&taskInstanceId=' + taskInstanceId + '&cp_prm_action=8');
 }
 
 function initCaseGrid(piId, customerView, tableClassName, populatingFunction, subGridForThisGrid, namesForColumns, modelForColumns, onSelectRowFunction, rightsChanger) {
@@ -326,6 +311,8 @@ function initCaseGrid(piId, customerView, tableClassName, populatingFunction, su
 	grid.createGrid(table, params);
 	
 	jQuery(table).addClass('scroll');
+	jQuery(table).attr('cellpadding', 0);
+	jQuery(table).attr('cellspacing', 0);
 }
 
 function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights) {
@@ -405,7 +392,7 @@ function showCustomerViewForCase(component, callbackFunction) {
 	}
 }
 
-function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, setSameRightsForAttachments) {	
+function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, variableName, setSameRightsForAttachments) {	
 	var element = jQuery('#' + id);
 	if (element == null || event == null) {
 		return false;
@@ -420,7 +407,8 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, s
 	var yCoord = offsets.top;
 	
 	if (event) {
-		event.stopPropagation();
+		alert('stop prop');
+		//event.stopPropagation();
 	}
 	
 	var rightsBoxId = 'caseProcessResourceAccessRightsSetterBox';
@@ -436,7 +424,7 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, s
 	rightsBox.css('top', yCoord + 'px');
 	rightsBox.css('left', xCoord + 'px');
 	
-	BPMProcessAssets.getAccessRightsSetterBox(processId, taskId, setSameRightsForAttachments, {
+	BPMProcessAssets.getAccessRightsSetterBox(processId, taskId, variableName, setSameRightsForAttachments, {
 		callback: function(component) {
 			if (component == null) {
 				return false;
@@ -448,7 +436,7 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, s
 	});
 }
 
-function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, sameRightsSetterId) {
+function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, variableName, sameRightsSetterId) {
 	var element = document.getElementById(id);
 	if (element == null) {
 		return false;
@@ -463,7 +451,7 @@ function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, sam
 		}
 	}
 	
-	BPMProcessAssets.setAccessRightsForProcessResource(element.name, taskInstanceId, canAccess, setSameRightsForAttachments);
+	BPMProcessAssets.setAccessRightsForProcessResource(element.name, taskInstanceId, variableName, canAccess, setSameRightsForAttachments);
 }
 
 function closeAccessRightsSetterBox() {

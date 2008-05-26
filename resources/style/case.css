@@ -78,7 +78,7 @@ div.casesListHeadersContainer {
 	overflow: hidden;
 }
 
-div.casesListHeadersContainerItem, div.casesListCaseContainer div {
+div.casesListHeadersContainerItem, div.casesListBodyContainerItem {
 	float: left;
 }
 
@@ -190,4 +190,29 @@ div.caseProcessResourceAccessRightsSetterStyle {
 	border: 1px solid #D7D7D7;
 	padding: 3px;
 	background-color: #fff;
+}
+
+div.caseGrids {
+	border: 1px #a0a0a0 solid;
+	background-color: #fff;
+	margin-top: 8px;
+	margin-bottom: 3px;
+	width: 614px !important;
+	clear: both;
+}
+
+div.caseGrids div {
+	height: auto !important;
+	width: auto !important;
+}
+
+div.caseGrids div.header {
+	display: block !important;
+	float: none;
+	width: 598px;
+	line-height: 22px;
+	height: 22px;
+	font-weight: bold;
+	padding: 0 8px;
+	border-bottom: 1px #a0a0a0 solid;
 }

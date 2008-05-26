@@ -586,11 +586,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	protected abstract Collection<GeneralCase> getCases(User user) throws RemoteException;
 	
-	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {	//	TODO: finish	
-		Form form = new Form();
-		add(form);
-		form.maintainParameter(PARAMETER_CASE_PK);
-
+	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {
 		GeneralCaseProcessorViewBuilder processorView = (GeneralCaseProcessorViewBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCaseProcessorViewBuilder.SPRING_BEAN_IDENTIFIER);
 		UIComponent view = null;
 		try {
@@ -601,16 +597,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		if (view == null) {
 			view = new Heading3(getResourceBundle(iwc).getLocalizedString("cases_list.can_not_get_case_view", "Sorry, error occurred - can not generate case processor view."));
 		}
-		form.add(view);
-		/*
-		HtmlTag div = (HtmlTag)iwc.getApplication().createComponent(HtmlTag.COMPONENT_TYPE);
-		div.setValue("div");
-		form.add(div);
-		
-		FaceletComponent facelet = (FaceletComponent)iwc.getApplication().createComponent(FaceletComponent.COMPONENT_TYPE);
-		facelet.setFaceletURI("/idegaweb/bundles/is.idega.idegaweb.egov.bpm.bundle/facelets/UICasesBPMAssetView.xhtml");
-		div.getChildren().add(facelet);
-		div.setValueBinding("rendered", iwc.getApplication().createValueBinding("#{casesBPMAssetsState.assetViewRendered}"));
-		*/
+		add(view);
 	}
 }
