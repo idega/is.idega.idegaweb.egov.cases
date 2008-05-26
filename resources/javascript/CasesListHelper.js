@@ -17,7 +17,7 @@ var CASE_GRID_STRING_SUBMITTED_BY = 'Submitted by';
 var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
 var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
 
-function initializeCasesList() {
+function initializeCasesList(caseToOpenId) {
 	/*DWREngine.setErrorHandler(function() {	//	TODO: uncomment
 		closeAllLoadingMessages();
 		//	TODO: close 'Loading...' for grids
@@ -30,7 +30,7 @@ function initializeCasesList() {
 	CasesEngine.getLocalizedStrings({
 		callback: function(data) {
 			setCasesListLocalizations(data);
-			continueInitializeCasesList();
+			continueInitializeCasesList(caseToOpenId);
 		}
 	});
 }
@@ -61,13 +61,14 @@ function setCasesListLocalizations(data) {
 	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[16];
 }
 
-function continueInitializeCasesList() {
+function continueInitializeCasesList(caseToOpenId) {
 	var togglers = jQuery('div.casesListBodyContainerItemToggler');
 	if (togglers == null || togglers.length == 0) {
 		return false;
 	}
 	
 	var toggler = null;
+	var caseIdPar = 'caseid';
 	var classExpanded = 'expanded';
 	var classCaseWithInfo = 'caseWithInfo';
 	for (var i = 0; i < togglers.length; i++) {
@@ -95,7 +96,7 @@ function continueInitializeCasesList() {
 				}
 				
 				showLoadingMessage('');
-				var caseId = caseToExpand.attr('caseid');
+				var caseId = caseToExpand.attr(caseIdPar);
 				CasesEngine.getInfoForCase(caseId, {
 					callback: function(component) {
 						closeAllLoadingMessages();
@@ -115,6 +116,15 @@ function continueInitializeCasesList() {
 				customerView.hide('fast');
 			}
 		});
+	}
+	
+	if (caseToOpenId != null && caseToOpenId != '') {
+		for (var i = 0; i < togglers.length; i++) {
+			toggler = jQuery(togglers[i]);
+			if (caseToOpenId == toggler.attr(caseIdPar)) {
+				toggler.click();
+			}
+		}
 	}
 }
 
@@ -302,7 +312,7 @@ function initCaseGrid(piId, customerView, tableClassName, populatingFunction, su
 		params.subGridRowExpanded = null;
 	}
 	else {
-		jQuery(table).attr('id', piId);
+		jQuery(table).attr('id', 'tableForTaskInstance_' + piId);
 		params.subGrid = true;
 		params.subGridRowExpanded = subGridForThisGrid;
 	}
@@ -328,7 +338,7 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 				callback(result);
 			}
 		});
-       };
+	};
 
 	var namesForColumns = new Array();
 	namesForColumns.push(CASE_GRID_STRING_FILE_NAME);
@@ -392,7 +402,7 @@ function showCustomerViewForCase(component, callbackFunction) {
 	}
 }
 
-function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, variableName, setSameRightsForAttachments) {	
+function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, fileHashValue, setSameRightsForAttachments) {	
 	var element = jQuery('#' + id);
 	if (element == null || event == null) {
 		return false;
@@ -407,8 +417,7 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, v
 	var yCoord = offsets.top;
 	
 	if (event) {
-		alert('stop prop');
-		//event.stopPropagation();
+		event.stopPropagation();
 	}
 	
 	var rightsBoxId = 'caseProcessResourceAccessRightsSetterBox';
@@ -424,7 +433,7 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, v
 	rightsBox.css('top', yCoord + 'px');
 	rightsBox.css('left', xCoord + 'px');
 	
-	BPMProcessAssets.getAccessRightsSetterBox(processId, taskId, variableName, setSameRightsForAttachments, {
+	BPMProcessAssets.getAccessRightsSetterBox(processId, taskId, fileHashValue, setSameRightsForAttachments, {
 		callback: function(component) {
 			if (component == null) {
 				return false;
@@ -436,7 +445,7 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, v
 	});
 }
 
-function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, variableName, sameRightsSetterId) {
+function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, fileHashValue, sameRightsSetterId) {
 	var element = document.getElementById(id);
 	if (element == null) {
 		return false;
@@ -451,7 +460,7 @@ function setAccessRightsForBpmRelatedResource(id, processId, taskInstanceId, var
 		}
 	}
 	
-	BPMProcessAssets.setAccessRightsForProcessResource(element.name, taskInstanceId, variableName, canAccess, setSameRightsForAttachments);
+	BPMProcessAssets.setAccessRightsForProcessResource(element.name, taskInstanceId, fileHashValue, canAccess, setSameRightsForAttachments);
 }
 
 function closeAccessRightsSetterBox() {

@@ -289,16 +289,27 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		List<String> css = new ArrayList<String>();
 		css.add(web2Business.getBundleURIToJQGridStyles());
 		
-		String initAction = "initializeCasesList();";
+		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
+		if (caseId == null || CoreConstants.EMPTY.equals(caseId)) {
+			caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK + "_id");
+		}
+		StringBuilder action = new StringBuilder("initializeCasesList(");
+		if (caseId == null || CoreConstants.EMPTY.equals(action)) {
+			action.append("null");
+		}
+		else {
+			action.append("'").append(caseId).append("'");
+		}
+		action.append(");");
 		if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			container.add(PresentationUtil.getJavaScriptSourceLines(scripts));
 			container.add(PresentationUtil.getStyleSheetsSourceLines(css));
-			container.add(PresentationUtil.getJavaScriptAction(initAction));
+			container.add(PresentationUtil.getJavaScriptAction(action.toString()));
 		}
 		else {
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 			PresentationUtil.addStyleSheetsToHeader(iwc, css);
-			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(document).ready(function() {"+initAction+"});");
+			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(document).ready(function() {"+action.toString()+"});");
 		}
 	}
 	
