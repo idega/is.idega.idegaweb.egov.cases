@@ -10,6 +10,7 @@ package is.idega.idegaweb.egov.cases.data;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.util.Collection;
+import java.util.logging.Level;
 
 import javax.ejb.FinderException;
 
@@ -198,6 +199,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			}
 		}
 
+		log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
 
