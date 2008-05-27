@@ -15,6 +15,7 @@ import is.idega.idegaweb.egov.cases.presentation.beans.GeneralCaseProcessorViewB
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,7 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
+import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
@@ -415,7 +417,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
 		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
-		form.add(listBuilder.getCasesList(iwc, getCasesProcessorType(), getPrefix(), showCheckBoxes));
+		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getPrefix(), showCheckBoxes));
 	}
 
 	protected void showMultiProcessForm(IWContext iwc) throws RemoteException {
@@ -575,7 +577,36 @@ public abstract class CasesProcessor extends CasesBlock {
 			}
 		}
 	}
-
+	
+	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
+		log(Level.INFO, "User: " + user + ", cases type: " + getCasesProcessorType());
+		List<CaseManager> caseHandlers = getCasesBusiness().getCaseHandlersProvider().getCaseHandlers();
+		Collection<GeneralCase> cases = null;
+		log(Level.INFO, "Case handlers: " + caseHandlers);
+		
+		for (CaseManager handler : caseHandlers) {
+			
+			@SuppressWarnings("unchecked")
+			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, getCasesProcessorType());
+			
+			if(cazes != null) {
+				
+				if(cases == null)
+					cases = cazes;
+				else
+					cases.addAll(cazes);
+			}
+		}
+		
+		if (cases == null || cases.isEmpty()) {
+			log(Level.INFO, "NO CASES - null!");
+		}
+		else {
+			log(Level.INFO, "Found cases: " + cases + ", totally: " + cases.size());
+		}
+		return cases;
+	}
+	
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
 	
 	protected abstract String getCasesProcessorType();
@@ -583,8 +614,6 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
 	protected abstract boolean showCheckBox();
-	
-	protected abstract Collection<GeneralCase> getCases(User user) throws RemoteException;
 	
 	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {
 		GeneralCaseProcessorViewBuilder processorView = (GeneralCaseProcessorViewBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCaseProcessorViewBuilder.SPRING_BEAN_IDENTIFIER);
