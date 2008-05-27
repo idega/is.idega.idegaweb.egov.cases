@@ -121,7 +121,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, String prefix, boolean showCheckBoxes,
-			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls) {
+			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -133,6 +133,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		CaseManager caseManager = null;
 		if (theCase.getCaseManagerType() != null) {
 			caseManager = getCasesBusiness(iwc).getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
+			showCheckBoxes = false;
 		}
 //		if (rowsCounter % 2 == 0) {
 //			caseManager = null;
@@ -164,8 +165,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
 		String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
+		logger.log(Level.INFO, "Case identifier: " + caseIdentifier + " for: " + theCase);
 		numberContainer.setStyleClass("firstColumn");
-		numberContainer.add(new Text(caseIdentifier));
+		numberContainer.add(caseManager == null ? caseIdentifier : getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
 
 		//	Sender
 		Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
@@ -257,6 +259,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return caseContainer;
 	}
 	
+	private String getEmailAddressMailtoFormattedWithSubject(String emailAddress, String subject) {
+		if (emailAddress == null || CoreConstants.EMPTY.equals(emailAddress)) {
+			return subject;
+		}
+		
+		return new StringBuilder("<a href=\"mailto:").append(emailAddress).append("?subject=(").append(subject).append(")\">").append(subject).append("</a>").toString();
+	} 
+	
 	@SuppressWarnings("unchecked")
 	public UIComponent getCasesList(IWContext iwc, Collection cases, String prefix, boolean showCheckBoxes) {		
 		if (cases == null || cases.isEmpty()) {	//	TODO: remove
@@ -265,6 +275,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		else {
 			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
 		}
+		
+		String emailAddress = getDefaultEmail(iwc);
 		
 		Layer container = new Layer();
 
@@ -300,11 +312,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (o instanceof GeneralCase) {
 				genCase = (GeneralCase) o;
 				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, prefix, showCheckBoxes, genCase.isPrivate(), false,
-						rowsCounter, null, false);
+						rowsCounter, null, false, emailAddress);
 			}
 			else if (o instanceof Case) {
 				caseContainer = addRowToCasesList(iwc, casesBodyContainer, (Case) o, caseStatusReview, l, prefix, showCheckBoxes, false, false, rowsCounter, null,
-						false);
+						false, emailAddress);
 			}
 			rowsCounter++;
 		}
@@ -323,6 +335,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		else {
 			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
 		}
+		
+		String emailAddress = getDefaultEmail(iwc);
 		
 		Layer container = new Layer();
 
@@ -354,12 +368,22 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		for (Case theCase: cases) {			
 			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, false, false, true, rowsCounter, pages,
-					addCredentialsToExernalUrls);
+					addCredentialsToExernalUrls, emailAddress);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
 
 		return container;
+	}
+	
+	private String getDefaultEmail(IWContext iwc) {
+		try {
+			return iwc.getApplicationSettings().getProperty(CoreConstants.PROP_SYSTEM_ACCOUNT);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode, CaseStatus caseStatus,

@@ -8,7 +8,7 @@ import com.idega.presentation.IWContext;
 
 public interface GeneralCaseProcessorViewBuilder {
 
-	public static final String SPRING_BEAN_IDENTIFIER = "GenericCaseProcessorViewBuilder";
+	public static final String SPRING_BEAN_IDENTIFIER = "GeneralCaseProcessorViewBuilder";
 	
 	public UIComponent getCaseProcessorView(IWContext iwc) throws RemoteException;
 	

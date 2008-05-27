@@ -412,7 +412,10 @@ function downloadCaseDocument(event, taskId) {
 	setCurrentWindowToDownloadCaseResource(uri, CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS);
 	
 	if (event) {
-		event.stopPropagation();
+		if (event.stopPropagation) {
+			event.stopPropagation();
+		}
+		event.cancelBubble = true;
 	}
 }
 
@@ -439,10 +442,10 @@ function setCurrentWindowToDownloadCaseResource(uri, styleClass) {
 function showCustomerViewForCase(component, callbackFunction) {
 	var displayProperty = 'fast';
 	if (callbackFunction == null) {
-		component.show(displayProperty);
+		jQuery(component).show(displayProperty);
 	}
 	else {
-		component.show(displayProperty, function() {
+		jQuery(component).show(displayProperty, function() {
 			callbackFunction();
 		});
 	}
@@ -463,7 +466,10 @@ function changeAccessRightsForBpmRelatedResource(event, processId, taskId, id, f
 	var yCoord = offsets.top;
 	
 	if (event) {
-		event.stopPropagation();
+		if (event.stopPropagation) {
+			event.stopPropagation();
+		}
+		event.cancelBubble = true;
 	}
 	
 	var rightsBoxId = 'caseProcessResourceAccessRightsSetterBox';

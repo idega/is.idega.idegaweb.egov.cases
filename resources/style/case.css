@@ -218,3 +218,11 @@ div.caseGrids div.header {
 	padding: 0 8px;
 	border-bottom: 1px #a0a0a0 solid;
 }
+
+a.casesBPMAttachmentDownloader {
+	display: none;
+}
+
+a.casesBPMPDFGeneratorAndDownloader {
+	display: none;
+}
