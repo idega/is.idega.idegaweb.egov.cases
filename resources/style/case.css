@@ -84,7 +84,6 @@ div.casesListHeadersContainerItem, div.casesListBodyContainerItem {
 
 div.casesListCaseContainer {
 	overflow: hidden;
-	padding: 3px;
 	border-bottom: 1px solid #D7D7D7;
 }
 
@@ -163,12 +162,15 @@ div.casesListBodyContainerItem {
 }
 
 div.expand {
-	background: transparent url(../edit.png) no-repeat scroll left top;
+	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit.png) no-repeat scroll left top;
 	cursor: pointer;
+	height: 16px;
 }
+
 div.expanded {
-	background: transparent url(../edit_expanded.png) no-repeat scroll left top;
+	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit_expanded.png) no-repeat scroll left top;
 	cursor: pointer;
+	height: 16px;
 }
 
 img.downloadCaseAsPdfStyle {
