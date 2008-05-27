@@ -170,7 +170,7 @@ function initializeCaseGrids(caseId, customerView) {
 			
 			BPMProcessAssets.hasUserRolesEditorRights(piId, {
 				callback: function(hasRightChangeRights) {
-					initTasksGrid(caseId, piId, customerView, hasRightChangeRights);
+					initTasksGrid(caseId, piId, customerView, /*hasRightChangeRights*/false);	//	TODO
 					initFormsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initEmailsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initContactsGrid(piId, customerView, hasRightChangeRights);
@@ -403,9 +403,13 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 	subgrid.createGrid("#"+subgridTableId, subGridParams);
 }
 
-function downloadCaseDocument(taskId) {
+function downloadCaseDocument(event, taskId) {
 	var uri = '&taskInstnaceId=' + taskId;
 	setCurrentWindowToDownloadCaseResource(uri, CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS);
+	
+	if (event) {
+		event.stopPropagation();
+	}
 }
 
 function setCurrentWindowToDownloadCaseResource(uri, styleClass) {
