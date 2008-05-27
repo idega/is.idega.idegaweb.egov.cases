@@ -8,6 +8,7 @@ var CASE_GRID_STRING_EMAIL_ADDRESS = 'E-mail address';
 var CASE_GRID_STRING_PHONE_NUMBER = 'Phone number';
 var CASE_GRID_STRING_ADDRESS = 'Address';
 var CASE_GRID_STRING_SUBJECT = 'Subject';
+var CASE_GRID_STRING_FILE_DESCRIPTION = 'Descriptive name';
 var CASE_GRID_STRING_FILE_NAME = 'File name';
 var CASE_GRID_STRING_CHANGE_ACCESS_RIGHTS = 'Change access rights';
 var CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = 'Download document';
@@ -68,6 +69,7 @@ function setCasesListLocalizations(data) {
 	//	Other info
 	CASE_ATTACHEMENT_LINK_STYLE_CLASS = data[15];
 	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[16];
+	CASE_GRID_STRING_FILE_DESCRIPTION = data[17];
 }
 
 function continueInitializeCasesList(caseToOpenId) {
@@ -379,6 +381,7 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 	};
 
 	var namesForColumns = new Array();
+	namesForColumns.push(CASE_GRID_STRING_FILE_DESCRIPTION);
 	namesForColumns.push(CASE_GRID_STRING_FILE_NAME);
 	namesForColumns.push(CASE_GRID_STRING_FILE_SIZE);
 	if (subGridParams.rightsChanger) {
@@ -387,6 +390,7 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 	subGridParams.colNames = namesForColumns;
 	
 	var modelForColumns = new Array();
+	modelForColumns.push({name:'description',index:'description'});
 	modelForColumns.push({name:'name',index:'name'});
 	modelForColumns.push({name:'fileSize',index:'fileSize'});
 	if (subGridParams.rightsChanger) {
