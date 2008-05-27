@@ -48,15 +48,15 @@ public class MyCases extends CasesProcessor {
 		return "myCases";
 	}
 
-	@Override
-	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		Collection<GeneralCase> cases = getCasesBusiness().getCases(user, getCasesProcessorType());
+	@SuppressWarnings("unchecked")
+	protected Collection getCases(User user) throws RemoteException {
+		
+		Collection<GeneralCase> cases = super.getCases(user);
 		Collection<GeneralCase> myCases = getCasesBusiness().getMyCases(user);
 		
-		if (cases != null) {
+		if(cases != null)
 			myCases.addAll(cases);
-		}
-			
+		
 		return myCases;
 	}
 

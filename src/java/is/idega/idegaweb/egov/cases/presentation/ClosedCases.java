@@ -41,15 +41,14 @@ public class ClosedCases extends CasesProcessor {
 		return "closedCases";
 	}
 
-	@Override
-	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		Collection<GeneralCase> cases = getCasesBusiness(getIWApplicationContext()).getCases(user, getCasesProcessorType());
+	protected Collection getCases(User user) throws RemoteException {
+		
+		Collection<GeneralCase> cases = super.getCases(user);
 		Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
 		
-		if (cases != null) {
+		if(cases != null)
 			closedCases.addAll(cases);
-		}
-			
+		
 		return closedCases;
 	}
 

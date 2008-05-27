@@ -65,13 +65,13 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	@Override
 	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		Collection<GeneralCase> cases = getCasesBusiness().getCases(user, getCasesProcessorType());
+
+		Collection<GeneralCase> cases = super.getCases(user);
 		Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
 		
-		if (cases != null) {
+		if(cases != null)
 			openCases.addAll(cases);
-		}
-			
+		
 		return openCases;
 	}
 
