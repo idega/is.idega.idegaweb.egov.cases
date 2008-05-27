@@ -22,7 +22,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 
 import javax.ejb.CreateException;
@@ -32,7 +31,6 @@ import javax.faces.context.FacesContext;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
-import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
@@ -784,26 +782,34 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 	
-	public Collection<GeneralCase> getCases(User user, String casesProcessorType) throws RemoteException {
-		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
-		Collection<GeneralCase> cases = null;
-		
-		for (CaseManager handler : caseHandlers) {
-			
-			@SuppressWarnings("unchecked")
-			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
-			
-			if(cazes != null) {
-				
-				if(cases == null)
-					cases = cazes;
-				else
-					cases.addAll(cazes);
-			}
-		}
-		
-		return cases;
-	}
+//	public Collection<GeneralCase> getCases(User user, String casesProcessorType) throws RemoteException {
+//		log(Level.INFO, "User: " + user + ", cases type: " + casesProcessorType);
+//		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
+//		Collection<GeneralCase> cases = null;
+//		log(Level.INFO, "Case handlers: " + caseHandlers);
+//		
+//		for (CaseManager handler : caseHandlers) {
+//			
+//			@SuppressWarnings("unchecked")
+//			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
+//			
+//			if(cazes != null) {
+//				
+//				if(cases == null)
+//					cases = cazes;
+//				else
+//					cases.addAll(cazes);
+//			}
+//		}
+//		
+//		if (cases == null || cases.isEmpty()) {
+//			log(Level.INFO, "NO CASES - null!");
+//		}
+//		else {
+//			log(Level.INFO, "Found cases: " + cases + ", totally: " + cases.size());
+//		}
+//		return cases;
+//	}
 	
 	public CaseManagersProvider getCaseHandlersProvider() {
 		return (CaseManagersProvider)WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);

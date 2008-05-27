@@ -227,7 +227,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	
 	public Collection<CaseType> getCaseTypesByName(String name) throws RemoteException;
 	
-	public Collection<GeneralCase> getCases(User user, String casesProcessorType) throws RemoteException;
+//	public Collection<GeneralCase> getCases(User user, String casesProcessorType) throws RemoteException;
 	
 	public CaseManagersProvider getCaseHandlersProvider();
 }
