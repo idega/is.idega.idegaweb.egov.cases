@@ -10,12 +10,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.ejb.EJBException;
 import javax.faces.component.UIComponent;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.idega.block.process.business.CaseBusiness;
+import com.idega.block.process.business.CaseCodeManager;
 import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
@@ -24,11 +30,14 @@ import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.SpringBeanLookup;
+import com.idega.core.accesscontrol.business.CredentialBusiness;
+import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Heading3;
@@ -47,10 +56,13 @@ import com.idega.util.text.Name;
 @Service(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER)
 public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
+	private static final Logger logger = Logger.getLogger(CasesListBuilderImpl.class.getName());
+	
 	private IWBundle bundle = null;
 	private IWResourceBundle iwrb = null;
 	
 	private CasesBusiness casesBusiness = null;
+	private CredentialBusiness credentialBusiness = null;
 	
 	private String caseContainerStyle = "casesListCaseContainer";
 	private String bodyItem = "casesListBodyContainerItem";
@@ -109,7 +121,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, String prefix, boolean showCheckBoxes,
-			boolean isPrivate, int rowsCounter) {
+			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -139,6 +151,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 		}
 		
+		boolean notGeneralCase = !(theCase instanceof GeneralCase);
+		CaseBusiness caseBusiness = null;
+		if (notGeneralCase) {
+			try {
+				caseBusiness = CaseCodeManager.getInstance().getCaseBusinessOrDefault(theCase.getCaseCode(), iwc);
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
 		String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
@@ -152,7 +174,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Description
 		Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
-		String subject = theCase.getSubject();
+		String subject = null;
+		if (notGeneralCase) {
+			try {
+				subject = caseBusiness.getCaseSubject(theCase, l);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			subject = theCase.getSubject();
+		}
 		descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
 
 		//	Creation date
@@ -161,19 +193,33 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		//	Status
 		String localizedStatus = null;
-		try {
-			localizedStatus = getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, l);
-		} catch (RemoteException e) {
-			e.printStackTrace();
+		if (theCase instanceof GeneralCase) {
+			try {
+				localizedStatus = getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, l);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			try {
+				localizedStatus = caseBusiness.getLocalizedCaseStatusDescription(theCase, status, l);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 		addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
-
+		
 		//	Controller
 		Layer customerView = null;
 		UIComponent childForContainer = null;
 		if (caseManager == null) {
-			childForContainer = getProcessLink(getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString(prefix + "view_case", "View case")),
-					theCase);
+			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString(prefix + "view_case", "View case"));
+			if (isUserList) {
+				childForContainer = getLinkToViewUserCase(iwc, theCase, caseBusiness, view, pages, theCase.getCode(), status, addCredentialsToExernalUrls);
+			}
+			else {
+				childForContainer = getProcessLink(iwc, view, theCase);
+			}
 		}
 		else {
 			childForContainer = Text.getNonBrakingSpace(10);
@@ -211,7 +257,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return caseContainer;
 	}
 	
-	public UIComponent getCasesList(IWContext iwc, String caseProcessorType, String prefix, boolean showCheckBoxes) {			
+	@SuppressWarnings("unchecked")
+	public UIComponent getCasesList(IWContext iwc, Collection cases, String prefix, boolean showCheckBoxes) {		
+		if (cases == null || cases.isEmpty()) {	//	TODO: remove
+			logger.log(Level.INFO, "NO CASES - null!");
+		}
+		else {
+			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
+		}
+		
 		Layer container = new Layer();
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -221,12 +275,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		Collection<GeneralCase> cases = null;
-		try {
-			cases = casesBusiness.getCases(iwc. getCurrentUser(), caseProcessorType);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
 		int totalCases = (cases == null || cases.isEmpty()) ? 0 : cases.size();
 		
 		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, showCheckBoxes);
@@ -246,17 +294,36 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		for(GeneralCase theCase: cases) {			
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, showCheckBoxes, theCase.isPrivate(), rowsCounter);
+
+		GeneralCase genCase = null;
+		for (Object o: cases) {
+			if (o instanceof GeneralCase) {
+				genCase = (GeneralCase) o;
+				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, prefix, showCheckBoxes, genCase.isPrivate(), false,
+						rowsCounter, null, false);
+			}
+			else if (o instanceof Case) {
+				caseContainer = addRowToCasesList(iwc, casesBodyContainer, (Case) o, caseStatusReview, l, prefix, showCheckBoxes, false, false, rowsCounter, null,
+						false);
+			}
 			rowsCounter++;
 		}
-		caseContainer.setStyleClass(lastRowStyle);
+		if (caseContainer != null) {
+			caseContainer.setStyleClass(lastRowStyle);
+		}
 		
 		return container;
 	}
 	
 	//	TODO: test this
-	public UIComponent getCasesList(IWContext iwc, Collection<Case> cases, String prefix) {
+	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String prefix, boolean addCredentialsToExernalUrls) {
+		if (cases == null || cases.isEmpty()) {	//	TODO: remove
+			logger.log(Level.INFO, "NO CASES - null!");
+		}
+		else {
+			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
+		}
+		
 		Layer container = new Layer();
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -285,8 +352,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		for(Case theCase: cases) {			
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, false, false, rowsCounter);
+		for (Case theCase: cases) {			
+			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, false, false, true, rowsCounter, pages,
+					addCredentialsToExernalUrls);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
@@ -294,8 +362,95 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
-	public Link getProcessLink(PresentationObject object, Case theCase) {
+	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode, CaseStatus caseStatus,
+			boolean addCredentialsToExernalUrls) {
+		ICPage page = getPage(pages, caseCode, caseStatus == null ? null : caseStatus.getStatus());
+		String caseUrl = null;
+		try {
+			caseUrl = caseBusiness.getUrl(theCase);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		if (page != null) {
+			Link link = new Link(viewCaseImage);
+			link.setStyleClass("caseEdit");
+			link.setToolTip(getToolTipForLink(iwc));
+			
+			Class<?> eventListener = null;
+			try {
+				eventListener = caseBusiness.getEventListener();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			if (eventListener != null) {
+				link.setEventListener(eventListener);
+			}
+			Map parameters = null;
+			try {
+				parameters = caseBusiness.getCaseParameters(theCase);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			if (parameters != null) {
+				link.setParameter(parameters);
+			}
+			
+			try {
+				link.addParameter(caseBusiness.getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (EJBException e) {
+				e.printStackTrace();
+			}
+			link.setPage(page);
+			return link;
+		}
+		else if (caseUrl != null) {
+			Link link = new Link(viewCaseImage, caseUrl);
+			link.setStyleClass("caseEdit");
+			link.setToolTip(getResourceBundle(iwc).getLocalizedString("view_case", "View case"));
+			if (addCredentialsToExernalUrls) {
+				try {
+					getCredentialBusiness(iwc).addCredentialsToLink(link, iwc);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			return link;
+		}
+		
+		return null;
+	}
+	
+	private ICPage getPage(Map pages, String caseCode, String caseStatus) {
+		if (pages == null) {
+			return null;
+		}
+		
+		try {
+			Object object = pages.get(caseCode);
+			if (object instanceof ICPage) {
+				return (ICPage) object;
+			}
+			else if (object instanceof Map) {
+				Map statusMap = (Map) object;
+				return (ICPage) statusMap.get(caseStatus);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	private String getToolTipForLink(IWContext iwc) {
+		return getResourceBundle(iwc).getLocalizedString("view_case", "View case");
+	}
+	
+	private Link getProcessLink(IWContext iwc, PresentationObject object, Case theCase) {
 		Link process = new Link(object);
+		process.setToolTip(getToolTipForLink(iwc));
 		
 		process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 		process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
@@ -358,6 +513,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return casesBusiness;
 	}
 	
+	private CredentialBusiness getCredentialBusiness(IWApplicationContext iwac) {
+		if (credentialBusiness == null) {
+			try {
+				credentialBusiness = (CredentialBusiness) IBOLookup.getServiceInstance(iwac, CredentialBusiness.class);
+			}
+			catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+		}
+		return credentialBusiness;
+	}
 	
 	private IWBundle getBundle(IWContext iwc) {
 		if (bundle == null) {
