@@ -8,6 +8,7 @@ import is.idega.idegaweb.egov.cases.util.CaseConstants;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
+import com.idega.block.process.util.CaseComparator;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -272,6 +274,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	} 
 	
 	@SuppressWarnings("unchecked")
+	private List<Case> getSortedCases(Collection cases) {
+		List<Case> casesInList = new ArrayList<Case>(cases);
+		Collections.sort(casesInList, new CaseComparator());
+		return casesInList;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public UIComponent getCasesList(IWContext iwc, Collection cases, String prefix, boolean showCheckBoxes) {		
 		if (cases == null || cases.isEmpty()) {	//	TODO: remove
 			logger.log(Level.INFO, "NO CASES - null!");
@@ -279,6 +288,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		else {
 			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
 		}
+		
+		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
 		
@@ -291,7 +302,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		int totalCases = (cases == null || cases.isEmpty()) ? 0 : cases.size();
+		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
 		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, showCheckBoxes);
 		
@@ -312,7 +323,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 
 		GeneralCase genCase = null;
-		for (Object o: cases) {
+		for (Object o: casesInList) {
 			if (o instanceof GeneralCase) {
 				genCase = (GeneralCase) o;
 				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, prefix, showCheckBoxes, genCase.isPrivate(), false,
@@ -341,6 +352,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
 		}
 		
+		List<Case> casesInList = getSortedCases(cases);
+		
 		String emailAddress = getDefaultEmail(iwc);
 		
 		Layer container = new Layer();
@@ -352,7 +365,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		int totalCases = (cases == null || cases.isEmpty()) ? 0 : cases.size();
+		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
 		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, false);
 		
@@ -371,7 +384,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		for (Case theCase: cases) {			
+		for (Case theCase: casesInList) {			
 			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, false, false, true, rowsCounter, pages,
 					addCredentialsToExernalUrls, emailAddress);
 			rowsCounter++;
