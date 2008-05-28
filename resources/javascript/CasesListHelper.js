@@ -174,7 +174,7 @@ function initializeCaseGrids(caseId, customerView) {
 			
 			BPMProcessAssets.hasUserRolesEditorRights(piId, {
 				callback: function(hasRightChangeRights) {
-					initTasksGrid(caseId, piId, customerView, /*hasRightChangeRights*/false);	//	TODO
+					initTasksGrid(caseId, piId, customerView, /*hasRightChangeRights*/false);	//	TODO: currently we are not managing access rights for tasks
 					initFormsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initEmailsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initContactsGrid(piId, customerView, hasRightChangeRights);
@@ -185,12 +185,16 @@ function initializeCaseGrids(caseId, customerView) {
 }
 
 function initContactsGrid(piId, customerView, hasRightChangeRights) {
+	var identifier = 'caseContacts';
+	
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
 		
 		BPMProcessAssets.getProcessContactsList(params, {
 			callback: function(result) {
 				callback(result);
+				
+				setStyleClassesForGridColumns(jQuery('div.' + identifier + 'Part'));
 			}
 		});
 	};
@@ -209,10 +213,12 @@ function initContactsGrid(piId, customerView, hasRightChangeRights) {
 	var onSelectRowFunction = function(rowId) {
 	}
 	
-	initCaseGrid(piId, customerView, 'caseContacts', populatingFunction, null, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
+	initCaseGrid(piId, customerView, identifier, populatingFunction, null, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
 }
 
 function initEmailsGrid(caseId, piId, customerView, hasRightChangeRights) {
+	var identifier = 'caseEmails';
+	
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
 
@@ -221,12 +227,14 @@ function initEmailsGrid(caseId, piId, customerView, hasRightChangeRights) {
 				callback(result);
 
 				openAllAttachmentsForCase(jQuery('#' + params.identifier + GRID_WITH_SUBGRID_ID_PREFIX + piId));
+				
+				setStyleClassesForGridColumns(jQuery('div.' + identifier + 'Part'));
 			}
 		});
 	};
 	
 	var subGridFunction = function(subgridId, rowId) {
-		initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights);
+		initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights, identifier);
 	};
 	
 	var namesForColumns = new Array();
@@ -248,10 +256,12 @@ function initEmailsGrid(caseId, piId, customerView, hasRightChangeRights) {
 		setBPMProcessForPreview(caseId, rowId);
 	};
 	
-	initCaseGrid(piId, customerView, 'caseEmails', populatingFunction, subGridFunction, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
+	initCaseGrid(piId, customerView, identifier, populatingFunction, subGridFunction, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
 }
 
 function initFormsGrid(caseId, piId, customerView, hasRightChangeRights) {
+	var identifier = 'caseForms';
+	
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
 		params.rightsChanger = hasRightChangeRights;
@@ -260,12 +270,14 @@ function initFormsGrid(caseId, piId, customerView, hasRightChangeRights) {
 				callback(result);
 				
 				openAllAttachmentsForCase(jQuery('#' + params.identifier + GRID_WITH_SUBGRID_ID_PREFIX + piId));
+				
+				setStyleClassesForGridColumns(jQuery('div.' + identifier + 'Part'));
 			}
 		});
 	};
 
 	var subGridFunction = function(subgridId, rowId) {
-		initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights);
+		initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights, identifier);
 	};
 	
     var namesForColumns = new Array();
@@ -289,16 +301,20 @@ function initFormsGrid(caseId, piId, customerView, hasRightChangeRights) {
 		setBPMProcessForPreview(caseId, rowId);
 	};
 	
-	initCaseGrid(piId, customerView, 'caseForms', populatingFunction, subGridFunction, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
+	initCaseGrid(piId, customerView, identifier, populatingFunction, subGridFunction, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
 }
 
 function initTasksGrid(caseId, piId, customerView, hasRightChangeRights) {
+	var identifier = 'caseTasks';
+	
 	var populatingFunction = function(params, callback) {
 		params.piId = piId;
 		
 		BPMProcessAssets.getProcessTasksList(params, {
 			callback: function(result) {
 				callback(result);
+				
+				setStyleClassesForGridColumns(jQuery('div.' + identifier + 'Part'));
 			}
 		});
 	};
@@ -322,11 +338,7 @@ function initTasksGrid(caseId, piId, customerView, hasRightChangeRights) {
 		setBPMProcessForPreview(caseId, rowId);
 	};
 	
-	initCaseGrid(piId, customerView, 'caseTasks', populatingFunction, null, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
-}
-
-function setBPMProcessForPreview(caseId, taskInstanceId) {
-	changeWindowLocationHref('prm_case_pk=' + caseId + '&taskInstanceId=' + taskInstanceId + '&cp_prm_action=8');
+	initCaseGrid(piId, customerView, identifier, populatingFunction, null, namesForColumns, modelForColumns, onSelectRowFunction, hasRightChangeRights);
 }
 
 function initCaseGrid(piId, customerView, tableClassName, populatingFunction, subGridForThisGrid, namesForColumns, modelForColumns, onSelectRowFunction, rightsChanger) {
@@ -367,24 +379,27 @@ function initCaseGrid(piId, customerView, tableClassName, populatingFunction, su
 	jQuery(table).attr('cellspacing', 0);
 }
 
-function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights) {
+function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights, identifier) {
 	var subgridTableId = subgridId + '_t';
 	jQuery('#' + subgridId).html('<table id=\''+subgridTableId+'\' class=\'scroll subGrid\' cellpadding=\'0\' cellspacing=\'0\'></table>');
 
 	var subGridParams = new JQGridParams();
 	subGridParams.rightsChanger = hasRightChangeRights;
+	subGridParams.identifier = identifier +'Attachments';
 	subGridParams.populateFromFunction = function(params, callback) {
 		params.taskId = rowId;
 		BPMProcessAssets.getTaskAttachments(params, {
 			callback: function(result) {
 				callback(result);
 				
-				if (result != null) {
+				var subGridTable = jQuery('#' + subgridTableId);
+				if (subGridTable == null || subGridTable.length == 0) {
 					return false;
 				}
 				
-				var emptyTable = jQuery('#' + subgridTableId);
-				if (emptyTable == null || emptyTable.length == 0) {
+				setStyleClassesForGridColumns(subGridTable.parent().parent());
+				
+				if (result != null) {
 					return false;
 				}
 				
@@ -392,7 +407,7 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 				var className = 'subgrid';
 				var fileGridRow = null;
 				var foundRow = false;
-				var parentElement = emptyTable.parent();
+				var parentElement = subGridTable;
 				var tempParentElement = null;
 				while (parentElement != null && !foundRow) {
 					tempParentElement = parentElement.get(0);
@@ -446,6 +461,59 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 
 	var subgrid = new JQGrid();
 	subgrid.createGrid("#"+subgridTableId, subGridParams);
+}
+
+function setStyleClassesForGridColumns(elements) {
+	if (elements == null || elements.length == 0) {
+		return false;
+	}
+	
+	var attributeName = 'col_with_classes';
+	var attribute = null;
+	var element = null;
+	var grids = null;
+	var grid = null;
+	var rows = null;
+	var row = null;
+	for (var i = 0; i < elements.length; i++) {
+		element = jQuery(elements[i]);
+		attribute = element.attr(attributeName);
+		if (attribute == null || attribute == '') {
+			element.attr(attributeName, 'true');
+			
+			grids = jQuery('table', element);
+			if (grids != null && grids.length > 0) {
+				for (var j = 0; j < grids.length; j++) {
+					grid = jQuery(grids[j]);
+					
+					rows = jQuery('tr', grid);
+					if (rows != null && rows.length > 0) {
+						for (var k = 0; k < rows.length; k++) {
+							row = jQuery(rows[k]);
+							
+							var headerCells = jQuery('th', row);
+							if (headerCells != null && headerCells.length > 0) {
+								for (var l = 0; l < headerCells.length; l++) {
+									jQuery(headerCells[l]).addClass('casesGridHeaderCell_' + l);
+								}
+							}
+							
+							var bodyCells = jQuery('td', row);
+							if (bodyCells != null && bodyCells.length > 0) {
+								for (var l = 0; l < bodyCells.length; l++) {
+									jQuery(bodyCells[l]).addClass('casesGridBodyCell_' + l);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function setBPMProcessForPreview(caseId, taskInstanceId) {
+	changeWindowLocationHref('prm_case_pk=' + caseId + '&taskInstanceId=' + taskInstanceId + '&cp_prm_action=8');
 }
 
 function downloadCaseDocument(event, taskId) {
