@@ -18,6 +18,7 @@ import java.util.Collection;
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseLog;
+import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
@@ -65,7 +66,7 @@ public class MyCases extends CasesProcessor {
 		form.setStyleClass("adminForm");
 		form.setStyleClass("overview");
 		form.maintainParameter(PARAMETER_CASE_PK);
-		form.addParameter(PARAMETER_ACTION, "");
+		form.addParameter(UserCases.PARAMETER_ACTION, "");
 
 		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
 
@@ -260,12 +261,12 @@ public class MyCases extends CasesProcessor {
 
 		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
 		back.setStyleClass("homeButton");
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
 
 		Link next = getButtonLink(getResourceBundle().getLocalizedString("process", "Process"));
-		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		next.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
 

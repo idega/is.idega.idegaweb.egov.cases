@@ -230,3 +230,7 @@ a.casesBPMPDFGeneratorAndDownloader {
 table.scroll tbody tr td {
 	cursor: pointer;
 }
+
+div.hiddenLinksForCasesContainerStyle {
+	display: none;
+}

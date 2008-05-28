@@ -25,6 +25,7 @@ import com.idega.block.process.business.CaseCodeManager;
 import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBOLookup;
@@ -120,6 +121,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return casesBodyContainer;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, String prefix, boolean showCheckBoxes,
 			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress) {
 		Layer caseContainer = new Layer();
@@ -133,11 +135,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		CaseManager caseManager = null;
 		if (theCase.getCaseManagerType() != null) {
 			caseManager = getCasesBusiness(iwc).getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
-			showCheckBoxes = false;
 		}
-//		if (rowsCounter % 2 == 0) {
-//			caseManager = null;
-//		}
 		
 		if (rowsCounter == 0) {
 			caseContainer.setStyleClass("firstRow");
@@ -165,9 +163,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
 		String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
+		if (caseIdentifier == null) {
+			logger.log(Level.INFO, "Didn't get case identifier from case manager, will treat case " + theCase + " as old case");
+			caseIdentifier = theCase.getPrimaryKey().toString();
+			caseManager = null;
+		}
 		logger.log(Level.INFO, "Case identifier: " + caseIdentifier + " for: " + theCase);
 		numberContainer.setStyleClass("firstColumn");
 		numberContainer.add(caseManager == null ? caseIdentifier : getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
+		showCheckBoxes = caseManager == null ? showCheckBoxes : false;
 
 		//	Sender
 		Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
@@ -328,6 +332,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	//	TODO: test this
+	@SuppressWarnings("unchecked")
 	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String prefix, boolean addCredentialsToExernalUrls) {
 		if (cases == null || cases.isEmpty()) {	//	TODO: remove
 			logger.log(Level.INFO, "NO CASES - null!");
@@ -386,6 +391,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode, CaseStatus caseStatus,
 			boolean addCredentialsToExernalUrls) {
 		ICPage page = getPage(pages, caseCode, caseStatus == null ? null : caseStatus.getStatus());
@@ -447,6 +453,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private ICPage getPage(Map pages, String caseCode, String caseStatus) {
 		if (pages == null) {
 			return null;
@@ -477,7 +484,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		process.setToolTip(getToolTipForLink(iwc));
 		
 		process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-		process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
+		process.addParameter(UserCases.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 
 		return process;
 	}

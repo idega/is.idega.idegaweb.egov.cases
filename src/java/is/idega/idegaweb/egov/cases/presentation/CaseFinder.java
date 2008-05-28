@@ -19,6 +19,7 @@ import java.util.Iterator;
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.presentation.UserCases;
 import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -245,7 +246,7 @@ public class CaseFinder extends CasesBlock {
 				boolean addProcessLink = false;
 				Link process = new Link(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")));
 				process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-				process.addParameter(CasesProcessor.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
+				process.addParameter(UserCases.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
 				if (this.openCasesPage != null && status.equals(getCasesBusiness().getCaseStatusOpen())) {
 					process.setPage(this.openCasesPage);
 					addProcessLink = true;

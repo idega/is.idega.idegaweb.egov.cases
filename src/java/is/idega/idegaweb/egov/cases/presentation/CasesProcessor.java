@@ -10,7 +10,6 @@ package is.idega.idegaweb.egov.cases.presentation;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.presentation.beans.GeneralCaseProcessorViewBuilder;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -26,6 +25,7 @@ import javax.faces.context.FacesContext;
 import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
+import com.idega.block.process.presentation.beans.GeneralCaseProcessorViewBuilder;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
 import com.idega.business.SpringBeanLookup;
@@ -45,8 +45,6 @@ import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
 
-	public static final String PARAMETER_ACTION = "cp_prm_action";
-
 	public static final String PARAMETER_CASE_PK = UserCases.PARAMETER_CASE_PK;
 	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
@@ -62,8 +60,6 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	//public static final int SHOW_CASE_HANDLER = UserCases.SHOW_CASE_HANDLER;
-	protected static final int ACTION_BPM_PROCESS = 8;
 	
 	private static final String caseManagerFacet = "caseManager";
 
@@ -112,7 +108,7 @@ public abstract class CasesProcessor extends CasesBlock {
 //					showCaseHandlerView(iwc);
 //					break;
 				
-				case ACTION_BPM_PROCESS:
+				case UserCases.ACTION_BPM_PROCESS:
 					showProcessorForBpm(iwc);
 					break;
 				
@@ -120,6 +116,20 @@ public abstract class CasesProcessor extends CasesBlock {
 					showList(iwc);
 			}
 		}
+	}
+	
+	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {
+		GeneralCaseProcessorViewBuilder processorView = (GeneralCaseProcessorViewBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCaseProcessorViewBuilder.SPRING_BEAN_IDENTIFIER);
+		UIComponent view = null;
+		try {
+			view = processorView.getCaseProcessorView(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (view == null) {
+			view = new Heading3(getResourceBundle(iwc).getLocalizedString("cases_list.can_not_get_case_view", "Sorry, error occurred - can not generate case processor view."));
+		}
+		add(view);
 	}
 	
 	@Override
@@ -189,15 +199,15 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 	
 	private int parseAction(IWContext iwc) {
-		if (iwc.isParameterSet(PARAMETER_ACTION)) {
-			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		if (iwc.isParameterSet(UserCases.PARAMETER_ACTION)) {
+			return Integer.parseInt(iwc.getParameter(UserCases.PARAMETER_ACTION));
 		}
 		return ACTION_VIEW;
 	}
 
 	private void showList(IWContext iwc) throws RemoteException {
 		Form form = new Form();
-		form.addParameter(PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
+		form.addParameter(UserCases.PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
 //
 		boolean showCheckBoxes = showCheckBox() && getCasesBusiness(iwc).allowAnonymousCases();
 //		
@@ -409,7 +419,7 @@ public abstract class CasesProcessor extends CasesBlock {
 			layer.setStyleClass("multiProcessLayer");
 			form.add(layer);
 
-			SubmitButton multiProcess = new SubmitButton(getResourceBundle().getLocalizedString("multi_process", "Multi process"), PARAMETER_ACTION, String.valueOf(ACTION_MULTI_PROCESS_FORM));
+			SubmitButton multiProcess = new SubmitButton(getResourceBundle().getLocalizedString("multi_process", "Multi process"), UserCases.PARAMETER_ACTION, String.valueOf(ACTION_MULTI_PROCESS_FORM));
 			multiProcess.setStyleClass("button");
 			layer.add(multiProcess);
 		}
@@ -424,7 +434,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.maintainParameter(PARAMETER_CASE_PK);
-		form.addParameter(PARAMETER_ACTION, "");
+		form.addParameter(UserCases.PARAMETER_ACTION, "");
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -469,12 +479,12 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
 		back.setStyleClass("homeButton");
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
 
 		Link next = getButtonLink(getResourceBundle().getLocalizedString("process", "Process"));
-		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_MULTI_PROCESS));
+		next.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_MULTI_PROCESS));
 		next.setToFormSubmit(form);
 		bottom.add(next);
 
@@ -485,7 +495,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.maintainParameter(PARAMETER_CASE_PK);
-		form.addParameter(PARAMETER_ACTION, "");
+		form.addParameter(UserCases.PARAMETER_ACTION, "");
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -543,12 +553,12 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
 		back.setStyleClass("homeButton");
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
+		back.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		back.setToFormSubmit(form);
 		bottom.add(back);
 
 		Link next = getButtonLink(getResourceBundle().getLocalizedString("allocate", "Allocate"));
-		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		next.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
 
@@ -614,18 +624,4 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
 	protected abstract boolean showCheckBox();
-	
-	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {
-		GeneralCaseProcessorViewBuilder processorView = (GeneralCaseProcessorViewBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCaseProcessorViewBuilder.SPRING_BEAN_IDENTIFIER);
-		UIComponent view = null;
-		try {
-			view = processorView.getCaseProcessorView(iwc);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		if (view == null) {
-			view = new Heading3(getResourceBundle(iwc).getLocalizedString("cases_list.can_not_get_case_view", "Sorry, error occurred - can not generate case processor view."));
-		}
-		add(view);
-	}
 }

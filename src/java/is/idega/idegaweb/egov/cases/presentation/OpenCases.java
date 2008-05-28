@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
@@ -102,7 +103,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		if (this.iMyCasesPage != null) {
 			form.setPageToSubmitTo(this.iMyCasesPage);
 		}
-		form.addParameter(PARAMETER_ACTION, "");
+		form.addParameter(UserCases.PARAMETER_ACTION, "");
 		form.maintainParameter(PARAMETER_CASE_PK);
 
 		GeneralCase theCase = null;
@@ -230,18 +231,18 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 		Link back = getButtonLink(getResourceBundle().getLocalizedString("back", "Back"));
 		back.setStyleClass("homeButton");
-		back.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		bottom.add(back);
 
 		if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
 			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
-			next.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
+			next.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
 			next.maintainParameter(PARAMETER_CASE_PK, iwc);
 			bottom.add(next);
 		}
 
 		Link next = getButtonLink(theCase.getCaseStatus().equals(getCasesBusiness().getCaseStatusPending()) ? getResourceBundle().getLocalizedString(getPrefix() + "take_over_case", "Take over case") : getResourceBundle().getLocalizedString(getPrefix() + "take_case", "Take case"));
-		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
+		next.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_PROCESS));
 		next.setToFormSubmit(form);
 		bottom.add(next);
 
