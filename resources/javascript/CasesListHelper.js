@@ -31,6 +31,8 @@ function initializeCasesList(caseToOpenId) {
 		for (var i = 0; i < loadingLabels.length; i++) {
 			jQuery(loadingLabels[i]).css('display', 'none');
 		}
+		
+		//	TODO: make some explanation text for user
 	});
 	
 	var jQGridInclude = new JQGridInclude();
@@ -376,6 +378,45 @@ function initFilesSubGridForCasesListGrid(subgridId, rowId, hasRightChangeRights
 		BPMProcessAssets.getTaskAttachments(params, {
 			callback: function(result) {
 				callback(result);
+				
+				if (result != null) {
+					return false;
+				}
+				
+				var emptyTable = jQuery('#' + subgridTableId);
+				if (emptyTable == null || emptyTable.length == 0) {
+					return false;
+				}
+				
+				var tagName = 'TR';
+				var className = 'subgrid';
+				var fileGridRow = null;
+				var foundRow = false;
+				var parentElement = emptyTable.parent();
+				var tempParentElement = null;
+				while (parentElement != null && !foundRow) {
+					tempParentElement = parentElement.get(0);
+					if (tempParentElement.tagName == tagName && jQuery(tempParentElement).hasClass(className)) {
+						fileGridRow = tempParentElement;
+						foundRow = true;
+					}
+					parentElement = parentElement.parent();
+				}
+				if (fileGridRow != null) {
+					jQuery(fileGridRow).css('display', 'none');
+					
+					var mainRow = jQuery('#' + rowId);
+					if (mainRow == null || mainRow.length == 0) {
+						return false;
+					}
+					
+					var subGridOpener = jQuery('td.subGridOpener', mainRow);
+					if (subGridOpener == null || subGridOpener.length == 0) {
+						return false;
+					}
+					subGridOpener.empty();
+					subGridOpener.unbind('click');
+				}
 			}
 		});
 	};

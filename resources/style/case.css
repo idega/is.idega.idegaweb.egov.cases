@@ -226,3 +226,7 @@ a.casesBPMAttachmentDownloader {
 a.casesBPMPDFGeneratorAndDownloader {
 	display: none;
 }
+
+table.scroll tbody tr td {
+	cursor: pointer;
+}
