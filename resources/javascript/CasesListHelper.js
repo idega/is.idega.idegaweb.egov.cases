@@ -20,6 +20,8 @@ var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
 
 var GRID_WITH_SUBGRID_ID_PREFIX = '_tableForProcessInstanceGrid_';
 
+var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
+
 function initializeCasesList(caseToOpenId) {
 	DWREngine.setErrorHandler(function() {
 		closeAllLoadingMessages();
@@ -75,59 +77,17 @@ function setCasesListLocalizations(data) {
 }
 
 function continueInitializeCasesList(caseToOpenId) {
-	var togglers = jQuery('div.casesListBodyContainerItemToggler');
+	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);
 	if (togglers == null || togglers.length == 0) {
 		return false;
 	}
 	
-	var toggler = null;
 	var caseIdPar = 'caseid';
-	var classExpanded = 'expanded';
-	var classCaseWithInfo = 'caseWithInfo';
+	var toggler = null;
 	for (var i = 0; i < togglers.length; i++) {
 		toggler = jQuery(togglers[i]);
-		toggler.click(function() {
-			var caseToExpand = jQuery(this);
-			var show = false;
-			if (caseToExpand.hasClass(classExpanded)) {
-				caseToExpand.removeClass(classExpanded);
-			}
-			else {
-				caseToExpand.addClass(classExpanded);
-				show = true;
-			}
-			
-			var customerViewId = caseToExpand.attr('customerviewid');
-			var customerView = jQuery('#' + customerViewId);
-			if (customerView == null || customerView.length == 0) {
-				return false;
-			}
-			if (show) {
-				if (customerView.hasClass(classCaseWithInfo)) {
-					showCustomerViewForCase(customerView, null);
-					return false;
-				}
-				
-				showLoadingMessage('');
-				var caseId = caseToExpand.attr(caseIdPar);
-				CasesEngine.getInfoForCase(caseId, {
-					callback: function(component) {
-						closeAllLoadingMessages();
-						
-						if (component == null) {
-							return false;
-						}
-						
-						insertNodesToContainer(component, customerView[0]);
-						customerView.addClass(classCaseWithInfo);
-						
-						showCustomerViewForCase(customerView, function() {initializeCaseGrids(caseId, customerView);});
-					}
-				});
-			}
-			else {
-				customerView.hide('fast');
-			}
+		toggler.click(function(event) {
+			registerGridExpanderActionsForElement(event, this);
 		});
 	}
 	
@@ -138,6 +98,90 @@ function continueInitializeCasesList(caseToOpenId) {
 				toggler.click();
 			}
 		}
+	}
+}
+
+function registerGridExpanderActionsForElement(event, element) {
+	if (element == null) {
+		return false;
+	}
+	
+	if (event) {
+		if (event.target != element) {
+			if (event.stopPropagation) {
+				event.stopPropagation();
+			}
+			event.cancelBubble = true;
+			
+			return false;
+		}
+	}
+	
+	var parentElement = jQuery(element).parent();
+	var allTogglersInTheSameContainer = jQuery(CASE_GRID_TOGGLERS_FILTER, parentElement);
+	
+	var caseIdPar = 'caseid';
+	var classExpanded = 'expandedWithNoImage';
+	var changeImageClass = 'expanded';
+	var classCaseWithInfo = 'caseWithInfo';
+	
+	var caseToExpand = jQuery(element);
+	var show = false;
+	
+	var toggler = null;
+	var changeImageAttribute = null;
+	for (var i = 0; i < allTogglersInTheSameContainer.length; i++) {
+		toggler = jQuery(allTogglersInTheSameContainer[i]);
+		
+		if (toggler.hasClass(classExpanded)) {
+			toggler.removeClass(classExpanded);
+		}
+		else {
+			toggler.addClass(classExpanded);
+			show = true;
+		}
+	
+		changeImageAttribute = toggler.attr('changeimage');
+		if (changeImageAttribute != null && changeImageAttribute == 'true') {
+			if (toggler.hasClass(changeImageClass)) {
+				toggler.removeClass(changeImageClass);
+			}
+			else {
+				toggler.addClass(changeImageClass);
+			}
+		}
+	}
+	
+	var customerViewId = caseToExpand.attr('customerviewid');
+	var customerView = jQuery('#' + customerViewId);
+	if (customerView == null || customerView.length == 0) {
+		return false;
+	}
+	if (show) {
+		if (customerView.hasClass(classCaseWithInfo)) {
+			showCustomerViewForCase(customerView, null);
+			return false;
+		}
+		
+		showLoadingMessage('');
+		var caseId = caseToExpand.attr(caseIdPar);
+		CasesEngine.getInfoForCase(caseId, {
+			callback: function(component) {
+				closeAllLoadingMessages();
+				
+				if (component == null) {
+					return false;
+				}
+				
+				insertNodesToContainer(component, customerView[0]);
+				customerView.addClass(classCaseWithInfo);
+				
+				showCustomerViewForCase(customerView, function() {initializeCaseGrids(caseId, customerView);});
+			}
+		});
+	}
+	else {
+		customerView.hide('fast');
 	}
 }
 

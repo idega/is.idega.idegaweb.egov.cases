@@ -161,6 +161,10 @@ div.casesListBodyContainerItem {
 	float: left;
 }
 
+div.casesListGridExpanderStyleClass {
+	cursor: pointer;
+}
+
 div.expand {
 	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit.png) no-repeat scroll left top;
 	cursor: pointer;

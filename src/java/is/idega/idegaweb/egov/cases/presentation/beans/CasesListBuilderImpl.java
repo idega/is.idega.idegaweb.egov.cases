@@ -123,6 +123,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return casesBodyContainer;
 	}
 	
+	private void prepareCellToBeGridExpander(Layer layer, String caseId, String gridViewerId) {
+		layer.setStyleClass("casesListGridExpanderStyleClass");
+		layer.setMarkupAttribute("caseid", caseId);
+		layer.setMarkupAttribute("customerviewid", gridViewerId);
+	}
+	
 	@SuppressWarnings("unchecked")
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, String prefix, boolean showCheckBoxes,
 			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress) {
@@ -170,15 +176,40 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			caseIdentifier = theCase.getPrimaryKey().toString();
 			caseManager = null;
 		}
-		logger.log(Level.INFO, "Case identifier: " + caseIdentifier + " for: " + theCase);
 		numberContainer.setStyleClass("firstColumn");
-		numberContainer.add(caseManager == null ? caseIdentifier : getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
+		if (caseManager == null) {
+			numberContainer.add(caseIdentifier);
+		}
+		else {
+			IWBundle bundle = getBundle(iwc);
+			IWResourceBundle iwrb = getResourceBundle(iwc);
+			Link sendEmail = new Link(bundle.getImage("images/email.png", iwrb.getLocalizedString("send_email", "Send e-mail")),
+					getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
+			numberContainer.add(sendEmail);
+			numberContainer.add(Text.getNonBrakingSpace());
+			numberContainer.add(caseIdentifier);
+		}
 		showCheckBoxes = caseManager == null ? showCheckBoxes : false;
+		
+		Layer customerView = null;
+		String caseId = theCase.getPrimaryKey().toString();
+		String gridViewerId = null;
+		if (caseManager != null) {
+			customerView = new Layer();
+			gridViewerId = customerView.getId();
+		}
+		
+		if (caseManager != null) {
+			prepareCellToBeGridExpander(numberContainer, caseId, gridViewerId);
+		}
 
 		//	Sender
 		Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
 		senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
 				owner.getLastName()).getName(l)));
+		if (caseManager != null) {
+			prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId);
+		}
 		
 		//	Description
 		Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
@@ -198,6 +229,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Creation date
 		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
 		creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
+		if (caseManager != null) {
+			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId);
+		}
 
 		//	Status
 		String localizedStatus = null;
@@ -215,10 +249,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				e.printStackTrace();
 			}
 		}
-		addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
+		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
+		if (caseManager != null) {
+			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId);
+		}
 		
 		//	Controller
-		Layer customerView = null;
 		UIComponent childForContainer = null;
 		if (caseManager == null) {
 			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString(prefix + "view_case", "View case"));
@@ -235,9 +271,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, caseManager == null ? oldBodyItem : bodyItem, "Toggler");
 		if (caseManager != null) {
 			togglerContainer.setStyleClass("expand");
-			togglerContainer.setMarkupAttribute("caseid", theCase.getPrimaryKey().toString());
-			customerView = new Layer();
-			togglerContainer.setMarkupAttribute("customerviewid", customerView.getId());
+			togglerContainer.setMarkupAttribute("changeimage", "true");
+			prepareCellToBeGridExpander(togglerContainer, caseId, gridViewerId);
 		}
 		
 		//	Handle case
@@ -270,7 +305,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return subject;
 		}
 		
-		return new StringBuilder("<a href=\"mailto:").append(emailAddress).append("?subject=(").append(subject).append(")\">").append(subject).append("</a>").toString();
+		return new StringBuilder("mailto:").append(emailAddress).append("?subject=(").append(subject).append(")").toString();
 	} 
 	
 	@SuppressWarnings("unchecked")
@@ -282,13 +317,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	@SuppressWarnings("unchecked")
 	public UIComponent getCasesList(IWContext iwc, Collection cases, String prefix, boolean showCheckBoxes) {		
-		if (cases == null || cases.isEmpty()) {	//	TODO: remove
-			logger.log(Level.INFO, "NO CASES - null!");
-		}
-		else {
-			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
-		}
-		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
@@ -345,13 +373,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	//	TODO: test this
 	@SuppressWarnings("unchecked")
 	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String prefix, boolean addCredentialsToExernalUrls) {
-		if (cases == null || cases.isEmpty()) {	//	TODO: remove
-			logger.log(Level.INFO, "NO CASES - null!");
-		}
-		else {
-			logger.log(Level.INFO, "Got cases: " + cases + ", totally: " + cases.size());
-		}
-		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
