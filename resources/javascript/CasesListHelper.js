@@ -14,6 +14,7 @@ var CASE_GRID_STRING_CHANGE_ACCESS_RIGHTS = 'Change access rights';
 var CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = 'Download document';
 var CASE_GRID_STRING_FILE_SIZE = 'File size';
 var CASE_GRID_STRING_SUBMITTED_BY = 'Submitted by';
+var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 
 var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
 var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
@@ -50,7 +51,7 @@ function initializeCasesList(caseToOpenId) {
 }
 
 function setCasesListLocalizations(data) {
-	if (data == null || data.length < 17) {
+	if (data == null || data.length < 19) {
 		return false;
 	}
 	
@@ -73,7 +74,9 @@ function setCasesListLocalizations(data) {
 	//	Other info
 	CASE_ATTACHEMENT_LINK_STYLE_CLASS = data[15];
 	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[16];
+	
 	CASE_GRID_STRING_FILE_DESCRIPTION = data[17];
+	CASE_GRID_STRING_CLICK_TO_EDIT = data[18];
 }
 
 function continueInitializeCasesList(caseToOpenId) {
@@ -96,6 +99,51 @@ function continueInitializeCasesList(caseToOpenId) {
 			toggler = jQuery(togglers[i]);
 			if (caseToOpenId == toggler.attr(caseIdPar)) {
 				toggler.click();
+			}
+		}
+	}
+	
+	var editableFields = jQuery('div.casesListBodyItemIsEditable');
+	if (editableFields != null && editableFields.length > 0) {
+		var editableField = null;
+		var editableFieldId = 'editableCasesListElementId';
+		var editableFieldName = 'editableCasesListElementName';
+		var editableFieldParName = 'iseditable';
+		var editableFieldParValue = null;
+		
+		for (var i = 0; i < editableFields.length; i++) {
+			editableField = jQuery(editableFields[i]);
+			
+			editableFieldParValue = editableField.attr(editableFieldParName);
+			if (editableFieldParValue == null || editableFieldParValue == '') {
+				editableField.editable(function() {
+					var editableElement = jQuery(this);
+					var inlineElements = jQuery('input[name='+editableFieldName+']', editableElement);
+					if (inlineElements == null || inlineElements.length == 0) {
+						return;
+					}
+					
+					var newDescription = jQuery(inlineElements[0]).attr('value');
+					if (newDescription == null || newDescription == '') {
+						return;
+					}
+					
+					CasesEngine.setCaseSubject(editableElement.attr(caseIdPar), newDescription, {
+						callback: function(result) {
+							if (!result) {
+								return;
+							}
+							
+							editableElement.empty().text(newDescription);
+						}
+					});
+				}, {
+					id:			editableFieldId,
+					name:		editableFieldName,
+					tooltip:	CASE_GRID_STRING_CLICK_TO_EDIT
+				});
+				
+				editableField.attr(editableFieldParName, 'true');
 			}
 		}
 	}

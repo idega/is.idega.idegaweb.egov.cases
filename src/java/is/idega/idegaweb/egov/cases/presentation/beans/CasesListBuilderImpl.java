@@ -3,6 +3,8 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
+import is.idega.idegaweb.egov.cases.presentation.MyCases;
+import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
 import java.rmi.RemoteException;
@@ -29,6 +31,7 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.process.util.CaseComparator;
+import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -72,7 +75,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String oldBodyItem = "old_" + bodyItem;
 	private String lastRowStyle = "lastRow";
 	
-	private Layer createHeader(IWContext iwc, Layer container, String prefix, int totalCases, boolean showCheckBoxes) {
+	private String caseIdParName = "caseid";
+	
+	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes) {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		if (totalCases < 1) {
 			container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
@@ -89,7 +94,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		String headerItem = "casesListHeadersContainerItem";
 
 		//	Number
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(prefix + "case_nr", "Case nr.")), headerItem, "CaseNumber");
+		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("case_nr", "Case nr.")), headerItem, "CaseNumber");
 
 		//	Sender
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
@@ -125,13 +130,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private void prepareCellToBeGridExpander(Layer layer, String caseId, String gridViewerId) {
 		layer.setStyleClass("casesListGridExpanderStyleClass");
-		layer.setMarkupAttribute("caseid", caseId);
+		layer.setMarkupAttribute(caseIdParName, caseId);
 		layer.setMarkupAttribute("customerviewid", gridViewerId);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, String prefix, boolean showCheckBoxes,
-			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress) {
+	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, boolean showCheckBoxes,
+			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress, boolean descriptionIsEditable) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -213,6 +218,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Description
 		Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
+		if (descriptionIsEditable) {
+			descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
+			descriptionContainer.setMarkupAttribute(caseIdParName, caseId);
+		}
 		String subject = null;
 		if (notGeneralCase) {
 			try {
@@ -223,6 +232,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		else {
 			subject = theCase.getSubject();
+		}
+		if (subject != null && subject.length() > 100) {
+			subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT).append(CoreConstants.DOT).toString();
 		}
 		descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
 
@@ -257,7 +269,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Controller
 		UIComponent childForContainer = null;
 		if (caseManager == null) {
-			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString(prefix + "view_case", "View case"));
+			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString("view_case", "View case"));
 			if (isUserList) {
 				childForContainer = getLinkToViewUserCase(iwc, theCase, caseBusiness, view, pages, theCase.getCode(), status, addCredentialsToExernalUrls);
 			}
@@ -315,11 +327,21 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return casesInList;
 	}
 	
+	private boolean isDescriptionEditable(String casesType, boolean isAdmin) {
+		boolean descriptionIsEditable = OpenCases.TYPE.equals(casesType);
+		if (!descriptionIsEditable) {
+			descriptionIsEditable = MyCases.TYPE.equals(casesType) && isAdmin;
+		}
+		return descriptionIsEditable;
+	}
+	
 	@SuppressWarnings("unchecked")
-	public UIComponent getCasesList(IWContext iwc, Collection cases, String prefix, boolean showCheckBoxes) {		
+	public UIComponent getCasesList(IWContext iwc, Collection cases, String casesType, boolean showCheckBoxes) {		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
+		
+		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
 		
 		Layer container = new Layer();
 
@@ -332,7 +354,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, showCheckBoxes);
+		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes);
 		
 		if (totalCases < 1) {
 			return container;
@@ -354,12 +376,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		for (Object o: casesInList) {
 			if (o instanceof GeneralCase) {
 				genCase = (GeneralCase) o;
-				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, prefix, showCheckBoxes, genCase.isPrivate(), false,
-						rowsCounter, null, false, emailAddress);
+				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, showCheckBoxes, genCase.isPrivate(), false,
+						rowsCounter, null, false, emailAddress, descriptionIsEditable);
 			}
 			else if (o instanceof Case) {
-				caseContainer = addRowToCasesList(iwc, casesBodyContainer, (Case) o, caseStatusReview, l, prefix, showCheckBoxes, false, false, rowsCounter, null,
-						false, emailAddress);
+				caseContainer = addRowToCasesList(iwc, casesBodyContainer, (Case) o, caseStatusReview, l, showCheckBoxes, false, false, rowsCounter, null,
+						false, emailAddress, descriptionIsEditable);
 			}
 			rowsCounter++;
 		}
@@ -372,10 +394,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	//	TODO: test this
 	@SuppressWarnings("unchecked")
-	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String prefix, boolean addCredentialsToExernalUrls) {
+	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String casesType, boolean addCredentialsToExernalUrls) {
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
+		
+		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
 		
 		Layer container = new Layer();
 
@@ -388,7 +412,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, prefix, totalCases, false);
+		Layer casesContainer = createHeader(iwc, container, totalCases, false);
 		
 		if (totalCases < 1) {
 			return container;
@@ -406,8 +430,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			e.printStackTrace();
 		}
 		for (Case theCase: casesInList) {			
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, prefix, false, false, true, rowsCounter, pages,
-					addCredentialsToExernalUrls, emailAddress);
+			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, false, true, rowsCounter, pages,
+					addCredentialsToExernalUrls, emailAddress, descriptionIsEditable);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
@@ -533,6 +557,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			e.printStackTrace();
 		}
 		scripts.add(web2Business.getBundleURIToJQGrid());
+		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		IWBundle bundle = getBundle(iwc);
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);

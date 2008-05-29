@@ -104,10 +104,6 @@ public abstract class CasesProcessor extends CasesBlock {
 					showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 					break;
 					
-//				case SHOW_CASE_HANDLER:
-//					showCaseHandlerView(iwc);
-//					break;
-				
 				case UserCases.ACTION_BPM_PROCESS:
 					showProcessorForBpm(iwc);
 					break;
@@ -145,45 +141,6 @@ public abstract class CasesProcessor extends CasesBlock {
 			Logger.getLogger(getClassName()).log(Level.SEVERE, "Exception while displaying CasesProcessor", e);
 		}
 	}
-	
-	/*
-	public void showCaseHandlerView(IWContext iwc) {
-		
-		try {
-			GeneralCase theCase = getBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_PK));
-			String caseManagerType = theCase.getCaseManagerType();
-			
-			if(caseManagerType == null || CoreConstants.EMPTY.equals(caseManagerType)) {
-				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handlerType resolved from case, though showCaseHandlerView method was called");
-				return;
-			}
-			
-			CaseManager caseManager = getCaseHandlersProvider().getCaseHandler(caseManagerType);
-			
-			if(caseManager == null) {
-				
-				Logger.getLogger(getClassName()).log(Level.SEVERE, "No case handler found for case handler type provided: "+caseManagerType);
-				return;
-			}
-			
-			CaseManagerState caseManagerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
-			caseManagerState.setCaseId(new Integer(String.valueOf(theCase.getPrimaryKey())));
-			caseManagerState.setShowCaseHandler(true);
-			caseManagerState.setFullView(true);
-			caseManagerState.setInCasesComponent(true);
-			
-			UIComponent view = caseManager.getView(iwc, theCase);
-			getFacets().put(caseManagerFacet, view);
-			
-		} catch (FinderException fe) {
-			fe.printStackTrace();
-			throw new IBORuntimeException(fe);
-		} catch (RemoteException fe) {
-			fe.printStackTrace();
-			throw new IBORuntimeException(fe);
-		}
-	}
-	*/
 	
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
@@ -427,7 +384,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
 		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
-		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getPrefix(), showCheckBoxes));
+		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getCasesProcessorType(), showCheckBoxes));
 	}
 
 	protected void showMultiProcessForm(IWContext iwc) throws RemoteException {
@@ -589,10 +546,8 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 	
 	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		log(Level.INFO, "User: " + user + ", cases type: " + getCasesProcessorType());
 		List<CaseManager> caseHandlers = getCasesBusiness().getCaseHandlersProvider().getCaseHandlers();
 		Collection<GeneralCase> cases = null;
-		log(Level.INFO, "Case handlers: " + caseHandlers);
 		
 		for (CaseManager handler : caseHandlers) {
 			
@@ -608,12 +563,6 @@ public abstract class CasesProcessor extends CasesBlock {
 			}
 		}
 		
-		if (cases == null || cases.isEmpty()) {
-			log(Level.INFO, "NO CASES - null!");
-		}
-		else {
-			log(Level.INFO, "Found cases: " + cases + ", totally: " + cases.size());
-		}
 		return cases;
 	}
 	
