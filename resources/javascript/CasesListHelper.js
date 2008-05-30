@@ -95,9 +95,11 @@ function continueInitializeCasesList(caseToOpenId) {
 	}
 	
 	if (caseToOpenId != null && caseToOpenId != '') {
-		for (var i = 0; i < togglers.length; i++) {
+		var foundWhatToOpen = false;
+		for (var i = 0; (i < togglers.length && !foundWhatToOpen); i++) {
 			toggler = jQuery(togglers[i]);
 			if (caseToOpenId == toggler.attr(caseIdPar)) {
+				foundWhatToOpen = false;
 				toggler.click();
 			}
 		}
@@ -609,7 +611,7 @@ function setBPMProcessForPreview(caseId, taskInstanceId) {
 }
 
 function downloadCaseDocument(event, taskId) {
-	var uri = '&taskInstnaceId=' + taskId;
+	var uri = '&taskInstanceId=' + taskId;
 	setCurrentWindowToDownloadCaseResource(uri, CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS);
 	
 	if (event) {
@@ -724,4 +726,23 @@ function closeAccessRightsSetterBox() {
 	}
 	
 	rightsBox.hide('fast');
+}
+
+function takeCurrentProcessTask(event, taskInstanceId, id, allowReAssign) {
+	if (event) {
+		if (event.stopPropagation) {
+			event.stopPropagation();
+		}
+		event.cancelBubble = true;
+	}
+	
+	CasesEngine.takeBPMProcessTask(taskInstanceId, allowReAssign, {
+		callback: function(takenByValue) {
+			if (takenByValue == null) {
+				return false;
+			}
+		
+			jQuery('#' + id).parent().empty().text(takenByValue);
+		}
+	});
 }
