@@ -99,7 +99,7 @@ function continueInitializeCasesList(caseToOpenId) {
 		for (var i = 0; (i < togglers.length && !foundWhatToOpen); i++) {
 			toggler = jQuery(togglers[i]);
 			if (caseToOpenId == toggler.attr(caseIdPar)) {
-				foundWhatToOpen = false;
+				foundWhatToOpen = true;
 				toggler.click();
 			}
 		}
