@@ -546,7 +546,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 	
 	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		List<CaseManager> caseHandlers = getCasesBusiness().getCaseHandlersProvider().getCaseHandlers();
+		List<CaseManager> caseHandlers = getCasesBusiness().getCaseHandlersProvider().getCaseManagers();
 		Collection<GeneralCase> cases = null;
 		
 		for (CaseManager handler : caseHandlers) {

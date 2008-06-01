@@ -147,7 +147,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		CaseManager caseManager = null;
 		if (theCase.getCaseManagerType() != null) {
-			caseManager = getCasesBusiness(iwc).getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
+			caseManager = getCasesBusiness(iwc).getCaseHandlersProvider().getCaseManager(theCase.getCaseManagerType());
 		}
 		
 		if (rowsCounter == 0) {
