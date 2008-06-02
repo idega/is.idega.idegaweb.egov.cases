@@ -28,11 +28,10 @@ function initializeCasesList(caseToOpenId) {
 		closeAllLoadingMessages();
 		
 		var loadingLabels = jQuery('div.loading');
-		if (loadingLabels == null || loadingLabels.length == 0) {
-			return false;
-		}
-		for (var i = 0; i < loadingLabels.length; i++) {
-			jQuery(loadingLabels[i]).css('display', 'none');
+		if (loadingLabels != null && loadingLabels.length > 0) {
+			for (var i = 0; i < loadingLabels.length; i++) {
+				jQuery(loadingLabels[i]).css('display', 'none');
+			}
 		}
 		
 		//	TODO: make some explanation text for user
