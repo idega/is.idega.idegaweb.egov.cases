@@ -20,12 +20,14 @@ import java.util.logging.Logger;
 import javax.ejb.EJBException;
 import javax.faces.component.UIComponent;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseCodeManager;
 import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
@@ -35,7 +37,6 @@ import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.business.SpringBeanLookup;
 import com.idega.core.accesscontrol.business.CredentialBusiness;
 import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWApplicationContext;
@@ -57,18 +58,21 @@ import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
+import com.idega.webface.WFUtil;
 
-@Scope("session")
+@Scope("singleton")
 @Service(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER)
 public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private static final Logger logger = Logger.getLogger(CasesListBuilderImpl.class.getName());
 	
-	private IWBundle bundle = null;
-	private IWResourceBundle iwrb = null;
-	
-	private CasesBusiness casesBusiness = null;
-	private CredentialBusiness credentialBusiness = null;
+	private CaseManagersProvider caseManagersProvider;
+//	
+//	private IWBundle bundle;
+//	private IWResourceBundle iwrb;
+//	
+//	private CasesBusiness casesBusiness;
+//	private CredentialBusiness credentialBusiness;
 	
 	private String caseContainerStyle = "casesListCaseContainer";
 	private String bodyItem = "casesListBodyContainerItem";
@@ -84,7 +88,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		addWeb2Stuff(iwc, container);
+		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
+		addWeb2Stuff(caseId, iwc, getBundle(iwc), container);
 		
 		Layer casesContainer = new Layer();
 		container.add(casesContainer);
@@ -547,8 +552,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return process;
 	}
 	
-	private void addWeb2Stuff(IWContext iwc, Layer container) {
-		Web2Business web2Business = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
+	public void addWeb2Stuff(String caseId, IWContext iwc, IWBundle bundle, Layer container) {
+		
+		Web2Business web2Business = (Web2Business)WFUtil.getBeanInstance(iwc, "web2bean");
 		
 		List<String> scripts = new ArrayList<String>();
 		try {
@@ -558,17 +564,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		scripts.add(web2Business.getBundleURIToJQGrid());
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
-		IWBundle bundle = getBundle(iwc);
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
-		scripts.add("/dwr/interface/BPMProcessAssets.js");
+		//scripts.add("/dwr/interface/BPMProcessAssets.js");
 	
 		List<String> css = new ArrayList<String>();
 		css.add(web2Business.getBundleURIToJQGridStyles());
 		
-		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
 		if (caseId == null || CoreConstants.EMPTY.equals(caseId)) {
 			caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK + "_id");
 		}
@@ -593,40 +597,33 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
-		if (casesBusiness == null) {
-			try {
-				casesBusiness = (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
-			} catch (IBOLookupException e) {
-				e.printStackTrace();
-			}
+		try {
+			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
 		}
-		return casesBusiness;
+		
+		return null;
 	}
 	
 	private CredentialBusiness getCredentialBusiness(IWApplicationContext iwac) {
-		if (credentialBusiness == null) {
-			try {
-				credentialBusiness = (CredentialBusiness) IBOLookup.getServiceInstance(iwac, CredentialBusiness.class);
-			}
-			catch (IBOLookupException e) {
-				e.printStackTrace();
-			}
+		
+		try {
+			return (CredentialBusiness) IBOLookup.getServiceInstance(iwac, CredentialBusiness.class);
 		}
-		return credentialBusiness;
+		catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	private IWBundle getBundle(IWContext iwc) {
-		if (bundle == null) {
-			bundle = iwc.getIWMainApplication().getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER);
-		}
-		return bundle;
+		return iwc.getIWMainApplication().getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER);
 	}
 	
 	private IWResourceBundle getResourceBundle(IWContext iwc) {
-		if (iwrb == null) {
-			iwrb = getBundle(iwc).getResourceBundle(iwc);
-		}
-		return iwrb;
+		return getBundle(iwc).getResourceBundle(iwc);
 	}
 	
 	private Layer addLayerToCasesList(Layer container, UIComponent child, String defaultStyleClass, String suffixForStyleClass) {
@@ -647,4 +644,43 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return layer;
 	}
 
+	public UIComponent getCaseManagerView(IWContext iwc, Integer caseId) {
+		
+		try {
+			Case theCase = getCasesBusiness(iwc).getCase(caseId);
+			
+			CaseManager caseManager;
+			
+			if(theCase.getCaseManagerType() != null)
+				caseManager = getCaseManagersProvider().getCaseManager(theCase.getCaseManagerType());
+			else 
+				caseManager = null;
+			
+			if(caseManager != null) {
+				
+				UIComponent caseAssets = caseManager.getView(iwc, theCase);
+				
+				if(caseAssets != null)
+					return caseAssets;
+				else
+					Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case assets component resolved from case manager: "+caseManager.getType()+" by case pk: "+theCase.getPrimaryKey().toString());
+			} else
+				Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case manager resolved by type="+theCase.getCaseManagerType());
+			
+		} catch (Exception e) {
+			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Exception while resolving case manager view", e);
+		}
+		
+		return null;
+	}
+
+	public CaseManagersProvider getCaseManagersProvider() {
+		return caseManagersProvider;
+	}
+
+	@Autowired
+	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
+		this.caseManagersProvider = caseManagersProvider;
+	}
+	
 }
