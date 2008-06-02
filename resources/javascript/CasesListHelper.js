@@ -24,6 +24,7 @@ var GRID_WITH_SUBGRID_ID_PREFIX = '_tableForProcessInstanceGrid_';
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
 function initializeCasesList(caseToOpenId) {
+	/*
 	DWREngine.setErrorHandler(function() {
 		closeAllLoadingMessages();
 		
@@ -36,6 +37,7 @@ function initializeCasesList(caseToOpenId) {
 		
 		//	TODO: make some explanation text for user
 	});
+	*/
 	
 	var jQGridInclude = new JQGridInclude();
 	jQGridInclude.SUBGRID = true;
@@ -214,8 +216,9 @@ function registerGridExpanderActionsForElement(event, element) {
 		
 		showLoadingMessage('');
 		var caseId = caseToExpand.attr(caseIdPar);
-		CasesEngine.getInfoForCase(caseId, {
+		CasesEngine.getCaseManagerView(caseId, {
 			callback: function(component) {
+				
 				closeAllLoadingMessages();
 				
 				if (component == null) {
@@ -224,8 +227,9 @@ function registerGridExpanderActionsForElement(event, element) {
 				
 				insertNodesToContainer(component, customerView[0]);
 				customerView.addClass(classCaseWithInfo);
+                showCustomerViewForCase(customerView, null);
 				
-				showCustomerViewForCase(customerView, function() {initializeCaseGrids(caseId, customerView);});
+				//showCustomerViewForCase(customerView, function() {initializeCaseGrids(caseId, customerView);});
 			}
 		});
 	}
@@ -234,6 +238,7 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 }
 
+/*
 function openAllAttachmentsForCase(table) {
 	if (table == null) {
 		return false;
@@ -258,6 +263,7 @@ function openAllAttachmentsForCase(table) {
 	}
 }
 
+
 function initializeCaseGrids(caseId, customerView) {
 	CasesEngine.getProcessInstanceId(caseId, {
 		callback: function(piId) {
@@ -267,7 +273,7 @@ function initializeCaseGrids(caseId, customerView) {
 			
 			BPMProcessAssets.hasUserRolesEditorRights(piId, {
 				callback: function(hasRightChangeRights) {
-					initTasksGrid(caseId, piId, customerView, /*hasRightChangeRights*/false);	//	TODO: currently we are not managing access rights for tasks
+					initTasksGrid(caseId, piId, customerView, false);	//	TODO: currently we are not managing access rights for tasks
 					initFormsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initEmailsGrid(caseId, piId, customerView, hasRightChangeRights);
 					initContactsGrid(piId, customerView, hasRightChangeRights);
@@ -276,6 +282,7 @@ function initializeCaseGrids(caseId, customerView) {
 		}
 	});
 }
+
 
 function initContactsGrid(piId, customerView, hasRightChangeRights) {
 	var identifier = 'caseContacts';
@@ -606,7 +613,7 @@ function setStyleClassesForGridColumns(elements) {
 }
 
 function setBPMProcessForPreview(caseId, taskInstanceId) {
-	changeWindowLocationHref('prm_case_pk=' + caseId + '&taskInstanceId=' + taskInstanceId + '&cp_prm_action=8');
+	changeWindowLocationHref('prm_case_pk=' + caseId + '&tiId=' + taskInstanceId + '&cp_prm_action=8');
 }
 
 function downloadCaseDocument(event, taskId) {
@@ -640,6 +647,8 @@ function setCurrentWindowToDownloadCaseResource(uri, styleClass) {
 	window.location.href = linkHref;
 	return true;
 }
+
+*/
 
 function showCustomerViewForCase(component, callbackFunction) {
 	var displayProperty = 'fast';
