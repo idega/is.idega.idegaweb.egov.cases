@@ -25,10 +25,8 @@ import javax.faces.context.FacesContext;
 import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
-import com.idega.block.process.presentation.beans.GeneralCaseProcessorViewBuilder;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
-import com.idega.business.SpringBeanLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading3;
@@ -41,6 +39,7 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
@@ -104,8 +103,8 @@ public abstract class CasesProcessor extends CasesBlock {
 					showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 					break;
 					
-				case UserCases.ACTION_BPM_PROCESS:
-					showProcessorForBpm(iwc);
+				case UserCases.ACTION_CASE_MANAGER_VIEW:
+					showCaseManagerView(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 					break;
 				
 				default:
@@ -114,17 +113,27 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
-	private void showProcessorForBpm(IWContext iwc) throws NullPointerException {
-		GeneralCaseProcessorViewBuilder processorView = (GeneralCaseProcessorViewBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCaseProcessorViewBuilder.SPRING_BEAN_IDENTIFIER);
+	private void showCaseManagerView(IWContext iwc, Object casePK) {
+
 		UIComponent view = null;
-		try {
-			view = processorView.getCaseProcessorView(iwc);
-		} catch (RemoteException e) {
-			e.printStackTrace();
+		
+		if(casePK != null && !CoreConstants.EMPTY.equals(casePK)) {
+			
+			Integer caseId;
+		
+			if(casePK instanceof Integer)
+				caseId = (Integer)casePK;
+			else
+				caseId = new Integer(casePK instanceof String ? (String)casePK : casePK.toString());
+			
+			GeneralCasesListBuilder listBuilder = WFUtil.getBeanInstance(iwc, GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
+			view = listBuilder.getCaseManagerView(iwc, caseId);
 		}
+		
 		if (view == null) {
 			view = new Heading3(getResourceBundle(iwc).getLocalizedString("cases_list.can_not_get_case_view", "Sorry, error occurred - can not generate case processor view."));
 		}
+		
 		add(view);
 	}
 	
@@ -383,7 +392,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 	
 	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
-		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder) SpringBeanLookup.getInstance().getSpringBean(iwc.getServletContext(), GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
+		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder)WFUtil.getBeanInstance(iwc, GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
 		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getCasesProcessorType(), showCheckBoxes));
 	}
 
