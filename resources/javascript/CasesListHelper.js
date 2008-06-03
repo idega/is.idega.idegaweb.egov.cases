@@ -1,32 +1,8 @@
-/*
-var CASE_GRID_STRING_CONTACT_NAME = 'Name';
-var CASE_GRID_STRING_TASK_NAME = 'Task name';
-var CASE_GRID_STRING_FORM_NAME = 'Document name';
-var CASE_GRID_STRING_SENDER = 'Sender';
-var CASE_GRID_STRING_DATE = 'Date';
-var CASE_GRID_STRING_TAKEN_BY = 'Taken by';
-var CASE_GRID_STRING_EMAIL_ADDRESS = 'E-mail address';
-var CASE_GRID_STRING_PHONE_NUMBER = 'Phone number';
-var CASE_GRID_STRING_ADDRESS = 'Address';
-var CASE_GRID_STRING_SUBJECT = 'Subject';
-var CASE_GRID_STRING_FILE_DESCRIPTION = 'Descriptive name';
-var CASE_GRID_STRING_FILE_NAME = 'File name';
-var CASE_GRID_STRING_CHANGE_ACCESS_RIGHTS = 'Change access rights';
-var CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = 'Download document';
-var CASE_GRID_STRING_FILE_SIZE = 'File size';
-var CASE_GRID_STRING_SUBMITTED_BY = 'Submitted by';
-*/
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 
-/*
-var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
-var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
-
-var GRID_WITH_SUBGRID_ID_PREFIX = '_tableForProcessInstanceGrid_';
-*/
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
-function initializeCasesList(caseToOpenId) {
+function initializeCasesList(caseToOpenId, localizations) {
 	DWREngine.setErrorHandler(function() {
 		closeAllLoadingMessages();
 		
@@ -39,50 +15,17 @@ function initializeCasesList(caseToOpenId) {
 		
 		//	TODO: make some explanation text for user
 	});
-	
+
 	var jQGridInclude = new JQGridInclude();
 	jQGridInclude.SUBGRID = true;
 	jqGridInclude(jQGridInclude);
 	
-	CasesEngine.getLocalizedStrings({
-		callback: function(data) {
-			//setCasesListLocalizations(data);
-			continueInitializeCasesList(caseToOpenId);
-		}
-	});
-}
-
-/*
-function setCasesListLocalizations(data) {
-	if (data == null || data.length < 19) {
-		return false;
+	if (localizations != null && localizations.length >= 1) {
+		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];	//	0
 	}
 	
-	CASE_GRID_STRING_CONTACT_NAME = data[0];
-	CASE_GRID_STRING_SENDER = data[1];
-	CASE_GRID_STRING_DATE = data[2];
-	CASE_GRID_STRING_TAKEN_BY = data[3];
-	CASE_GRID_STRING_EMAIL_ADDRESS = data[4];
-	CASE_GRID_STRING_PHONE_NUMBER = data[5];
-	CASE_GRID_STRING_ADDRESS = data[6];
-	CASE_GRID_STRING_SUBJECT = data[7];
-	CASE_GRID_STRING_FILE_NAME = data[8];
-	CASE_GRID_STRING_CHANGE_ACCESS_RIGHTS = data[9];
-	CASE_GRID_STRING_TASK_NAME = data[10];
-	CASE_GRID_STRING_FORM_NAME = data[11];
-	CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = data[12];
-	CASE_GRID_STRING_FILE_SIZE = data[13];
-	CASE_GRID_STRING_SUBMITTED_BY = data[14];
-	
-	//	Other info
-	CASE_ATTACHEMENT_LINK_STYLE_CLASS = data[15];
-	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[16];
-	
-	CASE_GRID_STRING_FILE_DESCRIPTION = data[17];
-	
-	CASE_GRID_STRING_CLICK_TO_EDIT = data[18];
+	continueInitializeCasesList(caseToOpenId);
 }
-* */ 
 
 function continueInitializeCasesList(caseToOpenId) {
 	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);

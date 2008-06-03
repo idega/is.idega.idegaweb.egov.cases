@@ -553,7 +553,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	public void addWeb2Stuff(String caseId, IWContext iwc, IWBundle bundle, Layer container) {
-		
 		Web2Business web2Business = (Web2Business)WFUtil.getBeanInstance(iwc, "web2bean");
 		
 		List<String> scripts = new ArrayList<String>();
@@ -568,7 +567,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
-		//scripts.add("/dwr/interface/BPMProcessAssets.js");
 	
 		List<String> css = new ArrayList<String>();
 		css.add(web2Business.getBundleURIToJQGridStyles());
@@ -583,7 +581,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		else {
 			action.append("'").append(caseId).append("'");
 		}
-		action.append(");");
+		action.append(", [");
+		
+		//	Localizations: array as parameter
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		action.append("'").append(iwrb.getLocalizedString("click_to_edit", "Click to edit...")).append("'");
+		
+		action.append("]);");
+		
+		//	Adding resources
 		if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			container.add(PresentationUtil.getJavaScriptSourceLines(scripts));
 			container.add(PresentationUtil.getStyleSheetsSourceLines(css));

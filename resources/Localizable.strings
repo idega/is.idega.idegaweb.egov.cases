@@ -225,3 +225,4 @@ zip_city=City
 zip_code=Postal code
 cases_list.can_not_get_cases_list=Sorry, error occurred - can not generate cases list.
 send_email=Send e-mail
+click_to_edit=Click to edit...
