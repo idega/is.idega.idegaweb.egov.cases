@@ -25,11 +25,11 @@ import javax.faces.context.FacesContext;
 import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
+import com.idega.block.process.presentation.beans.GeneralCaseManagerViewBuilder;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
@@ -39,7 +39,6 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
@@ -104,7 +103,7 @@ public abstract class CasesProcessor extends CasesBlock {
 					break;
 					
 				case UserCases.ACTION_CASE_MANAGER_VIEW:
-					showCaseManagerView(iwc, iwc.getParameter(PARAMETER_CASE_PK));
+					showCaseManagerView(iwc);
 					break;
 				
 				default:
@@ -113,25 +112,19 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
-	private void showCaseManagerView(IWContext iwc, Object casePK) {
+	private void showCaseManagerView(IWContext iwc) {
 
 		UIComponent view = null;
-		
-		if(casePK != null && !CoreConstants.EMPTY.equals(casePK)) {
-			
-			Integer caseId;
-		
-			if(casePK instanceof Integer)
-				caseId = (Integer)casePK;
-			else
-				caseId = new Integer(casePK instanceof String ? (String)casePK : casePK.toString());
-			
-			GeneralCasesListBuilder listBuilder = WFUtil.getBeanInstance(iwc, GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
-			view = listBuilder.getCaseManagerView(iwc, caseId);
+
+		GeneralCaseManagerViewBuilder viewBuilder = (GeneralCaseManagerViewBuilder) WFUtil.getBeanInstance(GeneralCaseManagerViewBuilder.SPRING_BEAN_IDENTIFIER);
+		try {
+			view = viewBuilder.getCaseManagerView(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
 		
 		if (view == null) {
-			view = new Heading3(getResourceBundle(iwc).getLocalizedString("cases_list.can_not_get_case_view", "Sorry, error occurred - can not generate case processor view."));
+			return;
 		}
 		
 		add(view);

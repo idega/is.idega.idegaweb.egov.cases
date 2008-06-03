@@ -223,6 +223,5 @@ view=View
 view_case=View case
 zip_city=City
 zip_code=Postal code
-cases_list.can_not_get_case_view=Sorry, error occurred - can not generate case processor view.
 cases_list.can_not_get_cases_list=Sorry, error occurred - can not generate cases list.
 send_email=Send e-mail
