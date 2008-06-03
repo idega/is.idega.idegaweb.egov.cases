@@ -1,3 +1,4 @@
+/*
 var CASE_GRID_STRING_CONTACT_NAME = 'Name';
 var CASE_GRID_STRING_TASK_NAME = 'Task name';
 var CASE_GRID_STRING_FORM_NAME = 'Document name';
@@ -14,13 +15,15 @@ var CASE_GRID_STRING_CHANGE_ACCESS_RIGHTS = 'Change access rights';
 var CASE_GRID_STRING_DOWNLOAD_DOCUMENT_AS_PDF = 'Download document';
 var CASE_GRID_STRING_FILE_SIZE = 'File size';
 var CASE_GRID_STRING_SUBMITTED_BY = 'Submitted by';
+*/
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 
+/*
 var CASE_ATTACHEMENT_LINK_STYLE_CLASS = 'casesBPMAttachmentDownloader';
 var CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = 'casesBPMPDFGeneratorAndDownloader';
 
 var GRID_WITH_SUBGRID_ID_PREFIX = '_tableForProcessInstanceGrid_';
-
+*/
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
 function initializeCasesList(caseToOpenId) {
@@ -43,12 +46,13 @@ function initializeCasesList(caseToOpenId) {
 	
 	CasesEngine.getLocalizedStrings({
 		callback: function(data) {
-			setCasesListLocalizations(data);
+			//setCasesListLocalizations(data);
 			continueInitializeCasesList(caseToOpenId);
 		}
 	});
 }
 
+/*
 function setCasesListLocalizations(data) {
 	if (data == null || data.length < 19) {
 		return false;
@@ -75,8 +79,10 @@ function setCasesListLocalizations(data) {
 	CASE_PDF_DOWNLOADER_LINK_STYLE_CLASS = data[16];
 	
 	CASE_GRID_STRING_FILE_DESCRIPTION = data[17];
+	
 	CASE_GRID_STRING_CLICK_TO_EDIT = data[18];
 }
+* */ 
 
 function continueInitializeCasesList(caseToOpenId) {
 	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);
