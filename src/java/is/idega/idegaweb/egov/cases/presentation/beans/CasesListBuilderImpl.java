@@ -565,7 +565,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
-		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
 	
 		List<String> css = new ArrayList<String>();
@@ -598,7 +597,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		else {
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 			PresentationUtil.addStyleSheetsToHeader(iwc, css);
-			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(document).ready(function() {"+action.toString()+"});");
+			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(window).load(function() {"+action.toString()+"});");
 		}
 	}
 	
