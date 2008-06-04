@@ -221,6 +221,7 @@ div.caseGrids div.header {
 	font-weight: bold;
 	padding: 0 8px;
 	border-bottom: 1px #a0a0a0 solid;
+	overflow: hidden;
 }
 
 a.casesBPMAttachmentDownloader {
@@ -237,4 +238,8 @@ table.scroll tbody tr td {
 
 div.hiddenLinksForCasesContainerStyle {
 	display: none;
+}
+
+span.watchUnwatchCase {
+	cursor: pointer;
 }
