@@ -556,11 +556,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Web2Business web2Business = (Web2Business)WFUtil.getBeanInstance(iwc, "web2bean");
 		
 		List<String> scripts = new ArrayList<String>();
-		try {
-			scripts.add(web2Business.getBundleURIToJQueryLib());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		scripts.add(web2Business.getBundleURIToJQueryLib());
 		scripts.add(web2Business.getBundleURIToJQGrid());
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
