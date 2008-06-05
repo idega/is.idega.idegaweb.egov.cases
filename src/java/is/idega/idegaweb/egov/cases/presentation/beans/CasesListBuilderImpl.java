@@ -557,14 +557,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(web2Business.getBundleURIToJQueryLib());
-		scripts.add(web2Business.getBundleURIToJQGrid());
+		//scripts.add(web2Business.getBundleURIToJQGrid());
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
 	
-		List<String> css = new ArrayList<String>();
-		css.add(web2Business.getBundleURIToJQGridStyles());
+//		List<String> css = new ArrayList<String>();
+//		css.add(web2Business.getBundleURIToJQGridStyles());
 		
 		if (caseId == null || CoreConstants.EMPTY.equals(caseId)) {
 			caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK + "_id");
@@ -587,12 +587,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Adding resources
 		if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			container.add(PresentationUtil.getJavaScriptSourceLines(scripts));
-			container.add(PresentationUtil.getStyleSheetsSourceLines(css));
+			//container.add(PresentationUtil.getStyleSheetsSourceLines(css));
 			container.add(PresentationUtil.getJavaScriptAction(action.toString()));
 		}
 		else {
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-			PresentationUtil.addStyleSheetsToHeader(iwc, css);
+			//PresentationUtil.addStyleSheetsToHeader(iwc, css);
 			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(window).load(function() {"+action.toString()+"});");
 		}
 	}
