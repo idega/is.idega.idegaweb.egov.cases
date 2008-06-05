@@ -3,6 +3,7 @@ var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
 function initializeCasesList(caseToOpenId, localizations) {
+	
 	DWREngine.setErrorHandler(function() {
 		closeAllLoadingMessages();
 		
@@ -15,7 +16,7 @@ function initializeCasesList(caseToOpenId, localizations) {
 		
 		//	TODO: make some explanation text for user
 	});
-
+	
 	var jQGridInclude = new JQGridInclude();
 	jQGridInclude.SUBGRID = true;
 	jqGridInclude(jQGridInclude);
@@ -172,7 +173,8 @@ function registerGridExpanderActionsForElement(event, element) {
 					return false;
 				}
 				
-				insertNodesToContainer(component, customerView[0]);
+				IWCORE.insertHtml(component, customerView[0]);
+				
 				customerView.addClass(classCaseWithInfo);
                 jQuery(customerView).show('fast');
 			}
