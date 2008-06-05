@@ -17,10 +17,6 @@ function initializeCasesList(caseToOpenId, localizations) {
 		//	TODO: make some explanation text for user
 	});
 	
-	var jQGridInclude = new JQGridInclude();
-	jQGridInclude.SUBGRID = true;
-	jqGridInclude(jQGridInclude);
-	
 	if (localizations != null && localizations.length >= 1) {
 		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];	//	0
 	}
