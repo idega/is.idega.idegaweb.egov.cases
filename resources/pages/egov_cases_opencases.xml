@@ -59,7 +59,6 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
-    	<module id="" class="com.idega.block.article.component.ArticleCategoriesViewer" />
     </region>
     <region id="footer" label="footer">
     	<module id="" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
