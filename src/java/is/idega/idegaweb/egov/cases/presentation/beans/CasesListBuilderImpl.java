@@ -580,7 +580,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		action.append("'").append(iwrb.getLocalizedString("click_to_edit", "Click to edit...")).append("'");
 		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page", "Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
 		
-		action.append("], true);");
+		action.append("], false);");
 		
 		//	Adding resources
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
