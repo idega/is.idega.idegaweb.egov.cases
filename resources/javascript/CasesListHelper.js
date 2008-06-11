@@ -19,7 +19,7 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 			}
 		}
 		
-		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception + '\n ' + CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
+		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception + '\n' + CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
 		if (window.confirm(debug ? text : CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE)) {
 			reloadPage();
 			return false;
