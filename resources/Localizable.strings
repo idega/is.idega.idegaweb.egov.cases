@@ -226,3 +226,6 @@ zip_code=Postal code
 cases_list.can_not_get_cases_list=Sorry, error occurred - can not generate cases list.
 send_email=Send e-mail
 click_to_edit=Click to edit...
+date_range=Date range
+select_status=Select status
+error_occurred_confirm_to_reload_page=Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?

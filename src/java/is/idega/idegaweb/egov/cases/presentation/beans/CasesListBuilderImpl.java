@@ -562,9 +562,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
-	
-//		List<String> css = new ArrayList<String>();
-//		css.add(web2Business.getBundleURIToJQGridStyles());
 		
 		if (caseId == null || CoreConstants.EMPTY.equals(caseId)) {
 			caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK + "_id");
@@ -581,20 +578,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Localizations: array as parameter
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		action.append("'").append(iwrb.getLocalizedString("click_to_edit", "Click to edit...")).append("'");
+		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page", "Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
 		
-		action.append("]);");
+		action.append("], true);");
 		
 		//	Adding resources
-		if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
-			container.add(PresentationUtil.getJavaScriptSourceLines(scripts));
-			//container.add(PresentationUtil.getStyleSheetsSourceLines(css));
-			container.add(PresentationUtil.getJavaScriptAction(action.toString()));
+		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+			action = new StringBuilder("jQuery(window).load(function() {").append(action.toString()).append("});");
 		}
-		else {
-			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-			//PresentationUtil.addStyleSheetsToHeader(iwc, css);
-			PresentationUtil.addJavaScriptActionToBody(iwc, "jQuery(window).load(function() {"+action.toString()+"});");
-		}
+		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
+		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 	}
 	
 	private CasesBusiness getCasesBusiness(IWApplicationContext iwac) {

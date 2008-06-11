@@ -1,10 +1,15 @@
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
+var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?';
 
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
-function initializeCasesList(caseToOpenId, localizations) {
+function initializeCasesList(caseToOpenId, localizations, debug) {
+	if (localizations != null && localizations.length >= 2) {
+		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];						//	0
+		CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = localizations[1];	//	1
+	}
 	
-	DWREngine.setErrorHandler(function() {
+	DWREngine.setErrorHandler(function(message, exception) {
 		closeAllLoadingMessages();
 		
 		var loadingLabels = jQuery('div.loading');
@@ -14,12 +19,12 @@ function initializeCasesList(caseToOpenId, localizations) {
 			}
 		}
 		
-		//	TODO: make some explanation text for user
+		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception + '\n ' + CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
+		if (window.confirm(debug ? text : CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE)) {
+			reloadPage();
+			return false;
+		}
 	});
-	
-	if (localizations != null && localizations.length >= 1) {
-		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];	//	0
-	}
 	
 	continueInitializeCasesList(caseToOpenId);
 }
