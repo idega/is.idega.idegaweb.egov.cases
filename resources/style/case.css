@@ -1,4 +1,4 @@
-.casesTable td, th {
+.casesTable td, .casesTable th {
 	font-size: 10px;
 	empty-cells: show;
 }
@@ -39,7 +39,7 @@
 	background-color: #FFFFFF;	
 }
 
-.statisticsLayer TH {
+.statisticsLayer th {
 	width : 100px;
 }
 
