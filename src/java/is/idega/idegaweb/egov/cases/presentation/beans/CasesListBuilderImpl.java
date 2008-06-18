@@ -64,15 +64,7 @@ import com.idega.webface.WFUtil;
 @Service(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER)
 public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
-	private static final Logger logger = Logger.getLogger(CasesListBuilderImpl.class.getName());
-	
 	private CaseManagersProvider caseManagersProvider;
-//	
-//	private IWBundle bundle;
-//	private IWResourceBundle iwrb;
-//	
-//	private CasesBusiness casesBusiness;
-//	private CredentialBusiness credentialBusiness;
 	
 	private String caseContainerStyle = "casesListCaseContainer";
 	private String bodyItem = "casesListBodyContainerItem";
@@ -180,23 +172,41 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
+		
+		
+		boolean caseIdentifierFromCaseManager = false;
+		
 		String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
-		if (caseIdentifier == null) {
-			logger.log(Level.INFO, "Didn't get case identifier from case manager, will treat case " + theCase + " as old case");
+		
+		if(caseManager != null) {
+			caseIdentifier = caseManager.getProcessIdentifier(theCase);
+			
+			if(caseIdentifier == null) {
+			
+				caseIdentifier = theCase.getPrimaryKey().toString();
+			} else {
+				caseIdentifierFromCaseManager = true;
+			}
+		} else {
+			
 			caseIdentifier = theCase.getPrimaryKey().toString();
-			caseManager = null;
 		}
+		
 		numberContainer.setStyleClass("firstColumn");
 		if (caseManager == null) {
 			numberContainer.add(caseIdentifier);
-		}
-		else {
-			IWBundle bundle = getBundle(iwc);
-			IWResourceBundle iwrb = getResourceBundle(iwc);
-			Link sendEmail = new Link(bundle.getImage("images/email.png", iwrb.getLocalizedString("send_email", "Send e-mail")),
-					getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
-			numberContainer.add(sendEmail);
-			numberContainer.add(Text.getNonBrakingSpace());
+		} else {
+			
+			if(caseIdentifierFromCaseManager) {
+			
+				IWBundle bundle = getBundle(iwc);
+				IWResourceBundle iwrb = getResourceBundle(iwc);
+				Link sendEmail = new Link(bundle.getImage("images/email.png", iwrb.getLocalizedString("send_email", "Send e-mail")),
+						getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
+				numberContainer.add(sendEmail);
+				numberContainer.add(Text.getNonBrakingSpace());
+			}
+			
 			numberContainer.add(caseIdentifier);
 		}
 		showCheckBoxes = caseManager == null ? showCheckBoxes : false;
