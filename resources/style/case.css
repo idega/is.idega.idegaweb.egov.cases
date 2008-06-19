@@ -198,6 +198,11 @@ div.caseGrids div.header {
 	overflow: hidden;
 }
 
+div.caseGrids div.header {
+	margin-bottom: 0;
+	background-color: #efefef;
+}
+
 div.caseGrids table {
 	width: 100% !important;
 }
