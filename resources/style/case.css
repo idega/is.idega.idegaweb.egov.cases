@@ -68,13 +68,11 @@ div.info div#phone, div.info div#email {
 }
 
 div.casesListHeadersContainer {
-	border-top: 1px solid #D7D7D7;
-	border-bottom: 1px solid #D7D7D7;
-	color: #595A54;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
 	font-weight: bold;
-	padding: 3px;
+	padding: 5px 8px;
 	text-align:left;
-	background-color: #C0E0FC;
 	overflow: hidden;
 }
 
@@ -84,77 +82,53 @@ div.casesListHeadersContainerItem, div.casesListBodyContainerItem {
 
 div.casesListCaseContainer {
 	overflow: hidden;
-	border-bottom: 1px solid #D7D7D7;
+	border-bottom: 1px solid #ccc;
+	padding: 5px 8px;
 }
 
-div.casesListHeadersContainerItemToggler {
+div.casesListCaseContainer:hover {
+	background-color: #dfdfdf;
+}
+
+div.casesListHeadersContainerItemToggler, div.casesListBodyContainerItemToggler {
 	width: 5%;
 }
-div.casesListBodyContainerItemToggler {
-	width: 5%;
+
+div.casesListHeadersContainerItemCaseNumber, div.casesListBodyContainerItemCaseNumber {
+	width: 28%;
 }
 
-div.casesListHeadersContainerItemCaseNumber {
-	width: 20%;
-}
-div.casesListBodyContainerItemCaseNumber {
-	width: 20%;
+div.casesListBodyContainerItemCaseNumber img {
+	float: left;
 }
 
-div.casesListHeadersContainerItemSender {
+div.casesListHeadersContainerItemSender, div.casesListBodyContainerItemSender {
 	width: 15%;
-}
-div.casesListBodyContainerItemSender {
-	width: 15%;
+	display: none;
 }
 
-div.casesListHeadersContainerItemDescription {
-	width: 27%;
-}
-div.casesListBodyContainerItemDescription {
-	width: 27%;
+div.casesListHeadersContainerItemDescription, div.casesListBodyContainerItemDescription {
+	width: 30%;
 }
 
-div.casesListHeadersContainerItemCaseType {
-	width: 12%;
-}
-div.casesListBodyContainerItemCaseType {
+div.casesListHeadersContainerItemCaseType, div.casesListBodyContainerItemCaseType {
 	width: 12%;
 }
 
-div.casesListHeadersContainerItemCreatedDate {
-	width: 15%;
+div.casesListHeadersContainerItemCreatedDate, div.casesListBodyContainerItemCreationDate {
+	width: 20%;
 }
-div.casesListBodyContainerItemCreationDate {
+
+div.casesListHeadersContainerItemStatus, div.casesListBodyContainerItemStatus {
 	width: 15%;
 }
 
-div.casesListHeadersContainerItemStatus {
-	width: 15%;
-}
-div.casesListBodyContainerItemStatus {
-	width: 15%;
-}
-
-div.casesListHeadersContainerItemHandler {
-	width: 10%;
-}
-div.casesListBodyContainerItemHandler {
+div.casesListHeadersContainerItemHandler, div.casesListBodyContainerItemHandler {
 	width: 10%;
 }
 
-div.casesListHeadersContainerItemMultiHandle {
+div.casesListHeadersContainerItemMultiHandle, div.casesListBodyContainerItemMultiHandle {
 	width: 3%;
-}
-div.casesListBodyContainerItemMultiHandle {
-	width: 3%;
-}
-
-div.casesListBodyContainer {
-}
-
-div.casesListCaseContainer {
-	width: 100%;
 }
 
 div.casesListBodyContainerItem {
@@ -166,13 +140,13 @@ div.casesListGridExpanderStyleClass {
 }
 
 div.expand {
-	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit.png) no-repeat scroll left top;
+	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit.png) no-repeat scroll center center;
 	cursor: pointer;
 	height: 16px;
 }
 
 div.expanded {
-	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit_expanded.png) no-repeat scroll left top;
+	background: transparent url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/edit_expanded.png) no-repeat scroll center center;
 	cursor: pointer;
 	height: 16px;
 }
@@ -203,7 +177,7 @@ div.caseGrids {
 	background-color: #fff;
 	margin-top: 8px;
 	margin-bottom: 3px;
-	width: 614px !important;
+	width: auto !important;
 	clear: both;
 }
 
@@ -222,6 +196,10 @@ div.caseGrids div.header {
 	padding: 0 8px;
 	border-bottom: 1px #a0a0a0 solid;
 	overflow: hidden;
+}
+
+div.caseGrids table {
+	width: 100% !important;
 }
 
 a.casesBPMAttachmentDownloader {
