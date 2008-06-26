@@ -7,6 +7,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CaseWriter;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
@@ -25,6 +26,7 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -113,10 +115,18 @@ public class ClosedCases extends CasesProcessor {
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label();
+		label.setLabel(getResourceBundle().getLocalizedString("case_nr", "Case nr"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
+		layer.add(formItem);
+		
 		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 			element.add(label);
 			element.add(caseType);
@@ -129,7 +139,7 @@ public class ClosedCases extends CasesProcessor {
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(parentCaseCategory);
@@ -146,7 +156,7 @@ public class ClosedCases extends CasesProcessor {
 		else {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(caseCategory);
@@ -155,7 +165,7 @@ public class ClosedCases extends CasesProcessor {
 
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label();
+		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);
@@ -227,6 +237,10 @@ public class ClosedCases extends CasesProcessor {
 		back.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
+		
+		Link pdf = getDownloadButtonLink(getResourceBundle().getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
+		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+		bottom.add(pdf);
 
 		Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "reactivate_case", "Reactivate case"));
 		next.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
@@ -249,6 +263,13 @@ public class ClosedCases extends CasesProcessor {
 
 	protected boolean showCheckBox() {
 		return false;
+	}
+	
+	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,1]] } ); } );");
+
+		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 	}
 	
 	@Override
