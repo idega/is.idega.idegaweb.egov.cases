@@ -15,6 +15,7 @@ import is.idega.idegaweb.egov.cases.util.CaseConstants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Date;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
@@ -49,15 +50,17 @@ import com.idega.util.text.Name;
 
 public class CasesWriter extends DownloadWriter implements MediaWritable {
 
-	private MemoryFileBuffer buffer = null;
-	private Locale locale;
-	private IWResourceBundle iwrb;
+	protected MemoryFileBuffer buffer = null;
+	protected Locale locale;
+	protected IWResourceBundle iwrb;
 
 	public static final String PARAMETER_CASE_CATEGORY = "prm_case_category";
 	public static final String PARAMETER_SUB_CASE_CATEGORY = "prm_sub_case_category";
 	public static final String PARAMETER_CASE_TYPE = "prm_case_type";
 	public static final String PARAMETER_CASE_STATUS = "prm_case_status";
 	public static final String PARAMETER_ANONYMOUS = "prm_anonymous";
+	public static final String PARAMETER_FROM_DATE = "prm_from_date";
+	public static final String PARAMETER_TO_DATE = "prm_to_date";
 
 	public CasesWriter() {
 	}
@@ -107,7 +110,17 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 				anonymous = new Boolean(iwc.getParameter(PARAMETER_ANONYMOUS));
 			}
 
-			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, anonymous);
+			Date fromDate = null;
+			if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
+				fromDate = new IWTimestamp(iwc.getParameter(PARAMETER_FROM_DATE)).getDate();
+			}
+
+			Date toDate = null;
+			if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
+				toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
+			}
+			
+			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, fromDate, toDate, anonymous);
 
 			this.buffer = writeXLS(iwc, cases);
 			setAsDownload(iwc, "cases.xls", this.buffer.length());
@@ -155,13 +168,18 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		}
 		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
-		sheet.setColumnWidth(cellColumn++, (short) (150 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (30 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (50 * 256));
 
 		HSSFFont font = workbook.createFont();
 		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		font.setFontHeightInPoints((short) 12);
 		HSSFCellStyle style = workbook.createCellStyle();
 		style.setFont(font);
+
+		HSSFCellStyle style2 = workbook.createCellStyle();
+		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);
+		style2.setWrapText(true);
 
 		int cellRow = 0;
 		cellColumn = 0;
@@ -198,6 +216,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		cell.setCellStyle(style);
 
 		cell = row.createCell(cellColumn++);
+		cell.setCellValue(this.iwrb.getLocalizedString("regarding", "Regarding"));
+		cell.setCellStyle(style);
+
+		cell = row.createCell(cellColumn++);
 		cell.setCellValue(this.iwrb.getLocalizedString("message", "Message"));
 		cell.setCellStyle(style);
 
@@ -215,17 +237,21 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getPrimaryKey().toString());
+			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(created.getLocaleDateAndTime(locale, IWTimestamp.SHORT, IWTimestamp.SHORT));
+			cell.setCellStyle(style2);
 
 			if (user != null) {
 				Name name = new Name(user.getFirstName(), user.getMiddleName(), user.getLastName());
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(name.getName(locale));
+				cell.setCellStyle(style2);
 
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(PersonalIDFormatter.format(user.getPersonalID(), locale));
+				cell.setCellStyle(style2);
 			}
 			else {
 				cell = row.createCell(cellColumn++);
@@ -236,17 +262,25 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(category.getLocalizedCategoryName(locale));
+			cell.setCellStyle(style2);
 
 			if (getBusiness(iwc).useTypes()) {
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(type.getName());
+				cell.setCellStyle(style2);
 			}
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));
+			cell.setCellStyle(style2);
+
+			cell = row.createCell(cellColumn++);
+			cell.setCellValue(element.getSubject() != null ? element.getSubject() : "-");
+			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getMessage());
+			cell.setCellStyle(style2);
 		}
 
 		workbook.write(mos);
@@ -255,7 +289,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		return buffer;
 	}
 
-	private CasesBusiness getBusiness(IWApplicationContext iwac) {
+	protected CasesBusiness getBusiness(IWApplicationContext iwac) {
 		try {
 			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		}

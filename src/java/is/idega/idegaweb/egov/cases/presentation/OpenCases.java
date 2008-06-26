@@ -7,6 +7,7 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.cases.business.CaseWriter;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
@@ -27,6 +28,7 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -148,10 +150,18 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
 
+		Layer formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		Label label = new Label();
+		label.setLabel(getResourceBundle().getLocalizedString("case_nr", "Case nr"));
+		formItem.add(label);
+		formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
+		section.add(formItem);
+		
 		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_type", "Case type"));
 			element.add(label);
 			element.add(caseType);
@@ -164,7 +174,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(parentCaseCategory);
@@ -181,7 +191,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		else {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			Label label = new Label();
+			label = new Label();
 			label.setLabel(getResourceBundle().getLocalizedString("case_category", "Case category"));
 			element.add(label);
 			element.add(caseCategory);
@@ -190,7 +200,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label();
+		label = new Label();
 		label.setLabel(getResourceBundle().getLocalizedString("created_date", "Created date"));
 		element.add(label);
 		element.add(createdDate);
@@ -211,6 +221,16 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			element.add(label);
 			element.add(attachmentSpan);
 			section.add(element);
+		}
+		
+		if (theCase.getSubject() != null) {
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(getResourceBundle().getLocalizedString("regarding", "Regarding"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(theCase.getSubject())));
+			section.add(formItem);
 		}
 
 		element = new Layer(Layer.DIV);
@@ -233,6 +253,10 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		back.setStyleClass("homeButton");
 		back.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		bottom.add(back);
+		
+		Link pdf = getDownloadButtonLink(getResourceBundle().getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
+		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
+		bottom.add(pdf);
 
 		if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
 			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
@@ -252,6 +276,9 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	protected void save(IWContext iwc) throws RemoteException {
 		
 		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
+		Object caseCategoryPK = iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_CASE_CATEGORY_PK) : null;
+		Object subCaseCategoryPK = iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK) : null;
+		Object caseTypePK = iwc.isParameterSet(PARAMETER_CASE_TYPE_PK) ? iwc.getParameter(PARAMETER_CASE_TYPE_PK) : null;
 		if (casePK != null) {
 			try {
 				GeneralCase theCase = getCasesBusiness(iwc).getGeneralCase(new Integer(casePK));
@@ -277,6 +304,13 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.iMyCasesPage = myCasesPage;
+	}
+	
+	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
+
+		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 	}
 
 	@Override
