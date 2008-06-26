@@ -9,6 +9,7 @@ package is.idega.idegaweb.egov.cases.data;
 
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
 
+import java.sql.Date;
 import java.util.Collection;
 import java.util.logging.Level;
 
@@ -42,6 +43,12 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
+	private static final String COLUMN_IS_ANONYMOUS = "is_anonymous";
+	private static final String COLUMN_PRIORITY = "priority";
+	private static final String COLUMN_TITLE = "title";
+	private static final String COLUMN_WANT_REPLY = "want_reply";
+	private static final String COLUMN_WANT_REPLY_EMAIL = "want_reply_email";
+	private static final String COLUMN_WANT_REPLY_PHONE = "want_reply_phone";
 
 	/*
 	 * (non-Javadoc)
@@ -72,6 +79,12 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addAttribute(COLUMN_REPLY, "Reply", String.class, 4000);
 		addAttribute(COLUMN_TYPE, "Type", String.class);
 		addAttribute(COLUMN_IS_PRIVATE, "Is private", Boolean.class);
+		addAttribute(COLUMN_IS_ANONYMOUS, "Is anonymous", Boolean.class);
+		addAttribute(COLUMN_PRIORITY, "Priority", String.class);
+		addAttribute(COLUMN_TITLE, "Title", String.class);
+		addAttribute(COLUMN_WANT_REPLY, "Want reply", String.class);
+		addAttribute(COLUMN_WANT_REPLY_EMAIL, "Email reply", String.class);
+		addAttribute(COLUMN_WANT_REPLY_PHONE, "Phone reply", String.class);
 
 		addManyToOneRelationship(COLUMN_CASE_CATEGORY, CaseCategory.class);
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
@@ -120,6 +133,30 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	public boolean isPrivate() {
 		return getBooleanColumnValue(COLUMN_IS_PRIVATE, false);
 	}
+	
+	public boolean isAnonymous() {
+		return getBooleanColumnValue(COLUMN_IS_ANONYMOUS, false);
+	}
+
+	public String getPriority() {
+		return getStringColumnValue(COLUMN_PRIORITY);
+	}
+
+	public String getTitle() {
+		return getStringColumnValue(COLUMN_TITLE);
+	}
+
+	public String getWantReply() {
+		return getStringColumnValue(COLUMN_WANT_REPLY);
+	}
+
+	public String getWantReplyEmail() {
+		return getStringColumnValue(COLUMN_WANT_REPLY_EMAIL);
+	}
+
+	public String getWantReplyPhone() {
+		return getStringColumnValue(COLUMN_WANT_REPLY_PHONE);
+	}
 
 	// Setters
 	public void setMessage(String message) {
@@ -153,7 +190,31 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	public void setAsPrivate(boolean isPrivate) {
 		setColumn(COLUMN_IS_PRIVATE, isPrivate);
 	}
+	
+	public void setAsAnonymous(boolean isAnonymous) {
+		setColumn(COLUMN_IS_ANONYMOUS, isAnonymous);
+	}
 
+	public void setPriority(String priority) {
+		setColumn(COLUMN_PRIORITY, priority);
+	}
+
+	public void setTitle(String title) {
+		setColumn(COLUMN_TITLE, title);
+	}
+
+	public void setWantReply(String wantReply) {
+		setColumn(COLUMN_WANT_REPLY, wantReply);
+	}
+
+	public void setWantReplyEmail(String wantReplyEmail) {
+		setColumn(COLUMN_WANT_REPLY_EMAIL, wantReplyEmail);
+	}
+
+	public void setWantReplyPhone(String wantReplyPhone) {
+		setColumn(COLUMN_WANT_REPLY_PHONE, wantReplyPhone);
+	}
+	
 	// Finders
 	public Collection ejbFindAllByGroup(Collection groups) throws FinderException {
 		return ejbFindAllByGroupAndStatuses(groups, null, null);
@@ -266,8 +327,70 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 	
+	public Collection ejbFindAllByMessage(String message) throws FinderException {
+		Table table = new Table(this);
+
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName(), true);
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_MESSAGE), MatchCriteria.LIKE, "%" + message + "%"));
+
+		return idoFindPKsByQuery(query);
+	}
+	
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
 		return ejbFindByCriteria(parentCategory, category, type, status, anonymous, null);
+	}
+	
+	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
+		Table table = new Table(this);
+		Table process = new Table(Case.class);
+		Table categories = new Table(CaseCategory.class);
+
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		try {
+			query.addJoin(table, process);
+		}
+		catch (IDORelationshipException e) {
+			e.printStackTrace();
+			throw new FinderException(e.getMessage());
+		}
+
+		if (parentCategory != null) {
+			if (category == null) {
+				try {
+					query.addJoin(table, categories);
+				}
+				catch (IDORelationshipException e) {
+					e.printStackTrace();
+					throw new FinderException(e.getMessage());
+				}
+				query.addCriteria(new MatchCriteria(categories.getColumn("parent_category"), MatchCriteria.EQUALS, parentCategory));
+			}
+			else {
+				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_CATEGORY), MatchCriteria.EQUALS, category));
+			}
+		}
+		if (type != null) {
+			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_TYPE), MatchCriteria.EQUALS, type));
+		}
+		if (status != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), MatchCriteria.EQUALS, status));
+		}
+		if (anonymous != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseUserColumnName()), !anonymous.booleanValue()));
+		}
+		if (fromDate != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCreatedColumnName()), MatchCriteria.GREATEREQUAL, fromDate));
+		}
+		if (toDate != null) {
+			query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCreatedColumnName()), MatchCriteria.LESSEQUAL, toDate));
+		}
+
+		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));
+
+		System.out.println(query.toString());
+		return idoFindPKsByQuery(query);
 	}
 	
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseManagerType) throws FinderException {
@@ -278,7 +401,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		SelectQuery query = new SelectQuery(table);
 		query.addColumn(table, getIDColumnName());
-		
 		try {
 			query.addJoin(table, process);
 		}
