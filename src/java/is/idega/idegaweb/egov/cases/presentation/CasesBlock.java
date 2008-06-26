@@ -30,6 +30,7 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
+import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.ListItem;
@@ -87,6 +88,31 @@ public abstract class CasesBlock extends Block {
 
 		Link link = new Link(all);
 		link.setStyleClass("button");
+
+		return link;
+	}
+	
+	protected Link getDownloadButtonLink(String text, Class mediaWriterClass) {
+		Layer all = new Layer(Layer.SPAN);
+		all.setStyleClass("buttonSpan");
+
+		Layer left = new Layer(Layer.SPAN);
+		left.setStyleClass("left");
+		all.add(left);
+
+		Layer middle = new Layer(Layer.SPAN);
+		middle.setStyleClass("middle");
+		middle.add(new Text(text));
+		all.add(middle);
+
+		Layer right = new Layer(Layer.SPAN);
+		right.setStyleClass("right");
+		all.add(right);
+
+		DownloadLink link = new DownloadLink(all);
+		link.setStyleClass("button");
+		link.setMediaWriterClass(mediaWriterClass);
+		link.setTarget(Link.TARGET_BLANK_WINDOW);
 
 		return link;
 	}

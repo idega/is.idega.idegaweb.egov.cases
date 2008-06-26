@@ -47,6 +47,7 @@ public class CaseFinder extends CasesBlock {
 	private static final String PARAMETER_CASE_NUMBER = "cf_prm_case_number";
 	private static final String PARAMETER_NAME = "cf_prm_name";
 	private static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
+	private static final String PARAMETER_TEXT = "cf_prm_text";
 
 	private static final int ACTION_SEARCH = 1;
 	private static final int ACTION_RESULTS = 2;
@@ -99,6 +100,10 @@ public class CaseFinder extends CasesBlock {
 		TextInput personalID = new TextInput(PARAMETER_PERSONAL_ID);
 		personalID.setStyleClass("textinput");
 		personalID.keepStatusOnAction(true);
+		
+		TextInput text = new TextInput(PARAMETER_TEXT);
+		text.setStyleClass("textinput");
+		text.keepStatusOnAction(true);
 
 		caseNumber.setToDisableOnWhenNotEmpty(name);
 		caseNumber.setToDisableOnWhenNotEmpty(personalID);
@@ -127,6 +132,14 @@ public class CaseFinder extends CasesBlock {
 		element.add(label);
 		element.add(personalID);
 		layer.add(element);
+		
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		label = new Label(getResourceBundle().getLocalizedString("text", "Text"), text);
+		element.add(label);
+		element.add(text);
+		layer.add(element);
+		
 
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");
@@ -172,6 +185,9 @@ public class CaseFinder extends CasesBlock {
 				fe.printStackTrace();
 			}
 		}
+		else if (iwc.isParameterSet(PARAMETER_TEXT)) {
+			cases.addAll(getCasesBusiness().getCasesByMessage(iwc.getParameter(PARAMETER_PERSONAL_ID)));
+		} 
 
 		if (cases.isEmpty()) {
 			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));

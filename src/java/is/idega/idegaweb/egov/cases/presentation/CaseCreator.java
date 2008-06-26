@@ -50,6 +50,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.business.UserSession;
 import com.idega.user.data.User;
@@ -57,27 +58,28 @@ import com.idega.util.FileUtil;
 
 public class CaseCreator extends ApplicationForm {
 
-	private static final String PARAMETER_ACTION = "cc_prm_action";
+	protected static final String PARAMETER_ACTION = "cc_prm_action";
 
-	private static final String PARAMETER_MESSAGE = "prm_message";
-	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
-	private static final String PARAMETER_HIDE_OTHERS = "hide_others";
-	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
-	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-	private static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
-	private static final String PARAMETER_PRIVATE = "prm_private";
+	protected static final String PARAMETER_REGARDING = "prm_regarding";
+	protected static final String PARAMETER_MESSAGE = "prm_message";
+	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
+	protected static final String PARAMETER_HIDE_OTHERS = "hide_others";
+	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
+	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
+	protected static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
+	protected static final String PARAMETER_PRIVATE = "prm_private";
 
-	private static final int ACTION_PHASE_1 = 1;
-	private static final int ACTION_OVERVIEW = 2;
-	private static final int ACTION_SAVE = 3;
+	protected static final int ACTION_PHASE_1 = 1;
+	protected static final int ACTION_OVERVIEW = 2;
+	protected static final int ACTION_SAVE = 3;
 
-	private String iType;
+	protected String iType;
 
-	private IWResourceBundle iwrb;
-	private boolean iUseSessionUser = false;
-	private boolean iUseAnonymous = false;
+	protected IWResourceBundle iwrb;
+	protected boolean iUseSessionUser = false;
+	protected boolean iUseAnonymous = false;
 
-	private Collection iCategories;
+	protected Collection iCategories;
 
 	public String getBundleIdentifier() {
 		return CaseConstants.IW_BUNDLE_IDENTIFIER;
@@ -117,7 +119,7 @@ public class CaseCreator extends ApplicationForm {
 		return ACTION_PHASE_1;
 	}
 
-	private void showPhaseOne(IWContext iwc) throws RemoteException {
+	protected void showPhaseOne(IWContext iwc) throws RemoteException {
 		User user = getUser(iwc);
 		Locale locale = iwc.getCurrentLocale();
 		boolean hideOtherCategories = "true".equalsIgnoreCase(iwc.getParameter(PARAMETER_HIDE_OTHERS));
@@ -246,7 +248,10 @@ public class CaseCreator extends ApplicationForm {
 
 		CaseType firstType = getCasesBusiness(iwc).getFirstAvailableCaseType();
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, firstType != null ? firstType.getPrimaryKey().toString() : "");
-
+		
+		TextInput regarding = new TextInput(PARAMETER_REGARDING);
+		regarding.keepStatusOnAction(true);
+		
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		// message.keepStatusOnAction(true);
@@ -281,6 +286,9 @@ public class CaseCreator extends ApplicationForm {
 			Layer formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_CASE_TYPE_PK)) {
+				formItem.setStyleClass("hasError");
+			}
 			Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_type", "Case type"))), types);
 			formItem.add(label);
 			formItem.add(types);
@@ -293,6 +301,9 @@ public class CaseCreator extends ApplicationForm {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
+		if (hasError(PARAMETER_CASE_CATEGORY_PK)) {
+			formItem.setStyleClass("hasError");
+		}
 		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
 		formItem.add(label);
 		formItem.add(categories);
@@ -316,6 +327,9 @@ public class CaseCreator extends ApplicationForm {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_SUB_CASE_CATEGORY_PK)) {
+				formItem.setStyleClass("hasError");
+			}
 			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("sub_case_category", "Sub case category"))), subCategories);
 			formItem.add(label);
 			formItem.add(subCategories);
@@ -333,6 +347,17 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(file);
 			section.add(formItem);
 		}
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
+		formItem.setStyleClass("required");
+		if (hasError(PARAMETER_REGARDING)) {
+			formItem.setStyleClass("hasError");
+		}
+		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"))), regarding);
+		formItem.add(label);
+		formItem.add(regarding);
+		section.add(formItem);
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
@@ -390,12 +415,13 @@ public class CaseCreator extends ApplicationForm {
 		add(form);
 	}
 
-	private void showOverview(IWContext iwc) throws RemoteException {
+	protected void showOverview(IWContext iwc) throws RemoteException {
 		Locale locale = iwc.getCurrentLocale();
 
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
+		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 
 		ICFile attachment = null;
@@ -472,6 +498,9 @@ public class CaseCreator extends ApplicationForm {
 		if (!iwc.isParameterSet(PARAMETER_CASE_TYPE_PK)) {
 			setError(PARAMETER_CASE_TYPE_PK, this.iwrb.getLocalizedString("case_creator.type_empty", "You must select a type"));
 		}
+		if (!iwc.isParameterSet(PARAMETER_REGARDING)) {
+			setError(PARAMETER_REGARDING, this.iwrb.getLocalizedString(getPrefix() + "case_creator.regarding_empty", "You must enter what the case is regarding"));
+		}
 		if (!iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
 		}
@@ -494,6 +523,7 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_PRIVATE);
+		form.maintainParameter(PARAMETER_REGARDING);
 		if (attachment != null) {
 			form.add(new HiddenInput(PARAMETER_ATTACHMENT_PK, attachment.getPrimaryKey().toString()));
 		}
@@ -524,6 +554,8 @@ public class CaseCreator extends ApplicationForm {
 
 		Layer categorySpan = new Layer(Layer.SPAN);
 		categorySpan.add(new Text(category.getLocalizedCategoryName(locale)));
+
+		Span regardingSpan = new Span(new Text(regarding));
 
 		Layer messageSpan = new Layer(Layer.SPAN);
 		messageSpan.add(new Text(message));
@@ -578,6 +610,14 @@ public class CaseCreator extends ApplicationForm {
 
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
+		label = new Label();
+		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"));
+		formItem.add(label);
+		formItem.add(regardingSpan);
+		section.add(formItem);
+
+		formItem = new Layer(Layer.DIV);
+		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
 		label = new Label();
 		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "message", "Message"));
@@ -607,7 +647,8 @@ public class CaseCreator extends ApplicationForm {
 		add(form);
 	}
 
-	private void save(IWContext iwc) throws RemoteException {
+	protected void save(IWContext iwc) throws RemoteException {
+		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
 
@@ -701,7 +742,7 @@ public class CaseCreator extends ApplicationForm {
 		}
 	}
 
-	private User getUser(IWContext iwc) throws RemoteException {
+	protected User getUser(IWContext iwc) throws RemoteException {
 		if (this.iUseAnonymous) {
 			return null;
 		}

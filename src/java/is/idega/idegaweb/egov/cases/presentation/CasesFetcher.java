@@ -5,11 +5,13 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
 import is.idega.idegaweb.egov.cases.business.CasesWriter;
+import is.idega.idegaweb.egov.cases.business.CasesWriterExtended;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -28,6 +30,7 @@ import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
@@ -49,12 +52,16 @@ public class CasesFetcher extends CasesBlock {
 	private static final String PARAMETER_CASE_STATUS = "prm_instruments";
 	private static final String PARAMETER_ANONYMOUS = "prm_anonymous";
 	private static final String PARAMETER_SHOW_RESULTS = "prm_show_results";
+	private static final String PARAMETER_FROM_DATE = "prm_from_date";
+	private static final String PARAMETER_TO_DATE = "prm_to_date";
 
 	private CaseCategory parentCategory;
 	private CaseCategory category;
 	private CaseType type;
 	private CaseStatus status;
 	private Boolean anonymous;
+	private Date fromDate;
+	private Date toDate;
 
 	private Collection cases;
 
@@ -72,7 +79,7 @@ public class CasesFetcher extends CasesBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY)) {
 			try {
-				category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_CASE_CATEGORY));
+				category = getCasesBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY));
 			}
 			catch (FinderException fe) {
 				fe.printStackTrace();
@@ -95,9 +102,17 @@ public class CasesFetcher extends CasesBlock {
 		if (iwc.isParameterSet(PARAMETER_ANONYMOUS)) {
 			anonymous = new Boolean(iwc.getParameter(PARAMETER_ANONYMOUS));
 		}
+		
+		if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
+			fromDate = new IWTimestamp(iwc.getParameter(PARAMETER_FROM_DATE)).getDate();
+		}
+
+		if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
+			toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
+		}
 
 		if (iwc.isParameterSet(PARAMETER_SHOW_RESULTS)) {
-			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, anonymous);
+			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
 		}
 	}
 
@@ -132,7 +147,7 @@ public class CasesFetcher extends CasesBlock {
 			if (parentCategory != null) {
 				Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
 				if (collection.isEmpty()) {
-					subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+					subCategories.addMenuElement(parentCategory.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
 				}
 				else {
 					Iterator iter = collection.iterator();
@@ -159,11 +174,23 @@ public class CasesFetcher extends CasesBlock {
 			statuses.setMenuElementFirst("", "");
 
 			DropdownMenu anonymous = new DropdownMenu(PARAMETER_ANONYMOUS);
-			anonymous.addMenuElement("", "");
+			anonymous.addMenuElement("", getResourceBundle().getLocalizedString("cases_fetcher.both", "Both"));
 			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.yes", "Yes"));
-			anonymous.addMenuElement(Boolean.TRUE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
+			anonymous.addMenuElement(Boolean.FALSE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
 			anonymous.keepStatusOnAction(true);
 			anonymous.setStyleClass("anonymousDropdown");
+			
+			IWTimestamp stamp = new IWTimestamp();
+
+			DateInput from = new DateInput(PARAMETER_FROM_DATE);
+			from.setStyleClass("dateInput");
+			from.keepStatusOnAction(true);
+			from.setYearRange(stamp.getYear(), stamp.getYear() - 5);
+
+			DateInput to = new DateInput(PARAMETER_TO_DATE);
+			to.setStyleClass("dateInput");
+			to.keepStatusOnAction(true);
+			to.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -216,6 +243,22 @@ public class CasesFetcher extends CasesBlock {
 			element.add(anonymous);
 			section.add(element);
 
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			element.setStyleClass("dateInput");
+			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
+			element.add(label);
+			element.add(from);
+			section.add(element);
+
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			element.setStyleClass("dateInput");
+			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
+			element.add(label);
+			element.add(to);
+			section.add(element);
+
 			SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));
 			fetch.setStyleClass("indentedButton");
 			fetch.setStyleClass("button");
@@ -247,6 +290,15 @@ public class CasesFetcher extends CasesBlock {
 		table.setCellspacing(0);
 		table.setStyleClass("ruler");
 		table.setStyleClass("adminTable");
+		table.setID("casesFetcher");
+
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery-1.2.1.pack.js");
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery.tablesorter.pack.js");
+
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("$(document).ready(function() { $('#casesFetcher').tablesorter( { headers: { 1: { sorter: false }, " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
+
+		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -401,6 +453,40 @@ public class CasesFetcher extends CasesBlock {
 		}
 		if (status != null) {
 			link.addParameter(CasesWriter.PARAMETER_CASE_STATUS, status.getPrimaryKey().toString());
+		}
+		if (fromDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_FROM_DATE, fromDate.toString());
+		}
+		if (toDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_TO_DATE, toDate.toString());
+		}
+		if (anonymous != null) {
+			link.addParameter(CasesWriter.PARAMETER_ANONYMOUS, anonymous.toString());
+		}
+
+		layer.add(link);
+
+		link = new DownloadLink(getBundle().getImage("xls.gif"));
+		link.setStyleClass("xls");
+		link.setTarget(Link.TARGET_NEW_WINDOW);
+		link.setMediaWriterClass(CasesWriterExtended.class);
+		if (parentCategory != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, parentCategory.getPrimaryKey().toString());
+		}
+		if (category != null) {
+			link.addParameter(CasesWriter.PARAMETER_SUB_CASE_CATEGORY, category.getPrimaryKey().toString());
+		}
+		if (type != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_TYPE, type.getPrimaryKey().toString());
+		}
+		if (status != null) {
+			link.addParameter(CasesWriter.PARAMETER_CASE_STATUS, status.getPrimaryKey().toString());
+		}
+		if (fromDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_FROM_DATE, fromDate.toString());
+		}
+		if (toDate != null) {
+			link.addParameter(CasesWriter.PARAMETER_TO_DATE, toDate.toString());
 		}
 		if (anonymous != null) {
 			link.addParameter(CasesWriter.PARAMETER_ANONYMOUS, anonymous.toString());
