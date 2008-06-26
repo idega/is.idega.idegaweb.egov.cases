@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.ejb.FinderException;
@@ -85,23 +87,32 @@ public class CasesStatistics extends CasesBlock {
 		section.add(heading);
 
 		Collection coll = getResults(iwc, useSubCats, -1);
-		addResults(null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_category", "Cases by category"), useSubCats, false, 0);
+		addResults(null, null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_category", "Cases by category"), useSubCats, false, 0);
 		section.add(clearLayer);
 
 		coll = getResultsUsers(iwc);
-		addResults(null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"), false, false, 0);
+		addResults(null, null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"), false, false, 0);
 		section.add(clearLayer);
 		
 		if (useTypes) {
 			coll = getResultsCode(iwc);
-			addResults(null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"), false, false, 0);
+			addResults(null, null, null, iwc, iwrb, section, coll, statuses, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"), false, false, 0);
 			section.add(clearLayer);
 		}
 		
 	}
 
-	private int addResults(Table2 table, TableRowGroup group, IWContext iwc, IWResourceBundle iwrb, Layer section, Collection coll, Collection statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow) {
+	private int addResults(Map totals, Table2 table, TableRowGroup group, IWContext iwc, IWResourceBundle iwrb, Layer section, Collection coll, Collection statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow) {
+		if (totals == null) {
+			totals = new LinkedHashMap();
 
+			Iterator statIter = statuses.iterator();
+			while (statIter.hasNext()) {
+				CaseStatus status = (CaseStatus) statIter.next();
+				totals.put(status, new Integer(0));
+			}
+		}
+		
 		if (table == null) {
 			Heading2 heading2 = new Heading2(header);
 			section.add(heading2);
@@ -152,17 +163,45 @@ public class CasesStatistics extends CasesBlock {
 				subCats = getResults(iwc, true, res.getID());
 				hasSubCats = subCats != null && !subCats.isEmpty();
 			}
-			addResultToTable(statuses, group, iRow, res, isSubCategory, !hasSubCats);
+			addResultToTable(totals, statuses, group, iRow, res, isSubCategory, !hasSubCats);
 			if (hasSubCats) {
-				iRow = addResults(table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow);
+				iRow = addResults(totals, table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow);
 			}
 		}
 		
+		if (!isSubCategory) {
+			group = table.createFooterRowGroup();
+			TableRow row = group.createRow();
+
+			TableCell2 cell = row.createCell();
+			cell.setStyleClass("total");
+			cell.setStyleClass("firstColumn");
+			cell.add(new Text(iwrb.getLocalizedString("total", "Total")));
+
+			int total = 0;
+
+			iter = totals.keySet().iterator();
+			while (iter.hasNext()) {
+				CaseStatus status = (CaseStatus) iter.next();
+				Integer statusTotal = (Integer) totals.get(status);
+				total += statusTotal.intValue();
+
+				cell = row.createCell();
+				cell.setStyleClass(status.getStatus());
+				cell.add(new Text(statusTotal.toString()));
+			}
+
+			cell = row.createCell();
+			cell.setStyleClass("total");
+			cell.setStyleClass("lastColumn");
+			cell.add(new Text(String.valueOf(total)));
+		}
+
 		return iRow;
 	}
 
 
-	private void addResultToTable(Collection statuses, TableRowGroup group, int iRow, Result res, boolean isSubCategory, boolean showNumbers) {
+	private void addResultToTable(Map totals, Collection statuses, TableRowGroup group, int iRow, Result res, boolean isSubCategory, boolean showNumbers) {
 		TableRow row;
 		TableCell2 cell;
 		Iterator statIter;
@@ -174,6 +213,7 @@ public class CasesStatistics extends CasesBlock {
 		cell = row.createCell();
 		cell.add(new Text(res.getName()));
 		cell.setStyleClass("firstColumn");
+		int totalValue = 0;
 		while (statIter.hasNext()) {
 			status = (CaseStatus) statIter.next();
 			Integer value = (Integer) map.get(status.getStatus());
@@ -181,6 +221,8 @@ public class CasesStatistics extends CasesBlock {
 			if (value != null) {
 				val = value.intValue();
 			}
+			totalValue += val;
+			
 			cell = row.createCell();
 			cell.setStyleClass(status.getStatus());
 			if (showNumbers) {
@@ -189,8 +231,20 @@ public class CasesStatistics extends CasesBlock {
 				cell.add(Text.getNonBrakingSpace());
 			}
 			cell.setHorizontalAlignment(Table2.HORIZONTAL_ALIGNMENT_CENTER);
+			
+			Integer total = (Integer) totals.get(status);
+			totals.put(status, new Integer(total.intValue() + val));
 		}
+		
+		cell = row.createCell();
+		cell.setStyleClass("total");
 		cell.setStyleClass("lastColumn");
+		if (showNumbers) {
+			cell.add(new Text(String.valueOf(totalValue)));
+		}
+		else {
+			cell.add(Text.getNonBrakingSpace());
+		}
 
 		if (iRow % 2 == 0) {
 			row.setStyleClass("evenRow");
