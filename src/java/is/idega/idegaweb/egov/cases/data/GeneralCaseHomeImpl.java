@@ -1,14 +1,17 @@
 package is.idega.idegaweb.egov.cases.data;
 
 
-import com.idega.data.IDOException;
+import java.sql.Date;
 import java.util.Collection;
-import com.idega.block.process.data.CaseStatus;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
-import com.idega.user.data.User;
+
+import com.idega.block.process.data.CaseStatus;
 import com.idega.data.IDOEntity;
+import com.idega.data.IDOException;
 import com.idega.data.IDOFactory;
+import com.idega.user.data.User;
 
 public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 
@@ -78,9 +81,26 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	public Collection<GeneralCase> findAllByIds(Collection<Integer> ids) throws FinderException {
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
-
+	
+	public Collection findAllByMessage(String message) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((GeneralCaseBMPBean) entity)
+				.ejbFindAllByMessage(message);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+	
 	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
 		return findByCriteria(parentCategory, category, type, status, anonymous, null);
+	}
+	
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(
+				parentCategory, category, type, status, fromDate, toDate,
+				anonymous);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 	
 	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseHandler) throws FinderException {

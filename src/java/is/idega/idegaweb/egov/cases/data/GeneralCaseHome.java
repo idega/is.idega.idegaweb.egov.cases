@@ -1,12 +1,15 @@
 package is.idega.idegaweb.egov.cases.data;
 
 
-import com.idega.data.IDOException;
+import java.sql.Date;
 import java.util.Collection;
-import com.idega.block.process.data.CaseStatus;
+
 import javax.ejb.CreateException;
-import com.idega.data.IDOHome;
 import javax.ejb.FinderException;
+
+import com.idega.block.process.data.CaseStatus;
+import com.idega.data.IDOException;
+import com.idega.data.IDOHome;
 import com.idega.user.data.User;
 
 public interface GeneralCaseHome extends IDOHome {
@@ -40,7 +43,11 @@ public interface GeneralCaseHome extends IDOHome {
 	public Collection findAllByHandlerAndStatuses(User handler, String[] statuses, String[] caseHandlers) throws FinderException;
 
 	public Collection findAllByUsers(Collection users) throws FinderException;
+	
+	public Collection findAllByMessage(String message) throws FinderException;
 
+	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException;
+			
 	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException;
 	
 	public Collection findByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseHandler) throws FinderException;
