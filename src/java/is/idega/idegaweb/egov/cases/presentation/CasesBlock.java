@@ -312,10 +312,14 @@ public abstract class CasesBlock extends Block {
 		return this.iwrb;
 	}
 
-	protected CasesBusiness getBusiness() {
+	protected CasesBusiness getCasesBusiness() {
 		return this.business;
 	}
-
+	
+	protected CasesBusiness getBusiness() {
+		return getCasesBusiness();
+	}
+	
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
 			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);

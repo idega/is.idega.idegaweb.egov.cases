@@ -5,6 +5,13 @@
 	</properties>
 	
 	<body>
+
+		<release version="1.0.39" date="2008-06-27">
+			<action dev="tryggvil" type="update">
+				Update to CasesBlock to match refactoring in HEAD branch (added getCasesBusiness() method)
+			</action>
+		</release>
+
 		<release version="1.0.38" date="2008-04-23">
 			<action dev="laddi" type="update">
 				Added totals to statistics.
