@@ -3,7 +3,6 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
-import is.idega.idegaweb.egov.cases.presentation.CasesSearcher;
 import is.idega.idegaweb.egov.cases.presentation.MyCases;
 import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
