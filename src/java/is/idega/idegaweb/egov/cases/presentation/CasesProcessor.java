@@ -14,6 +14,7 @@ import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,19 +31,24 @@ import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
-
+	
+	public static final String PARAMETER_ACTION = "cp_prm_action";
+	
 	public static final String PARAMETER_CASE_PK = UserCases.PARAMETER_CASE_PK;
 	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
@@ -455,6 +461,13 @@ public abstract class CasesProcessor extends CasesBlock {
 		form.setStyleClass("adminForm");
 		form.maintainParameter(PARAMETER_CASE_PK);
 		form.addParameter(UserCases.PARAMETER_ACTION, "");
+		
+		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
+
+		super.getParentPage().addJavascriptURL("/dwr/interface/CasesDWRUtil.js");
+		super.getParentPage().addJavascriptURL("/dwr/engine.js");
+		super.getParentPage().addJavascriptURL("/dwr/util.js");
+		super.getParentPage().addJavascriptURL(getBundle().getResourcesVirtualPath() + "/js/navigation.js");
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -477,7 +490,45 @@ public abstract class CasesProcessor extends CasesBlock {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
+		CaseCategory parentCategory = category.getParent();
+		CaseType type = theCase.getCaseType();
 		Group handlerGroup = category.getHandlerGroup();
+
+		SelectorUtility util = new SelectorUtility();
+		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness().getCaseCategories(), "getName");
+		categories.setID(PARAMETER_CASE_CATEGORY_PK);
+		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		categories.setStyleClass("caseCategoryDropdown");
+		if (useSubCategories) {
+			categories.setOnChange("changeSubCategories('" + PARAMETER_CASE_CATEGORY_PK + "', '" + iwc.getCurrentLocale().getCountry() + "')");
+		}
+		categories.setOnChange("changeUsers('" + PARAMETER_CASE_CATEGORY_PK + "')");
+
+		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
+		subCategories.setID(PARAMETER_SUB_CASE_CATEGORY_PK);
+		subCategories.setSelectedElement(category.getPrimaryKey().toString());
+		subCategories.setStyleClass("subCaseCategoryDropdown");
+		subCategories.setOnChange("changeUsers('" + PARAMETER_SUB_CASE_CATEGORY_PK + "')");
+
+		Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
+		if (collection.isEmpty()) {
+			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+		}
+		else {
+			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
+			Iterator iter = collection.iterator();
+			while (iter.hasNext()) {
+				CaseCategory subCategory = (CaseCategory) iter.next();
+				subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
+			}
+		}
+
+		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness().getCaseTypes(), "getName");
+		types.keepStatusOnAction(true);
+		types.setSelectedElement(type.getPrimaryKey().toString());
+		types.setStyleClass("caseTypeDropdown");
+		
+		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
 		
 		@SuppressWarnings("unchecked")
 		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
@@ -489,10 +540,38 @@ public abstract class CasesProcessor extends CasesBlock {
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		message.keepStatusOnAction(true);
+		
+		if (getCasesBusiness().useTypes()) {
+			Layer element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			Label label = new Label(getResourceBundle().getLocalizedString("case_type", "Case type"), types);
+			element.add(label);
+			element.add(types);
+			section.add(element);
+		}
+		else {
+			form.add(hiddenType);
+		}
 
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("handler", "Handler"), users);
+		Label label = new Label(getResourceBundle().getLocalizedString("case_category", "Case category"), categories);
+		element.add(label);
+		element.add(categories);
+		section.add(element);
+
+		if (useSubCategories) {
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label(getResourceBundle().getLocalizedString("sub_case_category", "Sub case category"), subCategories);
+			element.add(label);
+			element.add(subCategories);
+			section.add(element);
+		}
+
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		label = new Label(getResourceBundle().getLocalizedString("handler", "Handler"), users);
 		element.add(label);
 		element.add(users);
 		section.add(element);
@@ -547,6 +626,14 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
+	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {
+		Link process = new Link(object);
+		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+
+		return process;
+	}
+	
 	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
 		List<CaseManager> caseHandlers = getCasesBusiness().getCaseHandlersProvider().getCaseManagers();
 		Collection<GeneralCase> cases = null;
@@ -575,4 +662,6 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract void save(IWContext iwc) throws RemoteException;
 
 	protected abstract boolean showCheckBox();
+	
+	protected abstract void initializeTableSorter(IWContext iwc) throws RemoteException;
 }
