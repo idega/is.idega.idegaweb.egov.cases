@@ -257,8 +257,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		// Should not need to check the preferred locale for a user for now since the only method that uses it,handleCase
 		// passes the preferred locale in.
 		try {
-			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
+			GeneralCase genCase = theCase == null ? null : getGeneralCase(theCase.getPrimaryKey());
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
+			if (genCase == null) {
+				return iwrb.getLocalizedString("case_status_key." + status.getStatus(), status.getStatus());
+			}
 			return iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_status_key." + status.getStatus(), status.getStatus());
 		}
 		catch (FinderException fe) {
