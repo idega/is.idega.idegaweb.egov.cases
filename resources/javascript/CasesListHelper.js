@@ -1,12 +1,14 @@
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?';
+var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading, please wait...';
 
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
 function initializeCasesList(caseToOpenId, localizations, debug) {
-	if (localizations != null && localizations.length >= 2) {
+	if (localizations != null && localizations.length >= 3) {
 		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];						//	0
 		CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = localizations[1];	//	1
+		CASE_GRID_STRING_LOADING_PLEASE_WAIT = localizations[2];				//	2
 	}
 	
 	DWREngine.setErrorHandler(function(message, exception) {
@@ -163,7 +165,7 @@ function registerGridExpanderActionsForElement(event, element) {
 			return false;
 		}
 		
-		showLoadingMessage('');
+		showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
 		var caseId = caseToExpand.attr(caseIdPar);
 		CasesEngine.getCaseManagerView(caseId, {
 			callback: function(component) {

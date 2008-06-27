@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
+import is.idega.idegaweb.egov.cases.presentation.CasesSearcher;
 import is.idega.idegaweb.egov.cases.presentation.MyCases;
 import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CaseConstants;
@@ -81,7 +82,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
-		addWeb2Stuff(caseId, iwc, getBundle(iwc), container);
+		addResources(caseId, iwc, getBundle(iwc));
 		
 		Layer casesContainer = new Layer();
 		container.add(casesContainer);
@@ -350,6 +351,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return descriptionIsEditable;
 	}
 	
+	private Layer getCasesListContainer() {
+		Layer container = new Layer();
+		container.setStyleClass(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE);
+		return container;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public UIComponent getCasesList(IWContext iwc, Collection cases, String casesType, boolean showCheckBoxes) {		
 		List<Case> casesInList = getSortedCases(cases);
@@ -358,7 +365,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
 		
-		Layer container = new Layer();
+		Layer container = getCasesListContainer();
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -416,7 +423,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
 		
-		Layer container = new Layer();
+		Layer container = getCasesListContainer();
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -562,12 +569,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return process;
 	}
 	
-	public void addWeb2Stuff(String caseId, IWContext iwc, IWBundle bundle, Layer container) {
+	private void addResources(String caseId, IWContext iwc, IWBundle bundle) {
 		Web2Business web2Business = (Web2Business)WFUtil.getBeanInstance(iwc, "web2bean");
 		
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(web2Business.getBundleURIToJQueryLib());
-		//scripts.add(web2Business.getBundleURIToJQGrid());
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
@@ -587,15 +593,18 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Localizations: array as parameter
 		IWResourceBundle iwrb = getResourceBundle(iwc);
+		
 		action.append("'").append(iwrb.getLocalizedString("click_to_edit", "Click to edit...")).append("'");
 		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page", "Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
+		action.append(", '").append(iwrb.getLocalizedString("loading_please_wait", "Loading, please wait...")).append("'");
 		
 		action.append("], false);");
 		
-		//	Adding resources
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			action = new StringBuilder("jQuery(window).load(function() {").append(action.toString()).append("});");
 		}
+		
+		//	Adding resources
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 	}
