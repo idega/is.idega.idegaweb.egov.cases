@@ -11,7 +11,7 @@ import is.idega.idegaweb.egov.cases.business.CaseWriter;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import com.idega.block.process.business.CaseConstants;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
