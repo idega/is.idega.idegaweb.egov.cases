@@ -5,7 +5,7 @@ import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.MyCases;
 import is.idega.idegaweb.egov.cases.presentation.OpenCases;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import javax.ejb.EJBException;
 import javax.faces.component.UIComponent;
 
+import org.directwebremoting.WebContext;
+import org.directwebremoting.WebContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -73,15 +75,26 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private String caseIdParName = "caseid";
 	
-	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes) {
+	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults) {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		if (totalCases < 1) {
-			container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
+			if (searchResults) {
+				container.add(new Heading5(iwrb.getLocalizedString("no_cases_found", "No cases were found by your query!")));
+			}
+			else {
+				container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
+			}
 			return container;
 		}
 		
 		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
 		addResources(caseId, iwc, getBundle(iwc));
+		
+		if (searchResults) {
+			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results")).append(CoreConstants.SPACE);
+			message.append("(").append(totalCases).append("):");
+			container.add(new Heading5(message.toString()));
+		}
 		
 		Layer casesContainer = new Layer();
 		container.add(casesContainer);
@@ -172,7 +185,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
-		
 		
 		boolean caseIdentifierFromCaseManager = false;
 		
@@ -337,6 +349,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	@SuppressWarnings("unchecked")
 	private List<Case> getSortedCases(Collection cases) {
+		if (cases == null || cases.isEmpty()) {
+			return new ArrayList<Case>(0);
+		}
 		List<Case> casesInList = new ArrayList<Case>(cases);
 		Collections.sort(casesInList, new CaseComparator());
 		return casesInList;
@@ -350,9 +365,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return descriptionIsEditable;
 	}
 	
-	private Layer getCasesListContainer() {
+	private Layer getCasesListContainer(boolean searchResults) {
 		Layer container = new Layer();
 		container.setStyleClass(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE);
+		if (searchResults) {
+			container.setMarkupAttribute("searchresult", Boolean.TRUE.toString());
+		}
 		return container;
 	}
 	
@@ -364,7 +382,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
 		
-		Layer container = getCasesListContainer();
+		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(casesType);
+		Layer container = getCasesListContainer(searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -375,7 +394,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes);
+		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes, searchResults);
 		
 		if (totalCases < 1) {
 			return container;
@@ -418,11 +437,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String casesType, boolean addCredentialsToExernalUrls) {
 		List<Case> casesInList = getSortedCases(cases);
 		
-		String emailAddress = getDefaultEmail(iwc);
+		String emailAddress = getDefaultEmail(iwc); 
 		
 		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
 		
-		Layer container = getCasesListContainer();
+		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(casesType);
+		Layer container = getCasesListContainer(searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -433,7 +453,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, totalCases, false);
+		Layer casesContainer = createHeader(iwc, container, totalCases, false, searchResults);
 		
 		if (totalCases < 1) {
 			return container;
@@ -473,6 +493,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	@SuppressWarnings("unchecked")
 	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode, CaseStatus caseStatus,
 			boolean addCredentialsToExernalUrls) {
+		if (caseBusiness == null) {
+			try {
+				caseBusiness = (CaseBusiness) IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+		}
+		if (caseBusiness == null) {
+			return null;
+		}
+		
 		ICPage page = getPage(pages, caseCode, caseStatus == null ? null : caseStatus.getStatus());
 		String caseUrl = null;
 		try {
@@ -560,21 +591,29 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private Link getProcessLink(IWContext iwc, PresentationObject object, Case theCase) {
 		Link process = new Link(object);
+		
+		WebContext webContext = WebContextFactory.get();
+		if (webContext != null) {
+			process.setURL(webContext.getCurrentPage());
+		}
+		
 		process.setToolTip(getToolTipForLink(iwc));
 		
 		process.addParameter(CasesProcessor.PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
 		process.addParameter(UserCases.PARAMETER_ACTION, CasesProcessor.ACTION_PROCESS);
+		
+		process.setStyleClass("old_casesListBodyContainerItemLink");
 
 		return process;
 	}
 	
 	private void addResources(String caseId, IWContext iwc, IWBundle bundle) {
-		Web2Business web2Business = (Web2Business)WFUtil.getBeanInstance(iwc, "web2bean");
+		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(web2Business.getBundleURIToJQueryLib());
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
-		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/CasesListHelper.js"));
+		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
 		
@@ -595,7 +634,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		action.append("'").append(iwrb.getLocalizedString("click_to_edit", "Click to edit...")).append("'");
 		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page", "Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
-		action.append(", '").append(iwrb.getLocalizedString("loading_please_wait", "Loading, please wait...")).append("'");
+		action.append(", '").append(iwrb.getLocalizedString("loading", "Loading...")).append("'");
 		
 		action.append("], false);");
 		
@@ -631,7 +670,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private IWBundle getBundle(IWContext iwc) {
-		return iwc.getIWMainApplication().getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER);
+		return iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
 	}
 	
 	private IWResourceBundle getResourceBundle(IWContext iwc) {

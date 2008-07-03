@@ -3,14 +3,16 @@ package is.idega.idegaweb.egov.cases.data;
 
 import java.sql.Date;
 import java.util.Collection;
-
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.data.IDOException;
 import com.idega.data.IDOHome;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 
 public interface GeneralCaseHome extends IDOHome {
 
@@ -57,4 +59,9 @@ public interface GeneralCaseHome extends IDOHome {
 	public int getCountByGroupAndStatuses(Collection groups, String[] statuses) throws IDOException;
 	
 	public abstract Collection<GeneralCase> findAllByIds(Collection<Integer> ids) throws FinderException;
+	
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, Collection<String> owners, String processId, String[] statuses,
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups) throws FinderException;
+	
+	public Collection<Case> getCasesByIds(Collection<Integer> ids) throws FinderException;
 }

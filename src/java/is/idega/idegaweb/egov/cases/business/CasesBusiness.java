@@ -23,7 +23,9 @@ import com.idega.business.IBOService;
 import com.idega.core.file.data.ICFile;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 
 public interface CasesBusiness extends IBOService, CaseBusiness {
 
@@ -278,4 +280,15 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Collection<CaseType> getCaseTypesByName(String name) throws RemoteException;
 	
 	public CaseManagersProvider getCaseHandlersProvider();
+	
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String processId, String[] statuses,
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups);
+	
+	public String[] getStatusesForOpenCases();
+	
+	public String[] getStatusesForClosedCases();
+	
+	public String[] getStatusesForMyCases();
+	
+	public Collection<Case> getCasesByIds(Collection<Integer> ids);
 }

@@ -12,7 +12,7 @@ import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -280,7 +280,7 @@ public class ClosedCases extends CasesProcessor {
 	@SuppressWarnings("unchecked")
 	public static Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) throws RemoteException {
 		
-		boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+		boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
 		
 		Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
 		Collection<GeneralCase> closedCases;

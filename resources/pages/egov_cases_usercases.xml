@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
-  <page type="myCases">
+  <page type="userCases">
   	<region id="content" label="content">
   		<module id="" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
       		<property>
@@ -12,7 +12,7 @@
     	<module id="" class="com.idega.presentation.text.Heading1">
       		<property>
         		<name>:method:1:implied:void:setText:java.lang.String:</name>
-        		<value>My cases</value>
+        		<value>Cases</value>
         		<type>java.lang.String</type>
       		</property>
       		<property>
@@ -21,7 +21,7 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
-    	<module id="" class="is.idega.idegaweb.egov.cases.presentation.MyCases" />
+    	<module id="" class="com.idega.block.process.presentation.UserCases" />
     </region>
     <region id="toolbar" label="toolbar">
     	<module id="" class="com.idega.block.navigation.presentation.NavigationList">
@@ -56,7 +56,7 @@
     	<module id="" class="is.idega.idegaweb.egov.cases.presentation.CasesSearcher">
 			<property>
 				<name>:method:1:implied:void:setListType:java.lang.String:</name>
-				<value>PEND:idega_builder_module_property:WAIT</value>
+				<value>UserCases</value>
 				<type>java.lang.String</type>
 			</property>
 		</module>

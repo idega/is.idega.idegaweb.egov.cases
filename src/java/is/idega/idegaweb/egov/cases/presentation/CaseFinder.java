@@ -43,11 +43,11 @@ import com.idega.util.text.Name;
 
 public class CaseFinder extends CasesBlock {
 
-	private static final String PARAMETER_ACTION = "cf_prm_action";
-	private static final String PARAMETER_CASE_NUMBER = "cf_prm_case_number";
-	private static final String PARAMETER_NAME = "cf_prm_name";
-	private static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
-	private static final String PARAMETER_TEXT = "cf_prm_text";
+	protected static final String PARAMETER_ACTION = "cf_prm_action";
+	protected static final String PARAMETER_CASE_NUMBER = "cf_prm_case_number";
+	protected static final String PARAMETER_NAME = "cf_prm_name";
+	protected static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
+	protected static final String PARAMETER_TEXT = "cf_prm_text";
 
 	private static final int ACTION_SEARCH = 1;
 	private static final int ACTION_RESULTS = 2;

@@ -11,7 +11,7 @@ import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -82,11 +82,11 @@ public class CaseCreator extends ApplicationForm {
 	protected Collection iCategories;
 
 	public String getBundleIdentifier() {
-		return CaseConstants.IW_BUNDLE_IDENTIFIER;
+		return CasesConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
 	public String getCaseCode() {
-		return CaseConstants.CASE_CODE_KEY;
+		return CasesConstants.CASE_CODE_KEY;
 	}
 
 	protected void present(IWContext iwc) {

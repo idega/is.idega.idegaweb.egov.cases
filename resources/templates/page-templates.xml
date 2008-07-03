@@ -7,6 +7,8 @@
 	<page name="Open cases" type="openCases" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/openCases.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_opencases.xml"></page>	
 
 	<page name="My cases" type="myCases" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/myCases.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_mycases.xml"></page>	
+	
+	<page name="User cases" type="userCases" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/userCases.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_usercases.xml"></page>	
 
 	<page name="Closed cases" type="closedCases" iconfile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/images/pageIcons/closedCases.png" templatefile="idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/pages/egov_cases_closedcases.xml"></page>	
 

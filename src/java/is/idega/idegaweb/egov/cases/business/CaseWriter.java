@@ -12,7 +12,7 @@ package is.idega.idegaweb.egov.cases.business;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 	public void init(HttpServletRequest req, IWContext iwc) {
 		try {
 			this.locale = iwc.getApplicationSettings().getApplicationLocale();
-			this.iwrb = iwc.getIWMainApplication().getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(this.locale);
+			this.iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(this.locale);
 
 			if (iwc.isParameterSet(getCasesBusiness(iwc).getSelectedCaseParameter())) {
 				this.theCase = getCasesBusiness(iwc).getGeneralCase(iwc.getParameter(getCasesBusiness(iwc).getSelectedCaseParameter()));

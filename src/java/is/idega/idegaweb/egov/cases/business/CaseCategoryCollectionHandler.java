@@ -10,7 +10,7 @@
 package is.idega.idegaweb.egov.cases.business;
 
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import com.idega.presentation.remotescripting.RemoteScriptingResults;
 public class CaseCategoryCollectionHandler implements RemoteScriptCollection {
 
 	public RemoteScriptingResults getResults(IWContext iwc) {
-		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(CaseConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 		Locale locale = iwc.getCurrentLocale();
 		
 		String sourceName = iwc.getParameter(RemoteScriptHandler.PARAMETER_SOURCE_PARAMETER_NAME);

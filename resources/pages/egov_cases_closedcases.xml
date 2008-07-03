@@ -53,6 +53,13 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
+    	<module id="" class="is.idega.idegaweb.egov.cases.presentation.CasesSearcher">
+			<property>
+				<name>:method:1:implied:void:setListType:java.lang.String:</name>
+				<value>TYST:idega_builder_module_property:KLAR</value>
+				<type>java.lang.String</type>
+			</property>
+		</module>
     </region>
     <region id="footer" label="footer">
     	<module id="" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">

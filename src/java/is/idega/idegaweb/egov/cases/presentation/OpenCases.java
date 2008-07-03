@@ -12,7 +12,7 @@ import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -81,7 +81,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	@SuppressWarnings("unchecked")
 	public static Collection<GeneralCase> getOpenCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) throws RemoteException {
 		
-		boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+		boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
 		
 		Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
 		Collection<GeneralCase> openCases;
@@ -258,7 +258,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		bottom.add(pdf);
 
-		if (iwc.getAccessController().hasRole(CaseConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
+		if (iwc.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
 			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
 			next.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
 			next.maintainParameter(PARAMETER_CASE_PK, iwc);

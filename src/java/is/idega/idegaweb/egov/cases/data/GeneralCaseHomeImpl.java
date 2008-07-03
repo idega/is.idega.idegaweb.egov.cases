@@ -3,18 +3,23 @@ package is.idega.idegaweb.egov.cases.data;
 
 import java.sql.Date;
 import java.util.Collection;
+import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.data.IDOEntity;
 import com.idega.data.IDOException;
 import com.idega.data.IDOFactory;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 
 public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 
+	@Override
 	public Class getEntityInterfaceClass() {
 		return GeneralCase.class;
 	}
@@ -122,5 +127,19 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		int theReturn = ((GeneralCaseBMPBean) entity).ejbHomeGetCountByGroupAndStatuses(groups, statuses);
 		this.idoCheckInPooledEntity(entity);
 		return theReturn;
+	}
+	
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, Collection<String> owners, String processId, String[] statuses,
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(caseNumber, description, owners, processId, statuses, dateFrom, dateTo, owner, groups);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
+	public Collection<Case> getCasesByIds(Collection<Integer> ids) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 }

@@ -7,27 +7,37 @@
  */
 package is.idega.idegaweb.egov.cases.data;
 
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.AbstractCaseBMPBean;
 import com.idega.block.process.data.Case;
+import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.core.file.data.ICFile;
+import com.idega.data.IDOCompositePrimaryKeyException;
 import com.idega.data.IDOException;
 import com.idega.data.IDORelationshipException;
+import com.idega.data.query.BetweenCriteria;
+import com.idega.data.query.Column;
 import com.idega.data.query.CountColumn;
 import com.idega.data.query.InCriteria;
 import com.idega.data.query.MatchCriteria;
 import com.idega.data.query.Order;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
+import com.idega.data.query.range.DateRange;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 
 public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, GeneralCase {
 
@@ -55,8 +65,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	 * 
 	 * @see com.idega.block.process.data.AbstractCaseBMPBean#getCaseCodeKey()
 	 */
+	@Override
 	public String getCaseCodeKey() {
-		return CaseConstants.CASE_CODE_KEY;
+		return CasesConstants.CASE_CODE_KEY;
 	}
 
 	/*
@@ -64,14 +75,17 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	 * 
 	 * @see com.idega.block.process.data.AbstractCaseBMPBean#getCaseCodeDescription()
 	 */
+	@Override
 	public String getCaseCodeDescription() {
 		return "General case";
 	}
 
+	@Override
 	public String getEntityName() {
 		return ENTITY_NAME;
 	}
 
+	@Override
 	public void initializeAttributes() {
 		addGeneralCaseRelation();
 
@@ -466,4 +480,76 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		return idoGetNumberOfRecords(query);
 	}
+	
+	public Collection ejbFindByCriteria(String caseNumber, String description, Collection<String> owners, String processId, String[] statuses, IWTimestamp dateFrom,
+			IWTimestamp dateTo, User owner, Collection<Group> groups) throws FinderException {
+		
+		Table generalCasesTable = new Table(this);
+		Table casesTable = new Table(Case.class);
+		
+		String casesTableIdColumnName = null;
+		try {
+			casesTableIdColumnName = casesTable.getPrimaryKeyColumnName();
+		} catch (IDOCompositePrimaryKeyException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		SelectQuery query = new SelectQuery(generalCasesTable);
+		query.addColumn(generalCasesTable.getColumn(getIDColumnName()));
+		try {
+			query.addJoin(generalCasesTable, casesTable);
+		}
+		catch (IDORelationshipException e) {
+			e.printStackTrace();
+			throw new FinderException(e.getMessage());
+		}
+		
+		if (owner != null) {
+			query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_USER), MatchCriteria.EQUALS, owner.getId()));
+		}
+		if (!ListUtil.isEmpty(groups)) {
+			List<String> groupsIds = new ArrayList<String>(groups.size());
+			for (Group group: groups) {
+				groupsIds.add(group.getId());
+			}
+			
+			query.addCriteria(new InCriteria(casesTable.getColumn(getSQLGeneralCaseHandlerColumnName()), groupsIds));
+		}
+		if (caseNumber != null) {
+			Column column = new Column(casesTable, casesTableIdColumnName);
+			column.setPrefix("lower(");
+			column.setPostfix(")");
+			query.addCriteria(new MatchCriteria(column, MatchCriteria.LIKE, true, caseNumber));
+		}
+		if (description != null) {
+			Column column = casesTable.getColumn(CaseBMPBean.COLUMN_CASE_SUBJECT);
+			column.setPrefix("lower(");
+			column.setPostfix(")");
+			query.addCriteria(new MatchCriteria(column, MatchCriteria.LIKE, true, description));
+		}
+		if (!ListUtil.isEmpty(owners) && owner == null) {
+			query.addCriteria(new InCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_USER), owners));
+		}
+		if (statuses != null && statuses.length > 0) {
+			query.addCriteria(new InCriteria(casesTable.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
+		}
+		if (dateFrom != null && dateTo != null) {
+			query.addCriteria(new BetweenCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CREATED), new DateRange(dateFrom.getDate(), dateTo.getDate())));
+		}
+		else {
+			if (dateFrom != null) {
+				query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CREATED), MatchCriteria.GREATEREQUAL, dateFrom.getDate()));
+			}
+			if (dateTo != null) {
+				query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CREATED), MatchCriteria.LESSEQUAL, dateTo.getDate()));
+			}
+		}
+		
+		query.addGroupByColumn(generalCasesTable.getColumn(getIDColumnName()));
+	
+		log(Level.INFO, query.toString());
+		return idoFindPKsByQuery(query);
+	}
+
 }

@@ -8,7 +8,7 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 
@@ -66,7 +66,7 @@ public abstract class CasesBlock extends Block {
 	protected abstract void present(IWContext iwc) throws Exception;
 
 	public String getBundleIdentifier() {
-		return CaseConstants.IW_BUNDLE_IDENTIFIER;
+		return CasesConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
 	protected Link getButtonLink(String text) {

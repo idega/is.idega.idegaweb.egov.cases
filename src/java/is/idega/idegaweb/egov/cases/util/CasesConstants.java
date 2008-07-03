@@ -1,5 +1,5 @@
 /*
- * $Id$ Created on Oct 30, 2005
+ * $Id: CasesConstants.java,v 1.1 2008/07/03 14:15:41 valdas Exp $ Created on Oct 30, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  * 
@@ -7,7 +7,7 @@
  */
 package is.idega.idegaweb.egov.cases.util;
 
-public class CaseConstants {
+public class CasesConstants {
 
 	public static final String IW_BUNDLE_IDENTIFIER = "is.idega.idegaweb.egov.cases";
 
@@ -20,5 +20,9 @@ public class CaseConstants {
 	public static final String PROPERTY_ALLOW_PRIVATE_CASES = "egov.cases.allow.private.cases";
 	public static final String PROPERTY_ALLOW_ANONYMOUS_CASES = "egov.cases.allow.anonymous.cases";
 	public static final String PROPERTY_ALLOW_ATTACHMENTS = "egov.cases.allow.attachments";
+	
+	public static final String CASES_LIST_HELPER_JAVA_SCRIPT_FILE = "javascript/CasesListHelper.js";
+	
+	public static final String CASE_LIST_TYPE_SEARCH_RESULTS = "searchResults";
 
 }

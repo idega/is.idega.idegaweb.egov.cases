@@ -10,7 +10,7 @@
 package is.idega.idegaweb.egov.cases;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import com.idega.block.process.business.CaseCodeManager;
 import com.idega.idegaweb.IWBundle;
@@ -21,8 +21,8 @@ import com.idega.idegaweb.include.GlobalIncludeManager;
 public class IWBundleStarter implements IWBundleStartable {
 
 	public void start(IWBundle starterBundle) {
-		GlobalIncludeManager.getInstance().addBundleStyleSheet(CaseConstants.IW_BUNDLE_IDENTIFIER, "/style/case.css");
-		CaseCodeManager.getInstance().addCaseBusinessForCode(CaseConstants.CASE_CODE_KEY, CasesBusiness.class);
+		GlobalIncludeManager.getInstance().addBundleStyleSheet(CasesConstants.IW_BUNDLE_IDENTIFIER, "/style/case.css");
+		CaseCodeManager.getInstance().addCaseBusinessForCode(CasesConstants.CASE_CODE_KEY, CasesBusiness.class);
 		registerCaseChangeListener(starterBundle);
 	}
 

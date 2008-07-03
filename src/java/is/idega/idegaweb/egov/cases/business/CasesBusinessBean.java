@@ -13,7 +13,7 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
-import is.idega.idegaweb.egov.cases.util.CaseConstants;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -56,6 +57,10 @@ import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
+import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
 
@@ -66,8 +71,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	 */
 	private static final long serialVersionUID = -1807320113180412800L;
 
+	@Override
 	protected String getBundleIdentifier() {
-		return CaseConstants.IW_BUNDLE_IDENTIFIER;
+		return CasesConstants.IW_BUNDLE_IDENTIFIER;
 	}
 	
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) {
@@ -233,6 +239,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return null;
 	}
 
+	@Override
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) {
 		// Should not need to check the preferred locale for a user for now since it isn't used in sending messages
 		try {
@@ -253,6 +260,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return super.getLocalizedCaseStatusDescription(null, status, locale);
 	}
 
+	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) {
 		// Should not need to check the preferred locale for a user for now since the only method that uses it,handleCase
 		// passes the preferred locale in.
@@ -279,10 +287,22 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return getOpenCases(groups, new String[] {});
 	}
 	
+	public String[] getStatusesForOpenCases() {
+		return new String[] {getCaseStatusOpen().getStatus(), getCaseStatusReview().getStatus()};
+	}
+	
+	public String[] getStatusesForClosedCases() {
+		return new String[] {getCaseStatusInactive().getStatus(), getCaseStatusReady().getStatus()};
+	}
+	
+	public String[] getStatusesForMyCases() {
+		return new String[] {getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus()};
+	}
+	
 	public Collection getOpenCases(Collection groups, String[] caseHandlers) {
 		
 		try {
-			String[] statuses = { getCaseStatusOpen().getStatus(), getCaseStatusReview().getStatus() };
+			String[] statuses = getStatusesForOpenCases();
 			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses, caseHandlers);
 		}
 		catch (FinderException fe) {
@@ -298,7 +318,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	
 	public Collection getMyCases(User handler, String[] caseHandlers) {
 		try {
-			String[] statuses = { getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus() };
+			String[] statuses = getStatusesForMyCases();
 			return getGeneralCaseHome().findAllByHandlerAndStatuses(handler, statuses, caseHandlers);
 		}
 		catch (FinderException fe) {
@@ -314,7 +334,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	
 	public Collection getClosedCases(Collection groups, String[] caseHandlers) {
 		try {
-			String[] statuses = { getCaseStatusInactive().getStatus(), getCaseStatusReady().getStatus() };
+			String[] statuses = getStatusesForClosedCases();
 			return getGeneralCaseHome().findAllByGroupAndStatuses(groups, statuses, caseHandlers);
 		}
 		catch (FinderException fe) {
@@ -889,28 +909,29 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public boolean canDeleteCase(Case theCase) {
 		return false;
 	}
 
 	public boolean useSubCategories() {
-		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_USE_SUB_CATEGORIES, false);
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_USE_SUB_CATEGORIES, false);
 	}
 
 	public boolean useTypes() {
-		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_USE_TYPES, true);
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_USE_TYPES, true);
 	}
 
 	public boolean allowPrivateCases() {
-		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_PRIVATE_CASES, false);
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_ALLOW_PRIVATE_CASES, false);
 	}
 
 	public boolean allowAnonymousCases() {
-		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_ANONYMOUS_CASES, false);
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_ALLOW_ANONYMOUS_CASES, false);
 	}
 
 	public boolean allowAttachments() {
-		return getIWApplicationContext().getApplicationSettings().getBoolean(CaseConstants.PROPERTY_ALLOW_ATTACHMENTS, false);
+		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_ALLOW_ATTACHMENTS, false);
 	}
 	
 	public Object[] createDefaultCaseTypesForDefaultGroupIfNotExist(String caseCategoryName, String caseCategoryDescription, String caseTypeName, String caseTypeDescription, String caseCategoryHandlersGroupName, String caseCategoryHandlersGroupDescription) throws FinderException, CreateException, RemoteException {
@@ -1001,5 +1022,86 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	
 	public CaseManagersProvider getCaseHandlersProvider() {
 		return (CaseManagersProvider)WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
+	}
+	
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String processId, String[] statuses,
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups) {
+		
+		Collection<User> owners = null;
+		if (name != null || personalId != null) {
+			if (personalId != null) {
+				User caseOwner = null;
+				try {
+					caseOwner = getUserHome().findByPersonalID(personalId);
+				} catch (FinderException e) {
+					e.printStackTrace();
+				}
+				if (caseOwner != null) {
+					owners = new ArrayList<User>(1);
+					owners.add(caseOwner);
+				}
+			}
+			if (owners == null && name != null) {
+				Locale locale = null;
+				IWContext iwc = CoreUtil.getIWContext();
+				if (iwc != null) {
+					locale = iwc.getCurrentLocale();
+				}
+				if (locale == null) {
+					locale = Locale.ENGLISH;
+				}
+				
+				String[] nameParts = name.split(CoreConstants.SPACE);
+				String firstName = null;
+				String middleName = null;
+				String lastName = null;
+				if (nameParts.length == 3) {
+					middleName = nameParts[1].toLowerCase(locale);
+					lastName = nameParts[2].toLowerCase(locale);
+				}
+				if (nameParts.length == 2) {
+					lastName = nameParts[1].toLowerCase(locale);
+				}
+				if (nameParts.length >= 1) {
+					firstName = nameParts[0].toLowerCase(locale);
+				}
+				
+				try {
+					owners = getUserHome().findByNames(firstName, middleName, lastName, true);
+				} catch (FinderException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		Collection<String> ownersIds = null;
+		if (!ListUtil.isEmpty(owners)) {
+			ownersIds = new ArrayList<String>(owners.size());
+			for (User caseOwner: owners) {
+				ownersIds.add(caseOwner.getId());
+			}
+		}
+		
+		
+		try {
+			return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, processId, statuses, dateFrom, dateTo, owner, groups);
+		} catch(Exception e) {
+			log(Level.SEVERE, "Error getting cases by criteria: " + e);
+		}
+		
+		return null;
+	}
+
+	public Collection<Case> getCasesByIds(Collection<Integer> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return null;
+		}
+		
+		try {
+			return getGeneralCaseHome().getCasesByIds(ids);
+		} catch(Exception e) {
+			log(Level.SEVERE, "Error getting cases by criteria: " + e);
+		}
+		
+		return null;
 	}
 }

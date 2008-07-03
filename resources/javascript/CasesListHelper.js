@@ -39,11 +39,19 @@ function continueInitializeCasesList(caseToOpenId) {
 	
 	var caseIdPar = 'caseid';
 	var toggler = null;
+	var togglerIsRegisteredForActionParamValue = null;
+	var togglerIsRegisteredForActionParamName = 'togglerisregisteredforaction';
 	for (var i = 0; i < togglers.length; i++) {
 		toggler = jQuery(togglers[i]);
-		toggler.click(function(event) {
-			registerGridExpanderActionsForElement(event, this);
-		});
+		
+		togglerIsRegisteredForActionParamValue = toggler.attr(togglerIsRegisteredForActionParamName);
+		if (togglerIsRegisteredForActionParamValue == null || togglerIsRegisteredForActionParamValue == '') {
+			toggler.attr(togglerIsRegisteredForActionParamName, 'true');
+			
+			toggler.click(function(event) {
+				registerGridExpanderActionsForElement(event, this);
+			});
+		}
 	}
 	
 	if (caseToOpenId != null && caseToOpenId != '') {
@@ -185,5 +193,137 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 	else {
 		customerView.hide('fast');
+	}
+}
+
+function searchForCases(parameters) {
+	if (parameters == null || parameters.length < 10) {
+		return false;
+	}
+	
+	var caseNumberId = parameters[1];
+	var caseDescriptionId = parameters[8];
+	var nameId = parameters[2];
+	var personalId = parameters[3];
+	var processId = parameters[4];
+	var statusId = parameters[5];
+	var dateRangeId = parameters[6];
+	
+	var caseNumberValue = DWRUtil.getValue(caseNumberId);
+	var caseDescriptionValue = DWRUtil.getValue(caseDescriptionId);
+	var nameValue = DWRUtil.getValue(nameId);
+	var personalIdValue = DWRUtil.getValue(personalId);
+	var processValue = DWRUtil.getValue(processId);
+	if (processValue == '' || processValue == -1) {
+		processValue = null;
+	}
+	var statusValue = DWRUtil.getValue(statusId);
+	if (statusValue == '' || statusValue == -1) {
+		statusValue = null;
+	}
+	var dateRangeValue = DWRUtil.getValue(dateRangeId);
+	var caseListType = DWRUtil.getValue(parameters[9]);
+	
+	showLoadingMessage(parameters[7]);
+	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
+																		statusValue, dateRangeValue, caseListType), {
+		callback: function(component) {
+			closeAllLoadingMessages();
+			
+			var lastCaseList = setDisplayPropertyToAllCasesLists(parameters[0], false);
+			if (lastCaseList == null) {
+				return false;
+			}
+			
+			var container = lastCaseList.parent()[0];
+			insertNodesToContainerBefore(component, container, lastCaseList[0]);
+			continueInitializeCasesList(null);
+		}
+	});
+}
+
+function setDisplayPropertyToAllCasesLists(className, show) {
+	removePreviousSearchResults(className);
+	
+	var casesLists = jQuery('div.' + className);
+	if (casesLists == null || casesLists.length == 0) {
+		return null;
+	}
+			
+	var caseList = null;
+	for (var i = 0; i < casesLists.length; i++) {
+		caseList = jQuery(casesLists[i]);
+		
+		if (caseList.attr('searchresult') == null) {
+			if (show) {
+				caseList.show('fast');
+			}
+			else {
+				caseList.hide('fast');
+			}
+		}
+	}
+	
+	return caseList;
+}
+
+function clearSearchForCases(parameters) {
+	DWRUtil.setValue(parameters[1], '');
+	DWRUtil.setValue(parameters[8], '');
+	DWRUtil.setValue(parameters[2], '');
+	DWRUtil.setValue(parameters[3], '');
+	DWRUtil.setValue(parameters[4], '-1');
+	DWRUtil.setValue(parameters[5], '-1');
+	DWRUtil.setValue(parameters[6], '');
+	
+	setDisplayPropertyToAllCasesLists(parameters[0], true);
+}
+
+function removePreviousSearchResults(className) {
+	var casesLists = jQuery('div.' + className);
+	if (casesLists == null || casesLists.length == 0) {
+		return false;
+	}
+	
+	var caseList = null;
+	for (var i = 0; i < casesLists.length; i++) {
+		caseList = jQuery(casesLists[i]);
+	
+		if (caseList.attr('searchresult') == 'true') {
+			caseList.remove();
+		}
+	}
+}
+
+function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType) {
+	this.caseNumber = caseNumber == '' ? null : caseNumber;
+	this.description = description == '' ? null : description;
+	this.name = name == '' ? null : name;
+	this.personalId = personalId == '' ? null : personalId;
+	this.processId = processId;
+	this.statusId = statusId;
+	this.dateRange = dateRange == '' ? null : dateRange;
+	this.caseListType = caseListType == '' ? null : caseListType;
+}
+
+function registerCasesSearcherBoxActions(id, parameters) {
+	if (id == null) {
+		return false;
+	}
+	
+	var inputs = jQuery('input.textinput', jQuery('#' + id));
+	if (inputs == null || inputs.length == 0) {
+		return false;
+	}
+	
+	var input = null;
+	for (var i = 0; i < inputs.length; i++) {
+		input = jQuery(inputs[i]);
+		
+		input.keyup(function(event) {
+			if (isEnterEvent(event)) {
+				searchForCases(parameters);
+			}
+		});
 	}
 }

@@ -76,7 +76,7 @@ div.casesListHeadersContainer {
 	overflow: hidden;
 }
 
-div.casesListHeadersContainerItem, div.casesListBodyContainerItem {
+div.casesListHeadersContainerItem, div.casesListBodyContainerItem, div.old_casesListBodyContainerItem {
 	float: left;
 }
 
@@ -90,7 +90,7 @@ div.casesListCaseContainer:hover {
 	background-color: #dfdfdf;
 }
 
-div.casesListHeadersContainerItemToggler, div.casesListBodyContainerItemToggler {
+div.casesListHeadersContainerItemToggler, div.casesListBodyContainerItemToggler, div.old_casesListBodyContainerItemToggler {
 	width: 5%;
 }
 
@@ -129,10 +129,6 @@ div.casesListHeadersContainerItemHandler, div.casesListBodyContainerItemHandler 
 
 div.casesListHeadersContainerItemMultiHandle, div.casesListBodyContainerItemMultiHandle {
 	width: 3%;
-}
-
-div.casesListBodyContainerItem {
-	float: left;
 }
 
 div.casesListGridExpanderStyleClass {
@@ -225,4 +221,17 @@ div.hiddenLinksForCasesContainerStyle {
 
 span.watchUnwatchCase {
 	cursor: pointer;
+}
+
+div.shortFormItem label {
+	width: 75px;
+}
+
+div.shortFormItem input, select {
+	width: 73px;
+	margin: 0pt, 2px, 0pt, 0pt;
+}
+
+a.old_casesListBodyContainerItemLink {
+	margin-left: 8px;
 }
