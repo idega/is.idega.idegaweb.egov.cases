@@ -57,8 +57,6 @@ import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
-import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.text.Name;
@@ -1024,7 +1022,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return (CaseManagersProvider)WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
 	}
 	
-	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String processId, String[] statuses,
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses,
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups) {
 		
 		Collection<User> owners = null;
@@ -1042,35 +1040,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				}
 			}
 			if (owners == null && name != null) {
-				Locale locale = null;
-				IWContext iwc = CoreUtil.getIWContext();
-				if (iwc != null) {
-					locale = iwc.getCurrentLocale();
-				}
-				if (locale == null) {
-					locale = Locale.ENGLISH;
-				}
-				
-				String[] nameParts = name.split(CoreConstants.SPACE);
-				String firstName = null;
-				String middleName = null;
-				String lastName = null;
-				if (nameParts.length == 3) {
-					middleName = nameParts[1].toLowerCase(locale);
-					lastName = nameParts[2].toLowerCase(locale);
-				}
-				if (nameParts.length == 2) {
-					lastName = nameParts[1].toLowerCase(locale);
-				}
-				if (nameParts.length >= 1) {
-					firstName = nameParts[0].toLowerCase(locale);
-				}
-				
-				try {
-					owners = getUserHome().findByNames(firstName, middleName, lastName, true);
-				} catch (FinderException e) {
-					e.printStackTrace();
-				}
+				owners = getUserBusiness().getUsersByName(name);
 			}
 		}
 		Collection<String> ownersIds = null;
@@ -1081,9 +1051,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		}
 		
-		
 		try {
-			return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, processId, statuses, dateFrom, dateTo, owner, groups);
+			return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups);
 		} catch(Exception e) {
 			log(Level.SEVERE, "Error getting cases by criteria: " + e);
 		}

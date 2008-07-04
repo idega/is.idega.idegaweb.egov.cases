@@ -281,7 +281,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	
 	public CaseManagersProvider getCaseHandlersProvider();
 	
-	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String processId, String[] statuses,
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses,
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups);
 	
 	public String[] getStatusesForOpenCases();

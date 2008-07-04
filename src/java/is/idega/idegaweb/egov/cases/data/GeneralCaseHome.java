@@ -60,7 +60,7 @@ public interface GeneralCaseHome extends IDOHome {
 	
 	public abstract Collection<GeneralCase> findAllByIds(Collection<Integer> ids) throws FinderException;
 	
-	public Collection<Case> getCasesByCriteria(String caseNumber, String description, Collection<String> owners, String processId, String[] statuses,
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses,
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups) throws FinderException;
 	
 	public Collection<Case> getCasesByIds(Collection<Integer> ids) throws FinderException;

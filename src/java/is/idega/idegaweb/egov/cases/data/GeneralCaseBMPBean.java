@@ -481,7 +481,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoGetNumberOfRecords(query);
 	}
 	
-	public Collection ejbFindByCriteria(String caseNumber, String description, Collection<String> owners, String processId, String[] statuses, IWTimestamp dateFrom,
+	public Collection ejbFindByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups) throws FinderException {
 		
 		Table generalCasesTable = new Table(this);
