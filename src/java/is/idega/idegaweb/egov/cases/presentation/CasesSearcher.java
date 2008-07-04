@@ -49,6 +49,7 @@ public class CasesSearcher extends CasesBlock {
 	private static final String PARAMETER_PROCESS_ID = "cf_prm_process_id";
 	private static final String PARAMETER_CASE_STATUS = "cf_prm_case_status";
 	private static final String PARAMETER_CASE_LIST_TYPE = "cf_prm_case_list_type";
+	private static final String PARAMETER_CASE_CONTACT = "cf_prm_case_contact";
 
 	private String textInputStyleClass = "textinput";
 	private String buttonStyleClass = "button";
@@ -75,17 +76,16 @@ public class CasesSearcher extends CasesBlock {
 		
 		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
 		
-		TextInput caseNumber = new TextInput(CaseFinder.PARAMETER_CASE_NUMBER);
-		caseNumber.setStyleClass(textInputStyleClass);
+		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null);
 
-		TextInput caseDescription = new TextInput(CaseFinder.PARAMETER_TEXT);
-		caseDescription.setStyleClass(textInputStyleClass);
+		TextInput caseDescription = getTextInput(CaseFinder.PARAMETER_TEXT, null);
 		
-		TextInput name = new TextInput(CaseFinder.PARAMETER_NAME);
-		name.setStyleClass(textInputStyleClass);
+		TextInput name = getTextInput(CaseFinder.PARAMETER_NAME, null);
 
-		TextInput personalID = new TextInput(CaseFinder.PARAMETER_PERSONAL_ID);
-		personalID.setStyleClass(textInputStyleClass);
+		TextInput personalID = getTextInput(CaseFinder.PARAMETER_PERSONAL_ID, null);
+		
+		TextInput contact = getTextInput(PARAMETER_CASE_CONTACT, iwrb.getLocalizedString("cases_search_enter_name_email_or_phone",
+				"Contact's name, e-mail or phone number"));
 		
 		HiddenInput listTypeInput = new HiddenInput(PARAMETER_CASE_LIST_TYPE, StringUtil.isEmpty(listType) ? CoreConstants.EMPTY : listType);
 		container.add(listTypeInput);
@@ -101,6 +101,9 @@ public class CasesSearcher extends CasesBlock {
 
 		//	Case personal id
 		addFormItem(container, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID);
+		
+		//	Case contacts
+		addFormItem(container, iwrb.getLocalizedString("contact", "Contact"), contact);
 		
 		//	Process
 		DropdownMenu processes = getDropdownForProcess(iwc);
@@ -124,7 +127,7 @@ public class CasesSearcher extends CasesBlock {
 		parameters.append(caseNumber.getId()).append("', '").append(name.getId()).append("', '").append(personalID.getId()).append("', '");
 		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
-		parameters.append(listTypeInput.getId()).append("']");
+		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("']");
 		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(container.getId()).append("', ").append(parameters.toString())
 												.append(");");
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
@@ -142,6 +145,17 @@ public class CasesSearcher extends CasesBlock {
 		clearSearch.setOnClick(new StringBuilder("clearSearchForCases(").append(parameters.toString()).append(");").toString());
 		clearSearch.setStyleClass(buttonStyleClass);
 		buttonsContainer.add(clearSearch);
+	}
+	
+	private TextInput getTextInput(String name, String toolTip) {
+		TextInput input = new TextInput(name);
+		input.setStyleClass(textInputStyleClass);
+		
+		if (!StringUtil.isEmpty(toolTip)) {
+			input.setToolTip(toolTip);
+		}
+		
+		return input;
 	}
 	
 	private void fillDropdown(Locale locale, DropdownMenu menu, List<AdvancedProperty> options, AdvancedProperty firstElement, String selectedElement) {

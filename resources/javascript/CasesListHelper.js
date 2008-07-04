@@ -223,10 +223,11 @@ function searchForCases(parameters) {
 	}
 	var dateRangeValue = DWRUtil.getValue(dateRangeId);
 	var caseListType = DWRUtil.getValue(parameters[9]);
+	var contact = DWRUtil.getValue(parameters[10]);
 	
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
-																		statusValue, dateRangeValue, caseListType), {
+																		statusValue, dateRangeValue, caseListType, contact), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -275,6 +276,7 @@ function clearSearchForCases(parameters) {
 	DWRUtil.setValue(parameters[4], '-1');
 	DWRUtil.setValue(parameters[5], '-1');
 	DWRUtil.setValue(parameters[6], '');
+	DWRUtil.setValue(parameters[10], '');
 	
 	setDisplayPropertyToAllCasesLists(parameters[0], true);
 }
@@ -295,7 +297,7 @@ function removePreviousSearchResults(className) {
 	}
 }
 
-function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType) {
+function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -304,6 +306,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.statusId = statusId;
 	this.dateRange = dateRange == '' ? null : dateRange;
 	this.caseListType = caseListType == '' ? null : caseListType;
+	this.contact = contact == '' ? null : contact;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
