@@ -257,3 +257,5 @@ searching=Searching...
 no_cases_found=No cases were found by your query!
 search_for_cases_results=Your search results
 clear_search_results=Clear
+search_for_cases=Search
+cases_search_select_process=Process
