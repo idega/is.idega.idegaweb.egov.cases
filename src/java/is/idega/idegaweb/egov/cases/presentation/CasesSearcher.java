@@ -22,6 +22,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.text.Heading1;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
@@ -72,6 +73,8 @@ public class CasesSearcher extends CasesBlock {
 		Layer container = new Layer();
 		add(container);
 		
+		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
+		
 		TextInput caseNumber = new TextInput(CaseFinder.PARAMETER_CASE_NUMBER);
 		caseNumber.setStyleClass(textInputStyleClass);
 
@@ -101,7 +104,7 @@ public class CasesSearcher extends CasesBlock {
 		
 		//	Process
 		DropdownMenu processes = getDropdownForProcess(iwc);
-		addFormItem(container, iwrb.getLocalizedString("process", "Process"), processes);
+		addFormItem(container, iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
 
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
@@ -129,7 +132,7 @@ public class CasesSearcher extends CasesBlock {
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 		
-		GenericButton searchButton = new GenericButton(iwrb.getLocalizedString("search", "Search"));
+		GenericButton searchButton = new GenericButton(iwrb.getLocalizedString("search_for_cases", "Search"));
 		searchButton.setStyleClass(buttonStyleClass);
 		StringBuilder searchAction = new StringBuilder("searchForCases(").append(parameters.toString()).append(");");
 		searchButton.setOnClick(searchAction.toString());
