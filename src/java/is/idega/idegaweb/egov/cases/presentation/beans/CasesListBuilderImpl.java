@@ -432,7 +432,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
-	//	TODO: test this
 	@SuppressWarnings("unchecked")
 	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String casesType, boolean addCredentialsToExernalUrls) {
 		List<Case> casesInList = getSortedCases(cases);
@@ -616,6 +615,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
+//		scripts.add("/idegaweb/bundles/is.idega.idegaweb.egov.bpm.bundle/resources/javascript/CasesBPMAssets.js");
 		
 		if (caseId == null || CoreConstants.EMPTY.equals(caseId)) {
 			caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK + "_id");
@@ -636,7 +636,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page", "Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
 		action.append(", '").append(iwrb.getLocalizedString("loading", "Loading...")).append("'");
 		
-		action.append("], false);");
+		action.append("], true);");	//	TODO: set false after debug
 		
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			action = new StringBuilder("jQuery(window).load(function() {").append(action.toString()).append("});");
