@@ -223,13 +223,29 @@ span.watchUnwatchCase {
 	cursor: pointer;
 }
 
+div.casesSearcherInputsBoxStyleClass {
+	border-top: 1px #fff solid;
+	padding-top: 10px;
+}
+
 div.shortFormItem label {
 	width: 75px;
 }
 
-div.shortFormItem input, select {
-	width: 73px;
-	margin: 0pt, 2px, 0pt, 0pt;
+div.shortFormItem input, div.shortFormItem select {
+	width: 108px;
+	margin: 0;
+	border: 1px #a0a0a0 solid;
+}
+
+div.casesSearcherInputsBoxStyleClass .buttonLayer {
+	margin: 0;
+}
+
+div.casesSearcherInputsBoxStyleClass .buttonLayer input {
+	text-transform: none !important;
+	padding: 3px 5px;
+	margin-left: 8px;
 }
 
 a.old_casesListBodyContainerItemLink {
