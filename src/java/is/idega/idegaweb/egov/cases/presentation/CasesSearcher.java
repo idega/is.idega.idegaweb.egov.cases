@@ -73,6 +73,7 @@ public class CasesSearcher extends CasesBlock {
 		
 		Layer container = new Layer();
 		add(container);
+		container.setStyleClass("casesSearcherBoxStyleClass");
 		
 		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
 		
