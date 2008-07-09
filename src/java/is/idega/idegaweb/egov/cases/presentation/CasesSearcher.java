@@ -77,6 +77,10 @@ public class CasesSearcher extends CasesBlock {
 		
 		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
 		
+		Layer inputsContainer = new Layer();
+		container.add(inputsContainer);
+		inputsContainer.setStyleClass("casesSearcherInputsBoxStyleClass");
+		
 		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null);
 
 		TextInput caseDescription = getTextInput(CaseFinder.PARAMETER_TEXT, null);
@@ -89,48 +93,48 @@ public class CasesSearcher extends CasesBlock {
 				"Contact's name, e-mail or phone number"));
 		
 		HiddenInput listTypeInput = new HiddenInput(PARAMETER_CASE_LIST_TYPE, StringUtil.isEmpty(listType) ? CoreConstants.EMPTY : listType);
-		container.add(listTypeInput);
+		inputsContainer.add(listTypeInput);
 
 		//	Case number
-		addFormItem(container, iwrb.getLocalizedString("case_nr", "Case nr."), caseNumber);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("case_nr", "Case nr."), caseNumber);
 		
 		// Case description
-		addFormItem(container, iwrb.getLocalizedString("description", "Description"), caseDescription);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("description", "Description"), caseDescription);
 
 		//	Case name
-		addFormItem(container, iwrb.getLocalizedString("name", "Name"), name);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("name", "Name"), name);
 
 		//	Case personal id
-		addFormItem(container, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID);
 		
 		//	Case contacts
-		addFormItem(container, iwrb.getLocalizedString("contact", "Contact"), contact);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("contact", "Contact"), contact);
 		
 		//	Process
 		DropdownMenu processes = getDropdownForProcess(iwc);
-		addFormItem(container, iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
 
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
-		addFormItem(container, iwrb.getLocalizedString("status", "Status"), statuses);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("status", "Status"), statuses);
 		
 		//	Date range
 		IWDatePicker dateRange = getDateRange(iwc);
-		addFormItem(container, iwrb.getLocalizedString("date_range", "Date range"), dateRange);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("date_range", "Date range"), dateRange);
 		
-		container.add(new CSSSpacer());
+		inputsContainer.add(new CSSSpacer());
 
 		Layer buttonsContainer = new Layer(Layer.DIV);
 		buttonsContainer.setStyleClass("buttonLayer");
-		container.add(buttonsContainer);
+		inputsContainer.add(buttonsContainer);
 
 		StringBuilder parameters  = new StringBuilder("['").append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '");
 		parameters.append(caseNumber.getId()).append("', '").append(name.getId()).append("', '").append(personalID.getId()).append("', '");
 		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
 		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("']");
-		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(container.getId()).append("', ").append(parameters.toString())
-												.append(");");
+		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(inputsContainer.getId()).append("', ")
+												.append(parameters.toString()).append(");");
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			action = new StringBuilder("jQuery(window).load(function() {").append(action.toString()).append("});");
 		}
