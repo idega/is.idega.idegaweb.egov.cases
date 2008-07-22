@@ -59,6 +59,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
 
@@ -167,9 +168,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (isPrivate) {
 			caseContainer.setStyleClass("isPrivate");
 		}
+		String caseStatusCode = null;
 		if (status != null && caseStatusReview != null) {
 			if (status.equals(caseStatusReview)) {
 				caseContainer.setStyleClass("isReview");
+			}
+			
+			caseStatusCode = status.getStatus();
+			if (!StringUtil.isEmpty(caseStatusCode)) {
+				caseContainer.setStyleClass(caseStatusCode);
 			}
 		}
 		
@@ -291,6 +298,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
 		if (caseManager != null) {
 			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId);
+		}
+		if (!StringUtil.isEmpty(caseStatusCode)) {
+			statusContainer.setStyleClass(caseStatusCode);
 		}
 		
 		//	Controller
