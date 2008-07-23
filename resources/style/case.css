@@ -251,3 +251,7 @@ div.casesSearcherInputsBoxStyleClass .buttonLayer input {
 a.old_casesListBodyContainerItemLink {
 	margin-left: 8px;
 }
+
+div.noContentInCasesListGridBody {
+	margin-left: 5px !important;
+}
