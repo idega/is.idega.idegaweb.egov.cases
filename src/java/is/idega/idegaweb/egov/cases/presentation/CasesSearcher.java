@@ -41,7 +41,7 @@ import com.idega.webface.WFUtil;
  * Cases searcher. MUST be included in the same page as CasesList!
  * @author <a href="mailto:valdas@idega.com>Valdas Žemaitis</a>
  * Created: 2008.06.27
- * @version '$Revision '
+ * @version '$Revision 1.5'
  * Last modified: 2008.06.27 11:37:14 by: valdas
  */
 public class CasesSearcher extends CasesBlock {
@@ -55,6 +55,8 @@ public class CasesSearcher extends CasesBlock {
 	private String buttonStyleClass = "button";
 	
 	private String listType;
+	
+	private boolean showAllStatuses;
 	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
@@ -203,7 +205,11 @@ public class CasesSearcher extends CasesBlock {
 			return menu;
 		}
 		
-		fillDropdown(iwc.getCurrentLocale(), menu, allProcesses, new AdvancedProperty(String.valueOf(-1), getResourceBundle().getLocalizedString("select_porcess", "Select process")), selectedProcess);
+		IWResourceBundle iwrb = getResourceBundle();
+		
+		allProcesses.add(0, new AdvancedProperty(CasesConstants.GENERAL_CASES_TYPE, iwrb.getLocalizedString("general_cases", "General cases")));
+		fillDropdown(iwc.getCurrentLocale(), menu, allProcesses, new AdvancedProperty(String.valueOf(-1),
+				iwrb.getLocalizedString("cases_search_select_process", "Select process")), selectedProcess);
 		
 		return menu;
 	}
@@ -234,10 +240,22 @@ public class CasesSearcher extends CasesBlock {
 		if (l == null) {
 			l = Locale.ENGLISH;
 		}
+		
+		boolean addStatus = true;;
+		String localizedStatus = null;
 		List<AdvancedProperty> statuses = new ArrayList<AdvancedProperty>();
 		for (CaseStatus status: allStatuses) {
+			addStatus = true;
+			
 			try {
-				statuses.add(new AdvancedProperty(status.getStatus(), caseBusiness.getLocalizedCaseStatusDescription(null, status, l)));
+				localizedStatus = caseBusiness.getLocalizedCaseStatusDescription(null, status, l);
+				if (!showAllStatuses && localizedStatus.equals(status.getStatus())) {
+					addStatus = false;
+				}
+				
+				if (addStatus) {
+					statuses.add(new AdvancedProperty(status.getStatus(), localizedStatus));
+				}
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -274,6 +292,14 @@ public class CasesSearcher extends CasesBlock {
 
 	public void setListType(String listType) {
 		this.listType = listType;
+	}
+
+	public boolean isShowAllStatuses() {
+		return showAllStatuses;
+	}
+
+	public void setShowAllStatuses(boolean showAllStatuses) {
+		this.showAllStatuses = showAllStatuses;
 	}
 
 }

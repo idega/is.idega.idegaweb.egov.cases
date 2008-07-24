@@ -1,5 +1,5 @@
 /*
- * $Id: CasesConstants.java,v 1.1 2008/07/03 14:15:41 valdas Exp $ Created on Oct 30, 2005
+ * $Id: CasesConstants.java,v 1.2 2008/07/24 07:02:12 valdas Exp $ Created on Oct 30, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  * 
@@ -24,5 +24,6 @@ public class CasesConstants {
 	public static final String CASES_LIST_HELPER_JAVA_SCRIPT_FILE = "javascript/CasesListHelper.js";
 	
 	public static final String CASE_LIST_TYPE_SEARCH_RESULTS = "searchResults";
+	public static final String GENERAL_CASES_TYPE = "generalCases";
 
 }

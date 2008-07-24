@@ -1023,7 +1023,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 	
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses,
-			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups) {
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) {
 		
 		Collection<User> owners = null;
 		if (name != null || personalId != null) {
@@ -1052,7 +1052,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 		
 		try {
-			return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups);
+			return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
 		} catch(Exception e) {
 			log(Level.SEVERE, "Error getting cases by criteria: " + e);
 		}
