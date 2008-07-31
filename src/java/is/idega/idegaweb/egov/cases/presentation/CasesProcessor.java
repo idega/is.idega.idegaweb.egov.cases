@@ -124,7 +124,7 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		GeneralCaseManagerViewBuilder viewBuilder = (GeneralCaseManagerViewBuilder) WFUtil.getBeanInstance(GeneralCaseManagerViewBuilder.SPRING_BEAN_IDENTIFIER);
 		try {
-			view = viewBuilder.getCaseManagerView(iwc);
+			view = viewBuilder.getCaseManagerView(iwc, getCasesProcessorType());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

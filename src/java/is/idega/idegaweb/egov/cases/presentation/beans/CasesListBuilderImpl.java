@@ -76,7 +76,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private String caseIdParName = "caseid";
 	
-	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults) {
+	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults, String caseProcessorType) {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		if (totalCases < 1) {
 			if (searchResults) {
@@ -89,7 +89,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
-		addResources(caseId, iwc, getBundle(iwc));
+		addResources(caseId, iwc, getBundle(iwc), caseProcessorType);
 		
 		if (searchResults) {
 			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results")).append(CoreConstants.SPACE);
@@ -385,14 +385,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public UIComponent getCasesList(IWContext iwc, Collection cases, String casesType, boolean showCheckBoxes) {		
+	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes) {		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
 		
-		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
+		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
 		
-		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(casesType);
+		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
 		Layer container = getCasesListContainer(searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -404,7 +404,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes, searchResults);
+		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes, searchResults, caseProcessorType);
 		
 		if (totalCases < 1) {
 			return container;
@@ -443,14 +443,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String casesType, boolean addCredentialsToExernalUrls) {
+	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String caseProcessorType, boolean addCredentialsToExernalUrls) {
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc); 
 		
-		boolean descriptionIsEditable = isDescriptionEditable(casesType, iwc.isSuperAdmin());
+		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
 		
-		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(casesType);
+		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
 		Layer container = getCasesListContainer(searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -462,7 +462,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, totalCases, false, searchResults);
+		Layer casesContainer = createHeader(iwc, container, totalCases, false, searchResults, caseProcessorType);
 		
 		if (totalCases < 1) {
 			return container;
@@ -616,7 +616,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return process;
 	}
 	
-	private void addResources(String caseId, IWContext iwc, IWBundle bundle) {
+	private void addResources(String caseId, IWContext iwc, IWBundle bundle, String caseProcessorType) {
 		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		
 		List<String> scripts = new ArrayList<String>();
@@ -654,6 +654,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Adding resources
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
+		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \""+caseProcessorType+"\";");
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 	}
 	
@@ -705,7 +706,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return layer;
 	}
 
-	public UIComponent getCaseManagerView(IWContext iwc, Integer caseId) {
+	public UIComponent getCaseManagerView(IWContext iwc, Integer caseId, String caseProcessorType) {
 		
 		try {
 			Case theCase = getCasesBusiness(iwc).getCase(caseId);
@@ -719,7 +720,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			
 			if(caseManager != null) {
 				
-				UIComponent caseAssets = caseManager.getView(iwc, theCase);
+				UIComponent caseAssets = caseManager.getView(iwc, theCase, caseProcessorType);
 				
 				if(caseAssets != null)
 					return caseAssets;

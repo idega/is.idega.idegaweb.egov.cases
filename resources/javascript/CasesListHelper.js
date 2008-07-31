@@ -175,7 +175,7 @@ function registerGridExpanderActionsForElement(event, element) {
 		
 		showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
 		var caseId = caseToExpand.attr(caseIdPar);
-		CasesEngine.getCaseManagerView(caseId, {
+		CasesEngine.getCaseManagerView(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, {
 			callback: function(component) {
 				
 				closeAllLoadingMessages();
