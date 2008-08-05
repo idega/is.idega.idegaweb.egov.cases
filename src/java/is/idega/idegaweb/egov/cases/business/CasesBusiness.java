@@ -200,6 +200,10 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 */
 	public void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges) throws RemoteException;
 	
+	public abstract void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges, boolean sendMessages);
+	
+	public abstract void untakeCase(GeneralCase theCase);
+	
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reactivateCase
 	 */
