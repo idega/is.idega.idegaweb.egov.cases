@@ -159,6 +159,10 @@ img.caseProcessResourceAccessRightsStyle {
 	width: 16px;
 }
 
+img.setSameAccessRightsStyle {
+	cursor: pointer;
+}
+
 div.caseProcessResourceAccessRightsSetterStyle {
 	z-index: 1000;
 	position: absolute;
@@ -254,4 +258,8 @@ a.old_casesListBodyContainerItemLink {
 
 div.noContentInCasesListGridBody {
 	margin-left: 5px !important;
+}
+
+td.alignCenterText {
+	text-align:center !important;	
 }
