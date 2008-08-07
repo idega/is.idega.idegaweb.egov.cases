@@ -285,18 +285,6 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return getOpenCases(groups, new String[] {});
 	}
 	
-	public String[] getStatusesForOpenCases() {
-		return new String[] {getCaseStatusOpen().getStatus(), getCaseStatusReview().getStatus()};
-	}
-	
-	public String[] getStatusesForClosedCases() {
-		return new String[] {getCaseStatusInactive().getStatus(), getCaseStatusReady().getStatus()};
-	}
-	
-	public String[] getStatusesForMyCases() {
-		return new String[] {getCaseStatusPending().getStatus(), getCaseStatusWaiting().getStatus()};
-	}
-	
 	public Collection getOpenCases(Collection groups, String[] caseHandlers) {
 		
 		try {
