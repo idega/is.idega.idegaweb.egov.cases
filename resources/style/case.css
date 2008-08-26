@@ -263,3 +263,7 @@ div.noContentInCasesListGridBody {
 td.alignCenterText {
 	text-align:center !important;	
 }
+
+.caseProcessResourceAccessRightsSetterStyle .setRoleDefaults {
+    padding-left: 15px;
+}
