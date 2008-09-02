@@ -624,6 +624,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
+		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
 //		scripts.add("/idegaweb/bundles/is.idega.idegaweb.egov.bpm.bundle/resources/javascript/CasesBPMAssets.js");
 		
