@@ -1,14 +1,13 @@
 package is.idega.idegaweb.egov.cases.presentation.handlers;
 
-import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.presentation.ClosedCases;
+import is.idega.idegaweb.egov.cases.presentation.MyCases;
+import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.util.List;
 
 import com.idega.block.process.presentation.UserCases;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
-import com.idega.core.builder.business.ICBuilderConstants;
 import com.idega.core.builder.presentation.ICPropertyHandler;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
@@ -29,18 +28,23 @@ public class CasesListTypePropertyHandler implements ICPropertyHandler {
 		
 		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("select_list_type", "Select list type"), -1));
 		
-		CasesBusiness casesBusiness = null;
-		try {
-			casesBusiness = (CasesBusiness) IBOLookup.getServiceInstance(iwc, CasesBusiness.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-			return caseListTypes;
-		}
+//		CasesBusiness casesBusiness = null;
+//		try {
+//			casesBusiness = (CasesBusiness) IBOLookup.getServiceInstance(iwc, CasesBusiness.class);
+//		} catch (IBOLookupException e) {
+//			e.printStackTrace();
+//			return caseListTypes;
+//		}
 		
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), getStringFromArray(casesBusiness.getStatusesForOpenCases())));
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"),
-				getStringFromArray(casesBusiness.getStatusesForClosedCases())));
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), getStringFromArray(casesBusiness.getStatusesForMyCases())));
+//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), getStringFromArray(casesBusiness.getStatusesForOpenCases())));
+//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"),
+//				getStringFromArray(casesBusiness.getStatusesForClosedCases())));
+//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), getStringFromArray(casesBusiness.getStatusesForMyCases())));
+//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("user_cases", "User cases"), UserCases.TYPE));
+		
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), OpenCases.TYPE));
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"), ClosedCases.TYPE));
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), MyCases.TYPE));
 		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("user_cases", "User cases"), UserCases.TYPE));
 		
 		caseListTypes.setSelectedElement(stringValue);
@@ -48,6 +52,7 @@ public class CasesListTypePropertyHandler implements ICPropertyHandler {
 		return caseListTypes;
 	}
 
+	/*
 	private String getStringFromArray(String[] values) {
 		if (values == null || values.length == 0) {
 			return String.valueOf(-1);
@@ -63,6 +68,7 @@ public class CasesListTypePropertyHandler implements ICPropertyHandler {
 		}
 		return value.toString();
 	}
+	*/
 	
 	public void onUpdate(String[] values, IWContext iwc) {
 	}
