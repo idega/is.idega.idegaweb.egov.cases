@@ -94,6 +94,7 @@ public class CasesSearcher extends CasesBlock {
 		TextInput contact = getTextInput(PARAMETER_CASE_CONTACT, iwrb.getLocalizedString("cases_search_enter_name_email_or_phone",
 				"Contact's name, e-mail or phone number"));
 		
+		String listType = getListType();
 		HiddenInput listTypeInput = new HiddenInput(PARAMETER_CASE_LIST_TYPE, StringUtil.isEmpty(listType) ? CoreConstants.EMPTY : listType);
 		inputsContainer.add(listTypeInput);
 
