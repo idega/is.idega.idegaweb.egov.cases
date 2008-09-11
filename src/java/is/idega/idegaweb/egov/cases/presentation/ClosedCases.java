@@ -8,22 +8,17 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.CaseWriter;
-import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 
 import javax.ejb.FinderException;
 
 import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
-import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -32,7 +27,6 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
-import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
@@ -44,16 +38,16 @@ public class ClosedCases extends CasesProcessor {
 		return "closedCases";
 	}
 
-	protected Collection getCases(User user) throws RemoteException {
-		
-		Collection<GeneralCase> cases = super.getCases(user);
-		Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
-		
-		if(cases != null)
-			closedCases.addAll(cases);
-		
-		return closedCases;
-	}
+//	protected Collection<GeneralCase> getCases(User user) {
+//		
+//		Collection<GeneralCase> cases = super.getCases(user);
+//		Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
+//		
+//		if(cases != null)
+//			closedCases.addAll(cases);
+//		
+//		return closedCases;
+//	}
 
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		Form form = new Form();
@@ -277,21 +271,26 @@ public class ClosedCases extends CasesProcessor {
 		return TYPE;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) throws RemoteException {
-		
-		boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
-		
-		Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
-		Collection<GeneralCase> closedCases;
-		
-		if(caseHandlers == null) {
-		
-			closedCases = casesBusiness.getClosedCases(!isCaseSuperAdmin ? groups : null);
-		} else {
-			
-			closedCases = casesBusiness.getClosedCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
-		}
-		return closedCases;
-	}
+//	@SuppressWarnings("unchecked")
+//	public static Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) {
+//		
+//		try {
+//			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+//			
+//			Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
+//			Collection<GeneralCase> closedCases;
+//			
+//			if(caseHandlers == null) {
+//			
+//				closedCases = casesBusiness.getClosedCases(!isCaseSuperAdmin ? groups : null);
+//			} else {
+//				
+//				closedCases = casesBusiness.getClosedCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
+//			}
+//			return closedCases;
+//			
+//		} catch (RemoteException e) {
+//			throw new IBORuntimeException(e);
+//		}
+//	}
 }
