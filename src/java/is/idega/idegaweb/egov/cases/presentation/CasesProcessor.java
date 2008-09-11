@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +22,6 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
-import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.block.process.presentation.beans.GeneralCaseManagerViewBuilder;
@@ -31,7 +29,6 @@ import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
@@ -510,15 +507,16 @@ public abstract class CasesProcessor extends CasesBlock {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		subCategories.setOnChange("changeUsers('" + PARAMETER_SUB_CASE_CATEGORY_PK + "')");
 
-		Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
+		@SuppressWarnings("unchecked")
+		Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
 		if (collection.isEmpty()) {
 			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
 		}
 		else {
 			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
-			Iterator iter = collection.iterator();
+			Iterator<CaseCategory> iter = collection.iterator();
 			while (iter.hasNext()) {
-				CaseCategory subCategory = (CaseCategory) iter.next();
+				CaseCategory subCategory = iter.next();
 				subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 			}
 		}
@@ -626,33 +624,17 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
-	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-		Link process = new Link(object);
-		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-
-		return process;
-	}
+//	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {
+//		Link process = new Link(object);
+//		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
+//		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
+//
+//		return process;
+//	}
 	
-	protected Collection<GeneralCase> getCases(User user) throws RemoteException {
-		List<CaseManager> caseHandlers = getCasesBusiness().getCaseHandlersProvider().getCaseManagers();
-		Collection<GeneralCase> cases = null;
+	protected Collection<GeneralCase> getCases(User user) {
 		
-		for (CaseManager handler : caseHandlers) {
-			
-			@SuppressWarnings("unchecked")
-			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, getCasesProcessorType());
-			
-			if(cazes != null) {
-				
-				if(cases == null)
-					cases = cazes;
-				else
-					cases.addAll(cazes);
-			}
-		}
-		
-		return cases;
+		return getCasesBusiness().getCasesForUser(user, getCasesProcessorType());
 	}
 	
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
