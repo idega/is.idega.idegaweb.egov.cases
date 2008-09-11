@@ -66,7 +66,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getMyCases
 	 */
-	public Collection<GeneralCase> getMyCases(User handler) throws RemoteException;
+	public Collection<GeneralCase> getMyCases(User handler);
 	
 	public Collection<GeneralCase> getMyCases(User handler, String[] caseHandlers) throws RemoteException;
 
@@ -289,4 +289,6 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases);
 	
 	public Collection<Case> getCasesByIds(Collection<Integer> ids);
+	
+	public abstract Collection<GeneralCase> getCasesForUser(User user, String casesProcessorType);
 }

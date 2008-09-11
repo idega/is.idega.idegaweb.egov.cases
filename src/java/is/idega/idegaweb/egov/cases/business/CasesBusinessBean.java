@@ -13,8 +13,10 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
+import is.idega.idegaweb.egov.cases.presentation.ClosedCases;
+import is.idega.idegaweb.egov.cases.presentation.MyCases;
+import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
-import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -34,20 +37,19 @@ import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
 import javax.faces.context.FacesContext;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
+import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.presentation.UserCases;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextHome;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
-import com.idega.core.accesscontrol.business.AccessControl;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.localisation.business.ICLocaleBusiness;
@@ -56,6 +58,7 @@ import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
@@ -1070,5 +1073,103 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 
 		return null;
+	}
+	
+	public Collection<GeneralCase> getCasesForUser(User user, String casesProcessorType) {
+		
+		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseManagers();
+		Collection<GeneralCase> cases = null;
+		
+		for (CaseManager handler : caseHandlers) {
+			
+			@SuppressWarnings("unchecked")
+			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
+			
+			if(cazes != null) {
+				
+				if(cases == null)
+					cases = cazes;
+				else
+					cases.addAll(cazes);
+			}
+		}
+		
+		if(casesProcessorType != null) {
+			
+			if(OpenCases.TYPE.equals(casesProcessorType)) {
+			
+				Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), IWContext.getCurrentInstance(), null);
+				
+				if(cases != null)
+					openCases.addAll(cases);
+				
+			} else if(MyCases.TYPE.equals(casesProcessorType)) {
+				
+				@SuppressWarnings("unchecked")
+				Collection<GeneralCase> myCases = getMyCases(user);
+				
+				if(cases != null)
+					myCases.addAll(cases);
+				
+			} else if(ClosedCases.TYPE.equals(casesProcessorType)) {
+				
+				Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), IWContext.getCurrentInstance(), null);
+				
+				if(cases != null)
+					closedCases.addAll(cases);
+				
+			} else if(UserCases.TYPE.equals(casesProcessorType)) {
+			
+				log(Level.WARNING, UserCases.TYPE+" is not supported in this method");
+			}
+		}
+		
+		return cases;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<GeneralCase> getOpenCases(User user, IWMainApplication iwma, IWUserContext iwuc, String[] caseHandlers) {
+		
+		try {
+			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+			
+			Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
+			Collection<GeneralCase> openCases;
+			
+			if(caseHandlers == null) {
+			
+				openCases = getOpenCases(!isCaseSuperAdmin ? groups : null);
+			} else {
+				
+				openCases = getOpenCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
+			}
+			return openCases;
+			
+		} catch (RemoteException e) {
+			throw new IBORuntimeException(e);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, String[] caseHandlers) {
+		
+		try {
+			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+			
+			Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
+			Collection<GeneralCase> closedCases;
+			
+			if(caseHandlers == null) {
+			
+				closedCases = getClosedCases(!isCaseSuperAdmin ? groups : null);
+			} else {
+				
+				closedCases = getClosedCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
+			}
+			return closedCases;
+			
+		} catch (RemoteException e) {
+			throw new IBORuntimeException(e);
+		}
 	}
 }
