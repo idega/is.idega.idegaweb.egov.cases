@@ -20,6 +20,8 @@ import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
+import com.idega.block.web2.business.Web2Business;
+import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
@@ -36,7 +38,9 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
+import com.idega.util.PresentationUtil;
 import com.idega.util.text.TextSoap;
 
 public class MyCases extends CasesProcessor {
@@ -179,6 +183,13 @@ public class MyCases extends CasesProcessor {
 		section.add(element);
 
 		if (useSubCategories) {
+//			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getWeb2Business(iwc).getBundleURIToMootoolsLib());
+//			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
+//			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
+//			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/MusicSchoolBusiness.js");
+//			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getBundle(iwc).getResourcesVirtualPath() + EGOV_MUSIC_SCHOOL_JS);
+//			PresentationUtil.addJavaScriptActionToBody(iwc, "window.addEvent('domready', initializeMusicSchoolDropdowns);");
+			
 			try {
 				RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
 				rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
@@ -295,6 +306,10 @@ public class MyCases extends CasesProcessor {
 		bottom.add(next);
 
 		add(form);
+	}
+	
+	public Web2Business getWeb2Business(IWContext iwc) throws RemoteException {
+		return (Web2Business) IBOLookup.getServiceInstance(iwc, Web2Business.class);
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
