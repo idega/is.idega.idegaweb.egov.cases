@@ -20,8 +20,6 @@ import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
-import com.idega.block.web2.business.Web2Business;
-import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
@@ -38,9 +36,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
-import com.idega.util.PresentationUtil;
 import com.idega.util.text.TextSoap;
 
 public class MyCases extends CasesProcessor {
@@ -306,10 +302,6 @@ public class MyCases extends CasesProcessor {
 		bottom.add(next);
 
 		add(form);
-	}
-	
-	public Web2Business getWeb2Business(IWContext iwc) throws RemoteException {
-		return (Web2Business) IBOLookup.getServiceInstance(iwc, Web2Business.class);
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
