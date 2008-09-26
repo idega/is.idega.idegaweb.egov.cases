@@ -385,7 +385,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes) {		
+	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes, boolean allowPDFSigning) {		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
@@ -443,7 +443,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String caseProcessorType, boolean addCredentialsToExernalUrls) {
+	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String caseProcessorType, boolean addCredentialsToExernalUrls,
+			boolean allowPDFSigning) {
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc); 
