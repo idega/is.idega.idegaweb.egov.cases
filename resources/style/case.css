@@ -154,6 +154,13 @@ img.downloadCaseAsPdfStyle:hover {
 	cursor: pointer;
 }
 
+img.signGeneratedFormToPdfStyle {
+}
+
+img.signGeneratedFormToPdfStyle:hover {
+	cursor: pointer;
+}
+
 img.caseProcessResourceAccessRightsStyle {
 	height: 16px;
 	width: 16px;
