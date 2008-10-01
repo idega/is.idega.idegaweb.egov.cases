@@ -75,6 +75,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String lastRowStyle = "lastRow";
 	
 	private String caseIdParName = "caseid";
+	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
+	private String allowPDFSigningParName = "allowpdfsigning";
 	
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults, String caseProcessorType) {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -139,15 +141,18 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return casesBodyContainer;
 	}
 	
-	private void prepareCellToBeGridExpander(Layer layer, String caseId, String gridViewerId) {
-		layer.setStyleClass("casesListGridExpanderStyleClass");
+	private void prepareCellToBeGridExpander(Layer layer, String caseId, String gridViewerId, boolean usePDFDownloadColumn, boolean allowPDFSigning) {
+		layer.setStyleClass(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS);
 		layer.setMarkupAttribute(caseIdParName, caseId);
 		layer.setMarkupAttribute("customerviewid", gridViewerId);
+		layer.setMarkupAttribute(usePDFDownloadColumnParName, String.valueOf(usePDFDownloadColumn));
+		layer.setMarkupAttribute(allowPDFSigningParName, String.valueOf(allowPDFSigning));
 	}
 	
 	@SuppressWarnings("unchecked")
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, boolean showCheckBoxes,
-			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress, boolean descriptionIsEditable) {
+			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress,
+			boolean descriptionIsEditable, boolean usePDFDownloadColumn, boolean allowPDFSigning) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -239,7 +244,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		if (caseManager != null) {
-			prepareCellToBeGridExpander(numberContainer, caseId, gridViewerId);
+			prepareCellToBeGridExpander(numberContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning);
 		}
 
 		//	Sender
@@ -247,7 +252,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
 				owner.getLastName()).getName(l)));
 		if (caseManager != null) {
-			prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId);
+			prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning);
 		}
 		
 		//	Description
@@ -276,7 +281,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
 		creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
 		if (caseManager != null) {
-			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId);
+			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning);
 		}
 
 		//	Status
@@ -297,7 +302,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
 		if (caseManager != null) {
-			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId);
+			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning);
 		}
 		if (!StringUtil.isEmpty(caseStatusCode)) {
 			statusContainer.setStyleClass(caseStatusCode);
@@ -321,7 +326,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (caseManager != null) {
 			togglerContainer.setStyleClass("expand");
 			togglerContainer.setMarkupAttribute("changeimage", "true");
-			prepareCellToBeGridExpander(togglerContainer, caseId, gridViewerId);
+			prepareCellToBeGridExpander(togglerContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning);
 		}
 		
 		//	Handle case
@@ -385,7 +390,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes, boolean allowPDFSigning) {		
+	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes, boolean usePDFDownloadColumn,
+			boolean allowPDFSigning) {		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
@@ -427,11 +433,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (o instanceof GeneralCase) {
 				genCase = (GeneralCase) o;
 				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, showCheckBoxes, genCase.isPrivate(), false,
-						rowsCounter, null, false, emailAddress, descriptionIsEditable);
+						rowsCounter, null, false, emailAddress, descriptionIsEditable, usePDFDownloadColumn, allowPDFSigning);
 			}
 			else if (o instanceof Case) {
 				caseContainer = addRowToCasesList(iwc, casesBodyContainer, (Case) o, caseStatusReview, l, showCheckBoxes, false, false, rowsCounter, null,
-						false, emailAddress, descriptionIsEditable);
+						false, emailAddress, descriptionIsEditable, usePDFDownloadColumn, allowPDFSigning);
 			}
 			rowsCounter++;
 		}
@@ -444,7 +450,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	@SuppressWarnings("unchecked")
 	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String caseProcessorType, boolean addCredentialsToExernalUrls,
-			boolean allowPDFSigning) {
+			boolean usePDFDownloadColumn, boolean allowPDFSigning) {
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc); 
@@ -482,7 +488,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		for (Case theCase: casesInList) {			
 			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, false, true, rowsCounter, pages,
-					addCredentialsToExernalUrls, emailAddress, descriptionIsEditable);
+					addCredentialsToExernalUrls, emailAddress, descriptionIsEditable, usePDFDownloadColumn, allowPDFSigning);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
@@ -501,8 +507,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode, CaseStatus caseStatus,
-			boolean addCredentialsToExernalUrls) {
+	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode,
+			CaseStatus caseStatus, boolean addCredentialsToExernalUrls) {
 		if (caseBusiness == null) {
 			try {
 				caseBusiness = (CaseBusiness) IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
@@ -645,7 +651,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
 		action.append("'").append(iwrb.getLocalizedString("click_to_edit", "Click to edit...")).append("'");
-		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page", "Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
+		action.append(", '").append(iwrb.getLocalizedString("error_occurred_confirm_to_reload_page",
+				"Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?")).append("'");
 		action.append(", '").append(iwrb.getLocalizedString("loading", "Loading...")).append("'");
 		
 		action.append("], true);");	//	TODO: set false after debug
@@ -656,7 +663,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Adding resources
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \""+caseProcessorType+"\";");
+		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \"" + caseProcessorType +
+				"\";");
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 	}
 	
@@ -727,7 +735,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				if(caseAssets != null)
 					return caseAssets;
 				else
-					Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case assets component resolved from case manager: "+caseManager.getType()+" by case pk: "+theCase.getPrimaryKey().toString());
+					Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case assets component resolved from case manager: " + caseManager.getType() + 
+							" by case pk: "+theCase.getPrimaryKey().toString());
 			} else
 				Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case manager resolved by type="+theCase.getCaseManagerType());
 			

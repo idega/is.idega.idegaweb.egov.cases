@@ -38,6 +38,29 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	private ICPage iMyCasesPage;
 	
 	public static final String TYPE = "OpenCases";
+	
+	private boolean usePDFDownloadColumn = true;
+	private boolean allowPDFSigning = true;
+	
+	@Override
+	public boolean isUsePDFDownloadColumn() {
+		return usePDFDownloadColumn;
+	}
+	
+	@Override
+	public void setUsePDFDownloadColumn(boolean usePDFDownloadColumn) {
+		this.usePDFDownloadColumn = usePDFDownloadColumn;
+	}
+
+	@Override
+	public boolean isAllowPDFSigning() {
+		return allowPDFSigning;
+	}
+
+	@Override
+	public void setAllowPDFSigning(boolean allowPDFSigning) {
+		this.allowPDFSigning = allowPDFSigning;
+	}
 
 	protected String getBlockID() {
 		return "openCases";
@@ -276,9 +299,9 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	protected void save(IWContext iwc) throws RemoteException {
 		
 		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
-		Object caseCategoryPK = iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_CASE_CATEGORY_PK) : null;
-		Object subCaseCategoryPK = iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK) : null;
-		Object caseTypePK = iwc.isParameterSet(PARAMETER_CASE_TYPE_PK) ? iwc.getParameter(PARAMETER_CASE_TYPE_PK) : null;
+//		Object caseCategoryPK = iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_CASE_CATEGORY_PK) : null;
+//		Object subCaseCategoryPK = iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK) : null;
+//		Object caseTypePK = iwc.isParameterSet(PARAMETER_CASE_TYPE_PK) ? iwc.getParameter(PARAMETER_CASE_TYPE_PK) : null;
 		if (casePK != null) {
 			try {
 				GeneralCase theCase = getCasesBusiness(iwc).getGeneralCase(new Integer(casePK));

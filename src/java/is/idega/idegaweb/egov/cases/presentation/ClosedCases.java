@@ -33,6 +33,29 @@ import com.idega.util.IWTimestamp;
 public class ClosedCases extends CasesProcessor {
 	
 	public static final String TYPE = "ClosedCases";
+	
+	private boolean usePDFDownloadColumn = true;
+	private boolean allowPDFSigning = true;
+	
+	@Override
+	public boolean isUsePDFDownloadColumn() {
+		return usePDFDownloadColumn;
+	}
+	
+	@Override
+	public void setUsePDFDownloadColumn(boolean usePDFDownloadColumn) {
+		this.usePDFDownloadColumn = usePDFDownloadColumn;
+	}
+
+	@Override
+	public boolean isAllowPDFSigning() {
+		return allowPDFSigning;
+	}
+
+	@Override
+	public void setAllowPDFSigning(boolean allowPDFSigning) {
+		this.allowPDFSigning = allowPDFSigning;
+	}
 
 	protected String getBlockID() {
 		return "closedCases";

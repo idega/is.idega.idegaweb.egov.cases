@@ -135,7 +135,8 @@ public class CasesSearcher extends CasesBlock {
 		parameters.append(caseNumber.getId()).append("', '").append(name.getId()).append("', '").append(personalID.getId()).append("', '");
 		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
-		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("']");
+		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '").append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS)
+		.append("']");
 		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(inputsContainer.getId()).append("', ")
 												.append(parameters.toString()).append(");");
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
