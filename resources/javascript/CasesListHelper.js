@@ -175,7 +175,9 @@ function registerGridExpanderActionsForElement(event, element) {
 		
 		showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
 		var caseId = caseToExpand.attr(caseIdPar);
-		CasesEngine.getCaseManagerView(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, {
+		var usePDFDownloadColumn = caseToExpand.attr('usepdfdownloadcolumn') == 'true';
+		var allowPDFSigning = caseToExpand.attr('allowpdfsigning') == 'true';
+		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning), {
 			callback: function(component) {
 				
 				closeAllLoadingMessages();
@@ -196,8 +198,16 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 }
 
+function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning) {
+	this.caseId = caseId;
+	this.processorType = processorType;
+	
+	this.usePDFDownloadColumn = usePDFDownloadColumn;
+	this.allowPDFSigning = allowPDFSigning;
+}
+
 function searchForCases(parameters) {
-	if (parameters == null || parameters.length < 10) {
+	if (parameters == null || parameters.length < 11) {
 		return false;
 	}
 	
@@ -225,9 +235,20 @@ function searchForCases(parameters) {
 	var caseListType = DWRUtil.getValue(parameters[9]);
 	var contact = DWRUtil.getValue(parameters[10]);
 	
+	var usePDFDownloadColumn = true;
+	var allowPDFSigning = true;
+	var gridOpeners = jQuery('div.' + parameters[11]);
+	if (gridOpeners != null && gridOpeners.length > 0) {
+		var gridOpener = jQuery(gridOpeners[0]);
+		
+		usePDFDownloadColumn = gridOpener.attr('usepdfdownloadcolumn') == 'true';
+		allowPDFSigning = gridOpener.attr('allowpdfsigning') == 'true';
+	}
+	
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
-																		statusValue, dateRangeValue, caseListType, contact), {
+																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
+																		allowPDFSigning), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -297,7 +318,8 @@ function removePreviousSearchResults(className) {
 	}
 }
 
-function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact) {
+function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
+										allowPDFSigning) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -307,6 +329,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.dateRange = dateRange == '' ? null : dateRange;
 	this.caseListType = caseListType == '' ? null : caseListType;
 	this.contact = contact == '' ? null : contact;
+	this.usePDFDownloadColumn = usePDFDownloadColumn;
+	this.allowPDFSigning = allowPDFSigning;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {

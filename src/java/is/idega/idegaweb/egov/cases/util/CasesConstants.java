@@ -1,5 +1,5 @@
 /*
- * $Id: CasesConstants.java,v 1.2 2008/07/24 07:02:12 valdas Exp $ Created on Oct 30, 2005
+ * $Id: CasesConstants.java,v 1.3 2008/10/01 14:49:01 valdas Exp $ Created on Oct 30, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
  * 
@@ -25,5 +25,7 @@ public class CasesConstants {
 	
 	public static final String CASE_LIST_TYPE_SEARCH_RESULTS = "searchResults";
 	public static final String GENERAL_CASES_TYPE = "generalCases";
+	
+	public static final String CASES_LIST_GRID_EXPANDER_STYLE_CLASS = "casesListGridExpanderStyleClass";
 
 }
