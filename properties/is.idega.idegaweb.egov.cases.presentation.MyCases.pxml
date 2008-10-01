@@ -69,7 +69,6 @@
             </value>
             <type>map</type>
           </key>
-          
           <key>
             <name>:method:1:implied:void:setJbpmProcessViewerPage:com.idega.core.builder.data.ICPage:</name>
             <value>
@@ -119,6 +118,138 @@
                   <name>iw_method_identifier</name>
                   <type>java.lang.String</type>
                   <value>:method:1:implied:void:setJbpmProcessViewerPage:com.idega.core.builder.data.ICPage:</value>
+                </key>
+              </map>
+            </value>
+            <type>map</type>
+          </key>
+          <key>
+            <name>:method:1025:implied:void:setAllowPDFSigning:boolean:</name>
+            <value>
+              <map>
+                <key>
+                  <name>iw_method_params</name>
+                  <value>
+                    <map>
+                      <key>
+                        <name>0</name>
+                        <value>
+                          <map>
+                            <key>
+                              <name>iw_method_param_handler</name>
+                              <type>java.lang.String</type>
+                              <value />
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                            <key>
+                              <name>iw_method_param_prim_key</name>
+                              <type>java.lang.Boolean</type>
+                              <value>false</value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                            <key>
+                              <name>iw_method_param_desc</name>
+                              <type>java.lang.String</type>
+                              <value>Allow to sign PDF</value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                          </map>
+                        </value>
+                        <type>map</type>
+                      </key>
+                    </map>
+                  </value>
+                  <type>map</type>
+                </key>
+                <key>
+                  <name>iw_method_option_multiv</name>
+                  <type>java.lang.Boolean</type>
+                  <value>false</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+                <key>
+                  <name>iw_method_description</name>
+                  <type>java.lang.String</type>
+                  <value>Allow to sign PDF</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+                <key>
+                  <name>iw_method_identifier</name>
+                  <type>java.lang.String</type>
+                  <value>:method:1025:implied:void:setAllowPDFSigning:boolean:</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+              </map>
+            </value>
+            <type>map</type>
+          </key>
+          <key>
+            <name>:method:1025:implied:void:setUsePDFDownloadColumn:boolean:</name>
+            <value>
+              <map>
+                <key>
+                  <name>iw_method_params</name>
+                  <value>
+                    <map>
+                      <key>
+                        <name>0</name>
+                        <value>
+                          <map>
+                            <key>
+                              <name>iw_method_param_handler</name>
+                              <type>java.lang.String</type>
+                              <value />
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                            <key>
+                              <name>iw_method_param_prim_key</name>
+                              <type>java.lang.Boolean</type>
+                              <value>false</value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                            <key>
+                              <name>iw_method_param_desc</name>
+                              <type>java.lang.String</type>
+                              <value>Allow to download PDF</value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                          </map>
+                        </value>
+                        <type>map</type>
+                      </key>
+                    </map>
+                  </value>
+                  <type>map</type>
+                </key>
+                <key>
+                  <name>iw_method_option_multiv</name>
+                  <type>java.lang.Boolean</type>
+                  <value>false</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+                <key>
+                  <name>iw_method_description</name>
+                  <type>java.lang.String</type>
+                  <value>Allow to download PDF</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+                <key>
+                  <name>iw_method_identifier</name>
+                  <type>java.lang.String</type>
+                  <value>:method:1025:implied:void:setUsePDFDownloadColumn:boolean:</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
                 </key>
               </map>
             </value>
