@@ -56,7 +56,7 @@
     	<module id="" class="is.idega.idegaweb.egov.cases.presentation.CasesSearcher">
 			<property>
 				<name>:method:1:implied:void:setListType:java.lang.String:</name>
-				<value>TYST:idega_builder_module_property:KLAR</value>
+				<value>ClosedCases</value>
 				<type>java.lang.String</type>
 			</property>
 		</module>

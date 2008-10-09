@@ -62,7 +62,7 @@
     	<module id="" class="is.idega.idegaweb.egov.cases.presentation.CasesSearcher">
 			<property>
 				<name>:method:1:implied:void:setListType:java.lang.String:</name>
-				<value>UBEH:idega_builder_module_property:OMPR</value>
+				<value>OpenCases</value>
 				<type>java.lang.String</type>
 			</property>
 		</module>
