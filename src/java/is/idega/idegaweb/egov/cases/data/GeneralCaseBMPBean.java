@@ -403,7 +403,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));
 
-		System.out.println(query.toString());
+		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
 	
@@ -550,7 +550,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		
 		query.addGroupByColumn(generalCasesTable.getColumn(getIDColumnName()));
 	
-		log(Level.INFO, query.toString());
+		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
 
