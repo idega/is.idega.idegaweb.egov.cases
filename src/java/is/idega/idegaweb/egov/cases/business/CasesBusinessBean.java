@@ -1027,7 +1027,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
-			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) {
+			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
 		Collection<User> owners = null;
 		if (name != null || personalId != null) {
@@ -1055,10 +1055,19 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		}
 
-		try {
-			return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
-		} catch (Exception e) {
-			log(Level.SEVERE, "Error getting cases by criteria: " + e);
+		if (notGeneralCases) {
+			try {
+				return getCaseHome().findByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
+			} catch (Exception e) {
+				log(Level.SEVERE, "Error getting cases by criteria: " + e);
+			}
+		}
+		else {
+			try {
+				return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
+			} catch (Exception e) {
+				log(Level.SEVERE, "Error getting cases by criteria: " + e);
+			}
 		}
 
 		return null;
@@ -1228,23 +1237,38 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
-	public Collection<GeneralCase> getFilteredProcesslessCases(Collection<Integer> ids) {
+	public Collection<Case> getFilteredProcesslessCases(Collection<Integer> ids, boolean notGeneralCases) {
 		if (ListUtil.isEmpty(ids)) {
 			return null;
 		}
 		
-		Collection<GeneralCase> cases = null;
-		try {
-			cases = getGeneralCaseHome().findAllByIds(ids);
-		} catch (FinderException e) {
-			e.printStackTrace();
+		Collection<Case> cases = null;
+		if (notGeneralCases) {
+			try {
+				cases = getCaseHome().findAllByIds(ids);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			Collection<GeneralCase> generalCases = null;
+			try {
+				generalCases = getGeneralCaseHome().findAllByIds(ids);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+			if (ListUtil.isEmpty(generalCases)) {
+				return null;
+			}
+			
+			cases = new ArrayList<Case>(generalCases);
 		}
 		if (ListUtil.isEmpty(cases)) {
 			return null;
 		}
 		
-		List<GeneralCase> filteredCases = new ArrayList<GeneralCase>();
-		for (GeneralCase casse: cases) {
+		List<Case> filteredCases = new ArrayList<Case>();
+		for (Case casse: cases) {
 			if (StringUtil.isEmpty(casse.getCaseManagerType())) {
 				filteredCases.add(casse);
 			}
@@ -1253,15 +1277,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return filteredCases;
 	}
 
-	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids) {
-		Collection<GeneralCase> filteredCases = getFilteredProcesslessCases(ids);
+	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases) {
+		Collection<Case> filteredCases = getFilteredProcesslessCases(ids, notGeneralCases);
 		if (ListUtil.isEmpty(filteredCases)) {
 			return null;
 		}
 		
 		Integer id = null;
 		List<Integer> filteredIds = new ArrayList<Integer>();
-		for (GeneralCase casse: filteredCases) {
+		for (Case casse: filteredCases) {
 			id = null;
 			try {
 				id = Integer.valueOf(casse.getId());

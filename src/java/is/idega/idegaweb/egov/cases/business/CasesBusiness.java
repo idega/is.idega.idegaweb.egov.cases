@@ -287,7 +287,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public CaseManagersProvider getCaseHandlersProvider();
 	
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses,
-			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases);
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases);
 	
 	public Collection<Case> getCasesByIds(Collection<Integer> ids);
 	
@@ -295,7 +295,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	
 	public List<Integer> getCasesIdsForUser(User user, String casesProcessorType);
 	
-	public Collection<GeneralCase> getFilteredProcesslessCases(Collection<Integer> ids);
+	public Collection<Case> getFilteredProcesslessCases(Collection<Integer> ids, boolean notGeneralCases);
 	
-	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids);
+	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases);
 }
