@@ -64,8 +64,10 @@ import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
 
@@ -1024,7 +1026,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return (CaseManagersProvider) WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
 	}
 
-	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) {
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
+			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) {
 
 		Collection<User> owners = null;
 		if (name != null || personalId != null) {
@@ -1076,55 +1079,107 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 	
 	public Collection<GeneralCase> getCasesForUser(User user, String casesProcessorType) {
-		
 		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseManagers();
-		Collection<GeneralCase> cases = null;
+		List<GeneralCase> cases = null;
 		
 		for (CaseManager handler : caseHandlers) {
-			
 			@SuppressWarnings("unchecked")
 			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
-			
-			if(cazes != null) {
-				
-				if(cases == null)
-					cases = cazes;
-				else
-					cases.addAll(cazes);
+			if (cazes != null) {
+				cases = new ArrayList<GeneralCase>(cazes);
 			}
 		}
 		
-		if(casesProcessorType != null) {
+		if (casesProcessorType != null) {
 			
-			if(OpenCases.TYPE.equals(casesProcessorType)) {
-			
-				Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), IWContext.getCurrentInstance(), null);
+			if (OpenCases.TYPE.equals(casesProcessorType)) {
 				
-				if(cases != null)
-					openCases.addAll(cases);
-				
-			} else if(MyCases.TYPE.equals(casesProcessorType)) {
+				Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), CoreUtil.getIWContext(), null);
+				cases = getMergedCases(openCases, cases);
+			} else if (MyCases.TYPE.equals(casesProcessorType)) {
 				
 				@SuppressWarnings("unchecked")
 				Collection<GeneralCase> myCases = getMyCases(user);
+				cases = getMergedCases(myCases, cases);
+			} else if (ClosedCases.TYPE.equals(casesProcessorType)) {
 				
-				if(cases != null)
-					myCases.addAll(cases);
-				
-			} else if(ClosedCases.TYPE.equals(casesProcessorType)) {
-				
-				Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), IWContext.getCurrentInstance(), null);
-				
-				if(cases != null)
-					closedCases.addAll(cases);
-				
-			} else if(UserCases.TYPE.equals(casesProcessorType)) {
-			
-				log(Level.WARNING, UserCases.TYPE+" is not supported in this method");
+				Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), CoreUtil.getIWContext(), null);
+				cases = getMergedCases(closedCases, cases);
+			} else if (UserCases.TYPE.equals(casesProcessorType)) {
+//				log(Level.WARNING, UserCases.TYPE+" is not supported in this method");
 			}
 		}
 		
 		return cases;
+	}
+	
+	private List<GeneralCase> getMergedCases(Collection<GeneralCase> source, List<GeneralCase> destination) {
+		if (ListUtil.isEmpty(source)) {
+			return destination;
+		}
+		
+		if (destination == null) {
+			destination = new ArrayList<GeneralCase>();
+		}
+		for (GeneralCase theCase: source) {
+			if (!destination.contains(theCase)) {
+				destination.add(theCase);
+			}
+		}
+		
+		return destination;
+	}
+	
+	public List<Integer> getCasesIdsForUser(User user, String casesProcessorType) {
+		Collection<GeneralCase> cases = getCasesForUser(user, casesProcessorType);
+		
+		List<Integer> ids = null;
+		if (UserCases.TYPE.equals(casesProcessorType)) {
+			Collection<Case> userCases = null;
+			try {
+				userCases = getAllCasesForUserExceptCodes(user, getCaseCodesForUserCasesList(), -1, -1);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+			if (!ListUtil.isEmpty(userCases)) {
+				ids = new ArrayList<Integer>();
+				Integer id = null;
+				for (Case casse: userCases) {
+					id = null;
+					try {
+						id = Integer.valueOf(casse.getId());
+					} catch(NumberFormatException e) {
+						e.printStackTrace();
+					}
+					if (id != null && !ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+		}
+		if (ListUtil.isEmpty(cases) && ListUtil.isEmpty(ids)) {
+			return null;
+		}
+		if (ListUtil.isEmpty(cases)) {
+			return ids;
+		}
+		
+		if (ListUtil.isEmpty(ids)) {
+			ids = new ArrayList<Integer>();
+		}
+		Integer id = null;
+		for (GeneralCase casse: cases) {
+			id = null;
+			try {
+				id = Integer.valueOf(casse.getId());
+			} catch(NumberFormatException e) {
+				e.printStackTrace();
+			}
+			if (id != null && !ids.contains(id)) {
+				ids.add(id);
+			}
+		}
+		return ids;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1171,5 +1226,54 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		} catch (RemoteException e) {
 			throw new IBORuntimeException(e);
 		}
+	}
+
+	public Collection<GeneralCase> getFilteredProcesslessCases(Collection<Integer> ids) {
+		if (ListUtil.isEmpty(ids)) {
+			return null;
+		}
+		
+		Collection<GeneralCase> cases = null;
+		try {
+			cases = getGeneralCaseHome().findAllByIds(ids);
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		if (ListUtil.isEmpty(cases)) {
+			return null;
+		}
+		
+		List<GeneralCase> filteredCases = new ArrayList<GeneralCase>();
+		for (GeneralCase casse: cases) {
+			if (StringUtil.isEmpty(casse.getCaseManagerType())) {
+				filteredCases.add(casse);
+			}
+		}
+		
+		return filteredCases;
+	}
+
+	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids) {
+		Collection<GeneralCase> filteredCases = getFilteredProcesslessCases(ids);
+		if (ListUtil.isEmpty(filteredCases)) {
+			return null;
+		}
+		
+		Integer id = null;
+		List<Integer> filteredIds = new ArrayList<Integer>();
+		for (GeneralCase casse: filteredCases) {
+			id = null;
+			try {
+				id = Integer.valueOf(casse.getId());
+			} catch(NumberFormatException e) {
+				e.printStackTrace();
+			}
+			
+			if (id != null && !filteredIds.contains(id)) {
+				filteredIds.add(id);
+			}
+		}
+		
+		return filteredIds;
 	}
 }

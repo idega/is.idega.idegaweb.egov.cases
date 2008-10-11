@@ -8,6 +8,7 @@ import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -291,4 +292,10 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Collection<Case> getCasesByIds(Collection<Integer> ids);
 	
 	public abstract Collection<GeneralCase> getCasesForUser(User user, String casesProcessorType);
+	
+	public List<Integer> getCasesIdsForUser(User user, String casesProcessorType);
+	
+	public Collection<GeneralCase> getFilteredProcesslessCases(Collection<Integer> ids);
+	
+	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids);
 }
