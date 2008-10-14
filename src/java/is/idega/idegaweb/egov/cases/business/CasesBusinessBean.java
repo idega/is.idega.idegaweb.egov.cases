@@ -1030,25 +1030,43 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
 		Collection<User> owners = null;
-		if (name != null || personalId != null) {
-			if (personalId != null) {
-				User caseOwner = null;
-				try {
-					caseOwner = getUserHome().findByPersonalID(personalId);
-				} catch (FinderException e) {
-					e.printStackTrace();
-				}
-				if (caseOwner != null) {
-					owners = new ArrayList<User>(1);
-					owners.add(caseOwner);
-				}
+		if (personalId != null) {
+			User caseOwner = null;
+			try {
+				caseOwner = getUserHome().findByPersonalID(personalId);
+			} catch (FinderException e) {
+				e.printStackTrace();
 			}
-			if (owners == null && name != null) {
-				owners = getUserBusiness().getUsersByName(name);
+			if (caseOwner == null) {
+				return null;
+			}
+			
+			owners = new ArrayList<User>();
+			owners.add(caseOwner);
+		}
+		if (name != null) {
+			Collection<User> usersByName = getUserBusiness().getUsersByName(name);
+			if (ListUtil.isEmpty(usersByName)) {
+				return null;
+			}
+		
+			if (ListUtil.isEmpty(owners)) {
+				owners = new ArrayList<User>(usersByName);
+			}
+			else {
+				for (User userByName: usersByName) {
+					if (!owners.contains(userByName)) {
+						owners.add(userByName);
+					}
+				}
 			}
 		}
+		
 		Collection<String> ownersIds = null;
-		if (!ListUtil.isEmpty(owners)) {
+		if (personalId != null || name != null) {
+			if (ListUtil.isEmpty(owners)) {
+				return null;
+			}
 			ownersIds = new ArrayList<String>(owners.size());
 			for (User caseOwner : owners) {
 				ownersIds.add(caseOwner.getId());
