@@ -102,7 +102,8 @@ function continueInitializeCasesList(caseToOpenId) {
 				}, {
 					id:			editableFieldId,
 					name:		editableFieldName,
-					tooltip:	CASE_GRID_STRING_CLICK_TO_EDIT
+					tooltip:	CASE_GRID_STRING_CLICK_TO_EDIT,
+					onblur:		'submit'
 				});
 				
 				editableField.attr(editableFieldParName, 'true');
