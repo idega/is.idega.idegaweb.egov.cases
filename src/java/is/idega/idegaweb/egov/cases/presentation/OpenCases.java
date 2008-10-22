@@ -34,6 +34,8 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
+	
+	public static final String pageType = "openCases";
 
 	private ICPage iMyCasesPage;
 	
