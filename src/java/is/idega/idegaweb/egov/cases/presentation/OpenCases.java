@@ -43,6 +43,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
+	private boolean showStatistics;
 	
 	@Override
 	public boolean isUsePDFDownloadColumn() {
@@ -64,6 +65,17 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		this.allowPDFSigning = allowPDFSigning;
 	}
 
+	@Override
+	public boolean isShowStatistics() {
+		return showStatistics;
+	}
+
+	@Override
+	public void setShowStatistics(boolean showStatistics) {
+		this.showStatistics = showStatistics;
+	}
+
+	@Override
 	protected String getBlockID() {
 		return "openCases";
 	}
@@ -121,6 +133,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 //		}
 //	}
 
+	@Override
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
 		
 		Form form = new Form();
@@ -298,6 +311,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		add(form);
 	}
 
+	@Override
 	protected void save(IWContext iwc) throws RemoteException {
 		
 		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
@@ -323,6 +337,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		}
 	}
 
+	@Override
 	protected boolean showCheckBox() {
 		return true;
 	}
@@ -331,6 +346,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		this.iMyCasesPage = myCasesPage;
 	}
 	
+	@Override
 	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");

@@ -23,6 +23,7 @@ import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
+import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
@@ -94,6 +95,10 @@ public class CasesSearcher extends CasesBlock {
 		TextInput contact = getTextInput(PARAMETER_CASE_CONTACT, iwrb.getLocalizedString("cases_search_enter_name_email_or_phone",
 				"Contact's name, e-mail or phone number"));
 		
+		String showStatisticsLabel = iwrb.getLocalizedString("show_cases_statistics", "Show statistics");
+		CheckBox showStatistics = new CheckBox(CaseFinder.PARAMETER_SHOW_STATISTICS);
+		showStatistics.setToolTip(showStatisticsLabel);
+		
 		String listType = getListType();
 		HiddenInput listTypeInput = new HiddenInput(PARAMETER_CASE_LIST_TYPE, StringUtil.isEmpty(listType) ? CoreConstants.EMPTY : listType);
 		inputsContainer.add(listTypeInput);
@@ -125,6 +130,9 @@ public class CasesSearcher extends CasesBlock {
 		IWDatePicker dateRange = getDateRange(iwc);
 		addFormItem(inputsContainer, iwrb.getLocalizedString("date_range", "Date range"), dateRange);
 		
+		//	Show statistics
+		addFormItem(inputsContainer, showStatisticsLabel, showStatistics);
+		
 		inputsContainer.add(new CSSSpacer());
 
 		Layer buttonsContainer = new Layer(Layer.DIV);
@@ -136,7 +144,7 @@ public class CasesSearcher extends CasesBlock {
 		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
 		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '").append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS)
-		.append("']");
+		.append("', '").append(showStatistics.getId()).append("']");
 		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(inputsContainer.getId()).append("', ")
 												.append(parameters.toString()).append(");");
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {

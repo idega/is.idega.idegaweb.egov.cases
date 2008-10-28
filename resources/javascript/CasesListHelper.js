@@ -208,7 +208,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 }
 
 function searchForCases(parameters) {
-	if (parameters == null || parameters.length < 11) {
+	if (parameters == null || parameters.length < 13) {
 		return false;
 	}
 	
@@ -219,6 +219,7 @@ function searchForCases(parameters) {
 	var processId = parameters[4];
 	var statusId = parameters[5];
 	var dateRangeId = parameters[6];
+	var showStatisticsId = parameters[12];
 	
 	var caseNumberValue = DWRUtil.getValue(caseNumberId);
 	var caseDescriptionValue = DWRUtil.getValue(caseDescriptionId);
@@ -235,6 +236,10 @@ function searchForCases(parameters) {
 	var dateRangeValue = DWRUtil.getValue(dateRangeId);
 	var caseListType = DWRUtil.getValue(parameters[9]);
 	var contact = DWRUtil.getValue(parameters[10]);
+	var showStatistics = jQuery('#' + showStatisticsId).attr('checked');
+	if (!showStatistics) {
+		showStatistics = false;
+	}
 	
 	var usePDFDownloadColumn = true;
 	var allowPDFSigning = true;
@@ -249,7 +254,7 @@ function searchForCases(parameters) {
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
-																		allowPDFSigning), {
+																		allowPDFSigning, showStatistics), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -299,6 +304,7 @@ function clearSearchForCases(parameters) {
 	DWRUtil.setValue(parameters[5], '-1');
 	DWRUtil.setValue(parameters[6], '');
 	DWRUtil.setValue(parameters[10], '');
+	jQuery('#' + parameters[12]).attr('checked', false);
 	
 	setDisplayPropertyToAllCasesLists(parameters[0], true);
 }
@@ -320,7 +326,7 @@ function removePreviousSearchResults(className) {
 }
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
-										allowPDFSigning) {
+										allowPDFSigning, showStatistics) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -332,6 +338,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.contact = contact == '' ? null : contact;
 	this.usePDFDownloadColumn = usePDFDownloadColumn;
 	this.allowPDFSigning = allowPDFSigning;
+	this.showStatistics = showStatistics;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {

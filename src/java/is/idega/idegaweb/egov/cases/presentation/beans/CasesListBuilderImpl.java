@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
+import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.presentation.MyCases;
 import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
@@ -391,7 +392,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	@SuppressWarnings("unchecked")
 	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes, boolean usePDFDownloadColumn,
-			boolean allowPDFSigning) {		
+			boolean allowPDFSigning, boolean showStatistics) {		
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc);
@@ -445,12 +446,26 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			caseContainer.setStyleClass(lastRowStyle);
 		}
 		
+		if (showStatistics) {
+			addStatistics(iwc, container, cases);
+		}
+		
 		return container;
+	}
+	
+	private void addStatistics(IWContext iwc, Layer container, Collection<Case> cases) {
+		container.add(new CSSSpacer());
+		
+		Layer statisticsContainer = new Layer();
+		container.add(statisticsContainer);
+		statisticsContainer.setStyleClass("casesListCasesStatisticsContainer");
+		
+		statisticsContainer.add(getCasesStatistics(iwc, cases));
 	}
 	
 	@SuppressWarnings("unchecked")
 	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String caseProcessorType, boolean addCredentialsToExernalUrls,
-			boolean usePDFDownloadColumn, boolean allowPDFSigning) {
+			boolean usePDFDownloadColumn, boolean allowPDFSigning, boolean showStatistics) {
 		List<Case> casesInList = getSortedCases(cases);
 		
 		String emailAddress = getDefaultEmail(iwc); 
@@ -493,6 +508,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		caseContainer.setStyleClass(lastRowStyle);
 
+		if (showStatistics) {
+			addStatistics(iwc, container, cases);
+		}
+		
 		return container;
 	}
 	
@@ -754,6 +773,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	@Autowired
 	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
 		this.caseManagersProvider = caseManagersProvider;
+	}
+
+	public UIComponent getCasesStatistics(IWContext iwc, Collection<Case> cases) {
+		//	TODO: finish up!
+		CasesStatistics statistics = new CasesStatistics();
+		return statistics;
 	}
 	
 }

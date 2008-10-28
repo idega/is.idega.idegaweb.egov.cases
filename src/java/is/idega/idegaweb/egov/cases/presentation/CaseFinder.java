@@ -48,6 +48,7 @@ public class CaseFinder extends CasesBlock {
 	protected static final String PARAMETER_NAME = "cf_prm_name";
 	protected static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
 	protected static final String PARAMETER_TEXT = "cf_prm_text";
+	protected static final String PARAMETER_SHOW_STATISTICS = "cf_prm_show_statistics";
 
 	private static final int ACTION_SEARCH = 1;
 	private static final int ACTION_RESULTS = 2;
@@ -56,6 +57,7 @@ public class CaseFinder extends CasesBlock {
 	private ICPage openCasesPage;
 	private ICPage viewCasesPage;
 
+	@Override
 	protected void present(IWContext iwc) throws Exception {
 		switch (parseAction(iwc)) {
 			case ACTION_SEARCH:
