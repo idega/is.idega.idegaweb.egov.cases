@@ -3,8 +3,12 @@
 		<title>Cases changes</title>
 		<author email="laddi@idega.com">Thorhallur "Laddi" Helgason</author>
 	</properties>
-	
 	<body>
+		<release version="1.0.40" date="2008-11-03">
+			<action dev="laddi" type="update">
+				Added length restraint to case message (4000 letters).
+			</action>
+		</release>
 
 		<release version="1.0.39" date="2008-06-27">
 			<action dev="tryggvil" type="update">

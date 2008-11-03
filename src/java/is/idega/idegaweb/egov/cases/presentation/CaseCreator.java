@@ -251,6 +251,7 @@ public class CaseCreator extends ApplicationForm {
 
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
+		message.setMaximumCharacters(4000);
 		// message.keepStatusOnAction(true);
 		String messageText = getMessageParameterValue(iwc);
 		if (messageText != null) {
