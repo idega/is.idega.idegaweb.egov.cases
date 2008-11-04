@@ -37,7 +37,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	
 	public static final String pageType = "openCases";
 
-	private ICPage iMyCasesPage;
+	protected ICPage iMyCasesPage;
 	
 	public static final String TYPE = "OpenCases";
 	

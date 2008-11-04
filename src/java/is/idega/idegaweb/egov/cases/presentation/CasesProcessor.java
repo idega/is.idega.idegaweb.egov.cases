@@ -160,14 +160,14 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
-	private int parseAction(IWContext iwc) {
+	protected int parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(UserCases.PARAMETER_ACTION)) {
 			return Integer.parseInt(iwc.getParameter(UserCases.PARAMETER_ACTION));
 		}
 		return ACTION_VIEW;
 	}
-
-	private void showList(IWContext iwc) throws RemoteException {
+	
+	protected void showList(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.addParameter(UserCases.PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
 //
