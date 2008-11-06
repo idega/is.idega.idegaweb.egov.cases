@@ -55,6 +55,7 @@ import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.business.UserSession;
 import com.idega.user.data.User;
 import com.idega.util.FileUtil;
+import com.idega.util.PresentationUtil;
 
 public class CaseCreator extends ApplicationForm {
 
@@ -81,15 +82,19 @@ public class CaseCreator extends ApplicationForm {
 
 	protected Collection iCategories;
 
+	@Override
 	public String getBundleIdentifier() {
 		return CasesConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
+	@Override
 	public String getCaseCode() {
 		return CasesConstants.CASE_CODE_KEY;
 	}
 
+	@Override
 	protected void present(IWContext iwc) {
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/cases.css"));
 		this.iwrb = getResourceBundle(iwc);
 
 		try {

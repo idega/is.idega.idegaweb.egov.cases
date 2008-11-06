@@ -43,6 +43,7 @@ import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
 
 public class CaseViewer extends CaseCreator {
@@ -63,7 +64,9 @@ public class CaseViewer extends CaseCreator {
 	private ICPage iHomePage;
 	private ICPage iBackPage;
 
+	@Override
 	protected void present(IWContext iwc) {
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/cases.css"));
 		
 		try {
 			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {

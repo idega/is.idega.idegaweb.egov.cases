@@ -45,6 +45,7 @@ import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
 
 public abstract class CasesBlock extends Block {
@@ -58,13 +59,16 @@ public abstract class CasesBlock extends Block {
 	private ICPage iHomePage;
 	private String iType;
 
+	@Override
 	public void main(IWContext iwc) throws Exception {
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/cases.css"));
 		initialize(iwc);
 		present(iwc);
 	}
 
 	protected abstract void present(IWContext iwc) throws Exception;
 
+	@Override
 	public String getBundleIdentifier() {
 		return CasesConstants.IW_BUNDLE_IDENTIFIER;
 	}
