@@ -66,7 +66,7 @@ public class CaseViewer extends CaseCreator {
 
 	@Override
 	protected void present(IWContext iwc) {
-		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/cases.css"));
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 		
 		try {
 			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {

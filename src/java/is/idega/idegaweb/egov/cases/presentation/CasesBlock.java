@@ -61,7 +61,7 @@ public abstract class CasesBlock extends Block {
 
 	@Override
 	public void main(IWContext iwc) throws Exception {
-		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/cases.css"));
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 		initialize(iwc);
 		present(iwc);
 	}

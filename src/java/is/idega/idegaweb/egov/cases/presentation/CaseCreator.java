@@ -94,7 +94,7 @@ public class CaseCreator extends ApplicationForm {
 
 	@Override
 	protected void present(IWContext iwc) {
-		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/cases.css"));
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 		this.iwrb = getResourceBundle(iwc);
 
 		try {
