@@ -1,5 +1,6 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
+import is.idega.idegaweb.egov.application.IWBundleStarter;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
@@ -71,6 +72,9 @@ public class CasesSearcher extends CasesBlock {
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/CasesEngine.js");
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
+		
+		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER)
+																				.getVirtualPathWithFileNameString("style/application.css"));
 		
 		IWResourceBundle iwrb = getResourceBundle();
 		
