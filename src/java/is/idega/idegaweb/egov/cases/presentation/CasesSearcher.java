@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseManager;
@@ -210,9 +211,11 @@ public class CasesSearcher extends CasesBlock {
 		
 		List<AdvancedProperty> allProcesses = new ArrayList<AdvancedProperty>();
 		for (CaseManager caseManager: caseManagers) {
-			List<AdvancedProperty> processes = caseManager.getAllCaseProcesses();
+			Map<Long, String> processes = caseManager.getAllCaseProcessDefinitionsWithName();
 			if (processes != null && !processes.isEmpty()) {
-				allProcesses.addAll(processes);
+				for (Long id: processes.keySet()) {
+					allProcesses.add(new AdvancedProperty(String.valueOf(id), processes.get(id)));
+				}
 			}
 		}
 		if (allProcesses.isEmpty()) {
@@ -222,6 +225,8 @@ public class CasesSearcher extends CasesBlock {
 		IWResourceBundle iwrb = getResourceBundle();
 		
 		allProcesses.add(0, new AdvancedProperty(CasesConstants.GENERAL_CASES_TYPE, iwrb.getLocalizedString("general_cases", "General cases")));
+		Collections.sort(allProcesses, new AdvancedPropertyComparator(iwc.getCurrentLocale()));
+		
 		fillDropdown(iwc.getCurrentLocale(), menu, allProcesses, new AdvancedProperty(String.valueOf(-1),
 				iwrb.getLocalizedString("cases_search_select_process", "Select process")), selectedProcess);
 		

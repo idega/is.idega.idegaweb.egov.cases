@@ -38,6 +38,7 @@ import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.process.util.CaseComparator;
 import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.core.accesscontrol.business.CredentialBusiness;
@@ -50,15 +51,18 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
+import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Heading3;
-import com.idega.presentation.text.Heading5;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.text.ListItem;
+import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
@@ -81,12 +85,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults, String caseProcessorType) {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
+		
+		Layer searchInfo = searchResults ? getSearchQueryInfo(iwc) : null;
+		
 		if (totalCases < 1) {
 			if (searchResults) {
-				container.add(new Heading5(iwrb.getLocalizedString("no_cases_found", "No cases were found by your query!")));
+				container.add(new Heading3(iwrb.getLocalizedString("no_cases_found", "No cases were found by your query!")));
+				container.add(searchInfo);
 			}
 			else {
-				container.add(new Heading5(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
+				container.add(new Heading3(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
 			}
 			return container;
 		}
@@ -97,7 +105,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (searchResults) {
 			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results")).append(CoreConstants.SPACE);
 			message.append("(").append(totalCases).append("):");
-			container.add(new Heading5(message.toString()));
+			container.add(new Heading3(message.toString()));
+			
+			container.add(searchInfo);
 		}
 		
 		Layer casesContainer = new Layer();
@@ -381,12 +391,52 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return descriptionIsEditable;
 	}
 	
+	private boolean isSearchResultsList(String caseProcessorType) {
+		return CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
+	}
+	
 	private Layer getCasesListContainer(boolean searchResults) {
 		Layer container = new Layer();
 		container.setStyleClass(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE);
 		if (searchResults) {
 			container.setMarkupAttribute("searchresult", Boolean.TRUE.toString());
 		}
+		return container;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Layer getSearchQueryInfo(IWContext iwc) {
+		Layer container = new Layer();
+		container.setStyleClass("userCasesSearchQueryInfoContainer");
+		
+		Object o = iwc.getSessionAttribute(GeneralCasesListBuilder.USER_CASES_SEARCH_QUERY_BEAN_ATTRIBUTE);
+		if (!(o instanceof List)) {
+			container.setStyleAttribute("display", "none");
+			return container;
+		}
+		List<AdvancedProperty> searchCriterias = (List<AdvancedProperty>) o;
+		iwc.removeSessionAttribute(GeneralCasesListBuilder.USER_CASES_SEARCH_QUERY_BEAN_ATTRIBUTE);
+		
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		
+		if (ListUtil.isEmpty(searchCriterias)) {
+			container.add(new Heading3(iwrb.getLocalizedString("cases_list_builder.there_are_no_searh_criterias", "There are no search criterias")));
+			return container;
+		}
+		
+		container.add(new Heading3(iwrb.getLocalizedString("cases_list_builder.search_was_executed_by_following_criterias", "Searching by:")));
+		container.add(new Break());
+		
+		Lists criterias = new Lists();
+		container.add(criterias);
+		for (AdvancedProperty searchCriteria: searchCriterias) {
+			ListItem criteria = new ListItem();
+			criterias.add(criteria);
+			
+			criteria.add(new StringBuilder(iwrb.getLocalizedString(searchCriteria.getId(), searchCriteria.getId())).append(CoreConstants.COLON)
+						.append(CoreConstants.SPACE).append(searchCriteria.getValue()).toString());
+		}
+		
 		return container;
 	}
 	
@@ -399,7 +449,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
 		
-		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
+		boolean searchResults = isSearchResultsList(caseProcessorType);
 		Layer container = getCasesListContainer(searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -472,7 +522,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
 		
-		boolean searchResults = CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
+		boolean searchResults = isSearchResultsList(caseProcessorType);
 		Layer container = getCasesListContainer(searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -776,8 +826,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 
 	public UIComponent getCasesStatistics(IWContext iwc, Collection<Case> cases) {
-		//	TODO: finish up!
 		CasesStatistics statistics = new CasesStatistics();
+		statistics.setCases(cases);
 		return statistics;
 	}
 	
