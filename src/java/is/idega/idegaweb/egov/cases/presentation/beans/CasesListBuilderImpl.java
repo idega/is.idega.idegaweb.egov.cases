@@ -827,7 +827,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	public UIComponent getCasesStatistics(IWContext iwc, Collection<Case> cases) {
 		CasesStatistics statistics = new CasesStatistics();
-		statistics.setCases(cases);
+		//statistics.setCases(cases);
 		return statistics;
 	}
 	
