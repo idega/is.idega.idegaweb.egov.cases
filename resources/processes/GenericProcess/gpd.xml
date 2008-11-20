@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="EntrepreneurSupport" width="1039" height="1001">
+<root-container name="GenericProcess" width="1039" height="1001">
   <node name="submitNewCase" x="373" y="-147" width="104" height="32">
     <edge>
       <label x="-16" y="-9"/>
