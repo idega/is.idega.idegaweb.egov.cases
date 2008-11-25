@@ -15,7 +15,6 @@ import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import com.idega.block.process.business.CaseCodeManager;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
-import com.idega.idegaweb.include.GlobalIncludeManager;
 
 
 public class IWBundleStarter implements IWBundleStartable {
