@@ -423,20 +423,20 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			throw new FinderException(e.getMessage());
 		}
 
-		if (parentCategory != null) {
-			if (category == null) {
-				try {
-					query.addJoin(table, categories);
-				}
-				catch (IDORelationshipException e) {
-					e.printStackTrace();
-					throw new FinderException(e.getMessage());
-				}
-				query.addCriteria(new MatchCriteria(categories.getColumn("parent_category"), MatchCriteria.EQUALS, parentCategory));
-			}
-			else {
+		if (parentCategory == null) {
+			if (category != null) {
 				query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_CATEGORY), MatchCriteria.EQUALS, category));
 			}
+		}
+		else if (category == null) {
+			try {
+				query.addJoin(table, categories);
+			}
+			catch (IDORelationshipException e) {
+				e.printStackTrace();
+				throw new FinderException(e.getMessage());
+			}
+			query.addCriteria(new MatchCriteria(categories.getColumn("parent_category"), MatchCriteria.EQUALS, parentCategory));
 		}
 		if (type != null) {
 			query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_CASE_TYPE), MatchCriteria.EQUALS, type));
