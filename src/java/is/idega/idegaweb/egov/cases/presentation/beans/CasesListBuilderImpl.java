@@ -84,6 +84,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String allowPDFSigningParName = "allowpdfsigning";
 	
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults, String caseProcessorType) {
+		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
+		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
 		Layer searchInfo = searchResults ? getSearchQueryInfo(iwc) : null;
