@@ -85,7 +85,7 @@ public class CasesStatistics extends CasesBlock {
 		try {
 			ELUtil.getInstance().autowire(this);
 		} catch(Exception e) {
-			Logger.getLogger(CasesStatistics.class.getName()).log(Level.WARNING, "Unable to autowire!", e);
+			Logger.getLogger(CasesStatistics.class.getName()).log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManager.class.getName(), e);
 		}
 	}
 

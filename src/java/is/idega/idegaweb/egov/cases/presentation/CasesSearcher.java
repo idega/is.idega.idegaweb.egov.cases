@@ -74,8 +74,10 @@ public class CasesSearcher extends CasesBlock {
 		scripts.add("/dwr/interface/CasesEngine.js");
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 		
-		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER)
-																				.getVirtualPathWithFileNameString("style/application.css"));
+		List<String> css = new ArrayList<String>();
+		css.add(iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"));
+		css.add(bundle.getVirtualPathWithFileNameString("style/case.css"));
+		PresentationUtil.addStyleSheetsToHeader(iwc, css);
 		
 		IWResourceBundle iwrb = getResourceBundle();
 		
@@ -159,6 +161,7 @@ public class CasesSearcher extends CasesBlock {
 		
 		GenericButton searchButton = new GenericButton(iwrb.getLocalizedString("search_for_cases", "Search"));
 		searchButton.setStyleClass(buttonStyleClass);
+		searchButton.setStyleClass("seachForCasesButton");
 		StringBuilder searchAction = new StringBuilder("searchForCases(").append(parameters.toString()).append(");");
 		searchButton.setOnClick(searchAction.toString());
 		buttonsContainer.add(searchButton);
@@ -229,6 +232,9 @@ public class CasesSearcher extends CasesBlock {
 		
 		fillDropdown(iwc.getCurrentLocale(), menu, allProcesses, new AdvancedProperty(String.valueOf(-1),
 				iwrb.getLocalizedString("cases_search_select_process", "Select process")), selectedProcess);
+		
+		menu.setOnChange(new StringBuilder("CasesListHelper.getProcessDefinitionVariables('").append(iwrb.getLocalizedString("loading", "Loading..."))
+							.append("', '").append(menu.getId()).append("');").toString());
 		
 		return menu;
 	}

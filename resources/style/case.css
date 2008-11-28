@@ -274,3 +274,31 @@ td.alignCenterText {
 .caseProcessResourceAccessRightsSetterStyle .setRoleDefaults {
     padding-left: 15px;
 }
+
+.processDefinitionVariablesWindowStyle {
+	z-index: 1000;
+	position: absolute;
+	display: none;
+	border: 1px solid #D7D7D7;
+	padding: 3px;
+	background-color: #fff;
+	max-height: 350px;
+	overflow: auto;
+	max-width: 500px;
+}
+
+.processVariablesWindowMainButtonsContainer {
+	float: right;
+	margin: 5px;
+}
+
+.processVariablesWindowButtonsContainer {
+	float: right;
+	margin-left: 5px;
+}
+
+img.variableFieldDeleter {
+	cursor: pointer;
+	margin-left: 5px;
+	margin-top: 5px;
+}

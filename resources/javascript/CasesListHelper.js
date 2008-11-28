@@ -1,3 +1,5 @@
+if (CasesListHelper == null) var CasesListHelper = {};
+
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?';
 var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading, please wait...';
@@ -254,7 +256,7 @@ function searchForCases(parameters) {
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
-																		allowPDFSigning, showStatistics), {
+																		allowPDFSigning, showStatistics, CasesListHelper.processVariables), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -326,7 +328,7 @@ function removePreviousSearchResults(className) {
 }
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
-										allowPDFSigning, showStatistics) {
+										allowPDFSigning, showStatistics, processVariables) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -339,6 +341,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.usePDFDownloadColumn = usePDFDownloadColumn;
 	this.allowPDFSigning = allowPDFSigning;
 	this.showStatistics = showStatistics;
+	
+	this.processVariables = processVariables;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
@@ -362,3 +366,98 @@ function registerCasesSearcherBoxActions(id, parameters) {
 		});
 	}
 }
+
+CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
+	CasesListHelper.processVariables = [];
+	
+	var windowId = '#processDefinitionVariablesWindow';
+	var processDefinitionId = DWRUtil.getValue(chooserId);
+	
+	if (processDefinitionId == null || processDefinitionId == -1 || processDefinitionId == '') {
+		jQuery(windowId).hide('fast');
+		return false;
+	}
+	
+	showLoadingMessage(message);
+	CasesEngine.getVariablesWindow(processDefinitionId, {
+		callback: function(component) {
+			closeAllLoadingMessages();
+			
+			var variablesWindow = jQuery(windowId);
+			if (variablesWindow == null || variablesWindow.length == 0) {
+				jQuery(document.body).append('<div id=\'processDefinitionVariablesWindow\' class=\'processDefinitionVariablesWindowStyle\' />');
+				variablesWindow = jQuery(windowId);
+			}
+			
+			var offsets = jQuery('#' + chooserId).offset();
+			if (offsets == null) {
+				return false;
+			}
+			
+			var xCoord = offsets.left;
+			var yCoord = offsets.top;
+			variablesWindow.css('top', (yCoord + 20) + 'px');
+			variablesWindow.css('left', xCoord + 'px');
+			
+			IWCORE.insertRenderedComponent(component, variablesWindow, function() {
+				if (component.html == null) {
+					CasesListHelper.closeVariablesWindow();
+				}
+				else {
+					variablesWindow.show('fast');
+				}
+			});
+		}
+	});
+}
+
+CasesListHelper.closeVariablesWindow = function() {
+	CasesListHelper.processVariables = [];
+	
+	jQuery('#processDefinitionVariablesWindow').hide('fast');
+	jQuery('#processDefinitionVariablesWindow').remove();
+}
+
+CasesListHelper.addVariableInput = function(chooserId) {
+	if (chooserId == null || DWRUtil.getValue(chooserId) == -1) {
+		return false;
+	}
+	
+	var variableLabel = jQuery(document.getElementById(chooserId).options[jQuery('#' + chooserId).attr('selectedIndex')]).text();
+	
+	var variablesContainer = jQuery('#variableInputsContainer');
+	var emptyInputs = jQuery('input.variableValueField[value=\'\']', variablesContainer);
+	if (emptyInputs.length == 0) {
+		var id = 'id' + new Date().getTime();
+		variablesContainer.append('<div><label class=\'variableValueLabel\' for=\'' + id + '\'>' + variableLabel + ':</label><input id=\'' + id +
+		'\' type=\'text\' class=\'variableValueField\' name=' + DWRUtil.getValue(chooserId) +
+		' value=\'\' onkeyup="if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;" /><img class=\'variableFieldDeleter\' ' +
+		'onclick="jQuery(\'#' + id + '\').parent().remove();" src=\'/idegaweb/bundles/is.idega.idegaweb.egov.cases/resources/images/delete.png\' /></div>');
+	}
+	else {
+		emptyInputs.attr('name', DWRUtil.getValue(chooserId));
+		emptyInputs.prev().text(variableLabel + ':');
+	}
+}
+
+CasesListHelper.addVariablesAndSearch = function() {
+	CasesListHelper.processVariables = [];
+	
+	CasesListHelper.addVariables();
+	jQuery('input.seachForCasesButton[type=\'button\']').click();
+}
+
+CasesListHelper.addVariables = function() {
+	var allVariables = jQuery('input.variableValueField[value!=\'\']');
+	if (allVariables == null || allVariables.length == 0) {
+		CasesListHelper.processVariables = [];
+		return false;
+	}
+	
+	jQuery.each(allVariables, function() {
+		var input = jQuery(this);
+		CasesListHelper.processVariables.push({id: input.attr('name'), value: input.attr('value')});
+	});
+}
+
+CasesListHelper.processVariables = [];
