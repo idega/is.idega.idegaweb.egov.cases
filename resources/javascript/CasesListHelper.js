@@ -420,7 +420,8 @@ CasesListHelper.closeVariablesWindow = function() {
 	jQuery('#processDefinitionVariablesWindow').remove();
 }
 
-CasesListHelper.addVariableInput = function(chooserId) {
+CasesListHelper.addVariableInput = function() {
+	var chooserId = 'availableVariablesForProcess';
 	if (chooserId == null || DWRUtil.getValue(chooserId) == -1) {
 		return false;
 	}
