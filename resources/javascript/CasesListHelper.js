@@ -308,6 +308,8 @@ function clearSearchForCases(parameters) {
 	DWRUtil.setValue(parameters[10], '');
 	jQuery('#' + parameters[12]).attr('checked', false);
 	
+	CasesListHelper.processVariables = [];
+	
 	setDisplayPropertyToAllCasesLists(parameters[0], true);
 }
 
@@ -429,10 +431,12 @@ CasesListHelper.addVariableInput = function(chooserId) {
 	var emptyInputs = jQuery('input.variableValueField[value=\'\']', variablesContainer);
 	if (emptyInputs.length == 0) {
 		var id = 'id' + new Date().getTime();
-		variablesContainer.append('<div><label class=\'variableValueLabel\' for=\'' + id + '\'>' + variableLabel + ':</label><input id=\'' + id +
-		'\' type=\'text\' class=\'variableValueField\' name=' + DWRUtil.getValue(chooserId) +
+		var id2 = id + '2';
+		variablesContainer.append('<div id=\''+id2+'\' style=\'display: none;\'><label class=\'variableValueLabel\' for=\'' + id + '\'>' + variableLabel +
+		':</label><input id=\'' + id + '\' type=\'text\' class=\'variableValueField\' name=' + DWRUtil.getValue(chooserId) +
 		' value=\'\' onkeyup="if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;" /><img class=\'variableFieldDeleter\' ' +
 		'onclick="jQuery(\'#' + id + '\').parent().remove();" src=\'/idegaweb/bundles/is.idega.idegaweb.egov.cases/resources/images/delete.png\' /></div>');
+		jQuery('#' + id2).show('fast');
 	}
 	else {
 		emptyInputs.attr('name', DWRUtil.getValue(chooserId));
