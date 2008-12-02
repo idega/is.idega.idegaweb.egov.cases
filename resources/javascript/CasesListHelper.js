@@ -1,5 +1,7 @@
 if (CasesListHelper == null) var CasesListHelper = {};
 
+CasesListHelper.processVariables = [];
+
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?';
 var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading, please wait...';
@@ -308,7 +310,7 @@ function clearSearchForCases(parameters) {
 	DWRUtil.setValue(parameters[10], '');
 	jQuery('#' + parameters[12]).attr('checked', false);
 	
-	CasesListHelper.processVariables = [];
+	CasesListHelper.closeVariablesWindow();
 	
 	setDisplayPropertyToAllCasesLists(parameters[0], true);
 }
@@ -401,13 +403,17 @@ CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
 			variablesWindow.css('top', (yCoord + 20) + 'px');
 			variablesWindow.css('left', xCoord + 'px');
 			
-			IWCORE.insertRenderedComponent(component, variablesWindow, function() {
-				if (component.html == null) {
-					CasesListHelper.closeVariablesWindow();
-				}
-				else {
-					variablesWindow.show('fast');
-				}
+			IWCORE.insertRenderedComponent(component, {
+				container: variablesWindow,
+				callback: function() {
+					if (component.html == null) {
+						CasesListHelper.closeVariablesWindow();
+					}
+					else {
+						variablesWindow.show('fast');
+					}
+				},
+				rewrite: true
 			});
 		}
 	});
@@ -426,23 +432,39 @@ CasesListHelper.addVariableInput = function() {
 		return false;
 	}
 	
-	var variableLabel = jQuery(document.getElementById(chooserId).options[jQuery('#' + chooserId).attr('selectedIndex')]).text();
+	var selectedOption = document.getElementById(chooserId).options[jQuery('#' + chooserId).attr('selectedIndex')];
+	var variableLabel = jQuery(selectedOption).text();
 	
 	var variablesContainer = jQuery('#variableInputsContainer');
 	var emptyInputs = jQuery('input.variableValueField[value=\'\']', variablesContainer);
-	if (emptyInputs.length == 0) {
-		var id = 'id' + new Date().getTime();
-		var id2 = id + '2';
-		variablesContainer.append('<div id=\''+id2+'\' style=\'display: none;\'><label class=\'variableValueLabel\' for=\'' + id + '\'>' + variableLabel +
-		':</label><input id=\'' + id + '\' type=\'text\' class=\'variableValueField\' name=' + DWRUtil.getValue(chooserId) +
-		' value=\'\' onkeyup="if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;" /><img class=\'variableFieldDeleter\' ' +
-		'onclick="jQuery(\'#' + id + '\').parent().remove();" src=\'/idegaweb/bundles/is.idega.idegaweb.egov.cases/resources/images/delete.png\' /></div>');
-		jQuery('#' + id2).show('fast');
+	if (emptyInputs.length > 0) {
+		jQuery.each(emptyInputs, function() {
+			jQuery(this).parent().hide('fast').remove();
+		});
 	}
-	else {
-		emptyInputs.attr('name', DWRUtil.getValue(chooserId));
-		emptyInputs.prev().text(variableLabel + ':');
-	}
+	
+	var id = 'id' + new Date().getTime();
+	var id2 = id + '2';
+	
+	variablesContainer.append('<div id=\''+id2+'\' style=\'display: none;\'><label class=\'variableValueLabel\' for=\'' + id + '\'>' + variableLabel +
+								':</label></div>');
+	
+	var optionValue = jQuery(selectedOption).attr('value').split('@');
+	
+	var isDateField = optionValue[1] == 'D';
+	var options = {
+		className: isDateField ? 'com.idega.presentation.ui.IWDatePicker' : 'com.idega.presentation.ui.TextInput',
+		properties: [{id: 'setId', value: id}, {id: 'setStyleClass', value: 'variableValueField'}, {id: isDateField ? 'setInputName' : 'setName',
+					value: DWRUtil.getValue(chooserId)},
+					{id: 'setOnKeyUp', value: 'if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;'}],
+		container: id2,
+		callback: function() {
+			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 +
+									'\').remove();" src=\'/idegaweb/bundles/is.idega.idegaweb.egov.cases/resources/images/delete.png\' />').show('fast');
+		},
+		append: true
+	};
+	IWCORE.getRenderedComponentByClassName(options);
 }
 
 CasesListHelper.addVariablesAndSearch = function() {
@@ -461,8 +483,7 @@ CasesListHelper.addVariables = function() {
 	
 	jQuery.each(allVariables, function() {
 		var input = jQuery(this);
-		CasesListHelper.processVariables.push({id: input.attr('name'), value: input.attr('value')});
+		var nameAttr = input.attr('name').split('@');
+		CasesListHelper.processVariables.push({name: nameAttr[0], value: input.attr('value'), type: nameAttr[1]});
 	});
 }
-
-CasesListHelper.processVariables = [];
