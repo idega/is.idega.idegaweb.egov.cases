@@ -602,6 +602,20 @@ public class CasesStatistics extends CasesBlock {
 			
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
 
+			//	TODO
+			StringBuffer oldQuery = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
+				.append("from comm_case_category cc ")
+				.append("left join comm_case c on c.case_category = cc.comm_case_category_id ")
+				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
+			if (isUseSubCats() && getParentID() > -1) {
+				oldQuery.append("where cc.parent_category = ").append(getParentID());
+			} else {
+				oldQuery.append("where cc.parent_category is null");
+			}
+			oldQuery.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ")
+				.append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
+			System.out.println("OLD: " + oldQuery.toString());
+			
 			return query.toString();
 		}
 
@@ -701,6 +715,15 @@ public class CasesStatistics extends CasesBlock {
 				.append("left join comm_case_category cc on c.case_category = cc.comm_case_category_id ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.handler is not null ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria()).append(" group by c.handler, p.case_status");
+			
+			//	TODO
+			System.out.println("OLD: select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
+					"from comm_case c " +
+					"left join comm_case_category cc on c.case_category = cc.comm_case_category_id " +
+					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
+					"where c.handler is not null " +
+					"group by c.handler, p.case_status");
+			
 			return query.toString();
 		}
 
@@ -751,6 +774,14 @@ public class CasesStatistics extends CasesBlock {
 			StringBuilder query =  new StringBuilder("select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.case_type = c.case_type ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria()).append(" group by c.case_type, p.case_status order by case_type");
+			
+			//	TODO
+			System.out.println("OLD: select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
+					"from comm_case c " +
+					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
+					"group by p.case_status, c.case_type " +
+					"order by case_type");
+			
 			return query.toString();
 		}
 
