@@ -450,6 +450,7 @@ CasesListHelper.addVariableInput = function() {
 								':</label></div>');
 	
 	var optionValue = jQuery(selectedOption).attr('value').split('@');
+	var deleteImage = jQuery('input.deleteBPMVariableImagePath').attr('value');
 	
 	var isDateField = optionValue[1] == 'D';
 	var options = {
@@ -460,7 +461,7 @@ CasesListHelper.addVariableInput = function() {
 		container: id2,
 		callback: function() {
 			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 +
-									'\').remove();" src=\'/idegaweb/bundles/is.idega.idegaweb.egov.cases/resources/images/delete.png\' />').show('fast');
+									'\').remove();" src=\''+deleteImage+'\' />').show('fast');
 		},
 		append: true
 	};
