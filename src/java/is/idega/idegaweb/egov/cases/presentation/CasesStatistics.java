@@ -113,6 +113,20 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
+		
+		String localizedStatus = null;
+		Collection<CaseStatus> statusesToUse = new ArrayList<CaseStatus>();
+		if (!ListUtil.isEmpty(statuses)) {
+			for (CaseStatus status: statuses) {
+				if (!statusesToUse.contains(status)) {
+					localizedStatus = getCasesBusiness().getLocalizedCaseStatusDescription(null, status, iwc.getCurrentLocale());
+					
+					if (!StringUtil.isEmpty(localizedStatus) && !localizedStatus.equals(status.getStatus())) {
+						statusesToUse.add(status);
+					}
+				}
+			}
+		}
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -126,19 +140,19 @@ public class CasesStatistics extends CasesBlock {
 		section.add(heading);
 
 		Collection<Result> resultsByCaseCategories = getResults(iwc, useSubCats, -1, true);
-		addResults(null, null, null, iwc, iwrb, section, resultsByCaseCategories, statuses, iwrb.getLocalizedString("case.cases_by_category", "Cases by category"),
-				useSubCats, false, 0);
+		addResults(null, null, null, iwc, iwrb, section, resultsByCaseCategories, statusesToUse, iwrb.getLocalizedString("case.cases_by_category",
+				"Cases by category"), useSubCats, false, 0);
 		section.add(clearLayer);
 
 		Collection<Result> resultsByUsers = getResultsUsers(iwc);
-		addResults(null, null, null, iwc, iwrb, section, resultsByUsers, statuses, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"), false,
-				false, 0);
+		addResults(null, null, null, iwc, iwrb, section, resultsByUsers, statusesToUse, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"),
+				false, false, 0);
 		section.add(clearLayer);
 		
 		if (useTypes) {
 			Collection<Result> resultsByCaseTypes = getResultsCode(iwc);
-			addResults(null, null, null, iwc, iwrb, section, resultsByCaseTypes, statuses, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"), false,
-					false, 0);
+			addResults(null, null, null, iwc, iwrb, section, resultsByCaseTypes, statusesToUse, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"),
+					false, false, 0);
 			section.add(clearLayer);
 		}
 	}

@@ -426,7 +426,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		container.add(new Heading3(iwrb.getLocalizedString("cases_list_builder.search_was_executed_by_following_criterias", "Searching by:")));
+		String localizedSearchInfo = iwrb.getLocalizedString("cases_list_builder.search_was_executed_by_following_criterias", "Searching by");
+		if (!localizedSearchInfo.endsWith(":")) {
+			localizedSearchInfo = new StringBuilder(localizedSearchInfo).append(":").toString();
+		}
+		container.add(new Heading3(localizedSearchInfo));
 		container.add(new Break());
 		
 		Lists criterias = new Lists();

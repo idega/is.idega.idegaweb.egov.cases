@@ -3,7 +3,7 @@ if (CasesListHelper == null) var CasesListHelper = {};
 CasesListHelper.processVariables = [];
 
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
-var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Error occurred. Reloading current page might help to avoid it. Do you want to reload current page?';
+var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Out of cheese error! Please reboot the Universe and try again...or the page.';
 var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading, please wait...';
 
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
