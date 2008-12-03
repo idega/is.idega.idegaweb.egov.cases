@@ -127,6 +127,7 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
+		System.out.println("Statuses to use: " + statusesToUse);//	TODO: remove
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -422,11 +423,17 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private boolean canCaseBeUsedInStatistics(Case theCase) {
+		boolean result = false;
 		if (ListUtil.isEmpty(cases)) {
-			return true;	//	No data set is set
+			result = true;	//	No data set is set
 		}
 		
-		return cases.contains(theCase);
+		if (!result) {
+			result = cases.contains(theCase);
+		}
+		
+		System.out.println("Case '" + theCase + "' can be used: " + result + ". Data set: " + cases);//	TODO: remove
+		return result;
 	}
 	
 	private Map<String, List<Case>> getCasesByProcesses(Collection<Case> cases) {
@@ -473,10 +480,10 @@ public class CasesStatistics extends CasesBlock {
 			conn = ConnectionBroker.getConnection();
 			stmt = conn.createStatement();
 
+			System.out.println("QUERY: " + handler.getSQL());//	TODO: remove
 			rs = stmt.executeQuery(handler.getSQL());
 			
 			results.addAll(handler.getResults(iwc, rs));
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -499,6 +506,7 @@ public class CasesStatistics extends CasesBlock {
 			}
 		}
 		
+		System.out.println("RESULTS: " + results);	//	TODO: remove
 		return results;
 	}
 	
@@ -539,6 +547,12 @@ public class CasesStatistics extends CasesBlock {
 
 		public boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
 			return useDefaultHandlerIfNotFoundResultsProvider;
+		}
+		
+		//	TODO: remove
+		@Override
+		public String toString() {
+			return new StringBuilder("ID: ").append(id).append(", NAME: ").append(name).append(", STATUS MAP: ").append(statusMap).append(", COUNT: ").append(count).append(", USE DH: ").append(useDefaultHandlerIfNotFoundResultsProvider).toString();
 		}
 	}
 	
