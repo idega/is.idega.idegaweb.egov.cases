@@ -68,6 +68,8 @@ public class CasesStatistics extends CasesBlock {
 	
 	private String visibleStatuses = null;
 	
+	private Boolean useStatisticsByCaseType;
+	
 	private Collection<Case> cases;
 	
 	private List<Integer> customCategories;
@@ -150,6 +152,9 @@ public class CasesStatistics extends CasesBlock {
 				false, false, 0);
 		section.add(clearLayer);
 		
+		if (useStatisticsByCaseType != null) {
+			useTypes = useStatisticsByCaseType;
+		}
 		if (useTypes) {
 			Collection<Result> resultsByCaseTypes = getResultsCode(iwc);
 			addResults(null, null, null, iwc, iwrb, section, resultsByCaseTypes, statusesToUse, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"),
@@ -975,6 +980,14 @@ public class CasesStatistics extends CasesBlock {
 	@Override
 	public String getBundleIdentifier() {
 		return CasesConstants.IW_BUNDLE_IDENTIFIER;
+	}
+
+	public Boolean getUseStatisticsByCaseType() {
+		return useStatisticsByCaseType;
+	}
+
+	public void setUseStatisticsByCaseType(Boolean useStatisticsByCaseType) {
+		this.useStatisticsByCaseType = useStatisticsByCaseType;
 	}
 	
 }
