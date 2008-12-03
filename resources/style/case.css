@@ -276,15 +276,14 @@ td.alignCenterText {
 }
 
 .processDefinitionVariablesWindowStyle {
-	z-index: 1000;
-	position: absolute;
-	display: none;
-	border: 1px solid #D7D7D7;
-	padding: 3px;
-	background-color: #fff;
-	max-height: 350px;
-	overflow: auto;
-	max-width: 500px;
+}
+
+.deleteBPMVariableImagePath {
+	display: none !important;
+}
+
+.loadBPMVariableInputField {
+	display: none !important;
 }
 
 .processVariablesWindowMainButtonsContainer {

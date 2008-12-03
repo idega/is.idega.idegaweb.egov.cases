@@ -255,6 +255,9 @@ function searchForCases(parameters) {
 		allowPDFSigning = gridOpener.attr('allowpdfsigning') == 'true';
 	}
 	
+	CasesListHelper.processVariables = [];
+	CasesListHelper.addVariables();
+	
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
@@ -372,7 +375,7 @@ function registerCasesSearcherBoxActions(id, parameters) {
 }
 
 CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
-	CasesListHelper.processVariables = [];
+	CasesListHelper.closeVariablesWindow();
 	
 	var windowId = '#processDefinitionVariablesWindow';
 	var processDefinitionId = DWRUtil.getValue(chooserId);
@@ -387,21 +390,8 @@ CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
+			jQuery('#' + chooserId).parent().append('<div id=\'processDefinitionVariablesWindow\' class=\'processDefinitionVariablesWindowStyle\' />');
 			var variablesWindow = jQuery(windowId);
-			if (variablesWindow == null || variablesWindow.length == 0) {
-				jQuery(document.body).append('<div id=\'processDefinitionVariablesWindow\' class=\'processDefinitionVariablesWindowStyle\' />');
-				variablesWindow = jQuery(windowId);
-			}
-			
-			var offsets = jQuery('#' + chooserId).offset();
-			if (offsets == null) {
-				return false;
-			}
-			
-			var xCoord = offsets.left;
-			var yCoord = offsets.top;
-			variablesWindow.css('top', (yCoord + 20) + 'px');
-			variablesWindow.css('left', xCoord + 'px');
 			
 			IWCORE.insertRenderedComponent(component, {
 				container: variablesWindow,
@@ -413,7 +403,7 @@ CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
 						variablesWindow.show('fast');
 					}
 				},
-				rewrite: true
+				append: true
 			});
 		}
 	});
@@ -451,6 +441,9 @@ CasesListHelper.addVariableInput = function() {
 	
 	var optionValue = jQuery(selectedOption).attr('value').split('@');
 	var deleteImage = jQuery('input.deleteBPMVariableImagePath').attr('value');
+	var loadingMessage = jQuery('input.loadBPMVariableInputField').attr('value');
+	
+	showLoadingMessage(loadingMessage);
 	
 	var isDateField = optionValue[1] == 'D';
 	var options = {
@@ -460,8 +453,8 @@ CasesListHelper.addVariableInput = function() {
 					{id: 'setOnKeyUp', value: 'if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;'}],
 		container: id2,
 		callback: function() {
-			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 +
-									'\').remove();" src=\''+deleteImage+'\' />').show('fast');
+			closeAllLoadingMessages();
+			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 + '\').remove();" src=\''+deleteImage+'\' />').show('fast');
 		},
 		append: true
 	};
@@ -469,9 +462,6 @@ CasesListHelper.addVariableInput = function() {
 }
 
 CasesListHelper.addVariablesAndSearch = function() {
-	CasesListHelper.processVariables = [];
-	
-	CasesListHelper.addVariables();
 	jQuery('input.seachForCasesButton[type=\'button\']').click();
 }
 
@@ -485,6 +475,10 @@ CasesListHelper.addVariables = function() {
 	jQuery.each(allVariables, function() {
 		var input = jQuery(this);
 		var nameAttr = input.attr('name').split('@');
-		CasesListHelper.processVariables.push({name: nameAttr[0], value: input.attr('value'), type: nameAttr[1]});
+		
+		var variableObject = {name: nameAttr[0], value: input.attr('value'), type: nameAttr[1]};
+		if (!existsElementInArray(CasesListHelper.processVariables, variableObject)) {
+			CasesListHelper.processVariables.push(variableObject);
+		}
 	});
 }
