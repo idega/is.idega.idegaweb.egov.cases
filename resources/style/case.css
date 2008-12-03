@@ -360,3 +360,8 @@ img.variableFieldDeleter {
 	margin: 0;
 	margin-top: 6px;
 }
+
+div.formItem span.datepicker_wrap input {
+	margin: 0;
+	width: 150px;
+}
