@@ -138,7 +138,14 @@ public class CasesSearcher extends CasesBlock {
 		addFormItem(inputsContainer, iwrb.getLocalizedString("date_range", "Date range"), dateRange);
 		
 		//	Show statistics
-		addFormItem(inputsContainer, showStatisticsLabel, showStatistics);
+		Layer element = new Layer(Layer.DIV);
+		inputsContainer.add(element);
+		element.setStyleClass("formItem shortFormItem checkboxFormItem");
+		
+		Label label = null;
+		label = new Label(showStatisticsLabel, showStatistics);
+		element.add(showStatistics);		
+		element.add(label);
 		
 		inputsContainer.add(new CSSSpacer());
 
