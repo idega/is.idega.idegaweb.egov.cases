@@ -653,7 +653,7 @@ public class CaseCreator extends ApplicationForm {
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
-		String regarding = iwc.getParameter(PARAMETER_REGARDING);
+		//String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
 

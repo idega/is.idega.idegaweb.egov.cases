@@ -266,7 +266,7 @@ public class CasesSearcher extends CasesBlock {
 			l = Locale.ENGLISH;
 		}
 		
-		boolean addStatus = true;;
+		boolean addStatus = true;
 		String localizedStatus = null;
 		List<AdvancedProperty> statuses = new ArrayList<AdvancedProperty>();
 		for (CaseStatus status: allStatuses) {
