@@ -319,9 +319,9 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private Collection<Result> getResults(IWContext iwc, boolean useSubCats, int parentID, boolean useHandlerIfNotFoundCustom) {
-		if (useSubCats && isCustomCategory(parentID)) {
-			return getCustomCategoryResults(iwc, parentID);
-		}
+//		if (useSubCats && isCustomCategory(parentID)) {
+//			return getCustomCategoryResults(iwc, parentID);
+//		}
 		
 		if (useHandlerIfNotFoundCustom) {
 			Handler handler = new CategoryHandler(useSubCats, parentID);
@@ -588,6 +588,8 @@ public class CasesStatistics extends CasesBlock {
 	
 	//	Cases by categories
 	protected class CategoryHandler extends Handler {
+		private List<Integer> addedCategories = new ArrayList<Integer>();
+		
 		public CategoryHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
@@ -630,23 +632,28 @@ public class CasesStatistics extends CasesBlock {
 		public Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
 			Collection<Result> results = new ArrayList<Result>();
 			int previousCaseCategoryId = -1;
-			Map<String, Integer> statuses = new HashMap<String, Integer>();
+			Map<String, Integer> statuses = null;
 			while (rs.next()) {
 				int categoryId = rs.getInt("comm_case_category_id");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("CASE_STATUS");
 				
 				if (previousCaseCategoryId != categoryId) {
-					statuses.put(caseStatus, isCustomCategory(categoryId) || !isValidStatus(caseStatus) ? 0 : count);
-					addResult(iwc, results, categoryId, statuses);
+					if (statuses != null) {
+						//	Adding results for previous category
+						addResult(iwc, results, previousCaseCategoryId, statuses);
+					}
 					
+					//	New category
 					statuses = new HashMap<String, Integer>();
 				}
-				else {
-					statuses.put(caseStatus, isCustomCategory(categoryId) || !isValidStatus(caseStatus) ? 0 : count);
-				}
 				
+				statuses.put(caseStatus, /*isCustomCategory(categoryId) || */isValidStatus(caseStatus) ? count : 0);
 				previousCaseCategoryId = categoryId;
+			}
+			if (statuses != null) {
+				//	Adding results for previous category
+				addResult(iwc, results, previousCaseCategoryId, statuses);
 			}
 			
 			return results;
@@ -655,12 +662,20 @@ public class CasesStatistics extends CasesBlock {
 		@Override
 		public boolean addResult(IWContext iwc, Collection<Result> results, int caseCategoryId, Map<String, Integer> statuses)
 			throws RemoteException, FinderException {
-			String resultName = null;
-			if (caseCategoryId > -1) {
-				CaseCategory cat = getCaseCategory(caseCategoryId);
-				resultName = getCategoryName(iwc, cat);
+			if (caseCategoryId < 0) {
+				return false;
 			}
-			return addResultToList(resultName, results, caseCategoryId, statuses);
+			
+			if (!addedCategories.contains(caseCategoryId) && isCustomCategory(caseCategoryId)) {
+				addedCategories.add(caseCategoryId);
+				Collection<Result> customCategoryResults = getCustomCategoryResults(iwc, caseCategoryId);
+				if (!ListUtil.isEmpty(customCategoryResults)) {
+					results.addAll(customCategoryResults);
+				}
+				return true;
+			}
+			
+			return addResultToList(getCategoryName(iwc, getCaseCategory(caseCategoryId)), results, caseCategoryId, statuses);
 		}
 	}
 	
@@ -838,7 +853,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses) {
-		if (identifier < 0) {
+		if (identifier < 0 || StringUtil.isEmpty(resultName)) {
 			return false;
 		}
 		
