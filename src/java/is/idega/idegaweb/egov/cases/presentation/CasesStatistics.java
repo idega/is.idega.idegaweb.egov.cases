@@ -686,6 +686,10 @@ public class CasesStatistics extends CasesBlock {
 			return true;
 		}
 		
+		if (categoryId < 0) {
+			return false;
+		}
+		
 		CaseCategory category = null;
 		try {
 			category = getCaseCategory(categoryId);
@@ -696,6 +700,8 @@ public class CasesStatistics extends CasesBlock {
 		if (category == null) {
 			return false;
 		}
+		
+		System.out.println("CUSTOM CATEGORIES: " + namesOfCustomCategories + ", CURRENT CATEGORY: '" + category.getName() + "'");	//	TODO
 		if (namesOfCustomCategories.contains(category.getName())) {
 			if (ListUtil.isEmpty(customCategories)) {
 				customCategories = new ArrayList<Integer>();
