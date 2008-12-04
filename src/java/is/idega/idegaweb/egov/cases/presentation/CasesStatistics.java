@@ -101,7 +101,20 @@ public class CasesStatistics extends CasesBlock {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		Collection<CaseStatus> statuses = null;
 		if (visibleStatuses == null) {
-			statuses = getCasesBusiness().getCaseStatuses();
+			if (ListUtil.isEmpty(cases)) {
+				statuses = getCasesBusiness().getCaseStatuses();
+			}
+			else {
+				//	Will be used statuses provided by cases
+				statuses = new ArrayList<CaseStatus>();
+				CaseStatus status = null;
+				for (Case theCase: cases) {
+					status = theCase.getCaseStatus();
+					if (!statuses.contains(status)) {
+						statuses.add(status);
+					}
+				}
+			}
 		} else {
 			statuses = new ArrayList<CaseStatus>();
 			StringTokenizer tok = new StringTokenizer(visibleStatuses, ",");
@@ -372,7 +385,7 @@ public class CasesStatistics extends CasesBlock {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("Cases by category '"+category.getName()+"': " + cases);//	TODO
+//		System.out.println("Cases by category '"+category.getName()+"': " + cases);//	TODO
 		
 		Map<String, List<Case>> casesByProcesses = getCasesByProcesses(cases);
 		if (casesByProcesses == null || ListUtil.isEmpty(casesByProcesses.keySet())) {
@@ -487,7 +500,7 @@ public class CasesStatistics extends CasesBlock {
 			conn = ConnectionBroker.getConnection();
 			stmt = conn.createStatement();
 
-			System.out.println("QUERY: " + handler.getSQL());//	TODO: remove
+//			System.out.println("QUERY: " + handler.getSQL());//	TODO: remove
 			rs = stmt.executeQuery(handler.getSQL());
 			
 			results.addAll(handler.getResults(iwc, rs));
@@ -513,7 +526,7 @@ public class CasesStatistics extends CasesBlock {
 			}
 		}
 		
-		System.out.println("RESULTS: " + results);	//	TODO: remove
+//		System.out.println("RESULTS: " + results);	//	TODO: remove
 		return results;
 	}
 	
@@ -612,18 +625,18 @@ public class CasesStatistics extends CasesBlock {
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
 
 			//	TODO
-			StringBuffer oldQuery = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
-				.append("from comm_case_category cc ")
-				.append("left join comm_case c on c.case_category = cc.comm_case_category_id ")
-				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
-			if (isUseSubCats() && getParentID() > -1) {
-				oldQuery.append("where cc.parent_category = ").append(getParentID());
-			} else {
-				oldQuery.append("where cc.parent_category is null");
-			}
-			oldQuery.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ")
-				.append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
-			System.out.println("OLD: " + oldQuery.toString());
+//			StringBuffer oldQuery = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
+//				.append("from comm_case_category cc ")
+//				.append("left join comm_case c on c.case_category = cc.comm_case_category_id ")
+//				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
+//			if (isUseSubCats() && getParentID() > -1) {
+//				oldQuery.append("where cc.parent_category = ").append(getParentID());
+//			} else {
+//				oldQuery.append("where cc.parent_category is null");
+//			}
+//			oldQuery.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ")
+//				.append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
+//			System.out.println("OLD: " + oldQuery.toString());
 			
 			return query.toString();
 		}
@@ -648,11 +661,11 @@ public class CasesStatistics extends CasesBlock {
 					statuses = new HashMap<String, Integer>();
 				}
 				
-				statuses.put(caseStatus, /*isCustomCategory(categoryId) || */isValidStatus(caseStatus) ? count : 0);
+				statuses.put(caseStatus, isValidStatus(caseStatus) ? count : 0);
 				previousCaseCategoryId = categoryId;
 			}
 			if (statuses != null) {
-				//	Adding results for previous category
+				//	Adding results for LAST category
 				addResult(iwc, results, previousCaseCategoryId, statuses);
 			}
 			
@@ -748,12 +761,12 @@ public class CasesStatistics extends CasesBlock {
 				.append(getStatusesIdsCriteria()).append(" group by c.handler, p.case_status");
 			
 			//	TODO
-			System.out.println("OLD: select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
-					"from comm_case c " +
-					"left join comm_case_category cc on c.case_category = cc.comm_case_category_id " +
-					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
-					"where c.handler is not null " +
-					"group by c.handler, p.case_status");
+//			System.out.println("OLD: select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
+//					"from comm_case c " +
+//					"left join comm_case_category cc on c.case_category = cc.comm_case_category_id " +
+//					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
+//					"where c.handler is not null " +
+//					"group by c.handler, p.case_status");
 			
 			return query.toString();
 		}
@@ -762,20 +775,28 @@ public class CasesStatistics extends CasesBlock {
 		public Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
 			Collection<Result> results = new ArrayList<Result>();
 			int previousUserId = -1;
-			Map<String, Integer> statuses = new HashMap<String, Integer>();
+			Map<String, Integer> statuses = null;
 			while (rs.next()) {
 				int handlerId = rs.getInt("handler");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("case_status");
 				
 				if (previousUserId != handlerId) {
-					statuses.put(caseStatus, count);
-					addResult(iwc, results, handlerId, statuses);
+					if (statuses != null) {
+						//	Adding results for previous user
+						addResult(iwc, results, previousUserId, statuses);
+					}
 
+					//	New user
 					statuses = new HashMap<String, Integer>();
 				}
 				
+				statuses.put(caseStatus, count);
 				previousUserId = handlerId;
+			}
+			if (statuses != null) {
+				//	Adding results for LAST user
+				addResult(iwc, results, previousUserId, statuses);
 			}
 			
 			return results;
@@ -807,11 +828,11 @@ public class CasesStatistics extends CasesBlock {
 				.append(getStatusesIdsCriteria()).append(" group by c.case_type, p.case_status order by case_type");
 			
 			//	TODO
-			System.out.println("OLD: select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
-					"from comm_case c " +
-					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
-					"group by p.case_status, c.case_type " +
-					"order by case_type");
+//			System.out.println("OLD: select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
+//					"from comm_case c " +
+//					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
+//					"group by p.case_status, c.case_type " +
+//					"order by case_type");
 			
 			return query.toString();
 		}
@@ -820,20 +841,28 @@ public class CasesStatistics extends CasesBlock {
 		public Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
 			Collection<Result> results = new ArrayList<Result>();
 			int prevCaseTypeId = -1;
-			Map<String, Integer> statuses = new HashMap<String, Integer>();
+			Map<String, Integer> statuses = null;
 			while (rs.next()) {
 				int caseTypeId = rs.getInt("case_type");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("case_status");
 				
 				if (prevCaseTypeId != caseTypeId) {
-					statuses.put(caseStatus, count);
-					addResult(iwc, results, caseTypeId, statuses);
+					if (statuses != null) {
+						//	Adding results for previous case type
+						addResult(iwc, results, prevCaseTypeId, statuses);
+					}
 					
+					//	New case type
 					statuses = new HashMap<String, Integer>();
 				}
 				
+				statuses.put(caseStatus, count);
 				prevCaseTypeId = caseTypeId;
+			}
+			if (statuses != null) {
+				//	Adding results for LAST case type
+				addResult(iwc, results, prevCaseTypeId, statuses);
 			}
 			
 			return results;
