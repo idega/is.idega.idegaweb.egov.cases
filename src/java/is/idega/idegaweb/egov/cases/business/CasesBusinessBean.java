@@ -1031,18 +1031,17 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		Collection<User> owners = null;
 		if (personalId != null) {
-			User caseOwner = null;
+			Collection<User> caseOwners = null;
 			try {
-				caseOwner = getUserHome().findByPersonalID(personalId);
+				caseOwners = getUserHome().findAllByPersonalID(personalId);
 			} catch (FinderException e) {
 				e.printStackTrace();
 			}
-			if (caseOwner == null) {
+			if (ListUtil.isEmpty(caseOwners)) {
 				return null;
 			}
 			
-			owners = new ArrayList<User>();
-			owners.add(caseOwner);
+			owners = new ArrayList<User>(caseOwners);
 		}
 		if (name != null) {
 			Collection<User> usersByName = getUserBusiness().getUsersByName(name);
