@@ -372,9 +372,11 @@ public class CasesStatistics extends CasesBlock {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Cases by category '"+category.getName()+"': " + cases);//	TODO
 		
 		Map<String, List<Case>> casesByProcesses = getCasesByProcesses(cases);
 		if (casesByProcesses == null || ListUtil.isEmpty(casesByProcesses.keySet())) {
+			Logger.getLogger(this.getClass().getName()).info("Didn't find any custom category ('"+category+"') cases");
 			return null;
 		}
 		
@@ -437,7 +439,7 @@ public class CasesStatistics extends CasesBlock {
 			result = cases.contains(theCase);
 		}
 		
-		System.out.println("Case '" + theCase + "' can be used: " + result + ". Data set: " + cases);//	TODO: remove
+//		System.out.println("Case '" + theCase + "' can be used: " + result + ". Data set: " + cases);//	TODO: remove
 		return result;
 	}
 	
@@ -640,6 +642,9 @@ public class CasesStatistics extends CasesBlock {
 					
 					statuses = new HashMap<String, Integer>();
 				}
+				else {
+					statuses.put(caseStatus, isCustomCategory(categoryId) || !isValidStatus(caseStatus) ? 0 : count);
+				}
 				
 				previousCaseCategoryId = categoryId;
 			}
@@ -701,7 +706,7 @@ public class CasesStatistics extends CasesBlock {
 			return false;
 		}
 		
-		System.out.println("CUSTOM CATEGORIES: " + namesOfCustomCategories + ", CURRENT CATEGORY: '" + category.getName() + "'");	//	TODO
+//		System.out.println("CUSTOM CATEGORIES: " + namesOfCustomCategories + ", CURRENT CATEGORY: '" + category.getName() + "'");	//	TODO
 		if (namesOfCustomCategories.contains(category.getName())) {
 			if (ListUtil.isEmpty(customCategories)) {
 				customCategories = new ArrayList<Integer>();
