@@ -485,6 +485,10 @@ CasesListHelper.addVariables = function() {
 
 CasesListHelper.resetVariablesAndAddNewOne = function() {
 	CasesListHelper.processVariables = [];
-	jQuery('#variableInputsContainer').html('');
+	
+	jQuery('#variableInputsContainer').hide('fast', function() {
+		jQuery('#variableInputsContainer').html('');
+		jQuery('#variableInputsContainer').show('fast');
+	});
 	jQuery('#availableVariablesForProcess').attr('selectedIndex', 0);
 }

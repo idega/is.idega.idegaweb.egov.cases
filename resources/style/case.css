@@ -384,21 +384,17 @@ div.formItem span.datepicker_wrap input {
 	clear: both !important;
 }
 
-.processDefinitionVariablesWindowStyle select {
-	width: 172px !important;
-	margin: 0 !important;
-}
-
-.processDefinitionVariablesWindowStyle input {
+.processDefinitionVariablesWindowStyle input, .processDefinitionVariablesWindowStyle select {
 	width: 150px !important;
 	float: left !important;
 	clear: none !important;
 	margin: 0 !important;
 }
 
-.processDefinitionVariablesWindowStyle img.variableFieldDeleter {
+.processDefinitionVariablesWindowStyle img {
 	float: right;
 	margin: 0;
+	margin-top: 1px;
 }
 
 #variableInputsContainer label {
