@@ -365,3 +365,51 @@ div.formItem span.datepicker_wrap input {
 	margin: 0;
 	width: 150px;
 }
+
+.processDefinitionVariablesWindowStyle, .processVariablesWindowNoVariablesText {
+	border: 1px #a8a8a8 solid;
+	clear: both;
+	background-color: #efefef;
+	padding: 6px;
+	margin-top: 4px;
+	width: 172px;
+	overflow: hidden;
+}
+
+.processDefinitionVariablesWindowStyle label {
+	font-size: 0.8em;
+	width: auto !important;
+	display: block !important;
+	float: none !important;
+	clear: both !important;
+}
+
+.processDefinitionVariablesWindowStyle select {
+	width: 172px !important;
+	margin: 0 !important;
+}
+
+.processDefinitionVariablesWindowStyle input {
+	width: 150px !important;
+	float: left !important;
+	clear: none !important;
+	margin: 0 !important;
+}
+
+.processDefinitionVariablesWindowStyle img.variableFieldDeleter {
+	float: right;
+	margin: 0;
+}
+
+#variableInputsContainer label {
+	padding-top: 6px;
+}
+
+.processVariablesWindowNoVariablesText h3 {
+	margin: 0;
+	font-size: 1em;
+}
+
+img.addProcessVariableImageStyle {
+	cursor: pointer;
+}
