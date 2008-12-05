@@ -343,7 +343,7 @@ img.variableFieldDeleter {
 	padding: 8px;
 	border: 1px #EFD585 solid;
 	margin-bottom: 8px;
-	background: url(../images/search-query-background.gif);
+	background: url(images/search-query-background.gif) top left #ffd;
 }
 
 .userCasesSearchQueryInfoContainer br {
@@ -364,6 +364,17 @@ img.variableFieldDeleter {
 div.formItem span.datepicker_wrap input {
 	margin: 0;
 	width: 150px;
+}
+
+div.formItem.checkboxFormItem label {
+	float: left;
+	width: auto;
+}
+
+div.formItem.checkboxFormItem input {
+	width: auto;
+	float: left;
+	margin-right: 4px;
 }
 
 .processDefinitionVariablesWindowStyle, .processVariablesWindowNoVariablesText {
