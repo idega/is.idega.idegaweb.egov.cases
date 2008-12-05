@@ -482,3 +482,9 @@ CasesListHelper.addVariables = function() {
 		}
 	});
 }
+
+CasesListHelper.resetVariablesAndAddNewOne = function() {
+	CasesListHelper.processVariables = [];
+	jQuery('#variableInputsContainer').html('');
+	jQuery('#availableVariablesForProcess').attr('selectedIndex', 0);
+}
