@@ -117,7 +117,7 @@ public class CasesStatistics extends CasesBlock {
 			}
 		} else {
 			statuses = new ArrayList<CaseStatus>();
-			StringTokenizer tok = new StringTokenizer(visibleStatuses, ",");
+			StringTokenizer tok = new StringTokenizer(visibleStatuses, CoreConstants.COMMA);
 			while (tok.hasMoreTokens()) {
 				String status = tok.nextToken().trim();
 				try {
@@ -142,7 +142,6 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
-		System.out.println("Statuses to use: " + statusesToUse);//	TODO: remove
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -332,10 +331,6 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private Collection<Result> getResults(IWContext iwc, boolean useSubCats, int parentID, boolean useHandlerIfNotFoundCustom) {
-//		if (useSubCats && isCustomCategory(parentID)) {
-//			return getCustomCategoryResults(iwc, parentID);
-//		}
-		
 		if (useHandlerIfNotFoundCustom) {
 			Handler handler = new CategoryHandler(useSubCats, parentID);
 			return getResults(iwc, handler);
@@ -385,7 +380,6 @@ public class CasesStatistics extends CasesBlock {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		System.out.println("Cases by category '"+category.getName()+"': " + cases);//	TODO
 		
 		Map<String, List<Case>> casesByProcesses = getCasesByProcesses(cases);
 		if (casesByProcesses == null || ListUtil.isEmpty(casesByProcesses.keySet())) {
@@ -451,8 +445,7 @@ public class CasesStatistics extends CasesBlock {
 		if (!result) {
 			result = cases.contains(theCase);
 		}
-		
-//		System.out.println("Case '" + theCase + "' can be used: " + result + ". Data set: " + cases);//	TODO: remove
+
 		return result;
 	}
 	
@@ -500,7 +493,6 @@ public class CasesStatistics extends CasesBlock {
 			conn = ConnectionBroker.getConnection();
 			stmt = conn.createStatement();
 
-//			System.out.println("QUERY: " + handler.getSQL());//	TODO: remove
 			rs = stmt.executeQuery(handler.getSQL());
 			
 			results.addAll(handler.getResults(iwc, rs));
@@ -526,7 +518,6 @@ public class CasesStatistics extends CasesBlock {
 			}
 		}
 		
-//		System.out.println("RESULTS: " + results);	//	TODO: remove
 		return results;
 	}
 	
@@ -567,12 +558,6 @@ public class CasesStatistics extends CasesBlock {
 
 		public boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
 			return useDefaultHandlerIfNotFoundResultsProvider;
-		}
-		
-		//	TODO: remove
-		@Override
-		public String toString() {
-			return new StringBuilder("ID: ").append(id).append(", NAME: ").append(name).append(", STATUS MAP: ").append(statusMap).append(", COUNT: ").append(count).append(", USE DH: ").append(useDefaultHandlerIfNotFoundResultsProvider).toString();
 		}
 	}
 	
@@ -623,20 +608,6 @@ public class CasesStatistics extends CasesBlock {
 			}
 			
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
-
-			//	TODO
-//			StringBuffer oldQuery = new StringBuffer("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
-//				.append("from comm_case_category cc ")
-//				.append("left join comm_case c on c.case_category = cc.comm_case_category_id ")
-//				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
-//			if (isUseSubCats() && getParentID() > -1) {
-//				oldQuery.append("where cc.parent_category = ").append(getParentID());
-//			} else {
-//				oldQuery.append("where cc.parent_category is null");
-//			}
-//			oldQuery.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status ")
-//				.append("ORDER BY cc.category_order, COMM_CASE_CATEGORY_ID");
-//			System.out.println("OLD: " + oldQuery.toString());
 			
 			return query.toString();
 		}
@@ -734,7 +705,6 @@ public class CasesStatistics extends CasesBlock {
 			return false;
 		}
 		
-//		System.out.println("CUSTOM CATEGORIES: " + namesOfCustomCategories + ", CURRENT CATEGORY: '" + category.getName() + "'");	//	TODO
 		if (namesOfCustomCategories.contains(category.getName())) {
 			if (ListUtil.isEmpty(customCategories)) {
 				customCategories = new ArrayList<Integer>();
@@ -759,14 +729,6 @@ public class CasesStatistics extends CasesBlock {
 				.append("left join comm_case_category cc on c.case_category = cc.comm_case_category_id ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.handler is not null ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria()).append(" group by c.handler, p.case_status");
-			
-			//	TODO
-//			System.out.println("OLD: select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
-//					"from comm_case c " +
-//					"left join comm_case_category cc on c.case_category = cc.comm_case_category_id " +
-//					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
-//					"where c.handler is not null " +
-//					"group by c.handler, p.case_status");
 			
 			return query.toString();
 		}
@@ -826,13 +788,6 @@ public class CasesStatistics extends CasesBlock {
 			StringBuilder query =  new StringBuilder("select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.case_type = c.case_type ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria()).append(" group by c.case_type, p.case_status order by case_type");
-			
-			//	TODO
-//			System.out.println("OLD: select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status " +
-//					"from comm_case c " +
-//					"left join proc_case p on p.proc_case_id = c.comm_case_id " +
-//					"group by p.case_status, c.case_type " +
-//					"order by case_type");
 			
 			return query.toString();
 		}
