@@ -104,7 +104,7 @@ public class CasesSearcher extends CasesBlock {
 		
 		String showStatisticsLabel = iwrb.getLocalizedString("show_cases_statistics", "Show statistics");
 		CheckBox showStatistics = new CheckBox(CaseFinder.PARAMETER_SHOW_STATISTICS);
-		showStatistics.setToolTip(showStatisticsLabel);
+		showStatistics.setTitle(showStatisticsLabel);
 		
 		String listType = getListType();
 		HiddenInput listTypeInput = new HiddenInput(PARAMETER_CASE_LIST_TYPE, StringUtil.isEmpty(listType) ? CoreConstants.EMPTY : listType);
@@ -184,7 +184,7 @@ public class CasesSearcher extends CasesBlock {
 		input.setStyleClass(textInputStyleClass);
 		
 		if (!StringUtil.isEmpty(toolTip)) {
-			input.setToolTip(toolTip);
+			input.setTitle(toolTip);
 		}
 		
 		return input;
