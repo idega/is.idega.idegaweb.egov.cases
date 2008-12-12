@@ -1,15 +1,19 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.application.IWBundleStarter;
+import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
+import is.idega.idegaweb.egov.application.business.ApplicationType;
+import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.logging.Logger;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseManager;
@@ -19,6 +23,8 @@ import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.AdvancedPropertyComparator;
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
@@ -36,8 +42,10 @@ import com.idega.presentation.ui.SelectOption;
 import com.idega.presentation.ui.TextInput;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 /**
@@ -210,25 +218,72 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_PROCESS_ID);
 		String selectedProcess = iwc.isParameterSet(PARAMETER_PROCESS_ID) ? iwc.getParameter(PARAMETER_PROCESS_ID) : null;
 		
-		CaseManagersProvider caseManagersProvider = (CaseManagersProvider) WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
+		ApplicationBusiness appBusiness = null;
+		try {
+			appBusiness = (ApplicationBusiness) IBOLookup.getServiceInstance(iwc, ApplicationBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		if (appBusiness == null) {
+			return menu;
+		}
+		
+		ApplicationType appType = null;
+		try {
+			appType = ELUtil.getInstance().getBean("appTypeBPM");
+		} catch(Exception e) {
+			e.printStackTrace();
+			return menu;
+		}
+		
+		Collection<Application> bpmApps = appBusiness.getApplicationsByType(appType.getType());
+		if (ListUtil.isEmpty(bpmApps)) {
+			return menu;
+		}
+		
+		CaseManagersProvider caseManagersProvider = ELUtil.getInstance().getBean(CaseManagersProvider.beanIdentifier);
 		if (caseManagersProvider == null) {
 			return menu;
 		}
 		List<CaseManager> caseManagers = caseManagersProvider.getCaseManagers();
-		if (caseManagers == null || caseManagers.isEmpty()) {
+		if (ListUtil.isEmpty(caseManagers)) {
 			return menu;
 		}
 		
 		List<AdvancedProperty> allProcesses = new ArrayList<AdvancedProperty>();
-		for (CaseManager caseManager: caseManagers) {
-			Map<Long, String> processes = caseManager.getAllCaseProcessDefinitionsWithName();
-			if (processes != null && !processes.isEmpty()) {
-				for (Long id: processes.keySet()) {
-					allProcesses.add(new AdvancedProperty(String.valueOf(id), processes.get(id)));
+		
+		String processId = null;
+		String processName = null;
+		String localizedName = null;
+		CaseManager caseManager = null;
+		Locale locale = iwc.getCurrentLocale();
+		for (Application bpmApp: bpmApps) {
+			processId = null;
+			processName = bpmApp.getUrl();
+			localizedName = processName;
+			
+			if (appType.isVisible(bpmApp)) {
+				for (Iterator<CaseManager> managersIter = caseManagers.iterator(); (managersIter.hasNext() && localizedName.equals(processName));) {
+					caseManager = managersIter.next();
+					
+					if (StringUtil.isEmpty(processId)) {
+						processId = String.valueOf(caseManager.getLatestProcessDefinitionIdByProcessName(processName));
+					}
+					
+					localizedName = caseManager.getProcessName(processName, locale);
+				}
+				
+				if (!StringUtil.isEmpty(processId)) {
+					allProcesses.add(new AdvancedProperty(processId, localizedName));
 				}
 			}
+			else {
+				Logger.getLogger(this.getClass().getName()).warning(new StringBuilder("Application '").append(bpmApp.getName()).append("' is not accessible")
+						.append((iwc.isLoggedOn() ? " for user: " + iwc.getCurrentUser() : ": user must be logged in!")).toString());
+			}
 		}
-		if (allProcesses.isEmpty()) {
+		
+		if (ListUtil.isEmpty(allProcesses)) {
 			return menu;
 		}
 		
@@ -293,7 +348,8 @@ public class CasesSearcher extends CasesBlock {
 			}
 		}
 		
-		fillDropdown(l, menu, statuses, new AdvancedProperty(String.valueOf(-1), getResourceBundle().getLocalizedString("select_status", "Select status")), selectedStatus);
+		fillDropdown(l, menu, statuses, new AdvancedProperty(String.valueOf(-1), getResourceBundle().getLocalizedString("select_status", "Select status")),
+				selectedStatus);
 		
 		return menu;
 	}
