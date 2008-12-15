@@ -263,6 +263,10 @@ a.old_casesListBodyContainerItemLink {
 	margin-left: 8px;
 }
 
+div.noContentInCasesListGridBody {
+	margin-left: 5px !important;
+}
+
 td.alignCenterText {
 	text-align:center !important;	
 }
@@ -415,4 +419,8 @@ div.formItem.checkboxFormItem input {
 
 img.addProcessVariableImageStyle {
 	cursor: pointer;
+}
+
+.casesBPMAssets .content {
+	display: none;
 }
