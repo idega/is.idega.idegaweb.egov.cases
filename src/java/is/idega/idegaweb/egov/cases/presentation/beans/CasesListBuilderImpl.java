@@ -45,6 +45,7 @@ import com.idega.core.accesscontrol.business.CredentialBusiness;
 import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
@@ -233,12 +234,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (caseManager == null) {
 			numberContainer.add(caseIdentifier);
 		} else {
-			
-			if(caseIdentifierFromCaseManager) {
-			
-				IWBundle bundle = getBundle(iwc);
+			if (caseIdentifierFromCaseManager) {
 				IWResourceBundle iwrb = getResourceBundle(iwc);
-				Link sendEmail = new Link(bundle.getImage("images/email.png", iwrb.getLocalizedString("send_email", "Send e-mail")),
+				Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
 						getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
 				numberContainer.add(sendEmail);
 				numberContainer.add(Text.getNonBrakingSpace());
@@ -375,6 +373,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return new StringBuilder("mailto:").append(emailAddress).append("?subject=(").append(subject).append(")").toString();
 	} 
 	
+	public String getEmailAddressMailtoFormattedWithSubject(String subject) {
+		return getEmailAddressMailtoFormattedWithSubject(getDefaultEmail(), subject);
+	}
+	
 	@SuppressWarnings("unchecked")
 	private List<Case> getSortedCases(Collection cases) {
 		if (cases == null || cases.isEmpty()) {
@@ -451,7 +453,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			boolean allowPDFSigning, boolean showStatistics) {		
 		List<Case> casesInList = getSortedCases(cases);
 		
-		String emailAddress = getDefaultEmail(iwc);
+		String emailAddress = getDefaultEmail();
 		
 		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
 		
@@ -524,7 +526,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			boolean usePDFDownloadColumn, boolean allowPDFSigning, boolean showStatistics) {
 		List<Case> casesInList = getSortedCases(cases);
 		
-		String emailAddress = getDefaultEmail(iwc); 
+		String emailAddress = getDefaultEmail(); 
 		
 		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
 		
@@ -571,9 +573,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
-	private String getDefaultEmail(IWContext iwc) {
+	private String getDefaultEmail() {
 		try {
-			return iwc.getApplicationSettings().getProperty(CoreConstants.PROP_SYSTEM_ACCOUNT);
+			return IWMainApplication.getDefaultIWMainApplication().getSettings().getProperty(CoreConstants.PROP_SYSTEM_ACCOUNT);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -770,6 +772,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private IWResourceBundle getResourceBundle(IWContext iwc) {
+		if (iwc == null) {
+			iwc = CoreUtil.getIWContext();
+		}
 		return getBundle(iwc).getResourceBundle(iwc);
 	}
 	
@@ -836,6 +841,19 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		statistics.setCases(cases);
 		statistics.setUseStatisticsByCaseType(Boolean.FALSE);
 		return statistics;
+	}
+
+	public String getSendEmailImage() {
+		return IWMainApplication.getDefaultIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("images/email.png");
+	}
+
+	private String getTitleSendEmail(IWResourceBundle iwrb) {
+		String notFoundValue = "Send e-mail";
+		return iwrb == null ? notFoundValue : iwrb.getLocalizedString("send_email", notFoundValue);
+	}
+	
+	public String getTitleSendEmail() {
+		return getTitleSendEmail(getResourceBundle(CoreUtil.getIWContext()));
 	}
 	
 }
