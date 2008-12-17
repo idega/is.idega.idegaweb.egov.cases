@@ -390,7 +390,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
 		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder)WFUtil.getBeanInstance(iwc, GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
 		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getCasesProcessorType(), showCheckBoxes, isUsePDFDownloadColumn(),
-				isAllowPDFSigning(), isShowStatistics()));
+				isAllowPDFSigning(), isShowStatistics(), isHideEmptySection()));
 	}
 
 	protected void showMultiProcessForm(IWContext iwc) throws RemoteException {
@@ -649,6 +649,10 @@ public abstract class CasesProcessor extends CasesBlock {
 	public abstract boolean isShowStatistics();
 	
 	public abstract void setShowStatistics(boolean showStatistics);
+	
+	public abstract boolean isHideEmptySection();
+	
+	public abstract void setHideEmptySection(boolean hideEmptySection);
 
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
 	

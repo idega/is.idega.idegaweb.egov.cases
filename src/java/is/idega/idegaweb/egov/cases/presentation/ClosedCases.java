@@ -37,6 +37,7 @@ public class ClosedCases extends CasesProcessor {
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
 	private boolean showStatistics;
+	private boolean hideEmptySection;
 	
 	@Override
 	public boolean isUsePDFDownloadColumn() {
@@ -66,6 +67,16 @@ public class ClosedCases extends CasesProcessor {
 	@Override
 	public void setShowStatistics(boolean showStatistics) {
 		this.showStatistics = showStatistics;
+	}
+
+	@Override
+	public boolean isHideEmptySection() {
+		return hideEmptySection;
+	}
+
+	@Override
+	public void setHideEmptySection(boolean hideEmptySection) {
+		this.hideEmptySection = hideEmptySection;
 	}
 
 	@Override
