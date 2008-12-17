@@ -25,7 +25,8 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 			}
 		}
 		
-		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception.message + '\n' + CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
+		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception.message + '\n' +
+																											CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
 		if (window.confirm(debug ? text : CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE)) {
 			reloadPage();
 			return false;
@@ -182,7 +183,8 @@ function registerGridExpanderActionsForElement(event, element) {
 		var caseId = caseToExpand.attr(caseIdPar);
 		var usePDFDownloadColumn = caseToExpand.attr('usepdfdownloadcolumn') == 'true';
 		var allowPDFSigning = caseToExpand.attr('allowpdfsigning') == 'true';
-		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning), {
+		var hideEmptySection = caseToExpand.attr('hideemptysection') == 'true';
+		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning, hideEmptySection), {
 			callback: function(component) {
 				
 				closeAllLoadingMessages();
@@ -203,12 +205,13 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 }
 
-function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning) {
+function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
 	this.usePDFDownloadColumn = usePDFDownloadColumn;
 	this.allowPDFSigning = allowPDFSigning;
+	this.hideEmptySection = hideEmptySection;
 }
 
 function searchForCases(parameters) {
@@ -247,12 +250,14 @@ function searchForCases(parameters) {
 	
 	var usePDFDownloadColumn = true;
 	var allowPDFSigning = true;
+	var hideEmptySection = false;
 	var gridOpeners = jQuery('div.' + parameters[11]);
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
 		
 		usePDFDownloadColumn = gridOpener.attr('usepdfdownloadcolumn') == 'true';
 		allowPDFSigning = gridOpener.attr('allowpdfsigning') == 'true';
+		hideEmptySection = gridOpener.attr('hideEmptySection') == 'true';
 	}
 	
 	CasesListHelper.processVariables = [];
@@ -261,7 +266,7 @@ function searchForCases(parameters) {
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
-																		allowPDFSigning, showStatistics, CasesListHelper.processVariables), {
+																		allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -335,7 +340,7 @@ function removePreviousSearchResults(className) {
 }
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
-										allowPDFSigning, showStatistics, processVariables) {
+										allowPDFSigning, showStatistics, processVariables, hideEmptySection) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -348,6 +353,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.usePDFDownloadColumn = usePDFDownloadColumn;
 	this.allowPDFSigning = allowPDFSigning;
 	this.showStatistics = showStatistics;
+	this.hideEmptySection = hideEmptySection;
 	
 	this.processVariables = processVariables;
 }
