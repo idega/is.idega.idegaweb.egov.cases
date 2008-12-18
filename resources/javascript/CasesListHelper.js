@@ -490,11 +490,6 @@ CasesListHelper.addVariables = function() {
 }
 
 CasesListHelper.resetVariablesAndAddNewOne = function() {
-	/*CasesListHelper.processVariables = [];
-	
-	jQuery('#variableInputsContainer').hide('fast', function() {
-		jQuery('#variableInputsContainer').html('');
-		jQuery('#variableInputsContainer').show('fast');
-	});*/
+	jQuery('input.variableValueField[value=\'\']').parent().hide('normal', function() {jQuery('input.variableValueField[value=\'\']').parent().remove();});
 	jQuery('#availableVariablesForProcess').attr('selectedIndex', 0);
 }

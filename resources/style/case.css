@@ -424,3 +424,7 @@ img.addProcessVariableImageStyle {
 div.commentsViewerForTaskViewerInCasesList {
 	display: none;
 }
+
+span.sendCaseEmailTextStyleInBPMCaseViewer {
+	margin-left: 5px;
+}
