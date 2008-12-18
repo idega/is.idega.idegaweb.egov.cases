@@ -420,3 +420,7 @@ img.addProcessVariableImageStyle {
 .casesBPMAssets .content {
 	display: none;
 }
+
+div.commentsViewerForTaskViewerInCasesList {
+	display: none;
+}
