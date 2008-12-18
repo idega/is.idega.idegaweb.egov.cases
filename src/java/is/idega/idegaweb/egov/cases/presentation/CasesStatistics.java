@@ -45,6 +45,7 @@ import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -147,9 +148,6 @@ public class CasesStatistics extends CasesBlock {
 		section.setStyleClass("formSection");
 		section.setStyleClass("statisticsLayer");
 		add(section);
-
-		Layer clearLayer = new Layer(Layer.DIV);
-		clearLayer.setStyleClass("Clear");
 		
 		Heading1 heading = new Heading1(iwrb.getLocalizedString("case.statistics", "Case statistics"));
 		section.add(heading);
@@ -157,12 +155,12 @@ public class CasesStatistics extends CasesBlock {
 		Collection<Result> resultsByCaseCategories = getResults(iwc, useSubCats, -1, true);
 		addResults(null, null, null, iwc, iwrb, section, resultsByCaseCategories, statusesToUse, iwrb.getLocalizedString("case.cases_by_category",
 				"Cases by category"), useSubCats, false, 0);
-		section.add(clearLayer);
+		section.add(new CSSSpacer());
 
 		Collection<Result> resultsByUsers = getResultsUsers(iwc);
 		addResults(null, null, null, iwc, iwrb, section, resultsByUsers, statusesToUse, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"),
 				false, false, 0);
-		section.add(clearLayer);
+		section.add(new CSSSpacer());
 		
 		if (useStatisticsByCaseType != null) {
 			useTypes = useStatisticsByCaseType;
@@ -171,7 +169,7 @@ public class CasesStatistics extends CasesBlock {
 			Collection<Result> resultsByCaseTypes = getResultsCode(iwc);
 			addResults(null, null, null, iwc, iwrb, section, resultsByCaseTypes, statusesToUse, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"),
 					false, false, 0);
-			section.add(clearLayer);
+			section.add(new CSSSpacer());
 		}
 	}
 
