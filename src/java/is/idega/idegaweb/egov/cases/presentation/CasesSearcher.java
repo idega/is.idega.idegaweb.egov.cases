@@ -56,7 +56,7 @@ import com.idega.webface.WFUtil;
  * Last modified: 2008.06.27 11:37:14 by: valdas
  */
 public class CasesSearcher extends CasesBlock {
-	
+
 	private static final String PARAMETER_PROCESS_ID = "cf_prm_process_id";
 	private static final String PARAMETER_CASE_STATUS = "cf_prm_case_status";
 	private static final String PARAMETER_CASE_LIST_TYPE = "cf_prm_case_list_type";
@@ -68,6 +68,7 @@ public class CasesSearcher extends CasesBlock {
 	private String listType;
 	
 	private boolean showAllStatuses;
+	private boolean showExportButton = true;
 	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
@@ -76,6 +77,7 @@ public class CasesSearcher extends CasesBlock {
 		
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(web2Business.getBundleURIToJQueryLib());
+		scripts.add(web2Business.getBundleUriToHumanizedMessagesScript());
 		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
@@ -83,6 +85,7 @@ public class CasesSearcher extends CasesBlock {
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 		
 		List<String> css = new ArrayList<String>();
+		css.add(web2Business.getBundleUriToHumanizedMessagesStyleSheet());
 		css.add(iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"));
 		css.add(bundle.getVirtualPathWithFileNameString("style/case.css"));
 		PresentationUtil.addStyleSheetsToHeader(iwc, css);
@@ -175,6 +178,7 @@ public class CasesSearcher extends CasesBlock {
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 		
 		GenericButton searchButton = new GenericButton(iwrb.getLocalizedString("search_for_cases", "Search"));
+		searchButton.setTitle(iwrb.getLocalizedString("search_for_cases_by_selected_parameters", "Search for cases by selected parameters"));
 		searchButton.setStyleClass(buttonStyleClass);
 		searchButton.setStyleClass("seachForCasesButton");
 		StringBuilder searchAction = new StringBuilder("searchForCases(").append(parameters.toString()).append(");");
@@ -182,9 +186,19 @@ public class CasesSearcher extends CasesBlock {
 		buttonsContainer.add(searchButton);
 		
 		GenericButton clearSearch = new GenericButton(iwrb.getLocalizedString("clear_search_results", "Clear"));
+		clearSearch.setTitle(iwrb.getLocalizedString("clear_all_search_results", "Clear search resutls"));
 		clearSearch.setOnClick(new StringBuilder("clearSearchForCases(").append(parameters.toString()).append(");").toString());
 		clearSearch.setStyleClass(buttonStyleClass);
 		buttonsContainer.add(clearSearch);
+		
+		if (isShowExportButton()) {
+			GenericButton export = new GenericButton(iwrb.getLocalizedString("export_search_results", "Export"));
+			export.setTitle(iwrb.getLocalizedString("export_search_results_to_excel", "Export search results to Excel"));
+			export.setOnClick(new StringBuilder("CasesListHelper.exportSearchResults('").append(iwrb.getLocalizedString("exporting", "Exporting..."))
+																						.append("');").toString());
+			export.setStyleClass(buttonStyleClass);
+			buttonsContainer.add(export);
+		}
 	}
 	
 	private TextInput getTextInput(String name, String toolTip) {
@@ -390,4 +404,11 @@ public class CasesSearcher extends CasesBlock {
 		this.showAllStatuses = showAllStatuses;
 	}
 
+	public boolean isShowExportButton() {
+		return showExportButton;
+	}
+
+	public void setShowExportButton(boolean showExportButton) {
+		this.showExportButton = showExportButton;
+	}
 }

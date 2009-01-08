@@ -493,3 +493,19 @@ CasesListHelper.resetVariablesAndAddNewOne = function() {
 	jQuery('input.variableValueField[value=\'\']').parent().hide('normal', function() {jQuery('input.variableValueField[value=\'\']').parent().remove();});
 	jQuery('#availableVariablesForProcess').attr('selectedIndex', 0);
 }
+
+CasesListHelper.exportSearchResults = function(message) {
+	showLoadingMessage(message);
+	CasesEngine.getExportedSearchResults({
+		callback: function(result) {
+			if (result.id != 'true') {
+				closeAllLoadingMessages();
+				humanMsg.displayMsg(result.value);
+				return;
+			}
+			
+			window.location.href = result.value;
+			closeAllLoadingMessages();
+		}
+	});
+}

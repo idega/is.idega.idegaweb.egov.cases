@@ -67,6 +67,8 @@ import com.idega.util.expression.ELUtil;
 
 public class CasesStatistics extends CasesBlock {
 	
+	public static final String UNKOWN_CATEGORY_ID = "case.unkown_category";
+	
 	private String visibleStatuses = null;
 	
 	private Boolean useStatisticsByCaseType;
@@ -675,7 +677,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private String getCategoryName(IWContext iwc, CaseCategory caseCategory) {
-		return caseCategory == null ?	getResourceBundle(iwc).getLocalizedString("case.unkown_category", "Unkown category") :
+		return caseCategory == null ?	getResourceBundle(iwc).getLocalizedString(UNKOWN_CATEGORY_ID, "Unkown category") :
 										caseCategory.getLocalizedCategoryName(iwc.getCurrentLocale());
 	}
 	
