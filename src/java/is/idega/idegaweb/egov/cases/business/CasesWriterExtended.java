@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.idega.block.process.data.CaseStatus;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
@@ -35,6 +36,7 @@ import com.idega.util.text.Name;
 
 public class CasesWriterExtended extends CasesWriter {
 
+	@Override
 	public MemoryFileBuffer writeXLS(IWContext iwc, Collection cases) throws Exception {
 		MemoryFileBuffer buffer = new MemoryFileBuffer();
 		MemoryOutputStream mos = new MemoryOutputStream(buffer);
@@ -160,7 +162,7 @@ public class CasesWriterExtended extends CasesWriter {
 
 		workbook.write(mos);
 
-		buffer.setMimeType("application/x-msexcel");
+		buffer.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
 		return buffer;
 	}
 }

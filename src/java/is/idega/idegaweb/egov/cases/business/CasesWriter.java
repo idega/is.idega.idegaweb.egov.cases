@@ -34,6 +34,7 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.DownloadWriter;
@@ -65,6 +66,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 	public CasesWriter() {
 	}
 
+	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
 		try {
 			this.locale = iwc.getApplicationSettings().getApplicationLocale();
@@ -130,6 +132,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		}
 	}
 
+	@Override
 	public String getMimeType() {
 		if (this.buffer != null) {
 			return this.buffer.getMimeType();
@@ -137,6 +140,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		return super.getMimeType();
 	}
 
+	@Override
 	public void writeTo(OutputStream out) throws IOException {
 		if (this.buffer != null) {
 			MemoryInputStream mis = new MemoryInputStream(this.buffer);
@@ -285,7 +289,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 		workbook.write(mos);
 
-		buffer.setMimeType("application/x-msexcel");
+		buffer.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
 		return buffer;
 	}
 
