@@ -259,7 +259,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		// Should not need to check the preferred locale for a user for now since the only method that uses it,handleCase
 		// passes the preferred locale in.
 		try {
-			GeneralCase genCase = theCase == null ? null : getGeneralCase(theCase.getPrimaryKey());
+			GeneralCase genCase = null;
+			if (theCase!= null && theCase instanceof GeneralCase) {
+				genCase = (GeneralCase) theCase;
+			} else {
+				genCase = theCase == null ? null : getGeneralCase(theCase.getPrimaryKey());
+			}
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
 			if (genCase == null) {
 				return iwrb.getLocalizedString("case_status_key." + status.getStatus(), status.getStatus());
@@ -458,18 +463,18 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
-		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, true);
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, true, null);
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier) throws CreateException {
 		GeneralCase theCase = getGeneralCaseHome().create();
-		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, sendMessages);
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier);
 	}
 
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages) throws CreateException {
+	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -500,6 +505,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setAttachment(attachment);
 		theCase.setType(type);
 		theCase.setAsPrivate(isPrivate);
+		theCase.setCaseIdentifier(caseIdentifier);
 
 		if (caseManagerType != null)
 			theCase.setCaseManagerType(caseManagerType);

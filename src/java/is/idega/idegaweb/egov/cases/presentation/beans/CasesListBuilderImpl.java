@@ -214,37 +214,19 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
 		
-		boolean caseIdentifierFromCaseManager = false;
-		
-		String caseIdentifier = caseManager == null ? theCase.getPrimaryKey().toString() : caseManager.getProcessIdentifier(theCase);
-		
-		if(caseManager != null) {
-			caseIdentifier = caseManager.getProcessIdentifier(theCase);
-			
-			if(caseIdentifier == null) {
-			
-				caseIdentifier = theCase.getPrimaryKey().toString();
-			} else {
-				caseIdentifierFromCaseManager = true;
-			}
-		} else {
-			
-			caseIdentifier = theCase.getPrimaryKey().toString();
-		}
+		String identifier = theCase.getCaseIdentifier();
 		
 		numberContainer.setStyleClass("firstColumn");
-		if (caseManager == null) {
-			numberContainer.add(caseIdentifier);
+		if (identifier == null) {
+			numberContainer.add(theCase.getPrimaryKey().toString());
 		} else {
-			if (caseIdentifierFromCaseManager) {
-				IWResourceBundle iwrb = getResourceBundle(iwc);
-				Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
-						getEmailAddressMailtoFormattedWithSubject(emailAddress, caseIdentifier));
-				numberContainer.add(sendEmail);
-				numberContainer.add(Text.getNonBrakingSpace());
-			}
+			IWResourceBundle iwrb = getResourceBundle(iwc);
+		    Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
+			getEmailAddressMailtoFormattedWithSubject(emailAddress, identifier));
+			numberContainer.add(sendEmail);
+			numberContainer.add(Text.getNonBrakingSpace());
 			
-			numberContainer.add(caseIdentifier);
+			numberContainer.add(identifier);
 		}
 		showCheckBoxes = caseManager == null ? showCheckBoxes : false;
 		
