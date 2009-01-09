@@ -220,12 +220,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (identifier == null) {
 			numberContainer.add(theCase.getPrimaryKey().toString());
 		} else {
-			IWResourceBundle iwrb = getResourceBundle(iwc);
-		    Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
-			getEmailAddressMailtoFormattedWithSubject(emailAddress, identifier));
-			numberContainer.add(sendEmail);
-			numberContainer.add(Text.getNonBrakingSpace());
-			
+			if (caseManager != null) {
+				IWResourceBundle iwrb = getResourceBundle(iwc);
+				Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
+						getEmailAddressMailtoFormattedWithSubject(emailAddress, identifier));
+				numberContainer.add(sendEmail);
+				numberContainer.add(Text.getNonBrakingSpace());
+			}
 			numberContainer.add(identifier);
 		}
 		showCheckBoxes = caseManager == null ? showCheckBoxes : false;
