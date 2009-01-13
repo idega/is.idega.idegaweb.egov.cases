@@ -30,6 +30,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -227,6 +228,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		cell.setCellValue(this.iwrb.getLocalizedString("message", "Message"));
 		cell.setCellStyle(style);
 
+		cell = row.createCell(cellColumn++);
+		cell.setCellValue(this.iwrb.getLocalizedString("reply", "Reply"));
+		cell.setCellStyle(style);
+
 		Iterator iter = cases.iterator();
 		while (iter.hasNext()) {
 			GeneralCase element = (GeneralCase) iter.next();
@@ -285,6 +290,20 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getMessage());
 			cell.setCellStyle(style2);
+			
+			Collection<CaseLog> logs = getBusiness(iwc).getCaseLogs(element);
+			if (!logs.isEmpty()) {
+				for (CaseLog log : logs) {
+					cell = row.createCell(cellColumn++);
+					cell.setCellValue(log.getComment());
+					cell.setCellStyle(style2);
+				}
+			}
+			else if (element.getReply() != null) {
+				cell = row.createCell(cellColumn++);
+				cell.setCellValue(element.getReply());
+				cell.setCellStyle(style2);
+			}
 		}
 
 		workbook.write(mos);
