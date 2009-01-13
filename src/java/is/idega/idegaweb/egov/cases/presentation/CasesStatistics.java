@@ -362,8 +362,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId) {
+	@SuppressWarnings("unchecked") Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId) {
 		CaseCategory category = null;
 		try {
 			category = getCaseCategory(categoryId);
@@ -561,7 +560,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 	
-	private abstract class Handler {
+	protected abstract class Handler {
 		public abstract String getSQL();
 		public abstract Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException;
 		public abstract boolean addResult(IWContext iwc, Collection<Result> results, int prevID, Map<String, Integer> statuses)
@@ -663,7 +662,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 	
-	private boolean isValidStatus(String caseStatus) {
+	boolean isValidStatus(String caseStatus) {
 		if (ListUtil.isEmpty(getAvailableStatuses())) {
 			return true;
 		}
@@ -676,16 +675,16 @@ public class CasesStatistics extends CasesBlock {
 		return parentCategory == null ? category : getTopCategory(parentCategory);
 	}
 	
-	private String getCategoryName(IWContext iwc, CaseCategory caseCategory) {
+	String getCategoryName(IWContext iwc, CaseCategory caseCategory) {
 		return caseCategory == null ?	getResourceBundle(iwc).getLocalizedString(UNKOWN_CATEGORY_ID, "Unkown category") :
 										caseCategory.getLocalizedCategoryName(iwc.getCurrentLocale());
 	}
 	
-	private CaseCategory getCaseCategory(Object primaryKey) throws RemoteException, FinderException {
+	CaseCategory getCaseCategory(Object primaryKey) throws RemoteException, FinderException {
 		return getCasesBusiness(IWMainApplication.getDefaultIWApplicationContext()).getCaseCategory(primaryKey);
 	}
 	
-	private boolean isCustomCategory(int categoryId) {
+	boolean isCustomCategory(int categoryId) {
 		if (!ListUtil.isEmpty(customCategories) && customCategories.contains(Integer.valueOf(categoryId))) {
 			return true;
 		}
@@ -836,7 +835,7 @@ public class CasesStatistics extends CasesBlock {
 	
 	}
 	
-	private boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses) {
+	boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses) {
 		if (identifier < 0 || StringUtil.isEmpty(resultName)) {
 			return false;
 		}
@@ -846,7 +845,7 @@ public class CasesStatistics extends CasesBlock {
 		return true;
 	}
 	
-	private String getCasesIdsCriteria() {
+	String getCasesIdsCriteria() {
 		if (ListUtil.isEmpty(cases)) {
 			return CoreConstants.EMPTY;
 		}
@@ -868,7 +867,7 @@ public class CasesStatistics extends CasesBlock {
 		return casesCriteria;
 	}
 	
-	private String getCategoriesIdsCriteria() {
+	String getCategoriesIdsCriteria() {
 		if (ListUtil.isEmpty(cases)) {
 			return CoreConstants.EMPTY;
 		}
@@ -940,7 +939,7 @@ public class CasesStatistics extends CasesBlock {
 		return availableStatuses;
 	}
 	
-	private String getStatusesIdsCriteria() {
+	String getStatusesIdsCriteria() {
 		if (ListUtil.isEmpty(cases)) {
 			return CoreConstants.EMPTY;
 		}
