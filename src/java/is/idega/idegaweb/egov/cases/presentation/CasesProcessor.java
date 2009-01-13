@@ -40,6 +40,7 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
@@ -388,7 +389,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 	
 	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
-		GeneralCasesListBuilder listBuilder = (GeneralCasesListBuilder)WFUtil.getBeanInstance(iwc, GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
+		GeneralCasesListBuilder listBuilder = ELUtil.getInstance().getBean(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
 		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getCasesProcessorType(), showCheckBoxes, isUsePDFDownloadColumn(),
 				isAllowPDFSigning(), isShowStatistics(), isHideEmptySection()));
 	}
