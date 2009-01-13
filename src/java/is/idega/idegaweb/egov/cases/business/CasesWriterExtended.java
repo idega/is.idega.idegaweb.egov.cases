@@ -158,6 +158,18 @@ public class CasesWriterExtended extends CasesWriter {
 			cell = row.createCell((short) 1);
 			cell.setCellValue(element.getMessage());
 			cell.setCellStyle(style2);
+
+			if (element.getReply() != null) {
+				row = sheet.createRow(cellRow++);
+	
+				cell = row.createCell((short) 0);
+				cell.setCellValue(this.iwrb.getLocalizedString("reply", "Reply"));
+				cell.setCellStyle(style3);
+	
+				cell = row.createCell((short) 1);
+				cell.setCellValue(element.getReply());
+				cell.setCellStyle(style2);
+			}
 		}
 
 		workbook.write(mos);
