@@ -4,6 +4,12 @@
 		<author email="laddi@idega.com">Thorhallur "Laddi" Helgason</author>
 	</properties>
 	<body>
+		<release version="1.0.42" date="2009-01-13">
+			<action dev="laddi" type="update">
+				Added reply to excel all printouts and also added missing heading.
+			</action>
+		</release>
+
 		<release version="1.0.41" date="2009-01-13">
 			<action dev="laddi" type="update">
 				Added reply to excel printouts.

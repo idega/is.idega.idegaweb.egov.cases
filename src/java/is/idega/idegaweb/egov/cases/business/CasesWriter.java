@@ -224,6 +224,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		cell.setCellValue(this.iwrb.getLocalizedString("message", "Message"));
 		cell.setCellStyle(style);
 
+		cell = row.createCell(cellColumn++);
+		cell.setCellValue(this.iwrb.getLocalizedString("reply", "Reply"));
+		cell.setCellStyle(style);
+
 		Iterator iter = cases.iterator();
 		while (iter.hasNext()) {
 			GeneralCase element = (GeneralCase) iter.next();
