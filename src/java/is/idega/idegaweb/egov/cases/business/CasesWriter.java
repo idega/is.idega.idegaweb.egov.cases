@@ -171,6 +171,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (30 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (50 * 256));
+		sheet.setColumnWidth(cellColumn++, (short) (50 * 256));
 
 		HSSFFont font = workbook.createFont();
 		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
