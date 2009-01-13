@@ -173,7 +173,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
 		
-		CaseStatus status = theCase.getCaseStatus();
+		
+		String caseStatus = theCase.getStatus();
+		CaseStatus status = null;
+		try {
+			 //take cached case status
+			 status = getCasesBusiness(iwc).getCaseStatus(caseStatus);
+		} catch (RemoteException e) {
+			status = theCase.getCaseStatus();
+		}
+			
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 		
