@@ -30,6 +30,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -281,6 +282,23 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getMessage());
 			cell.setCellStyle(style2);
+			
+			Collection logs = getBusiness(iwc).getCaseLogs(element);
+			if (!logs.isEmpty()) {
+				Iterator iterator = logs.iterator();
+				while (iterator.hasNext()) {
+					CaseLog log = (CaseLog) iterator.next();
+					
+					cell = row.createCell(cellColumn++);
+					cell.setCellValue(log.getComment());
+					cell.setCellStyle(style2);
+				}
+			}
+			else if (element.getReply() != null) {
+				cell = row.createCell(cellColumn++);
+				cell.setCellValue(element.getReply());
+				cell.setCellStyle(style2);
+			}
 		}
 
 		workbook.write(mos);
