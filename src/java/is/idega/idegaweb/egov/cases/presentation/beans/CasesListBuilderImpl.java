@@ -270,6 +270,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (notGeneralCase) {
 			try {
 				subject = caseBusiness.getCaseSubject(theCase, l);
+				System.out.println("not a general Case id: '" + theCase.getId() + "' subject: " + theCase.getSubject());
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
