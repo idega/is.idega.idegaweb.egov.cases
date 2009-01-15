@@ -82,7 +82,10 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	}
 	
 	public Collection<GeneralCase> findAllByIds(Collection<Integer> ids) throws FinderException {
-		return this.getEntityCollectionForPrimaryKeys(ids);
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection resultIds = ((GeneralCaseBMPBean) entity).ejbFindAllByIds(ids);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(resultIds);
 	}
 	
 	public Collection findAllByMessage(String message) throws FinderException {

@@ -104,6 +104,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
+		getEntityDefinition().setUseFinderCollectionPrefetch(true);
 	}
 
 	// Getters
@@ -553,5 +554,23 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
+
+	public Collection ejbFindAllByIds(Collection<Integer> ids) throws FinderException {
+		Table generalCasesTable = new Table(this);
+		Table casesTable = new Table(Case.class);
+		
+		SelectQuery query = new SelectQuery(generalCasesTable);
+		String[] columnNames = getColumnNames();
+		for (String columnName: columnNames) {
+			query.addColumn(generalCasesTable, columnName);
+		}
+		if (!ListUtil.isEmpty(ids)) {
+			query.addCriteria(new InCriteria(generalCasesTable.getColumn(getIDColumnName()), ids));
+		}
+		
+		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
+		return idoFindPKsByQuery(query);
+	}
+	
 
 }
