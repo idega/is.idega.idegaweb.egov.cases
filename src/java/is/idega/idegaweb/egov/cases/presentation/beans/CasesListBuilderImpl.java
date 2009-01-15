@@ -270,7 +270,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (notGeneralCase) {
 			try {
 				subject = caseBusiness.getCaseSubject(theCase, l);
-				System.out.println("not a general Case id: '" + theCase.getId() + "' subject: " + theCase.getSubject());
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -281,7 +280,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (subject != null && subject.length() > 100) {
 			subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT).append(CoreConstants.DOT).toString();
 		}
-		System.out.println("case subject: '" + subject + "' case Id: " + theCase.getId());
 		descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
 
 		//	Creation date
