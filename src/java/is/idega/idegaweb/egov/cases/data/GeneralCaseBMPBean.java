@@ -104,7 +104,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
-		getEntityDefinition().setUseFinderCollectionPrefetch(true);
+		//getEntityDefinition().setUseFinderCollectionPrefetch(true);
 	}
 
 	// Getters
