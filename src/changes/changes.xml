@@ -1,0 +1,209 @@
+    <document xmlns='http://maven.apache.org/changes/1.0.0'>
+	<properties>
+		<title>Cases changes</title>
+		<author email='laddi@idega.com'>Thorhallur "Laddi" Helgason</author>
+	</properties>
+	
+	<body>
+		<release date='2009-01-27' description='First 4.1.x Release' version='4.1.0'>
+          <action type='add' dev='tryggvil'>First 4.1.x Release</action>
+        </release>
+        <release date='2007-03-28' version='1.0.28'>
+			<action type='update' dev='laddi'>
+				Added displaying of sender's email and phone when viewing cases as administrator.
+			</action>
+		</release>
+
+		<release date='2007-03-27' version='1.0.27'>
+			<action type='update' dev='laddi'>
+				Refactoring/Elimination of se bundles.
+			</action>
+		</release>
+
+		<release date='2007-03-16' version='1.0.26'>
+			<action type='update' dev='palli'>
+				Moved biztalk and onesystem listeners to new bundles.
+			</action>
+		</release>
+
+		<release date='2007-03-16' version='1.0.25'>
+			<action type='update' dev='laddi'>
+				Added possibility to add attachments to new cases.
+			</action>
+			<action type='fix' dev='laddi'>
+				Fixed so that the cases fetcher allows for choosing only parent category and leaving sub category blank.
+			</action>
+		</release>
+	
+		<release date='2007-03-09' version='1.0.24'>
+			<action type='update' dev='palli'>
+				Updating and fixing dependencies to create a new sunnan3
+				application.
+			</action>
+		</release>
+	
+		<release date='2007-03-09' version='1.0.23'>
+			<action type='update' dev='laddi'>
+				Added a new block to fetch all cases by a user specified criteria.  An Excel sheet can then be fetched based on the results.
+			</action>
+		</release>
+		
+		<release date='2007-03-01' version='1.0.22'>
+			<action type='fix' dev='eiki'>
+				Changed CaseCreator so it does not use Form.maintainParameter for the message text. 
+				The text would be sent incomplete if it contained html characters because of the confirmation step and a hidden input. The html would get invalid.
+			</action>
+		</release>
+		
+		<release date='2007-02-22' version='1.0.21'>
+			<action type='fix' dev='eiki'>
+				Fixed a NPE in CaseViewer when a user reactivates a case.
+			</action>
+		</release>
+		
+		<release date='2007-02-20' version='1.0.20'>
+			<action type='fix' dev='eiki'>
+				Fixed a NPE in CaseCreator when a user submits the form without selecting anything.
+			</action>
+		</release>
+		
+		<release date='2007-02-06' version='1.0.19'>
+			<action type='update' dev='laddi'>
+				Translation fixes.
+			</action>
+			<action type='update' dev='laddi'>
+				Added possibility to reactivate case directly from viewing cases through case finder.
+			</action>
+			<action type='update' dev='laddi'>
+				Changed so that the case finder only returns cases connected to categories that the logged in user is a handler for.
+			</action>
+			<action type='update' dev='laddi'>
+				Changed so that when changing category on a case a message is sent to all handler in the corresponding group and status changed if performer does not belong to that group.
+			</action>
+		</release>
+		
+		<release date='2007-02-05' version='1.0.18'>
+			<action type='fix' dev='eiki'>
+				localization fixes and fixed the bug with empty description overriding parent descriptions for case categories
+			</action>
+		</release>
+		
+		<release date='2007-02-01' version='1.0.17'>
+			<action type='fix' dev='eiki'>
+				localization
+			</action>
+		</release>
+		
+		<release date='2007-02-01' version='1.0.16'>
+			<action type='fix' dev='eiki'>
+				Fixed bugs in categoryeditor and casecreator
+			</action>
+		</release>
+		
+		<release date='2007-01-31' version='1.0.15'>
+			<action type='update' dev='eiki'>
+				Added support for displaying the case category description in CaseCreator
+		</action>
+		</release>
+		
+		<release date='2007-01-31' version='1.0.14'>
+			<action type='update' dev='eiki'>
+				Added localization support for case categories.
+				Added support for localizing messages by the users prefererred locale.
+				Updated to se.idega.idegaweb.commune 1.0.5 
+				Updated to com.idega.core 3.1.29
+				Updated to com.idega.block.process 3.1.7
+			</action>
+		</release>
+		
+		<release date='2007-01-10' version='1.0.13'>
+			<action type='update' dev='eiki'>
+				English localization and variants for Neytendastofa.
+			</action>
+		</release>
+		
+		<release date='2006-12-12' version='1.0.12'>
+			<action type='update' dev='laddi'>
+				Added support for marking cases as confidential.
+			</action>
+		</release>
+		
+		<release date='2006-11-15' version='1.0.11'>
+			<action type='update' dev='gimmi'>
+				CaseStatistics updated
+			</action>
+		</release>
+		
+		<release date='2006-11-06' version='1.0.10'>
+			<action type='update' dev='laddi'>
+				Added possibility to hide types in all modules with a property setting.
+			</action>
+		</release>
+		
+		<release date='2006-11-01' version='1.0.9'>
+			<action type='fix' dev='laddi'>
+				Translation fixes. Changed so that the type prefix is only used when needed.
+			</action>
+			<action type='update' dev='laddi'>
+				Changed so that when a parent category has no children the sub category dropdown get only one value, the parent value itself.
+			</action>
+			<action type='update' dev='laddi'>
+				Added possibility to set which categories to display in the case creator with a builder property.
+			</action>
+		</release>
+		
+		<release date='2006-10-31' version='1.0.8'>
+			<action type='fix' dev='laddi'>
+				Layout and translation fixes.
+			</action>
+		</release>
+		
+		<release date='2006-10-30' version='1.0.7'>
+			<action type='update' dev='sigtryggur'>
+				Changed from skjalfandi.skjalfandi.is to www.skjalfandi.is in localized texts.
+			</action>
+		</release>
+
+		<release date='2006-10-30' version='1.0.6'>
+			<action type='update' dev='laddi'>
+				Added heading to application form.
+			</action>
+		</release>
+		
+		<release date='2006-10-29' version='1.0.5'>
+			<action type='fix' dev='laddi'>
+				Various bug and layout fixes.
+			</action>
+		</release>
+		
+		<release date='2006-10-20' version='1.0.4'>
+			<action type='update' dev='laddi'>
+				Added possibility to send anonymous cases.
+			</action>
+			<action type='update' dev='laddi'>
+				Added support for sub categories.
+			</action>
+			<action type='update' dev='laddi'>
+				Added possibility to set case typ to all presentation objects which is then used in localized strings.
+			</action>
+		</release>
+		
+		<release date='2006-09-29' version='1.0.3'>
+			<action type='update' dev='palli'>
+				Added check on empty respones and if empty then a mail is now sent out.      
+			</action>
+		</release>
+		
+		<release date='2006-09-21' version='1.0.2'>
+			<action type='update' dev='palli'>
+				Added a new check on the response from the one systems web service.      
+			</action>
+		</release>
+		
+		<release date='2006-07-11' version='1.0.1'>
+			<action type='update' dev='laddi'>
+				Declaring new version of block.
+			</action>
+		</release>
+	</body>
+</document>
