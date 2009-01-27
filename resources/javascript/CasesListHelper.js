@@ -472,19 +472,17 @@ CasesListHelper.addVariablesAndSearch = function() {
 }
 
 CasesListHelper.addVariables = function() {
-	var allVariables = jQuery('input.variableValueField[value!=\'\']');
-	if (allVariables == null || allVariables.length == 0) {
-		CasesListHelper.processVariables = [];
-		return false;
-	}
-	
-	jQuery.each(allVariables, function() {
+	jQuery.each(jQuery('input.variableValueField'), function() {
 		var input = jQuery(this);
-		var nameAttr = input.attr('name').split('@');
 		
-		var variableObject = {name: nameAttr[0], value: input.attr('value'), type: nameAttr[1]};
-		if (!existsElementInArray(CasesListHelper.processVariables, variableObject)) {
-			CasesListHelper.processVariables.push(variableObject);
+		var variableValue = input.attr('value');
+		if (variableValue != null && variableValue != '') {
+			var nameAttr = input.attr('name').split('@');
+			
+			var variableObject = {name: nameAttr[0], value: variableValue, type: nameAttr[1]};
+			if (!existsElementInArray(CasesListHelper.processVariables, variableObject)) {
+				CasesListHelper.processVariables.push(variableObject);
+			}
 		}
 	});
 }
