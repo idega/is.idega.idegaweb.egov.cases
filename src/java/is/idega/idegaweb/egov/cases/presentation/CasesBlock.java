@@ -61,6 +61,7 @@ public abstract class CasesBlock extends Block {
 
 	@Override
 	public void main(IWContext iwc) throws Exception {
+		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"));
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 		initialize(iwc);
 		present(iwc);
