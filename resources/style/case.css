@@ -95,7 +95,7 @@ div.casesListHeadersContainerItemToggler, div.casesListBodyContainerItemToggler,
 }
 
 div.casesListHeadersContainerItemCaseNumber, div.casesListBodyContainerItemCaseNumber {
-	width: 28%;
+	width: 25%;
 }
 
 div.casesListBodyContainerItemCaseNumber img {
@@ -103,12 +103,15 @@ div.casesListBodyContainerItemCaseNumber img {
 }
 
 div.casesListHeadersContainerItemSender, div.casesListBodyContainerItemSender {
-	width: 15%;
-	display: none;
+	width: 13%;
 }
 
 div.casesListHeadersContainerItemDescription, div.casesListBodyContainerItemDescription {
-	width: 30%;
+	width: 20%;
+}
+
+div.casesListHeadersContainerItemSender, div.casesListBodyContainerItemSender, div.casesListHeadersContainerItemDescription, div.casesListBodyContainerItemDescription {
+	text-align: center;
 }
 
 div.casesListHeadersContainerItemCaseType, div.casesListBodyContainerItemCaseType {
@@ -260,7 +263,7 @@ div.casesSearcherInputsBoxStyleClass .buttonLayer input {
 }
 
 a.old_casesListBodyContainerItemLink {
-	margin-left: 8px;
+	margin-left: 13px;
 }
 
 td.alignCenterText {
