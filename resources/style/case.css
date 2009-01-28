@@ -84,6 +84,7 @@ div.casesListCaseContainer {
 	overflow: hidden;
 	border-bottom: 1px solid #ccc;
 	padding: 5px 8px;
+	font-size: 0.85em;
 }
 
 div.casesListCaseContainer:hover {
@@ -96,7 +97,6 @@ div.casesListHeadersContainerItemToggler, div.casesListBodyContainerItemToggler,
 
 div.casesListHeadersContainerItemCaseNumber, div.casesListBodyContainerItemCaseNumber {
 	width: 22%;
-	font-size: 0.85em;
 }
 
 div.casesListBodyContainerItemCaseNumber img {
@@ -104,11 +104,11 @@ div.casesListBodyContainerItemCaseNumber img {
 }
 
 div.casesListHeadersContainerItemSender, div.casesListBodyContainerItemSender {
-	width: 16%;
+	width: 21%;
 }
 
 div.casesListHeadersContainerItemDescription, div.casesListBodyContainerItemDescription {
-	width: 25%;
+	width: 23%;
 }
 
 div.casesListHeadersContainerItemCaseType, div.casesListBodyContainerItemCaseType {
@@ -117,11 +117,11 @@ div.casesListHeadersContainerItemCaseType, div.casesListBodyContainerItemCaseTyp
 }
 
 div.casesListHeadersContainerItemCreatedDate, div.casesListBodyContainerItemCreationDate {
-	width: 20%;
+	width: 15%;
 }
 
 div.casesListHeadersContainerItemStatus, div.casesListBodyContainerItemStatus {
-	width: 10%;
+	width: 12%;
 }
 
 div.casesListHeadersContainerItemHandler, div.casesListBodyContainerItemHandler {
