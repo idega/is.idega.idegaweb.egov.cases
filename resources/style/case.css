@@ -95,7 +95,8 @@ div.casesListHeadersContainerItemToggler, div.casesListBodyContainerItemToggler,
 }
 
 div.casesListHeadersContainerItemCaseNumber, div.casesListBodyContainerItemCaseNumber {
-	width: 25%;
+	width: 22%;
+	font-size: 0.85em;
 }
 
 div.casesListBodyContainerItemCaseNumber img {
@@ -103,19 +104,16 @@ div.casesListBodyContainerItemCaseNumber img {
 }
 
 div.casesListHeadersContainerItemSender, div.casesListBodyContainerItemSender {
-	width: 13%;
+	width: 16%;
 }
 
 div.casesListHeadersContainerItemDescription, div.casesListBodyContainerItemDescription {
-	width: 20%;
-}
-
-div.casesListHeadersContainerItemSender, div.casesListBodyContainerItemSender, div.casesListHeadersContainerItemDescription, div.casesListBodyContainerItemDescription {
-	text-align: center;
+	width: 25%;
 }
 
 div.casesListHeadersContainerItemCaseType, div.casesListBodyContainerItemCaseType {
-	width: 12%;
+	/*width: 12%;*/
+	display: none;
 }
 
 div.casesListHeadersContainerItemCreatedDate, div.casesListBodyContainerItemCreationDate {
@@ -123,11 +121,12 @@ div.casesListHeadersContainerItemCreatedDate, div.casesListBodyContainerItemCrea
 }
 
 div.casesListHeadersContainerItemStatus, div.casesListBodyContainerItemStatus {
-	width: 15%;
+	width: 10%;
 }
 
 div.casesListHeadersContainerItemHandler, div.casesListBodyContainerItemHandler {
-	width: 10%;
+	/*width: 10%;*/
+	display: none;
 }
 
 div.casesListHeadersContainerItemMultiHandle, div.casesListBodyContainerItemMultiHandle {
