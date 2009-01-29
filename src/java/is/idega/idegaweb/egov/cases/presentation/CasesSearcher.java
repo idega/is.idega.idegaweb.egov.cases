@@ -372,7 +372,6 @@ public class CasesSearcher extends CasesBlock {
 		IWDatePicker datePicker = new IWDatePicker();
 		
 		datePicker.setDateRange(true);
-		datePicker.setUseCurrentDateIfNotSet(false);
 		
 		return datePicker;
 	}
