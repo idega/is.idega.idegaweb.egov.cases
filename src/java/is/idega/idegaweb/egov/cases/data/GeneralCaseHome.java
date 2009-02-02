@@ -31,7 +31,7 @@ public interface GeneralCaseHome extends IDOHome {
 	 * @throws FinderException
 	 */
 	public Collection findAllByGroupAndStatuses(Collection groups, String[] statuses, String[] caseHandlers) throws FinderException;
-
+	
 	public Collection findAllByHandler(User handler) throws FinderException;
 
 	/**

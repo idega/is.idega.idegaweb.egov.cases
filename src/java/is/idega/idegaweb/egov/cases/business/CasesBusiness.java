@@ -291,10 +291,6 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	
 	public Collection<Case> getCasesByIds(Collection<Integer> ids);
 	
-	public abstract Collection<GeneralCase> getCasesForUser(User user, String casesProcessorType);
-	
-	public List<Integer> getCasesIdsForUser(User user, String casesProcessorType);
-	
 	public Collection<Case> getFilteredProcesslessCases(Collection<Integer> ids, boolean notGeneralCases);
 	
 	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases);

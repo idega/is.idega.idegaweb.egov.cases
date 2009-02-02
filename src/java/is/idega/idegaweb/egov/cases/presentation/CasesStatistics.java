@@ -37,9 +37,11 @@ import javax.ejb.FinderException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.data.CaseStatusHome;
+import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.business.IBORuntimeException;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
@@ -73,7 +75,7 @@ public class CasesStatistics extends CasesBlock {
 	
 	private Boolean useStatisticsByCaseType;
 	
-	private Collection<Case> cases;
+	private Collection<CasePresentation> cases;
 	
 	private List<Integer> customCategories;
 	private List<String> namesOfCustomCategories = Collections.unmodifiableList(Arrays.asList("BPM"));	//	TODO: use constant
@@ -84,7 +86,7 @@ public class CasesStatistics extends CasesBlock {
 	private String categoriesCriteria;
 	private String statusesCriteria;
 	
-	@Autowired(required = false) private CaseManager caseManager;
+	@Autowired(required = false) private CaseManagersProvider caseManagersProvider;
 	
 	public CasesStatistics() {
 		try {
@@ -111,7 +113,7 @@ public class CasesStatistics extends CasesBlock {
 				//	Will be used statuses provided by cases
 				statuses = new ArrayList<CaseStatus>();
 				CaseStatus status = null;
-				for (Case theCase: cases) {
+				for (CasePresentation theCase: cases) {
 					status = theCase.getCaseStatus();
 					if (!statuses.contains(status)) {
 						statuses.add(status);
@@ -375,7 +377,7 @@ public class CasesStatistics extends CasesBlock {
 		
 		Collection<Case> cases = null;
 		try {
-			cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManager().getType());
+			cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -393,7 +395,7 @@ public class CasesStatistics extends CasesBlock {
 		for (String processName: casesByProcesses.keySet()) {
 			localizedProcessName = null;
 			try {
-				localizedProcessName = getCaseManager().getProcessName(processName, locale);
+				localizedProcessName = getCaseManagersProvider().getCaseManager().getProcessName(processName, locale);
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
@@ -449,7 +451,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private Map<String, List<Case>> getCasesByProcesses(Collection<Case> cases) {
-		if (ListUtil.isEmpty(cases) || getCaseManager() == null) {
+		if (ListUtil.isEmpty(cases) || getCaseManagersProvider() == null || getCaseManagersProvider().getCaseManager() == null) {
 			return null;
 		}
 		
@@ -460,7 +462,7 @@ public class CasesStatistics extends CasesBlock {
 			if (canCaseBeUsedInStatistics(theCase)) {
 				processDefinitionName = null;
 				try {
-					processDefinitionName = getCaseManager().getProcessDefinitionName(theCase);
+					processDefinitionName = getCaseManagersProvider().getCaseManager().getProcessDefinitionName(theCase);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -855,7 +857,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 		
 		StringBuilder casesIds = new StringBuilder();
-		for (Iterator<Case> casesIter = cases.iterator(); casesIter.hasNext();) {
+		for (Iterator<CasePresentation> casesIter = cases.iterator(); casesIter.hasNext();) {
 			casesIds.append(casesIter.next().getId());
 			
 			if (casesIter.hasNext()) {
@@ -881,7 +883,7 @@ public class CasesStatistics extends CasesBlock {
 		CaseCategory category = null;
 		CaseCategory topCategory = null;
 		List<String> categoriesToUse = new ArrayList<String>();
-		for (Case theCase: cases) {
+		for (CasePresentation theCase: cases) {
 			category = null;
 			if (theCase instanceof GeneralCase) {
 				category = ((GeneralCase) theCase).getCaseCategory();
@@ -928,8 +930,8 @@ public class CasesStatistics extends CasesBlock {
 		
 		String status = null;
 		availableStatuses = new ArrayList<String>();
-		for (Iterator<Case> casesIter = cases.iterator(); casesIter.hasNext();) {
-			status = casesIter.next().getStatus();
+		for (Iterator<CasePresentation> casesIter = cases.iterator(); casesIter.hasNext();) {
+			status = casesIter.next().getCaseStatus().getStatus();
 			
 			if (!StringUtil.isEmpty(status) && !availableStatuses.contains(status)) {
 				availableStatuses.add(status);
@@ -970,22 +972,22 @@ public class CasesStatistics extends CasesBlock {
 		return statusesCriteria;
 	}
 
-	public Collection<Case> getCases() {
+	public Collection<CasePresentation> getCases() {
 		return cases;
 	}
 
-	public void setCases(Collection<Case> cases) {
+	public void setCases(Collection<CasePresentation> cases) {
 		this.cases = cases;
 	}
-
-	public CaseManager getCaseManager() {
-		return caseManager;
-	}
-
-	public void setCaseManager(CaseManager caseManager) {
-		this.caseManager = caseManager;
-	}
 	
+	public CaseManagersProvider getCaseManagersProvider() {
+		return caseManagersProvider;
+	}
+
+	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
+		this.caseManagersProvider = caseManagersProvider;
+	}
+
 	@Override
 	public String getBundleIdentifier() {
 		return CasesConstants.IW_BUNDLE_IDENTIFIER;

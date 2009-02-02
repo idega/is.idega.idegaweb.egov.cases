@@ -22,10 +22,13 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.presentation.UICasesList;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.block.process.presentation.beans.GeneralCaseManagerViewBuilder;
-import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.business.IBORuntimeException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -40,7 +43,6 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
-import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
@@ -63,8 +65,14 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
 	
+	@Autowired private CaseManagersProvider caseManagersProvider;
+	
 	private static final String caseManagerFacet = "caseManager";
 
+	private int pageSize = 20;
+	
+	private int page = 1;
+	
 	protected abstract String getBlockID();
 	
 	@Override
@@ -169,211 +177,28 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 	
 	protected void showList(IWContext iwc) throws RemoteException {
+		Layer topLayer = new Layer();
 		Form form = new Form();
 		form.addParameter(UserCases.PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
-//
 		boolean showCheckBoxes = showCheckBox() && getCasesBusiness(iwc).allowAnonymousCases();
-//		
-//		Table2 table = new Table2();
-//		table.setWidth("100%");
-//		table.setCellpadding(0);
-//		table.setCellspacing(0);
-//		table.setStyleClass("adminTable");
-//		table.setStyleClass("casesTable");
-//		table.setStyleClass("ruler");
-//		table.setID(getBlockID());
-//
-//		TableColumnGroup columnGroup = table.createColumnGroup();
-//		TableColumn column = columnGroup.createColumn();
-//		column.setSpan(6);
-//		column = columnGroup.createColumn();
-//		column.setSpan(1);
-//		column.setWidth("12");
-//
-//		Collection<GeneralCase> cases = getCases(iwc.getCurrentUser());
-//
-//		TableRowGroup group = table.createHeaderRowGroup();
-//		TableRow row = group.createRow();
-//
-//		
-//		TableCell2 cell = row.createHeaderCell();
-//		cell.setStyleClass("firstColumn");
-//		cell.setStyleClass("caseNumber");
-//		cell.add(new Text(getResourceBundle().getLocalizedString(getPrefix() + "case_nr", "Case nr.")));
-//
-//		cell = row.createHeaderCell();
-//		cell.setStyleClass("sender");
-//		cell.add(new Text(getResourceBundle().getLocalizedString("sender", "Sender")));
-//
-//		if (getBusiness().useTypes()) {
-//			cell = row.createHeaderCell();
-//			cell.setStyleClass("caseType");
-//			cell.add(new Text(getResourceBundle().getLocalizedString("case_type", "Case type")));
-//		}
-//
-//		cell = row.createHeaderCell();
-//		cell.setStyleClass("createdDate");
-//		cell.add(new Text(getResourceBundle().getLocalizedString("created_date", "Created date")));
-//
-//		cell = row.createHeaderCell();
-//		cell.setStyleClass("status");
-//		cell.add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
-//
-//		cell = row.createHeaderCell();
-//		cell.setStyleClass("handler");
-//		cell.add(new Text(getResourceBundle().getLocalizedString("handler", "Handler")));
-//
-//		cell = row.createHeaderCell();
-//		if (!showCheckBoxes) {
-//			cell.setStyleClass("lastColumn");
-//		}
-//		cell.setStyleClass("view");
-//		cell.add(new Text(getResourceBundle().getLocalizedString("view", "View")));
-//
-//		if (showCheckBoxes) {
-//			cell = row.createHeaderCell();
-//			cell.setStyleClass("lastColumn");
-//			cell.setStyleClass("multiHandle");
-//			cell.add(Text.getNonBrakingSpace());
-//		}
-//
-//		group = table.createBodyRowGroup();
-//		int iRow = 1;
-//
-//		Layer customerViewContainer = new Layer();
-//		
-//		for (Iterator<GeneralCase> iter = cases.iterator(); iter.hasNext();) {
-//			
-//			GeneralCase theCase = iter.next();
-//			CaseStatus status = theCase.getCaseStatus();
-//			CaseType type = theCase.getCaseType();
-//			User owner = theCase.getOwner();
-//			IWTimestamp created = new IWTimestamp(theCase.getCreated());
-//			
-//			CaseManager caseManager;
-//			
-//			if(theCase.getCaseManagerType() != null)
-//				caseManager = getCaseHandlersProvider().getCaseHandler(theCase.getCaseManagerType());
-//			else 
-//				caseManager = null;
-//
-//			row = group.createRow();
-//			if (iRow == 1) {
-//				row.setStyleClass("firstRow");
-//			}
-//			else if (!iter.hasNext()) {
-//				row.setStyleClass("lastRow");
-//			}
-//			if (theCase.isPrivate()) {
-//				row.setStyleClass("isPrivate");
-//			}
-//			if (status.equals(getCasesBusiness(iwc).getCaseStatusReview())) {
-//				row.setStyleClass("isReview");
-//			}
-//
-//			cell = row.createCell();
-//			cell.setStyleClass("firstColumn");
-//			cell.setStyleClass("caseNumber");
-//			
-//			String caseIdentifier;
-//			
-//			if(caseManager != null)
-//				caseIdentifier = caseManager.getProcessIdentifier(theCase);
-//			else
-//				caseIdentifier = null;
-//			
-//			if(caseIdentifier != null)
-//				cell.add(new Text(caseIdentifier));
-//			else
-//				cell.add(new Text(theCase.getPrimaryKey().toString()));
-//
-//			cell = row.createCell();
-//			cell.setStyleClass("sender");
-//			if (owner != null) {
-//				cell.add(new Text(new Name(owner.getFirstName(), owner.getMiddleName(), owner.getLastName()).getName(iwc.getCurrentLocale())));
-//			}
-//			else {
-//				cell.add(new Text("-"));
-//			}
-//
-//			if (getBusiness().useTypes()) {
-//				cell = row.createCell();
-//				cell.setStyleClass("caseType");
-//				cell.add(new Text(type.getName()));
-//			}
-//
-//			cell = row.createCell();
-//			cell.setStyleClass("createdDate");
-//			cell.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
-//
-//			cell = row.createCell();
-//			cell.setStyleClass("status");
-//			cell.add(new Text(getBusiness().getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale())));
-//
-//			User handler = theCase.getHandledBy();
-//			cell = row.createCell();
-//			cell.setStyleClass("handler");
-//			if (handler != null) {
-//				cell.add(new Text(new Name(handler.getFirstName(), handler.getMiddleName(), handler.getLastName()).getName(iwc.getCurrentLocale())));
-//			}
-//			else {
-//				cell.add(new Text("-"));
-//			}
-//
-//			cell = row.createCell();
-//			if (!showCheckBoxes) {
-//				cell.setStyleClass("lastColumn");
-//			}
-//			cell.setStyleClass("view");
-//			
-//			if(caseManager == null) {
-//			
-//				cell.add(getProcessLink(getBundle().getImage("edit.png", getResourceBundle().getLocalizedString(getPrefix() + "view_case", "View case")), theCase));
-//				
-//			} else {
-//				
-//				List<Link> links = caseManager.getCaseLinks(theCase, getCasesProcessorType());
-//				
-//				if(links != null)
-//					for (Link link : links)
-//						cell.add(link);
-//			}
-//
-//			if (showCheckBoxes) {
-//				CheckBox box = new CheckBox(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-//
-//				cell = row.createCell();
-//				cell.setStyleClass("firstColumn");
-//				cell.setStyleClass("multiHandle");
-//				cell.add(box);
-//			}
-//
-//			if (iRow % 2 == 0) {
-//				row.setStyleClass("evenRow");
-//			}
-//			else {
-//				row.setStyleClass("oddRow");
-//			}
-//		}
-//
-//		form.add(table);
-//		form.add(getLegend(iwc));
-//
-//		if (showCheckBoxes) {
-//			Layer layer = new Layer();
-//			layer.setStyleClass("buttonLayer");
-//			layer.setStyleClass("multiProcessLayer");
-//			form.add(layer);
-//
-//			SubmitButton multiProcess = new SubmitButton(getResourceBundle().getLocalizedString("multi_process", "Multi process"), PARAMETER_ACTION, String.valueOf(ACTION_MULTI_PROCESS_FORM));
-//			multiProcess.setStyleClass("button");
-//			layer.add(multiProcess);
-//		}
-
-		add(form);
+		topLayer.add(form);
 		
-		showNewList(iwc, form, showCheckBoxes);
+		add(topLayer);
+				
+		UICasesList list = (UICasesList)iwc.getApplication().createComponent(UICasesList.COMPONENT_TYPE);
+		list.setType(getCasesProcessorType());
+		list.setShowCheckBoxes(showCheckBoxes);
+		list.setUsePDFDownloadColumn(isUsePDFDownloadColumn());
+		list.setAllowPDFSigning(isAllowPDFSigning());
+		list.setShowStatistics(isShowStatistics());
+		list.setHideEmptySection(isHideEmptySection());
+		list.setPageSize(getPageSize());
+		list.setPage(getPage());
+		list.setComponentId(topLayer.getId());
+		list.setInstanceId(getBuilderService(iwc).getInstanceId(this));
 		
+		form.add(list);
+				
 		form.add(getLegend(iwc));
 		
 		if (showCheckBoxes) {
@@ -386,12 +211,6 @@ public abstract class CasesProcessor extends CasesBlock {
 			multiProcess.setStyleClass("button");
 			layer.add(multiProcess);
 		}
-	}
-	
-	private void showNewList(IWContext iwc, Form form, boolean showCheckBoxes) throws RemoteException {
-		GeneralCasesListBuilder listBuilder = ELUtil.getInstance().getBean(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER);
-		form.add(listBuilder.getCasesList(iwc, getCases(iwc.getCurrentUser()), getCasesProcessorType(), showCheckBoxes, isUsePDFDownloadColumn(),
-				isAllowPDFSigning(), isShowStatistics(), isHideEmptySection()));
 	}
 
 	protected void showMultiProcessForm(IWContext iwc) throws RemoteException {
@@ -599,7 +418,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		next.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		next.setToFormSubmit(form);
 		bottom.add(next);
-
 		add(form);
 	}
 
@@ -626,19 +444,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 	}
 	
-//	private Link getProcessLink(PresentationObject object, GeneralCase theCase) {
-//		Link process = new Link(object);
-//		process.addParameter(PARAMETER_CASE_PK, theCase.getPrimaryKey().toString());
-//		process.addParameter(PARAMETER_ACTION, ACTION_PROCESS);
-//
-//		return process;
-//	}
-	
-	protected Collection<GeneralCase> getCases(User user) {
-		
-		return getCasesBusiness().getCasesForUser(user, getCasesProcessorType());
-	}
-	
+			
 	public abstract boolean isUsePDFDownloadColumn();
 
 	public abstract void setUsePDFDownloadColumn(boolean usePDFDownloadColumn);
@@ -664,4 +470,28 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected abstract boolean showCheckBox();
 	
 	protected abstract void initializeTableSorter(IWContext iwc) throws RemoteException;
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
+	}
+
+	public CaseManagersProvider getCaseManagersProvider() {
+		return caseManagersProvider;
+	}
+
+	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
+		this.caseManagersProvider = caseManagersProvider;
+	}	
 }

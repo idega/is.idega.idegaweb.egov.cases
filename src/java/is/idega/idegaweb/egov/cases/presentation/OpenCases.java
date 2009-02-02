@@ -17,6 +17,7 @@ import java.rmi.RemoteException;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
@@ -38,8 +39,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	public static final String pageType = "openCases";
 
 	protected ICPage iMyCasesPage;
-	
-	public static final String TYPE = "OpenCases";
 	
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
@@ -108,41 +107,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		}
 		return false;
 	}
-
-//	@Override
-//	protected Collection<GeneralCase> getCases(User user) {
-//
-//		Collection<GeneralCase> cases = super.getCases(user);
-//		Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
-//		
-//		if(cases != null)
-//			openCases.addAll(cases);
-//		
-//		return openCases;
-//	}
-
-//	@SuppressWarnings("unchecked")
-//	public static Collection<GeneralCase> getOpenCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) {
-//		
-//		try {
-//			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
-//			
-//			Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
-//			Collection<GeneralCase> openCases;
-//			
-//			if(caseHandlers == null) {
-//			
-//				openCases = casesBusiness.getOpenCases(!isCaseSuperAdmin ? groups : null);
-//			} else {
-//				
-//				openCases = casesBusiness.getOpenCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
-//			}
-//			return openCases;
-//			
-//		} catch (RemoteException e) {
-//			throw new IBORuntimeException(e);
-//		}
-//	}
 
 	@Override
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
@@ -367,6 +331,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	@Override
 	protected String getCasesProcessorType() {
-		return TYPE;
+		return CaseManager.CASE_LIST_TYPE_OPEN;
 	}
 }

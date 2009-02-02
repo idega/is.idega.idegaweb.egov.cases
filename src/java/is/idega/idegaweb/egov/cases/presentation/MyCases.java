@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
@@ -45,12 +46,12 @@ public class MyCases extends CasesProcessor {
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	
-	public static final String TYPE = "MyCases";
-	
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
 	private boolean showStatistics;
 	private boolean hideEmptySection = true;
+	
+	
 	
 	@Override
 	public boolean isUsePDFDownloadColumn() {
@@ -383,6 +384,6 @@ public class MyCases extends CasesProcessor {
 	
 	@Override
 	protected String getCasesProcessorType() {
-		return TYPE;
+		return CaseManager.CASE_LIST_TYPE_MY;
 	}
 }

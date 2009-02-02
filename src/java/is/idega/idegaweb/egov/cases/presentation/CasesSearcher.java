@@ -10,7 +10,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -259,8 +258,8 @@ public class CasesSearcher extends CasesBlock {
 		if (caseManagersProvider == null) {
 			return menu;
 		}
-		List<CaseManager> caseManagers = caseManagersProvider.getCaseManagers();
-		if (ListUtil.isEmpty(caseManagers)) {
+		CaseManager caseManager = caseManagersProvider.getCaseManager();
+		if (caseManager == null) {
 			return menu;
 		}
 		
@@ -269,7 +268,6 @@ public class CasesSearcher extends CasesBlock {
 		String processId = null;
 		String processName = null;
 		String localizedName = null;
-		CaseManager caseManager = null;
 		Locale locale = iwc.getCurrentLocale();
 		for (Application bpmApp: bpmApps) {
 			processId = null;
@@ -277,15 +275,12 @@ public class CasesSearcher extends CasesBlock {
 			localizedName = processName;
 			
 			if (appType.isVisible(bpmApp)) {
-				for (Iterator<CaseManager> managersIter = caseManagers.iterator(); (managersIter.hasNext() && localizedName.equals(processName));) {
-					caseManager = managersIter.next();
 					
-					if (StringUtil.isEmpty(processId)) {
-						processId = String.valueOf(caseManager.getLatestProcessDefinitionIdByProcessName(processName));
-					}
-					
-					localizedName = caseManager.getProcessName(processName, locale);
+				if (StringUtil.isEmpty(processId)) {
+					processId = String.valueOf(caseManager.getLatestProcessDefinitionIdByProcessName(processName));
 				}
+					
+				localizedName = caseManager.getProcessName(processName, locale);
 				
 				if (!StringUtil.isEmpty(processId)) {
 					allProcesses.add(new AdvancedProperty(processId, localizedName));

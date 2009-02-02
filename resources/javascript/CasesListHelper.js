@@ -214,6 +214,22 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 	this.hideEmptySection = hideEmptySection;
 }
 
+function navigateCasesList(instanceId, containerId, page, count) {
+	showLoadingMessage("");
+	var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
+	IWCORE.renderComponent(instanceId, containerId, function() {
+		closeAllLoadingMessages();
+	}, properties);
+}
+
+function gotoCasesListPage(page, size, instanceId, containerId) {
+	navigateCasesList(instanceId, containerId, page, size);
+}
+
+function changeCasesListPageSize(size, instanceId, containerId) {
+	navigateCasesList(instanceId, containerId, 1, size);
+}
+
 function searchForCases(parameters) {
 	if (parameters == null || parameters.length < 13) {
 		return false;

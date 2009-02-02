@@ -13,9 +13,6 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
-import is.idega.idegaweb.egov.cases.presentation.ClosedCases;
-import is.idega.idegaweb.egov.cases.presentation.MyCases;
-import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
@@ -64,7 +61,6 @@ import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
-import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
@@ -1106,112 +1102,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		} catch (Exception e) {
 			log(Level.SEVERE, "Error getting cases by criteria: " + e);
 		}
-
 		return null;
-	}
-	
-	public Collection<GeneralCase> getCasesForUser(User user, String casesProcessorType) {
-		List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseManagers();
-		List<GeneralCase> cases = null;
-		
-		for (CaseManager handler : caseHandlers) {
-			@SuppressWarnings("unchecked")
-			Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
-			if (cazes != null) {
-				cases = new ArrayList<GeneralCase>(cazes);
-			}
-		}
-		
-		if (casesProcessorType != null) {
-			
-			if (OpenCases.TYPE.equals(casesProcessorType)) {
-				
-				Collection<GeneralCase> openCases = getOpenCases(user, getIWApplicationContext().getIWMainApplication(), CoreUtil.getIWContext(), null);
-				cases = getMergedCases(openCases, cases);
-			} else if (MyCases.TYPE.equals(casesProcessorType)) {
-				
-				@SuppressWarnings("unchecked")
-				Collection<GeneralCase> myCases = getMyCases(user);
-				cases = getMergedCases(myCases, cases);
-			} else if (ClosedCases.TYPE.equals(casesProcessorType)) {
-				
-				Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), CoreUtil.getIWContext(), null);
-				cases = getMergedCases(closedCases, cases);
-			} else if (UserCases.TYPE.equals(casesProcessorType)) {
-//				log(Level.WARNING, UserCases.TYPE+" is not supported in this method");
-			}
-		}
-		
-		return cases;
-	}
-	
-	private List<GeneralCase> getMergedCases(Collection<GeneralCase> source, List<GeneralCase> destination) {
-		if (ListUtil.isEmpty(source)) {
-			return destination;
-		}
-		
-		if (destination == null) {
-			destination = new ArrayList<GeneralCase>();
-		}
-		for (GeneralCase theCase: source) {
-			if (!destination.contains(theCase)) {
-				destination.add(theCase);
-			}
-		}
-		
-		return destination;
-	}
-	
-	public List<Integer> getCasesIdsForUser(User user, String casesProcessorType) {
-		Collection<GeneralCase> cases = getCasesForUser(user, casesProcessorType);
-		
-		List<Integer> ids = null;
-		if (UserCases.TYPE.equals(casesProcessorType)) {
-			Collection<Case> userCases = null;
-			try {
-				userCases = getAllCasesForUserExceptCodes(user, getCaseCodesForUserCasesList(), -1, -1);
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
-			if (!ListUtil.isEmpty(userCases)) {
-				ids = new ArrayList<Integer>();
-				Integer id = null;
-				for (Case casse: userCases) {
-					id = null;
-					try {
-						id = Integer.valueOf(casse.getId());
-					} catch(NumberFormatException e) {
-						e.printStackTrace();
-					}
-					if (id != null && !ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
-		}
-		if (ListUtil.isEmpty(cases) && ListUtil.isEmpty(ids)) {
-			return null;
-		}
-		if (ListUtil.isEmpty(cases)) {
-			return ids;
-		}
-		
-		if (ListUtil.isEmpty(ids)) {
-			ids = new ArrayList<Integer>();
-		}
-		Integer id = null;
-		for (GeneralCase casse: cases) {
-			id = null;
-			try {
-				id = Integer.valueOf(casse.getId());
-			} catch(NumberFormatException e) {
-				e.printStackTrace();
-			}
-			if (id != null && !ids.contains(id)) {
-				ids.add(id);
-			}
-		}
-		return ids;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1220,15 +1111,14 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		try {
 			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
 			
-			Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
 			Collection<GeneralCase> openCases;
 			
 			if(caseHandlers == null) {
 			
-				openCases = getOpenCases(!isCaseSuperAdmin ? groups : null);
+				openCases = getOpenCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null);
 			} else {
 				
-				openCases = getOpenCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
+				openCases = getOpenCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null, caseHandlers);
 			}
 			return openCases;
 			
@@ -1243,15 +1133,14 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		try {
 			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
 			
-			Collection groups = getUserBusiness().getUserGroupsDirectlyRelated(user);
 			Collection<GeneralCase> closedCases;
 			
 			if(caseHandlers == null) {
 			
-				closedCases = getClosedCases(!isCaseSuperAdmin ? groups : null);
+				closedCases = getClosedCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null);
 			} else {
 				
-				closedCases = getClosedCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
+				closedCases = getClosedCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null, caseHandlers);
 			}
 			return closedCases;
 			

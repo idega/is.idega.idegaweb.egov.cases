@@ -16,6 +16,7 @@ import java.rmi.RemoteException;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
@@ -31,8 +32,6 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 public class ClosedCases extends CasesProcessor {
-	
-	public static final String TYPE = "ClosedCases";
 	
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
@@ -318,7 +317,7 @@ public class ClosedCases extends CasesProcessor {
 	
 	@Override
 	protected String getCasesProcessorType() {
-		return TYPE;
+		return CaseManager.CASE_LIST_TYPE_CLOSED;
 	}
 	
 //	@SuppressWarnings("unchecked")

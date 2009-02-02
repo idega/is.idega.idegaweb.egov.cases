@@ -24,12 +24,14 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.core.file.data.ICFile;
 import com.idega.data.IDOCompositePrimaryKeyException;
 import com.idega.data.IDOException;
+import com.idega.data.IDOQuery;
 import com.idega.data.IDORelationshipException;
 import com.idega.data.query.BetweenCriteria;
 import com.idega.data.query.Column;
 import com.idega.data.query.CountColumn;
 import com.idega.data.query.InCriteria;
 import com.idega.data.query.MatchCriteria;
+import com.idega.data.query.OR;
 import com.idega.data.query.Order;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
@@ -104,7 +106,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
-		//getEntityDefinition().setUseFinderCollectionPrefetch(true);
+		getEntityDefinition().setBeanCachingActiveByDefault(true, 1000);
 	}
 
 	// Getters
@@ -278,7 +280,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
-
+	
 	public Collection ejbFindAllByHandler(User handler) throws FinderException {
 		return ejbFindAllByHandlerAndStatuses(handler, null, null);
 	}
@@ -323,7 +325,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		return idoFindPKsByQuery(query);
 	}
-
+	
 	public Collection ejbFindAllByUsers(Collection users) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
@@ -564,10 +566,15 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		for (String columnName: columnNames) {
 			query.addColumn(generalCasesTable, columnName);
 		}
+		try {
+			query.addJoin(generalCasesTable, casesTable);
+		} catch (IDORelationshipException e) {
+			throw new FinderException("Could not add join: " + e);
+		}
 		if (!ListUtil.isEmpty(ids)) {
 			query.addCriteria(new InCriteria(generalCasesTable.getColumn(getIDColumnName()), ids));
 		}
-		
+		query.addOrder(casesTable, CaseBMPBean.COLUMN_CREATED, false);
 		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}

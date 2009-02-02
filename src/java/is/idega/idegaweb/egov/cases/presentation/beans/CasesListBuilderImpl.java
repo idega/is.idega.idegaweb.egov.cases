@@ -1,7 +1,6 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.presentation.MyCases;
@@ -11,7 +10,6 @@ import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,14 +26,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.business.CaseCodeManager;
 import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
+import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
-import com.idega.block.process.util.CaseComparator;
 import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
@@ -51,7 +49,9 @@ import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
+import com.idega.presentation.ListNavigator;
 import com.idega.presentation.PresentationObject;
+import com.idega.presentation.paging.PagedDataCollection;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
@@ -84,7 +84,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
 	private String allowPDFSigningParName = "allowpdfsigning";
 	
-	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults, String caseProcessorType) {
+	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean showCheckBoxes, boolean searchResults, String type) {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -103,7 +103,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
-		addResources(caseId, iwc, getBundle(iwc), caseProcessorType);
+		addResources(caseId, iwc, getBundle(iwc), type);
 		
 		if (searchResults) {
 			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results")).append(CoreConstants.SPACE);
@@ -166,39 +166,26 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, Case theCase, CaseStatus caseStatusReview, Locale l, boolean showCheckBoxes,
-			boolean isPrivate, boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress,
+	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, CasePresentation theCase, CaseStatus caseStatusReview, Locale l, boolean showCheckBoxes,
+			boolean isUserList, int rowsCounter, Map pages, boolean addCredentialsToExernalUrls, String emailAddress,
 			boolean descriptionIsEditable, boolean usePDFDownloadColumn, boolean allowPDFSigning, boolean hideEmptySection) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
 		
-		
-		String caseStatus = theCase.getStatus();
-		CaseStatus status = null;
-		try {
-			 //take cached case status
-			 status = getCasesBusiness(iwc).getCaseStatus(caseStatus);
-		} catch (RemoteException e) {
-			status = theCase.getCaseStatus();
-		}
-			
+					
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
-		
-		CaseManager caseManager = null;
-		if (theCase.getCaseManagerType() != null) {
-			caseManager = getCasesBusiness(iwc).getCaseHandlersProvider().getCaseManager(theCase.getCaseManagerType());
-		}
-		
+				
 		if (rowsCounter == 0) {
 			caseContainer.setStyleClass("firstRow");
 		}
 
-		if (isPrivate) {
+		if (theCase.isPrivate()) {
 			caseContainer.setStyleClass("isPrivate");
 		}
 		String caseStatusCode = null;
+		CaseStatus status = theCase.getCaseStatus(); 
 		if (status != null && caseStatusReview != null) {
 			if (status.equals(caseStatusReview)) {
 				caseContainer.setStyleClass("isReview");
@@ -209,17 +196,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				caseContainer.setStyleClass(caseStatusCode);
 			}
 		}
-		
-		boolean notGeneralCase = !(theCase instanceof GeneralCase);
-		CaseBusiness caseBusiness = null;
-		if (notGeneralCase) {
-			try {
-				caseBusiness = CaseCodeManager.getInstance().getCaseBusinessOrDefault(theCase.getCaseCode(), iwc);
-			} catch (IBOLookupException e) {
-				e.printStackTrace();
-			}
-		}
-		
+				
 		//	Number
 		Layer numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
 		
@@ -229,7 +206,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (identifier == null) {
 			numberContainer.add(theCase.getPrimaryKey().toString());
 		} else {
-			if (caseManager != null) {
+			if (theCase.isBpm()) {
 				IWResourceBundle iwrb = getResourceBundle(iwc);
 				Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
 						getEmailAddressMailtoFormattedWithSubject(emailAddress, identifier));
@@ -238,17 +215,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 			numberContainer.add(identifier);
 		}
-		showCheckBoxes = caseManager == null ? showCheckBoxes : false;
+		showCheckBoxes = !theCase.isBpm() ? showCheckBoxes : false;
 		
 		Layer customerView = null;
 		String caseId = theCase.getPrimaryKey().toString();
 		String gridViewerId = null;
-		if (caseManager != null) {
+		if (theCase.isBpm()) {
 			customerView = new Layer();
 			gridViewerId = customerView.getId();
 		}
 		
-		if (caseManager != null) {
+		if (theCase.isBpm()) {
 			prepareCellToBeGridExpander(numberContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
 		}
 
@@ -256,7 +233,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
 		senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
 				owner.getLastName()).getName(l)));
-		if (caseManager != null) {
+		if (theCase.isBpm()) {
 			prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
 		}
 		
@@ -266,17 +243,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
 			descriptionContainer.setMarkupAttribute(caseIdParName, caseId);
 		}
-		String subject = null;
-		if (notGeneralCase) {
-			try {
-				subject = caseBusiness.getCaseSubject(theCase, l);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			subject = theCase.getSubject();
-		}
+		String subject = theCase.getSubject();
 		if (subject != null && subject.length() > 100) {
 			subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT).append(CoreConstants.DOT).toString();
 		}
@@ -285,28 +252,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Creation date
 		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
 		creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
-		if (caseManager != null) {
+		if (theCase.isBpm()) {
 			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
 		}
 
 		//	Status
-		String localizedStatus = null;
-		if (theCase instanceof GeneralCase) {
-			try {
-				localizedStatus = getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, l);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			try {
-				localizedStatus = caseBusiness.getLocalizedCaseStatusDescription(theCase, status, l);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
+		String localizedStatus = theCase.getLocalizedStatus();
 		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
-		if (caseManager != null) {
+		if (theCase.isBpm()) {
 			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
 		}
 		if (!StringUtil.isEmpty(caseStatusCode)) {
@@ -315,10 +268,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Controller
 		UIComponent childForContainer = null;
-		if (caseManager == null) {
+		if (!theCase.isBpm()) {
 			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString("view_case", "View case"));
 			if (isUserList) {
-				childForContainer = getLinkToViewUserCase(iwc, theCase, caseBusiness, view, pages, theCase.getCode(), status, addCredentialsToExernalUrls);
+				childForContainer = getLinkToViewUserCase(iwc, theCase, view, pages, theCase.getCode(), status, addCredentialsToExernalUrls);
 			}
 			else {
 				childForContainer = getProcessLink(iwc, view, theCase);
@@ -327,8 +280,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		else {
 			childForContainer = Text.getNonBrakingSpace(10);
 		}
-		Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, caseManager == null ? oldBodyItem : bodyItem, "Toggler");
-		if (caseManager != null) {
+		Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, !theCase.isBpm() ? oldBodyItem : bodyItem, "Toggler");
+		if (theCase.isBpm()) {
 			togglerContainer.setStyleClass("expand");
 			togglerContainer.setMarkupAttribute("changeimage", "true");
 			prepareCellToBeGridExpander(togglerContainer, caseId, gridViewerId, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
@@ -370,21 +323,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	public String getEmailAddressMailtoFormattedWithSubject(String subject) {
 		return getEmailAddressMailtoFormattedWithSubject(getDefaultEmail(), subject);
 	}
-	
-	@SuppressWarnings("unchecked")
-	private List<Case> getSortedCases(Collection cases) {
-		if (cases == null || cases.isEmpty()) {
-			return new ArrayList<Case>(0);
-		}
-		List<Case> casesInList = new ArrayList<Case>(cases);
-		Collections.sort(casesInList, new CaseComparator());
-		return casesInList;
-	}
-	
-	private boolean isDescriptionEditable(String casesType, boolean isAdmin) {
-		boolean descriptionIsEditable = OpenCases.TYPE.equals(casesType);
+		
+	private boolean isDescriptionEditable(String type, boolean isAdmin) {
+		boolean descriptionIsEditable = CaseManager.CASE_LIST_TYPE_OPEN.equals(type);
 		if (!descriptionIsEditable) {
-			descriptionIsEditable = MyCases.TYPE.equals(casesType) && isAdmin;
+			descriptionIsEditable = CaseManager.CASE_LIST_TYPE_MY.equals(type) && isAdmin;
 		}
 		return descriptionIsEditable;
 	}
@@ -442,18 +385,47 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public UIComponent getCasesList(IWContext iwc, Collection cases, String caseProcessorType, boolean showCheckBoxes, boolean usePDFDownloadColumn,
-			boolean allowPDFSigning, boolean showStatistics, boolean hideEmptySection) {		
-		List<Case> casesInList = getSortedCases(cases);
+	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, String type, boolean showCheckBoxes, boolean usePDFDownloadColumn,
+			boolean allowPDFSigning, boolean showStatistics, boolean hideEmptySection) {	
+		return getCasesList(iwc, cases, type, showCheckBoxes, usePDFDownloadColumn, allowPDFSigning, showStatistics, hideEmptySection, 0, 0, null, null);
+	}
+	
+	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, String type, boolean showCheckBoxes, boolean usePDFDownloadColumn,
+			boolean allowPDFSigning, boolean showStatistics, boolean hideEmptySection, int pageSize, int page, String instanceId, String componentId) {		
+		Collection<CasePresentation> casesInList = cases.getCollection();
 		
 		String emailAddress = getDefaultEmail();
 		
-		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
+		boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
 		
-		boolean searchResults = isSearchResultsList(caseProcessorType);
+		boolean searchResults = isSearchResultsList(type);
 		Layer container = getCasesListContainer(searchResults);
 
+		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
+
+		if (pageSize > 0 && instanceId != null && componentId != null && totalCases > 0) {
+			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(
+					ProcessConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/process.css"));
+			Layer navigationLayer = new Layer(Layer.DIV);
+			navigationLayer.setStyleClass("caseNavigation");
+			container.add(navigationLayer);
+			container.add(new CSSSpacer());
+
+			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(
+					ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+
+			ListNavigator navigator = new ListNavigator("userCases", cases.getTotalCount());
+			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
+			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
+			navigator.setPageSize(pageSize);
+			navigator.setCurrentPage(page);
+			StringBuilder navigationParams = new StringBuilder();
+			navigationParams.append("'").append(instanceId).append("'");
+			navigationParams.append(",'").append(componentId).append("'");
+			navigator.setNavigationFunction("gotoCasesListPage('#PAGE#','" + pageSize + "'," + navigationParams + ");");
+			navigator.setDropdownFunction("changeCasesListPageSize(this.value, " + navigationParams + ");");
+			navigationLayer.add(navigator);
+		}
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
 		if (casesBusiness == null) {
@@ -461,9 +433,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes, searchResults, caseProcessorType);
+		Layer casesContainer = createHeader(iwc, container, totalCases, showCheckBoxes, searchResults, type);
 		
 		if (totalCases < 1) {
 			return container;
@@ -481,17 +452,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			e.printStackTrace();
 		}
 
-		GeneralCase genCase = null;
-		for (Object o: casesInList) {
-			if (o instanceof GeneralCase) {
-				genCase = (GeneralCase) o;
-				caseContainer = addRowToCasesList(iwc, casesBodyContainer, genCase, caseStatusReview, l, showCheckBoxes, genCase.isPrivate(), false,
+		for (CasePresentation theCase: casesInList) {
+				caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, showCheckBoxes, false, 
 						rowsCounter, null, false, emailAddress, descriptionIsEditable, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
-			}
-			else if (o instanceof Case) {
-				caseContainer = addRowToCasesList(iwc, casesBodyContainer, (Case) o, caseStatusReview, l, showCheckBoxes, false, false, rowsCounter, null,
-						false, emailAddress, descriptionIsEditable, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
-			}
 			rowsCounter++;
 		}
 		if (caseContainer != null) {
@@ -499,13 +462,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		if (showStatistics) {
-			addStatistics(iwc, container, cases);
+			addStatistics(iwc, container, casesInList);
 		}
 		
 		return container;
 	}
 	
-	private void addStatistics(IWContext iwc, Layer container, Collection<Case> cases) {
+	private void addStatistics(IWContext iwc, Layer container, Collection<CasePresentation> cases) {
 		container.add(new CSSSpacer());
 		
 		Layer statisticsContainer = new Layer();
@@ -516,16 +479,41 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public UIComponent getUserCasesList(IWContext iwc, Collection<Case> cases, Map pages, String caseProcessorType, boolean addCredentialsToExernalUrls,
-			boolean usePDFDownloadColumn, boolean allowPDFSigning, boolean showStatistics, boolean hideEmptySection) {
-		List<Case> casesInList = getSortedCases(cases);
+	public UIComponent getUserCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, Map pages, String type, boolean addCredentialsToExernalUrls,
+			boolean usePDFDownloadColumn, boolean allowPDFSigning, boolean showStatistics, boolean hideEmptySection, int pageSize, int page, String instanceId, String componentId) {
+		
+		Collection<CasePresentation> casesInList = cases.getCollection();
 		
 		String emailAddress = getDefaultEmail(); 
 		
-		boolean descriptionIsEditable = isDescriptionEditable(caseProcessorType, iwc.isSuperAdmin());
+		boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
 		
-		boolean searchResults = isSearchResultsList(caseProcessorType);
+		boolean searchResults = isSearchResultsList(type);
 		Layer container = getCasesListContainer(searchResults);
+		
+		if (pageSize > 0 && instanceId != null && componentId != null) {
+			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(
+					ProcessConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/process.css"));
+			Layer navigationLayer = new Layer(Layer.DIV);
+			navigationLayer.setStyleClass("caseNavigation");
+			container.add(navigationLayer);
+			container.add(new CSSSpacer());
+
+			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(
+					ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+
+			ListNavigator navigator = new ListNavigator("userCases", cases.getTotalCount());
+			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
+			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
+			navigator.setPageSize(pageSize);
+			navigator.setCurrentPage(page);
+			StringBuilder navigationParams = new StringBuilder();
+			navigationParams.append("'").append(instanceId).append("'");
+			navigationParams.append(",'").append(componentId).append("'");
+			navigator.setNavigationFunction("gotoCasesListPage('#PAGE#','" + pageSize + "'," + navigationParams + ");");
+			navigator.setDropdownFunction("changeCasesListPageSize(this.value, " + navigationParams + ");");
+			navigationLayer.add(navigator);
+		}
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -536,7 +524,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
-		Layer casesContainer = createHeader(iwc, container, totalCases, false, searchResults, caseProcessorType);
+		Layer casesContainer = createHeader(iwc, container, totalCases, false, searchResults, type);
 		
 		if (totalCases < 1) {
 			return container;
@@ -553,15 +541,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		for (Case theCase: casesInList) {			
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, false, true, rowsCounter, pages,
+		for (CasePresentation theCase: casesInList) {			
+			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, true, rowsCounter, pages,
 					addCredentialsToExernalUrls, emailAddress, descriptionIsEditable, usePDFDownloadColumn, allowPDFSigning, hideEmptySection);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
 
 		if (showStatistics) {
-			addStatistics(iwc, container, cases);
+			addStatistics(iwc, container, casesInList);
 		}
 		
 		return container;
@@ -578,51 +566,26 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Link getLinkToViewUserCase(IWContext iwc, Case theCase, CaseBusiness caseBusiness, Image viewCaseImage, Map pages, String caseCode,
+	private Link getLinkToViewUserCase(IWContext iwc, CasePresentation theCase, Image viewCaseImage, Map pages, String caseCode,
 			CaseStatus caseStatus, boolean addCredentialsToExernalUrls) {
-		if (caseBusiness == null) {
-			try {
-				caseBusiness = (CaseBusiness) IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
-			} catch (IBOLookupException e) {
-				e.printStackTrace();
-			}
+		CaseBusiness caseBusiness = null;
+		try {
+			caseBusiness = (CaseBusiness) IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
 		}
 		if (caseBusiness == null) {
 			return null;
 		}
-		
+
 		ICPage page = getPage(pages, caseCode, caseStatus == null ? null : caseStatus.getStatus());
-		String caseUrl = null;
-		try {
-			caseUrl = caseBusiness.getUrl(theCase);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		
+		String caseUrl = theCase.getUrl();
+
 		if (page != null) {
 			Link link = new Link(viewCaseImage);
 			link.setStyleClass("caseEdit");
 			link.setToolTip(getToolTipForLink(iwc));
-			
-			Class<?> eventListener = null;
-			try {
-				eventListener = caseBusiness.getEventListener();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			if (eventListener != null) {
-				link.setEventListener(eventListener);
-			}
-			Map parameters = null;
-			try {
-				parameters = caseBusiness.getCaseParameters(theCase);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			if (parameters != null) {
-				link.setParameter(parameters);
-			}
-			
+
 			try {
 				link.addParameter(caseBusiness.getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 			} catch (RemoteException e) {
@@ -632,8 +595,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 			link.setPage(page);
 			return link;
-		}
-		else if (caseUrl != null) {
+		} else if (caseUrl != null) {
 			Link link = new Link(viewCaseImage, caseUrl);
 			link.setStyleClass("caseEdit");
 			link.setToolTip(getResourceBundle(iwc).getLocalizedString("view_case", "View case"));
@@ -646,7 +608,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 			return link;
 		}
-		
+
 		return null;
 	}
 	
@@ -676,7 +638,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return getResourceBundle(iwc).getLocalizedString("view_case", "View case");
 	}
 	
-	private Link getProcessLink(IWContext iwc, PresentationObject object, Case theCase) {
+	private Link getProcessLink(IWContext iwc, PresentationObject object, CasePresentation theCase) {
 		Link process = new Link(object);
 		
 		WebContext webContext = WebContextFactory.get();
@@ -694,7 +656,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return process;
 	}
 	
-	private void addResources(String caseId, IWContext iwc, IWBundle bundle, String caseProcessorType) {
+	private void addResources(String caseId, IWContext iwc, IWBundle bundle, String type) {
 		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		
 		List<String> scripts = new ArrayList<String>();
@@ -733,7 +695,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		//	Adding resources
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \"" + caseProcessorType +
+		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \"" + type.toString() +
 				"\";");
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 	}
@@ -789,21 +751,22 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return layer;
 	}
 
-	public UIComponent getCaseManagerView(IWContext iwc, Integer caseId, String caseProcessorType) {
+	public UIComponent getCaseManagerView(IWContext iwc, Integer caseId, String type) {
 		
 		try {
+			
 			Case theCase = getCasesBusiness(iwc).getCase(caseId);
 			
 			CaseManager caseManager;
 			
 			if(theCase.getCaseManagerType() != null)
-				caseManager = getCaseManagersProvider().getCaseManager(theCase.getCaseManagerType());
+				caseManager = getCaseManagersProvider().getCaseManager();
 			else 
 				caseManager = null;
 			
 			if(caseManager != null) {
 				
-				UIComponent caseAssets = caseManager.getView(iwc, theCase, caseProcessorType);
+				UIComponent caseAssets = caseManager.getView(iwc, caseId, type, theCase.getCaseManagerType());
 				
 				if(caseAssets != null)
 					return caseAssets;
@@ -829,7 +792,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		this.caseManagersProvider = caseManagersProvider;
 	}
 
-	public UIComponent getCasesStatistics(IWContext iwc, Collection<Case> cases) {
+	public UIComponent getCasesStatistics(IWContext iwc, Collection<CasePresentation> cases) {
 		CasesStatistics statistics = new CasesStatistics();
 		statistics.setCases(cases);
 		statistics.setUseStatisticsByCaseType(Boolean.FALSE);
