@@ -448,7 +448,16 @@ CasesListHelper.addVariableInput = function() {
 	var variableLabel = jQuery(selectedOption).text();
 	
 	var variablesContainer = jQuery('#variableInputsContainer');
-	var emptyInputs = jQuery('input.variableValueField[value=\'\']', variablesContainer);
+	var emptyInputs = [];
+	
+	jQuery.each(jQuery('input.variableValueField', variablesContainer), function() {
+		var variableInput = jQuery(this);
+		
+		if (variableInput.attr('value') == null || variableInput.attr('value') == '') {
+			emptyInputs.push(variableInput);
+		}
+	});
+	
 	if (emptyInputs.length > 0) {
 		jQuery.each(emptyInputs, function() {
 			jQuery(this).parent().hide('fast').remove();
@@ -504,7 +513,17 @@ CasesListHelper.addVariables = function() {
 }
 
 CasesListHelper.resetVariablesAndAddNewOne = function() {
-	jQuery('input.variableValueField[value=\'\']').parent().hide('normal', function() {jQuery('input.variableValueField[value=\'\']').parent().remove();});
+	var inputsToRemove = [];
+	jQuery.each(jQuery('input.variableValueField'), function() {
+		var inputToRemove = jQuery(this);
+		
+		if (inputToRemove.attr('value') == null || inputToRemove.attr('value') == '') {
+			inputsToRemove.push(inputToRemove);
+		}
+	});
+	jQuery.each(inputsToRemove, function() {
+		jQuery(this).parent().hide('normal', function() {jQuery(this).remove();});
+	});
 	jQuery('#availableVariablesForProcess').attr('selectedIndex', 0);
 }
 
