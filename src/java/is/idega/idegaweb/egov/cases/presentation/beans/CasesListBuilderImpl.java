@@ -3,8 +3,6 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
-import is.idega.idegaweb.egov.cases.presentation.MyCases;
-import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;

@@ -4,7 +4,7 @@ CasesListHelper.processVariables = [];
 
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Out of cheese error! Please reboot the Universe and try again...or the page.';
-var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading, please wait...';
+var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading...';
 
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
@@ -215,7 +215,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 }
 
 function navigateCasesList(instanceId, containerId, page, count) {
-	showLoadingMessage("");
+	showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
 	var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
 	IWCORE.renderComponent(instanceId, containerId, function() {
 		closeAllLoadingMessages();
