@@ -390,7 +390,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, String type, boolean showCheckBoxes, boolean usePDFDownloadColumn,
 			boolean allowPDFSigning, boolean showStatistics, boolean hideEmptySection, int pageSize, int page, String instanceId, String componentId) {		
-		Collection<CasePresentation> casesInList = cases.getCollection();
+		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
 		
 		String emailAddress = getDefaultEmail();
 		

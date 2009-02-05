@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import javax.ejb.FinderException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
@@ -86,13 +85,14 @@ public class CasesStatistics extends CasesBlock {
 	private String categoriesCriteria;
 	private String statusesCriteria;
 	
-	@Autowired(required = false) private CaseManagersProvider caseManagersProvider;
+	@Autowired(required = false)
+	private CaseManagersProvider caseManagersProvider;
 	
 	public CasesStatistics() {
 		try {
 			ELUtil.getInstance().autowire(this);
 		} catch(Exception e) {
-			Logger.getLogger(CasesStatistics.class.getName()).log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManager.class.getName(), e);
+			Logger.getLogger(CasesStatistics.class.getName()).log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManagersProvider.class.getName(), e);
 		}
 	}
 
