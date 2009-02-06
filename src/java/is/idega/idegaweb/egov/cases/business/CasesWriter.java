@@ -84,7 +84,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			}
 
 			CaseCategory subCategory = null;
-			if (iwc.isParameterSet(PARAMETER_CASE_CATEGORY)) {
+			if (iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY)) {
 				try {
 					subCategory = getBusiness(iwc).getCaseCategory(iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY));
 				}
