@@ -36,12 +36,10 @@ import javax.faces.context.FacesContext;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
-import com.idega.block.process.business.CaseManager;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
-import com.idega.block.process.presentation.UserCases;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextHome;
 import com.idega.business.IBOLookup;
@@ -454,23 +452,23 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		getCaseType(caseTypePK).remove();
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
-		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, null, isPrivate, iwrb);
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, null, isPrivate, iwrb);
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
-		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, true, null);
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb) throws CreateException {
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, true, null);
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier) throws CreateException {
 		GeneralCase theCase = getGeneralCaseHome().create();
-		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier);
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier);
 	}
 
 	/**
 	 * The iwrb is the users preferred locale
 	 */
-	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier) throws CreateException {
+	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier) throws CreateException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -497,6 +495,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setCaseType(caseType);
 		theCase.setOwner(sender);
 		theCase.setHandler(handlerGroup);
+		theCase.setSubject(regarding);
 		theCase.setMessage(message);
 		theCase.setAttachment(attachment);
 		theCase.setType(type);

@@ -653,7 +653,7 @@ public class CaseCreator extends ApplicationForm {
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
-		//String regarding = iwc.getParameter(PARAMETER_REGARDING);
+		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
 
@@ -676,7 +676,7 @@ public class CaseCreator extends ApplicationForm {
 
 		try {
 			User user = getUser(iwc);
-			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
+			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
 
 			String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
 			if (category != null) {
