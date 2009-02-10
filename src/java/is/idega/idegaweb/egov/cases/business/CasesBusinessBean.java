@@ -96,7 +96,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		sendMessage(theCase, receiver, sender, subject, body);
 	}
 
-	public Map<String, String> getSubCategories(String categoryPK, String country) {
+	public Map<String, String> getAllSubCategories(String categoryPK, String country) {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 		Locale locale = new Locale(country, country.toUpperCase());
 

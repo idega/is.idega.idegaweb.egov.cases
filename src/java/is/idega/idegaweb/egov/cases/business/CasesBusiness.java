@@ -44,9 +44,9 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public void sendReminder(GeneralCase theCase, User receiver, User sender, String message, IWContext iwc) throws RemoteException;
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getAllSubCategories
 	 */
-	public Map<String, String> getSubCategories(String categoryPK, String country) throws RemoteException;
+	public Map<String, String> getAllSubCategories(String categoryPK, String country) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getUsers

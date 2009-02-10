@@ -5,7 +5,7 @@ $j(document).ready(function() {
 		var locale = $('input#casesLocale').val();
 		var value = $j(this).val();
 		if (value.length > 0) {
-			CasesBusiness.getSubCategories(value, locale, {
+			CasesBusiness.getAllSubCategories(value, locale, {
 				callback: function(results) {
 					$j('select#casesSubCategory').each(function(item) {
 						dwr.util.removeAllOptions(item);
