@@ -2,7 +2,7 @@ var $j = jQuery.noConflict();
 
 $j(document).ready(function() {
 	$j('select#casesParentCategory').change(function() {
-		var locale = $('input#casesLocale').val();
+		var locale = $j('input#casesLocale').val();
 		var value = $j(this).val();
 		if (value.length > 0) {
 			CasesBusiness.getAllSubCategories(value, locale, {
