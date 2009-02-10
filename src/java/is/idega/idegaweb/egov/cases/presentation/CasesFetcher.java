@@ -3,7 +3,6 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.CaseCategoryCollectionHandler;
 import is.idega.idegaweb.egov.cases.business.CasesWriter;
 import is.idega.idegaweb.egov.cases.business.CasesWriterExtended;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
@@ -18,6 +17,7 @@ import java.util.Iterator;
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.IWContext;
@@ -26,19 +26,22 @@ import com.idega.presentation.Table2;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.remotescripting.RemoteScriptHandler;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.PresentationUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
 
 /**
@@ -120,10 +123,21 @@ public class CasesFetcher extends CasesBlock {
 		try {
 			parse(iwc);
 
+			Web2Business business = ELUtil.getInstance().getBean(Web2Business.class);
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleURIToJQueryLib());
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CasesBusiness.js");
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getBundle().getVirtualPathWithFileNameString("javascript/egov_cases.js"));
+
 			Form form = new Form();
 			form.setID("casesFetcher");
 			form.setStyleClass("adminForm");
 			form.addParameter(PARAMETER_SHOW_RESULTS, Boolean.TRUE.toString());
+			
+			HiddenInput localeInput = new HiddenInput("current_locale", iwc.getCurrentLocale().getCountry().toLowerCase());
+			localeInput.setID("casesLocale");
+			form.add(localeInput);
 
 			Layer section = new Layer(Layer.DIV);
 			section.setStyleClass("formSection");
@@ -136,11 +150,13 @@ public class CasesFetcher extends CasesBlock {
 
 			SelectorUtility util = new SelectorUtility();
 			DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY), getCasesBusiness().getCaseCategories(), "getName");
+			categories.setID("casesParentCategory");
 			categories.keepStatusOnAction(true);
 			categories.setStyleClass("caseCategoryDropdown");
 			categories.setMenuElementFirst("", "");
 
 			DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY);
+			subCategories.setID("casesSubCategory");
 			subCategories.keepStatusOnAction(true);
 			subCategories.setStyleClass("subCaseCategoryDropdown");
 
@@ -200,18 +216,6 @@ public class CasesFetcher extends CasesBlock {
 			section.add(element);
 
 			if (getCasesBusiness().useSubCategories()) {
-				try {
-					RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
-					rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
-					element.add(rsh);
-				}
-				catch (IllegalAccessException iae) {
-					iae.printStackTrace();
-				}
-				catch (InstantiationException ie) {
-					ie.printStackTrace();
-				}
-
 				element = new Layer(Layer.DIV);
 				element.setStyleClass("formItem");
 				label = new Label(getResourceBundle().getLocalizedString("sub_case_category", "Sub case category"), subCategories);
