@@ -430,3 +430,16 @@ div.commentsViewerForTaskViewerInCasesList {
 span.sendCaseEmailTextStyleInBPMCaseViewer {
 	margin-left: 5px;
 }
+
+div.personProfilePictureInCasesListContactPartStyle {
+	position: absolute;
+}
+
+.personProfilePictureInCasesListContactPartStyle img {
+	width: 107px;
+	height: 134px;
+}
+
+img.userProfilePictureInCasesList {
+	display: none !important;
+}
