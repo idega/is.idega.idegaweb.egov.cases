@@ -37,35 +37,33 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 }
 
 function continueInitializeCasesList(caseToOpenId) {
-	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);
-	if (togglers == null || togglers.length == 0) {
-		return false;
-	}
-	
 	var caseIdPar = 'caseid';
-	var toggler = null;
-	var togglerIsRegisteredForActionParamValue = null;
-	var togglerIsRegisteredForActionParamName = 'togglerisregisteredforaction';
-	for (var i = 0; i < togglers.length; i++) {
-		toggler = jQuery(togglers[i]);
-		
-		togglerIsRegisteredForActionParamValue = toggler.attr(togglerIsRegisteredForActionParamName);
-		if (togglerIsRegisteredForActionParamValue == null || togglerIsRegisteredForActionParamValue == '') {
-			toggler.attr(togglerIsRegisteredForActionParamName, 'true');
-			
-			toggler.click(function(event) {
-				registerGridExpanderActionsForElement(event, this);
-			});
-		}
-	}
-	
-	if (caseToOpenId != null && caseToOpenId != '') {
-		var foundWhatToOpen = false;
-		for (var i = 0; (i < togglers.length && !foundWhatToOpen); i++) {
+	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);
+	if (togglers != null && togglers.length > 0) { 
+		var toggler = null;
+		var togglerIsRegisteredForActionParamValue = null;
+		var togglerIsRegisteredForActionParamName = 'togglerisregisteredforaction';
+		for (var i = 0; i < togglers.length; i++) {
 			toggler = jQuery(togglers[i]);
-			if (caseToOpenId == toggler.attr(caseIdPar)) {
-				foundWhatToOpen = true;
-				toggler.click();
+			
+			togglerIsRegisteredForActionParamValue = toggler.attr(togglerIsRegisteredForActionParamName);
+			if (togglerIsRegisteredForActionParamValue == null || togglerIsRegisteredForActionParamValue == '') {
+				toggler.attr(togglerIsRegisteredForActionParamName, 'true');
+				
+				toggler.click(function(event) {
+					registerGridExpanderActionsForElement(event, this);
+				});
+			}
+		}
+		
+		if (caseToOpenId != null && caseToOpenId != '') {
+			var foundWhatToOpen = false;
+			for (var i = 0; (i < togglers.length && !foundWhatToOpen); i++) {
+				toggler = jQuery(togglers[i]);
+				if (caseToOpenId == toggler.attr(caseIdPar)) {
+					foundWhatToOpen = true;
+					toggler.click();
+				}
 			}
 		}
 	}
