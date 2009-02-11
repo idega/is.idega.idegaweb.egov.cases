@@ -7,9 +7,9 @@ $j(document).ready(function() {
 		if (value.length > 0) {
 			CasesBusiness.getAllSubCategories(value, locale, {
 				callback: function(results) {
-					$j('select#casesSubCategory').each(function(item) {
-						dwr.util.removeAllOptions(item);
-						dwr.util.addOptions(item, results);
+					$j('select#casesSubCategory').each(function() {
+						dwr.util.removeAllOptions(this);
+						dwr.util.addOptions(this, results);
 					});
 				}
 			});

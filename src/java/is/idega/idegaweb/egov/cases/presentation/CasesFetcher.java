@@ -29,12 +29,13 @@ import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
-import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.IWDatePicker;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
@@ -107,11 +108,11 @@ public class CasesFetcher extends CasesBlock {
 		}
 		
 		if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
-			fromDate = new IWTimestamp(iwc.getParameter(PARAMETER_FROM_DATE)).getDate();
+			fromDate = new IWTimestamp(IWDatePickerHandler.getParsedDate(iwc.getParameter(PARAMETER_FROM_DATE), iwc.getCurrentLocale())).getDate();
 		}
 
 		if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
-			toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
+			toDate = new IWTimestamp(IWDatePickerHandler.getParsedDate(iwc.getParameter(PARAMETER_TO_DATE), iwc.getCurrentLocale())).getDate();
 		}
 
 		if (iwc.isParameterSet(PARAMETER_SHOW_RESULTS)) {
@@ -196,17 +197,13 @@ public class CasesFetcher extends CasesBlock {
 			anonymous.keepStatusOnAction(true);
 			anonymous.setStyleClass("anonymousDropdown");
 			
-			IWTimestamp stamp = new IWTimestamp();
-
-			DateInput from = new DateInput(PARAMETER_FROM_DATE);
-			from.setStyleClass("dateInput");
+			IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
+			from.setUseCurrentDateIfNotSet(false);
 			from.keepStatusOnAction(true);
-			from.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 
-			DateInput to = new DateInput(PARAMETER_TO_DATE);
-			to.setStyleClass("dateInput");
+			IWDatePicker to = new IWDatePicker(PARAMETER_TO_DATE);
+			to.setUseCurrentDateIfNotSet(false);
 			to.keepStatusOnAction(true);
-			to.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -249,7 +246,6 @@ public class CasesFetcher extends CasesBlock {
 
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			element.setStyleClass("dateInput");
 			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
 			element.add(label);
 			element.add(from);
@@ -257,7 +253,6 @@ public class CasesFetcher extends CasesBlock {
 
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
-			element.setStyleClass("dateInput");
 			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
 			element.add(label);
 			element.add(to);
