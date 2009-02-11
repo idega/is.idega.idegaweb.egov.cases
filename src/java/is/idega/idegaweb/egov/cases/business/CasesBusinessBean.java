@@ -112,7 +112,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				Collection coll = getSubCategories(category);
 
 				if (!coll.isEmpty()) {
-					map.put(categoryPK, getLocalizedString("case_creator.select_sub_category", "Select sub category", locale));
+					map.put("", getLocalizedString("case_creator.select_sub_category", "Select sub category", locale));
 
 					Iterator iter = coll.iterator();
 					while (iter.hasNext()) {

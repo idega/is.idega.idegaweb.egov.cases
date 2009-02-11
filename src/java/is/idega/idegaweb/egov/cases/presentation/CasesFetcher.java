@@ -174,8 +174,8 @@ public class CasesFetcher extends CasesBlock {
 						CaseCategory subCategory = (CaseCategory) iter.next();
 						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 					}
+					subCategories.setMenuElementFirst("", getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
 				}
-				subCategories.setMenuElementFirst("", "");
 			}
 
 			DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE), getCasesBusiness().getCaseTypes(), "getName");
