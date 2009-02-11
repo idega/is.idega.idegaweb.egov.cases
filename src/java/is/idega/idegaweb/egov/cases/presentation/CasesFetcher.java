@@ -129,6 +129,8 @@ public class CasesFetcher extends CasesBlock {
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CasesBusiness.js");
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleURIToScriptsFolder() + "tablesorter/jquery.metadata.js");
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleURIToScriptsFolder() + "tablesorter/jquery.tablesorter.min.js");
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getBundle().getVirtualPathWithFileNameString("javascript/egov_cases.js"));
 
 			Form form = new Form();
@@ -270,7 +272,7 @@ public class CasesFetcher extends CasesBlock {
 			clearLayer.setStyleClass("Clear");
 			section.add(clearLayer);
 
-			if (cases != null && cases.size() > 0) {
+			if (cases != null) {
 				form.add(getPrintouts(iwc));
 				form.add(getFileTable(iwc));
 			}
@@ -290,14 +292,6 @@ public class CasesFetcher extends CasesBlock {
 		table.setStyleClass("ruler");
 		table.setStyleClass("adminTable");
 		table.setID("casesFetcher");
-
-		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery-1.2.1.pack.js");
-		super.getParentPage().addJavascriptURL(getBundle().getResourcesPath() + "/js/jquery.tablesorter.pack.js");
-
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("$(document).ready(function() { $('#casesFetcher').tablesorter( { headers: { 1: { sorter: false }, " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false } }, sortList: [[0,1]] } ); } );");
-
-		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -335,12 +329,12 @@ public class CasesFetcher extends CasesBlock {
 		}
 		cell.add(new Text(getResourceBundle().getLocalizedString("status", "Status")));
 
-		cell = row.createHeaderCell();
-		cell.setStyleClass("view");
 		if (getResponsePage() != null) {
+			cell = row.createHeaderCell();
+			cell.setStyleClass("view");
 			cell.setStyleClass("lastColumn");
+			cell.add(Text.getNonBrakingSpace());
 		}
-		cell.add(Text.getNonBrakingSpace());
 
 		group = table.createBodyRowGroup();
 		int iRow = 1;
@@ -351,6 +345,9 @@ public class CasesFetcher extends CasesBlock {
 			CaseCategory category = theCase.getCaseCategory();
 			CaseType type = theCase.getCaseType();
 			CaseStatus status = theCase.getCaseStatus();
+			if (status.equals(getCasesBusiness().getCaseStatusDeleted())) {
+				continue;
+			}
 			User user = theCase.getOwner();
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
 			row = group.createRow();

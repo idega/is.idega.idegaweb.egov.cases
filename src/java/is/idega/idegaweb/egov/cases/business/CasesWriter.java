@@ -238,6 +238,9 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			CaseCategory category = element.getCaseCategory();
 			CaseType type = element.getCaseType();
 			CaseStatus status = element.getCaseStatus();
+			if (status.equals(getBusiness(iwc).getCaseStatusDeleted())) {
+				continue;
+			}
 			User user = element.getOwner();
 			IWTimestamp created = new IWTimestamp(element.getCreated());
 
