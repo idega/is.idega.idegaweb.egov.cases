@@ -273,6 +273,8 @@ function searchForCases(parameters) {
 		allowPDFSigning = gridOpener.attr('allowpdfsigning') == 'true';
 		hideEmptySection = gridOpener.attr('hideEmptySection') == 'true';
 	}
+	var showCaseNumberColumn = jQuery('div.casesListHeadersContainerItemCaseNumber').length == 0 ? false : true;
+	var showCaseCreationDateColumn = jQuery('div.casesListHeadersContainerItemCreatedDate').length == 0 ? false : true;
 	
 	CasesListHelper.processVariables = [];
 	CasesListHelper.addVariables();
@@ -280,7 +282,8 @@ function searchForCases(parameters) {
 	showLoadingMessage(parameters[7]);
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
-																		allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection), {
+																		allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection,
+																		showCaseNumberColumn, showCaseCreationDateColumn), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -354,7 +357,7 @@ function removePreviousSearchResults(className) {
 }
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
-										allowPDFSigning, showStatistics, processVariables, hideEmptySection) {
+										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCaseCreationDateColumn) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -370,6 +373,9 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.hideEmptySection = hideEmptySection;
 	
 	this.processVariables = processVariables;
+	
+	this.showCaseNumberColumn = showCaseNumberColumn;
+	this.showCaseCreationDateColumn = showCaseCreationDateColumn;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
