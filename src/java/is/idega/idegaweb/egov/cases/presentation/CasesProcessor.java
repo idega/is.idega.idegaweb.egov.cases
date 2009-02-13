@@ -74,7 +74,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	private int page = 1;
 	
 	private boolean showCaseNumberColumn = true;
-	private boolean showCaseCreationDateColumn = true;
+	private boolean showCreationTimeInDateColumn = true;
 	
 	protected abstract String getBlockID();
 	
@@ -200,7 +200,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		list.setComponentId(topLayer.getId());
 		list.setInstanceId(getBuilderService(iwc).getInstanceId(this));
 		list.setShowCaseNumberColumn(isShowCaseNumberColumn());
-		list.setShowCaseCreationDateColumn(isShowCaseCreationDateColumn());
+		list.setShowCreationTimeInDateColumn(isShowCreationTimeInDateColumn());
 		
 		form.add(list);
 				
@@ -508,11 +508,12 @@ public abstract class CasesProcessor extends CasesBlock {
 		this.showCaseNumberColumn = showCaseNumberColumn;
 	}
 
-	public boolean isShowCaseCreationDateColumn() {
-		return showCaseCreationDateColumn;
+	public boolean isShowCreationTimeInDateColumn() {
+		return showCreationTimeInDateColumn;
 	}
 
-	public void setShowCaseCreationDateColumn(boolean showCaseCreationDateColumn) {
-		this.showCaseCreationDateColumn = showCaseCreationDateColumn;
+	public void setShowCreationTimeInDateColumn(boolean showCreationTimeInDateColumn) {
+		this.showCreationTimeInDateColumn = showCreationTimeInDateColumn;
 	}
+
 }

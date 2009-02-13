@@ -130,10 +130,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Description
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
 
-		if (properties.isShowCaseCreationDateColumn()) {
-			//	Creation date
-			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("created_date", "Created date")), headerItem, "CreatedDate");
-		}
+		//	Creation date
+		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("created_date", "Created date")), headerItem, "CreatedDate");
 		
 		//	Status
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
@@ -260,13 +258,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
 
-		if (properties.isShowCaseCreationDateColumn()) {
-			//	Creation date
-			Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
-			creationDateContainer.add(new Text(created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT)));
-			if (theCase.isBpm()) {
-				prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, properties);
-			}
+		//	Creation date
+		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
+		if (properties.isShowCreationTimeInDateColumn()) {
+			creationDateContainer.setStyleClass("showOnlyDateValueForCaseInCasesListRow");
+		}
+		creationDateContainer.add(new Text(properties.isShowCreationTimeInDateColumn() ? created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT) :
+			created.getLocaleDate(l, IWTimestamp.SHORT)));
+		if (theCase.isBpm()) {
+			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, properties);
 		}
 
 		//	Status
