@@ -73,6 +73,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	private int page = 1;
 	
+	private boolean showCaseNumberColumn = true;
+	private boolean showCaseCreationDateColumn = true;
+	
 	protected abstract String getBlockID();
 	
 	@Override
@@ -196,6 +199,8 @@ public abstract class CasesProcessor extends CasesBlock {
 		list.setPage(getPage());
 		list.setComponentId(topLayer.getId());
 		list.setInstanceId(getBuilderService(iwc).getInstanceId(this));
+		list.setShowCaseNumberColumn(isShowCaseNumberColumn());
+		list.setShowCaseCreationDateColumn(isShowCaseCreationDateColumn());
 		
 		form.add(list);
 				
@@ -493,5 +498,21 @@ public abstract class CasesProcessor extends CasesBlock {
 
 	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
 		this.caseManagersProvider = caseManagersProvider;
-	}	
+	}
+
+	public boolean isShowCaseNumberColumn() {
+		return showCaseNumberColumn;
+	}
+
+	public void setShowCaseNumberColumn(boolean showCaseNumberColumn) {
+		this.showCaseNumberColumn = showCaseNumberColumn;
+	}
+
+	public boolean isShowCaseCreationDateColumn() {
+		return showCaseCreationDateColumn;
+	}
+
+	public void setShowCaseCreationDateColumn(boolean showCaseCreationDateColumn) {
+		this.showCaseCreationDateColumn = showCaseCreationDateColumn;
+	}
 }
