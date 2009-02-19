@@ -19,7 +19,7 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/itextpdf/jars/itext-paulo-139.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.block.text">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.text-3.1.2.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4.jar">
   </classpathentry>

@@ -6,7 +6,6 @@
   </comment>
   <projects>
     <project>is.idega.idegaweb.egov.message</project>
-    <project>com.idega.block.text</project>
   </projects>
   <buildSpec>
     <buildCommand>
