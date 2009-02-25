@@ -132,6 +132,7 @@ public class CasesFetcher extends CasesBlock {
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleURIToScriptsFolder() + "tablesorter/jquery.metadata.js");
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleURIToScriptsFolder() + "tablesorter/jquery.tablesorter.min.js");
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getBundle().getVirtualPathWithFileNameString("javascript/egov_cases.js"));
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getBundle().getVirtualPathWithFileNameString("javascript/tablesorter.js"));
 
 			Form form = new Form();
 			form.setID("casesFetcher");
