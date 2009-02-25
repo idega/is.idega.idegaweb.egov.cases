@@ -42,6 +42,7 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
@@ -488,10 +489,10 @@ public class CaseViewer extends CaseCreator {
 
 		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
 
-		super.getParentPage().addJavascriptURL("/dwr/interface/CasesDWRUtil.js");
-		super.getParentPage().addJavascriptURL("/dwr/engine.js");
-		super.getParentPage().addJavascriptURL("/dwr/util.js");
-		super.getParentPage().addJavascriptURL(iwb.getResourcesVirtualPath() + "/js/navigation.js");
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CasesBusiness.js");
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, iwb.getVirtualPathWithFileNameString("js/navigation.js"));
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");

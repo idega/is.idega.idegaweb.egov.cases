@@ -6,6 +6,7 @@
 		<create creator="ibo" javascript="CasesBusiness" scope="application">
 			<param name="class" value="is.idega.idegaweb.egov.cases.business.CasesBusiness" />
 			<include method="getAllSubCategories" />
+			<include method="getUsers" />
 			<include method="useTypes" />
 		</create>
 	</allow>
