@@ -43,6 +43,7 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.Group;
 import com.idega.user.presentation.GroupChooser;
+import com.idega.util.PresentationUtil;
 
 
 public class CaseCategoryEditor extends CasesBlock {
@@ -430,11 +431,11 @@ public class CaseCategoryEditor extends CasesBlock {
 		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.name_not_empty", "You must provide a name for the case category."));
+			PresentationUtil.addJavascriptAlertOnLoad(iwc, getResourceBundle().getLocalizedString("case_category.name_not_empty", "You must provide a name for the case category."));
 			return false;
 		}
 		if (groupPK == null || groupPK.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_category.group_not_empty", "You must select a handler group for the case category."));
+			PresentationUtil.addJavascriptAlertOnLoad(iwc, getResourceBundle().getLocalizedString("case_category.group_not_empty", "You must select a handler group for the case category."));
 			return false;
 		}
 		if (groupPK.indexOf("_") != -1) {
@@ -461,7 +462,7 @@ public class CaseCategoryEditor extends CasesBlock {
 			getCasesBusiness().removeCaseCategory(caseCategoryPK);
 		}
 		catch (RemoveException re) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_category_failed", "You can't remove a case category that already has cases connected to it."));
+			PresentationUtil.addJavascriptAlertOnLoad(iwc, getResourceBundle().getLocalizedString("remove_case_category_failed", "You can't remove a case category that already has cases connected to it."));
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();

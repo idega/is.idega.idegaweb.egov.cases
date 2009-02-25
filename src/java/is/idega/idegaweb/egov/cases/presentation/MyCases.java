@@ -375,7 +375,9 @@ public class MyCases extends CasesProcessor {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
 
-		super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
+		if (getParentPage() != null) {
+			super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
+		}
 	}
 	
 	@Override

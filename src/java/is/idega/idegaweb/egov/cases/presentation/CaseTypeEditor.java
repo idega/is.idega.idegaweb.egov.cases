@@ -35,6 +35,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
+import com.idega.util.PresentationUtil;
 
 
 public class CaseTypeEditor extends CasesBlock {
@@ -267,7 +268,7 @@ public class CaseTypeEditor extends CasesBlock {
 		int order = iwc.isParameterSet(PARAMETER_ORDER) ? Integer.parseInt(iwc.getParameter(PARAMETER_ORDER)) : -1;
 		
 		if (name == null || name.length() == 0) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("case_type.name_not_empty", "You must provide a name for the case type."));
+			PresentationUtil.addJavascriptAlertOnLoad(iwc, getResourceBundle().getLocalizedString("case_type.name_not_empty", "You must provide a name for the case type."));
 			return false;
 		}
 		
@@ -290,7 +291,7 @@ public class CaseTypeEditor extends CasesBlock {
 			getCasesBusiness().removeCaseType(caseTypePK);
 		}
 		catch (RemoveException re) {
-			getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("remove_case_type_failed", "You can't remove a case type that already has cases connected to it."));
+			PresentationUtil.addJavascriptAlertOnLoad(iwc, getResourceBundle().getLocalizedString("remove_case_type_failed", "You can't remove a case type that already has cases connected to it."));
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
