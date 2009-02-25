@@ -359,6 +359,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		@SuppressWarnings("unchecked")
 		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
+		users.setID(PARAMETER_USER);
 
 		for (User handler : handlers)
 			users.addMenuElement(handler.getPrimaryKey().toString(), handler.getName());
