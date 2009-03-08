@@ -15,7 +15,7 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 		CASE_GRID_STRING_LOADING_PLEASE_WAIT = localizations[2];				//	2
 	}
 	
-	DWREngine.setErrorHandler(function(message, exception) {
+	dwr.engine.setErrorHandler(function(message, exception) {
 		closeAllLoadingMessages();
 		
 		var loadingLabels = jQuery('div.loading');
@@ -242,21 +242,21 @@ function searchForCases(parameters) {
 	var dateRangeId = parameters[6];
 	var showStatisticsId = parameters[12];
 	
-	var caseNumberValue = DWRUtil.getValue(caseNumberId);
-	var caseDescriptionValue = DWRUtil.getValue(caseDescriptionId);
-	var nameValue = DWRUtil.getValue(nameId);
-	var personalIdValue = DWRUtil.getValue(personalId);
-	var processValue = DWRUtil.getValue(processId);
+	var caseNumberValue = dwr.util.getValue(caseNumberId);
+	var caseDescriptionValue = dwr.util.getValue(caseDescriptionId);
+	var nameValue = dwr.util.getValue(nameId);
+	var personalIdValue = dwr.util.getValue(personalId);
+	var processValue = dwr.util.getValue(processId);
 	if (processValue == '' || processValue == -1) {
 		processValue = null;
 	}
-	var statusValue = DWRUtil.getValue(statusId);
+	var statusValue = dwr.util.getValue(statusId);
 	if (statusValue == '' || statusValue == -1) {
 		statusValue = null;
 	}
-	var dateRangeValue = DWRUtil.getValue(dateRangeId);
-	var caseListType = DWRUtil.getValue(parameters[9]);
-	var contact = DWRUtil.getValue(parameters[10]);
+	var dateRangeValue = dwr.util.getValue(dateRangeId);
+	var caseListType = dwr.util.getValue(parameters[9]);
+	var contact = dwr.util.getValue(parameters[10]);
 	var showStatistics = jQuery('#' + showStatisticsId).attr('checked');
 	if (!showStatistics) {
 		showStatistics = false;
@@ -325,19 +325,23 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 }
 
 function clearSearchForCases(parameters) {
-	DWRUtil.setValue(parameters[1], '');
-	DWRUtil.setValue(parameters[8], '');
-	DWRUtil.setValue(parameters[2], '');
-	DWRUtil.setValue(parameters[3], '');
-	DWRUtil.setValue(parameters[4], '-1');
-	DWRUtil.setValue(parameters[5], '-1');
-	DWRUtil.setValue(parameters[6], '');
-	DWRUtil.setValue(parameters[10], '');
-	jQuery('#' + parameters[12]).attr('checked', false);
-	
-	CasesListHelper.closeVariablesWindow();
-	
-	setDisplayPropertyToAllCasesLists(parameters[0], true);
+	CasesEngine.clearSearchResults({
+		callback: function(result) {
+			dwr.util.setValue(parameters[1], '');
+			dwr.util.setValue(parameters[8], '');
+			dwr.util.setValue(parameters[2], '');
+			dwr.util.setValue(parameters[3], '');
+			dwr.util.setValue(parameters[4], '-1');
+			dwr.util.setValue(parameters[5], '-1');
+			dwr.util.setValue(parameters[6], '');
+			dwr.util.setValue(parameters[10], '');
+			jQuery('#' + parameters[12]).attr('checked', false);
+			
+			CasesListHelper.closeVariablesWindow();
+			
+			setDisplayPropertyToAllCasesLists(parameters[0], true);
+		}
+	});
 }
 
 function removePreviousSearchResults(className) {
@@ -406,7 +410,7 @@ CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
 	CasesListHelper.closeVariablesWindow();
 	
 	var windowId = '#processDefinitionVariablesWindow';
-	var processDefinitionId = DWRUtil.getValue(chooserId);
+	var processDefinitionId = dwr.util.getValue(chooserId);
 	
 	if (processDefinitionId == null || processDefinitionId == -1 || processDefinitionId == '') {
 		jQuery(windowId).hide('fast');
@@ -446,7 +450,7 @@ CasesListHelper.closeVariablesWindow = function() {
 
 CasesListHelper.addVariableInput = function() {
 	var chooserId = 'availableVariablesForProcess';
-	if (chooserId == null || DWRUtil.getValue(chooserId) == -1) {
+	if (chooserId == null || dwr.util.getValue(chooserId) == -1) {
 		return false;
 	}
 	
@@ -486,7 +490,7 @@ CasesListHelper.addVariableInput = function() {
 	var options = {
 		className: isDateField ? 'com.idega.presentation.ui.IWDatePicker' : 'com.idega.presentation.ui.TextInput',
 		properties: [{id: 'setId', value: id}, {id: 'setStyleClass', value: 'variableValueField'}, {id: isDateField ? 'setInputName' : 'setName',
-					value: DWRUtil.getValue(chooserId)},
+					value: dwr.util.getValue(chooserId)},
 					{id: 'setOnKeyUp', value: 'if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;'}],
 		container: id2,
 		callback: function() {
