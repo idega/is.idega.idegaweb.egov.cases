@@ -380,6 +380,10 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.showCaseNumberColumn = showCaseNumberColumn;
 	this.showCreationTimeInDateColumn = showCreationTimeInDateColumn;
+	
+	this.showCheckBoxesForCases = false;	//	TODO
+	this.componentId = null;
+	this.uuid = null;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {

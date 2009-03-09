@@ -346,7 +346,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private boolean isSearchResultsList(String caseProcessorType) {
-		return CasesConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
+		return ProcessConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
 	}
 	
 	private Layer getCasesListContainer(boolean searchResults) {
@@ -369,7 +369,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		List<AdvancedProperty> searchCriterias = (List<AdvancedProperty>) o;
-		iwc.removeSessionAttribute(GeneralCasesListBuilder.USER_CASES_SEARCH_QUERY_BEAN_ATTRIBUTE);
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
