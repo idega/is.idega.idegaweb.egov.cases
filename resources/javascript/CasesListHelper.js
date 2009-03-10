@@ -265,6 +265,7 @@ function searchForCases(parameters) {
 	var usePDFDownloadColumn = true;
 	var allowPDFSigning = true;
 	var hideEmptySection = false;
+	var instanceId = null;
 	var gridOpeners = jQuery('div.' + parameters[11]);
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
@@ -272,6 +273,8 @@ function searchForCases(parameters) {
 		usePDFDownloadColumn = gridOpener.attr('usepdfdownloadcolumn') == 'true';
 		allowPDFSigning = gridOpener.attr('allowpdfsigning') == 'true';
 		hideEmptySection = gridOpener.attr('hideEmptySection') == 'true';
+		
+		instanceId = jQuery('input.casesListInstanceIdProperty').attr('value');
 	}
 	var showCaseNumberColumn = jQuery('div.casesListHeadersContainerItemCaseNumber').length == 0 ? false : true;
 	var showCreationTimeInDateColumn = jQuery('div.showOnlyDateValueForCaseInCasesListRow').length == 0 ? false : true;
@@ -283,7 +286,7 @@ function searchForCases(parameters) {
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
 																		allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection,
-																		showCaseNumberColumn, showCreationTimeInDateColumn), {
+																		showCaseNumberColumn, showCreationTimeInDateColumn, instanceId), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -325,7 +328,7 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 }
 
 function clearSearchForCases(parameters) {
-	CasesEngine.clearSearchResults({
+	CasesEngine.clearSearchResults(window.location.pathname, {
 		callback: function(result) {
 			dwr.util.setValue(parameters[1], '');
 			dwr.util.setValue(parameters[8], '');
@@ -350,18 +353,38 @@ function removePreviousSearchResults(className) {
 		return false;
 	}
 	
+	var uuid = null;
+	var container = null;
+	
 	var caseList = null;
 	for (var i = 0; i < casesLists.length; i++) {
 		caseList = jQuery(casesLists[i]);
 	
 		if (caseList.attr('searchresult') == 'true') {
+			container = jQuery('input.casesListInstanceIdProperty').parent().parent().parent().attr('id');
+			uuid = jQuery('input.casesListInstanceIdProperty').attr('value');
 			caseList.remove();
 		}
+	}
+	
+	casesLists = jQuery('div.' + className);
+	if (casesLists == null || casesLists.length == 0) {
+		if (uuid == null || container == null) {
+			reloadPage();
+			return false;
+		}
+		
+		showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
+		IWCORE.renderComponent(uuid, container, function() {
+			closeAllLoadingMessages();
+			continueInitializeCasesList(null);
+		}, null);
 	}
 }
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
-										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn) {
+										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
+										instanceId) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -381,9 +404,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.showCaseNumberColumn = showCaseNumberColumn;
 	this.showCreationTimeInDateColumn = showCreationTimeInDateColumn;
 	
-	this.showCheckBoxesForCases = false;	//	TODO
-	this.componentId = null;
-	this.uuid = null;
+	this.id = window.location.pathname;
+	this.instanceId = instanceId;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
@@ -543,7 +565,7 @@ CasesListHelper.resetVariablesAndAddNewOne = function() {
 
 CasesListHelper.exportSearchResults = function(message) {
 	showLoadingMessage(message);
-	CasesEngine.getExportedSearchResults({
+	CasesEngine.getExportedSearchResults(window.location.pathname, {
 		callback: function(result) {
 			if (result.id != 'true') {
 				closeAllLoadingMessages();

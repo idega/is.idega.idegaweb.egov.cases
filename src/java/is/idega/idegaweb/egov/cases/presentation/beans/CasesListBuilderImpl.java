@@ -58,6 +58,7 @@ import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
@@ -397,6 +398,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
+	
+	
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {		
 		int pageSize = properties.getPageSize();
 		int page = properties.getPage();
@@ -416,6 +419,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		boolean searchResults = isSearchResultsList(type);
 		Layer container = getCasesListContainer(searchResults);
 
+		addProperties(container, properties);
+		
 		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 
 		if (pageSize > 0 && instanceId != null && componentId != null && totalCases > 0) {
@@ -492,6 +497,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		statisticsContainer.add(getCasesStatistics(iwc, cases));
 	}
 	
+	private void addProperties(Layer container, CaseListPropertiesBean properties) {
+		container.getId();
+		
+		if (!StringUtil.isEmpty(properties.getInstanceId())) {
+			HiddenInput input = new HiddenInput("casesListInstanceIdProperty", properties.getInstanceId());
+			input.setStyleClass("casesListInstanceIdProperty");
+			container.add(input);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public UIComponent getUserCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, Map pages, CaseListPropertiesBean properties) {
 		int pageSize = properties.getPageSize();
@@ -511,6 +526,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean searchResults = isSearchResultsList(type);
 		Layer container = getCasesListContainer(searchResults);
+		
+		addProperties(container, properties);
 		
 		if (pageSize > 0 && instanceId != null && componentId != null) {
 			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(
