@@ -13,9 +13,7 @@ public interface BoardCasesManager {
 	
 	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, IWResourceBundle iwrb, String caseStatus);
 	
-	public boolean setCaseVariableValue(Integer caseId, String variableName, String value);
-	
-	public String getVariableValueInput(Integer caseId, String variableName, String currentValue);
+	public String setCaseVariableValue(Integer caseId, String variableName, String value);
 	
 	public String getLinkToTheTask(IWContext iwc, CaseBoardBean boardCase);
 	

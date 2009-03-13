@@ -231,7 +231,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		buttonsContainer.setStyleClass("casesBoardViewerContainer");
 		
 		GenericButton exportToExcel = new GenericButton(iwrb.getLocalizedString("cases_board_viewer.export_cases_list_to_excel", "Export to Excel"));
-		buttonsContainer.add(exportToExcel);
+		//buttonsContainer.add(exportToExcel);	//	TODO: finish up!
 		exportToExcel.setOnClick(new StringBuilder("humanMsg.displayMsg('").append(iwrb.getLocalizedString("cases_board_viewer.exporting_cases_list_to_excel",
 				"Exporting to Excel")).append("');window.location.href='").append(getUriToExcelExporter(iwc)).append("';").toString());
 	}

@@ -30,6 +30,7 @@ import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.URIUtil;
@@ -231,20 +232,25 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		return variables;
 	}
 	
-	public boolean setCaseVariableValue(Integer caseId, String variableName, String value) {
+	public String setCaseVariableValue(Integer caseId, String variableName, String value) {
 		if (caseId == null || StringUtil.isEmpty(variableName) || StringUtil.isEmpty(value)) {
-			return false;
-		}
-		
-		return true;	//	TODO
-	}
-
-	public String getVariableValueInput(Integer caseId, String variableName, String currentValue) {
-		if (caseId == null || StringUtil.isEmpty(variableName)) {
 			return null;
 		}
 		
-		return null;	//	TODO
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null || !iwc.isLoggedOn()) {	//	TODO: check role?
+			return null;
+		}
+		
+		try {
+			if (getCaseManager().setCaseVariable(getCasesBusiness(iwc).getCase(caseId), variableName, value)) {
+				return value;
+			}
+		} catch(Exception e) {
+			LOGGER.log(Level.SEVERE, "Error saving variable '"+variableName+"' with value '"+value+"' for case: " + caseId, e);
+		}
+		
+		return null;
 	}
 
 	public String getLinkToTheTask(IWContext iwc, CaseBoardBean boardCase) {
