@@ -175,14 +175,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 		for (int i = 0; i < CASE_FIELDS.size(); i++) {
 			TableCell2 footerCell = footerRow.createCell();
 			
-			if (i == CASE_FIELDS.size() - 5) {
+			if (i == CASE_FIELDS.size() - 4) {
 				//	SUMs label
 				footerCell.add(new Text(new StringBuilder(iwrb.getLocalizedString("case_board_viewer.total_sum", "Total")).append(CoreConstants.COLON)
 						.toString()));
-			} else if (i == CASE_FIELDS.size() - 4) {
+			} else if (i == CASE_FIELDS.size() - 3) {
 				//	Grant amount suggestions
 				footerCell.add(new Text(String.valueOf(grantAmountSuggestionTotal)));
-			} else if (i == CASE_FIELDS.size() - 3) {
+			} else if (i == CASE_FIELDS.size() - 2) {
 				//	Board amount
 				footerCell.add(new Text(String.valueOf(boardAmountTotal)));
 			}

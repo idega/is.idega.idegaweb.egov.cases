@@ -156,6 +156,8 @@ public class CaseBoardBean {
 			
 			allValues.add(getNutshell());
 			
+			allValues.add(getComment());
+			
 			allValues.add(getCategory());
 			
 			allValues.add(getOwnerGrade());

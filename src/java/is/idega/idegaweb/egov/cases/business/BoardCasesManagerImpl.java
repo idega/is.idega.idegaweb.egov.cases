@@ -125,7 +125,7 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 	}
 	
 	private String getStringValue(String value) {
-		if (StringUtil.isEmpty(value) || "-1".equals(value)) {
+		if (StringUtil.isEmpty(value) || "no_value".equals(value)) {
 			return CoreConstants.EMPTY;
 		}
 		
@@ -297,8 +297,8 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 			return "0";
 		}
 		
-		double sum = 0;
-		Double gradeValue = null;
+		long sum = 0;
+		Long gradeValue = null;
 		for (String value: gradingValues) {
 			if (StringUtil.isEmpty(getStringValue(value))) {
 				continue;
@@ -306,7 +306,7 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 			
 			gradeValue = null;
 			try {
-				gradeValue = Double.valueOf(value);
+				gradeValue = Long.valueOf(value);
 			} catch(Exception e) {
 				LOGGER.warning("Unable to convert '" + value + "' to number!");
 			}
