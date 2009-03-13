@@ -113,13 +113,13 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		boardCase.setAppliedAmount(String.valueOf(getNumberValue(values.get(5))));
 		
 		boardCase.setNutshell(getStringValue(values.get(6)));
+		//	Grading sums should be 7
+		boardCase.setCategory(getStringValue(values.get(8)));
 		
-		boardCase.setCategory(getStringValue(values.get(7)));
-		
-		boardCase.setComment(getStringValue(values.get(8)));
-		boardCase.setGrantAmountSuggestion(getNumberValue(values.get(9)));
-		boardCase.setBoardAmount(getNumberValue(values.get(10)));
-		boardCase.setRestrictions(getStringValue(values.get(11)));
+		boardCase.setComment(getStringValue(values.get(9)));
+		boardCase.setGrantAmountSuggestion(getNumberValue(values.get(10)));
+		boardCase.setBoardAmount(getNumberValue(values.get(11)));
+		boardCase.setRestrictions(getStringValue(values.get(12)));
 	
 		return boardCase;
 	}
@@ -247,7 +247,6 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		return null;	//	TODO
 	}
 
-	//	TODO: remove hardcoding
 	public String getLinkToTheTask(IWContext iwc, CaseBoardBean boardCase) {
 		if (iwc == null || boardCase == null) {
 			return null;

@@ -43,6 +43,11 @@
 				<property-resolver>com.idega.block.process.business.CaseStatusHandler</property-resolver>
 			</property-extension>
 		</property>
+		<property>
+			<display-name>Users role</display-name>
+			<property-name>role</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

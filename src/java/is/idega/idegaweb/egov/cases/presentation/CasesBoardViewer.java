@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.idegaweb.IWBundle;
@@ -35,6 +36,7 @@ import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.GenericButton;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
@@ -46,24 +48,29 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	private static final Logger LOGGER = Logger.getLogger(CasesBoardViewer.class.getName());
 	
+	private static final String EDITABLE_FIELD_TYPE_TEXT_INPUT = "textinput";
+	private static final String EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea";
+	private static final String EDITABLE_FIELD_TYPE_DROPDOWN = "select";
+	
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
-		new AdvancedProperty("string_ownerFullName", "Applicant"),
-		new AdvancedProperty("string_ownerPostCode", "Zip"),
-		new AdvancedProperty("string_caseIdentifier", "Case nr."),
-		new AdvancedProperty("string_caseDescription", "Description"),
+		new AdvancedProperty("string_ownerFullName", "Applicant"),						//	0
+		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	1
+		new AdvancedProperty("string_caseIdentifier", "Case nr."),						//	2
+		new AdvancedProperty("string_caseDescription", "Description"),					//	3
 		
-		new AdvancedProperty("string_ownerTotalCost", "Total cost"),
-		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),
+		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	4
+		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	5
 		
-		new AdvancedProperty("sum_all_grades", "Grade"),
-		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),
+		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),			//	6
 		
-		new AdvancedProperty("string_ownerProjectLead", "Category"),
+		new AdvancedProperty("sum_all_grades", "Grade"),								//	7
 		
-		new AdvancedProperty("string_ownerGrade", "Comment"),
-		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),
-		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),
-		new AdvancedProperty("string_ownerAnswer", "Restrictions")
+		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	8,	EDITABLE, select
+		
+		new AdvancedProperty("string_ownerGrade", "Comment"),							//	9
+		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	10
+		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	11,	EDITABLE, text input
+		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	12, EDITABLE, text area
 	));
 	
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
@@ -95,11 +102,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 		
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, web2.getBundleURIToJQueryLib());
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, web2.getBundleUriToHumanizedMessagesScript());
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, web2.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/BoardCasesManager.js");
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, bundle.getVirtualPathWithFileNameString("javascript/CasesBoardHelper.js"));
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
+		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/case.css"));
 		
 		Layer container = new Layer();
 		getChildren().add(container);
@@ -111,10 +120,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 		
 		addButtons(container, iwc, iwrb);
 		
-		String initAction = "CasesBoardHelper.initializeBoardCases();";
+		String initAction = new StringBuilder("CasesBoardHelper.initializeBoardCases({savingMessage: '")
+			.append(iwrb.getLocalizedString("case_board_viewer.saving_case_variable", "Saving...")).append("', select: '")
+			.append(iwrb.getLocalizedString("case_board_viewer.select_value", "Select")).append("'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
-			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
+			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
 		}
+		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 	}
 	
 	private void addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
@@ -140,6 +152,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		for (CaseBoardBean caseBoard: boardCases) {
 			TableRow row = body.createRow();
 			
+			row.getChildren().add(new HiddenInput("casesBoardViewerTableEditableCellCaseId", caseBoard.getCaseId()));
+			
 			int index = 0;
 			List<String> allValues = caseBoard.getAllValues();
 			for (String value: allValues) {
@@ -161,9 +175,20 @@ public class CasesBoardViewer extends IWBaseComponent {
 					boardAmountTotal += caseBoard.getBoardAmount();
 				}
 				
-				if (index == 6) {
+				if (index == 7) {
 					//	SUMs for grading variables
 					bodyRowCell.add(new Text(boardCasesManager.getGradingSum(iwc, caseBoard)));
+				}
+				
+				//	Editable fields
+				if (index == 8) {
+					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_DROPDOWN);
+				}
+				if (index == 11) {
+					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+				}
+				if (index == 12) {
+					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_AREA);
 				}
 				
 				index++;
@@ -187,6 +212,17 @@ public class CasesBoardViewer extends IWBaseComponent {
 				footerCell.add(new Text(String.valueOf(boardAmountTotal)));
 			}
 		}
+		
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName")
+				.toString(), CASE_FIELDS.get(8).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName")
+				.toString(), CASE_FIELDS.get(11).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName")
+				.toString(), CASE_FIELDS.get(12).getId()));
+	}
+	
+	private void makeCellEditable(TableCell2 cell, String type) {
+		cell.setStyleClass(new StringBuilder("casesBoardViewerTableEditableCell").append(type).toString());
 	}
 	
 	private void addButtons(Layer container, IWContext iwc, IWResourceBundle iwrb) {
