@@ -453,7 +453,6 @@ table.casesBoardViewerTable {
 table.casesBoardViewerTable th, td {
 	border-style: solid;
     margin: 0;
-    padding: 4px;
     border-width: 1px 1px 0 0;
 }
 
@@ -490,4 +489,8 @@ tr.odd {
 
 .casesBoardViewerTableEditableCellselect:HOVER {
 	background-color: transparent url(../images/text-edit.png) no-repeat scroll left top;
+}
+
+.casesBoardViewerTableWiderCell {
+	width: 150px;
 }

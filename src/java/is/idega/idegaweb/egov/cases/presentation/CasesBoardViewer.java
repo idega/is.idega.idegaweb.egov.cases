@@ -32,6 +32,7 @@ import com.idega.presentation.Table2;
 import com.idega.presentation.TableBodyRowGroup;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableFooterRowGroup;
+import com.idega.presentation.TableHeaderCell;
 import com.idega.presentation.TableHeaderRowGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.text.Heading3;
@@ -154,8 +155,16 @@ public class CasesBoardViewer extends IWBaseComponent {
 		
 		TableHeaderRowGroup header = table.createHeaderRowGroup();
 		TableRow headerRow = header.createRow();
+		int index = 0;
 		for (String headerLabel: data.getHeaderLabels()) {
-			headerRow.createHeaderCell().add(new Text(headerLabel));
+			TableHeaderCell headerCell = headerRow.createHeaderCell();
+			headerCell.add(new Text(headerLabel));
+			
+			if (index == 6 || index == 12) {
+				headerCell.setStyleClass("casesBoardViewerTableWiderCell");
+			}
+			
+			index++;
 		}
 
 		int rowsIndex = 0;
@@ -167,7 +176,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			row.setId(rowBean.getId());
 			row.setStyleClass(rowsIndex % 2 == 0 ? "even" : "odd");
 			
-			int index = 0;
+			index = 0;
 			for (String value: rowBean.getValues()) {
 				TableCell2 bodyRowCell = row.createCell();
 				
