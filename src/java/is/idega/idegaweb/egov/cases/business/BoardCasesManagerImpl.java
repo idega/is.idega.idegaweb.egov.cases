@@ -212,7 +212,13 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 	}
 	
 	private Collection<Case> getCasesByProcessAndCaseStatus(IWApplicationContext iwac, String caseStatus, String processName) {
-		Collection<Long> casesIdsByProcessDefinition = getCaseManager().getCasesIdsByProcessDefinitionName(processName);
+		CaseManager caseManager = getCaseManager();
+		if (caseManager == null) {
+			LOGGER.severe(CaseManager.class + " bean was not initialized!");
+			return null;
+		}
+		
+		Collection<Long> casesIdsByProcessDefinition = caseManager.getCasesIdsByProcessDefinitionName(processName);
 		if (ListUtil.isEmpty(casesIdsByProcessDefinition)) {
 			return null;
 		}
