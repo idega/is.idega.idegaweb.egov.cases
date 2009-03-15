@@ -2,10 +2,10 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
 import is.idega.idegaweb.egov.cases.media.CasesBoardViewerExporter;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,9 +15,11 @@ import javax.faces.context.FacesContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
+import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
@@ -39,7 +41,6 @@ import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
-import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
@@ -74,6 +75,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	));
 	
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
+	public static final String CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER = "casesBoardViewerProcessNameParameter";
 	
 	@Autowired
 	private BoardCasesManager boardCasesManager;
@@ -81,8 +83,12 @@ public class CasesBoardViewer extends IWBaseComponent {
 	@Autowired
 	private Web2Business web2;
 	
+	@Autowired
+	private BuilderLogicWrapper builderLogicWrapper;
+	
 	private String caseStatus;
-	private String role;
+	private String roleKey;
+	private String processName;
 	
 	@Override
 	protected void initializeComponent(FacesContext context) {
@@ -91,8 +97,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (!iwc.isLoggedOn()) {
 			LOGGER.warning("User must be logged to see cases!");
 		}
-		if (!StringUtil.isEmpty(role) && !iwc.hasRole(role)) {
-			LOGGER.warning("User must have role '" + role + "' to see cases!");
+		if (!StringUtil.isEmpty(roleKey) && !iwc.hasRole(roleKey)) {
+			LOGGER.warning("User must have role '" + roleKey + "' to see cases!");
 		}
 		
 		ELUtil.getInstance().autowire(this);
@@ -100,15 +106,20 @@ public class CasesBoardViewer extends IWBaseComponent {
 		IWBundle bundle = getBundle(context, CasesConstants.IW_BUNDLE_IDENTIFIER);
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, web2.getBundleURIToJQueryLib());
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, web2.getBundleUriToHumanizedMessagesScript());
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, web2.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/BoardCasesManager.js");
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, bundle.getVirtualPathWithFileNameString("javascript/CasesBoardHelper.js"));
-		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
-		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/case.css"));
+		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+			web2.getBundleURIToJQueryLib(),
+			web2.getBundleUriToHumanizedMessagesScript(),
+			web2.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE),
+			web2.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
+			CoreConstants.DWR_ENGINE_SCRIPT,
+			CoreConstants.DWR_UTIL_SCRIPT,
+			"/dwr/interface/BoardCasesManager.js",
+			bundle.getVirtualPathWithFileNameString("javascript/CasesBoardHelper.js")
+		));
+		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
+			web2.getBundleUriToHumanizedMessagesStyleSheet(),
+			bundle.getVirtualPathWithFileNameString("style/case.css")
+		));
 		
 		Layer container = new Layer();
 		getChildren().add(container);
@@ -121,8 +132,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		addButtons(container, iwc, iwrb);
 		
 		String initAction = new StringBuilder("CasesBoardHelper.initializeBoardCases({savingMessage: '")
-			.append(iwrb.getLocalizedString("case_board_viewer.saving_case_variable", "Saving...")).append("', select: '")
-			.append(iwrb.getLocalizedString("case_board_viewer.select_value", "Select")).append("'});").toString();
+			.append(iwrb.getLocalizedString("case_board_viewer.saving_case_variable", "Saving...")).append("', remove: '")
+			.append(iwrb.getLocalizedString("case_board_viewer.remove_value", "Remove")).append("', edit: '")
+			.append(iwrb.getLocalizedString("case_board_viewer.edit_value", "Edit")).append("'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
 		}
@@ -130,9 +142,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 	
 	private void addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
-		List<CaseBoardBean> boardCases = boardCasesManager.getAllSortedCases(iwc, iwrb, caseStatus);
-		if (ListUtil.isEmpty(boardCases)) {
-			getChildren().add(new Heading3(iwrb.getLocalizedString("cases_board_viewer.no_cases_found", "There are no cases!")));
+		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName);
+		if (data == null || !data.isFilledWithData()) {
+			getChildren().add(new Heading3(data.getErrorMessage()));
 			return;
 		}
 		
@@ -142,42 +154,29 @@ public class CasesBoardViewer extends IWBaseComponent {
 		
 		TableHeaderRowGroup header = table.createHeaderRowGroup();
 		TableRow headerRow = header.createRow();
-		for (String headerLabel: getTableHeaders(iwrb)) {
+		for (String headerLabel: data.getHeaderLabels()) {
 			headerRow.createHeaderCell().add(new Text(headerLabel));
 		}
 
-		double grantAmountSuggestionTotal = 0;
-		double boardAmountTotal = 0;
+		int rowsIndex = 0;
 		TableBodyRowGroup body = table.createBodyRowGroup();
-		for (CaseBoardBean caseBoard: boardCases) {
+		body.setStyleClass("casesBoardViewerBodyRows");
+		String taskViewerPage = boardCasesManager.getPageUriForTaskViewer(iwc);
+		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			TableRow row = body.createRow();
-			
-			row.getChildren().add(new HiddenInput("casesBoardViewerTableEditableCellCaseId", caseBoard.getCaseId()));
+			row.setId(rowBean.getId());
+			row.setStyleClass(rowsIndex % 2 == 0 ? "even" : "odd");
 			
 			int index = 0;
-			List<String> allValues = caseBoard.getAllValues();
-			for (String value: allValues) {
+			for (String value: rowBean.getValues()) {
 				TableCell2 bodyRowCell = row.createCell();
 				
 				if (index == 2) {
 					//	Link to grading task
-					bodyRowCell.add(new Link(caseBoard.getCaseIdentifier(), boardCasesManager.getLinkToTheTask(iwc, caseBoard)));
+					bodyRowCell.add(new Link(rowBean.getCaseIdentifier(), boardCasesManager.getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage)));
 				}
 				else {
 					bodyRowCell.add(new Text(value));
-				}
-				
-				if (index == allValues.size() - 3) {
-					//	Calculating grant amount suggestions
-					grantAmountSuggestionTotal += caseBoard.getGrantAmountSuggestion();
-				} else if (index == allValues.size() - 2) {
-					//	Calculating board amounts
-					boardAmountTotal += caseBoard.getBoardAmount();
-				}
-				
-				if (index == 7) {
-					//	SUMs for grading variables
-					bodyRowCell.add(new Text(boardCasesManager.getGradingSum(iwc, caseBoard)));
 				}
 				
 				//	Editable fields
@@ -193,24 +192,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 				
 				index++;
 			}
+			
+			rowsIndex++;
 		}
 		
 		TableFooterRowGroup footer = table.createFooterRowGroup();
 		TableRow footerRow = footer.createRow();
-		for (int i = 0; i < CASE_FIELDS.size(); i++) {
-			TableCell2 footerCell = footerRow.createCell();
-			
-			if (i == CASE_FIELDS.size() - 4) {
-				//	SUMs label
-				footerCell.add(new Text(new StringBuilder(iwrb.getLocalizedString("case_board_viewer.total_sum", "Total")).append(CoreConstants.COLON)
-						.toString()));
-			} else if (i == CASE_FIELDS.size() - 3) {
-				//	Grant amount suggestions
-				footerCell.add(new Text(String.valueOf(grantAmountSuggestionTotal)));
-			} else if (i == CASE_FIELDS.size() - 2) {
-				//	Board amount
-				footerCell.add(new Text(String.valueOf(boardAmountTotal)));
-			}
+		for (String footerLabel: data.getFooterValues()) {
+			footerRow.createCell().add(new Text(footerLabel));
 		}
 		
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName")
@@ -219,6 +208,16 @@ public class CasesBoardViewer extends IWBaseComponent {
 				.toString(), CASE_FIELDS.get(11).getId()));
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName")
 				.toString(), CASE_FIELDS.get(12).getId()));
+		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
+		
+		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", builderLogicWrapper.getBuilderService(iwc).getInstanceId(this)));
+		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
+		
+		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter();").toString();
+		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
+		}
+		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 	}
 	
 	private void makeCellEditable(TableCell2 cell, String type) {
@@ -231,7 +230,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		buttonsContainer.setStyleClass("casesBoardViewerContainer");
 		
 		GenericButton exportToExcel = new GenericButton(iwrb.getLocalizedString("cases_board_viewer.export_cases_list_to_excel", "Export to Excel"));
-		//buttonsContainer.add(exportToExcel);	//	TODO: finish up!
+		buttonsContainer.add(exportToExcel);
 		exportToExcel.setOnClick(new StringBuilder("humanMsg.displayMsg('").append(iwrb.getLocalizedString("cases_board_viewer.exporting_cases_list_to_excel",
 				"Exporting to Excel")).append("');window.location.href='").append(getUriToExcelExporter(iwc)).append("';").toString());
 	}
@@ -243,17 +242,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (!StringUtil.isEmpty(caseStatus)) {
 			uri.append("&").append(CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).append("=").append(caseStatus);
 		}
+		if (!StringUtil.isEmpty(processName)) {
+			uri.append("&").append(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER).append("=").append(processName);
+		}
 		
 		return uri.toString();
-	}
-	
-	private List<String> getTableHeaders(IWResourceBundle iwrb) {
-		String prefix = "case_board_viewer.";
-		List<String> headers = new ArrayList<String>(CASE_FIELDS.size());
-		for (AdvancedProperty header: CASE_FIELDS) {
-			headers.add(iwrb.getLocalizedString(new StringBuilder(prefix).append(header.getId()).toString(), header.getValue()));
-		}
-		return headers;
 	}
 
 	public String getCaseStatus() {
@@ -264,12 +257,20 @@ public class CasesBoardViewer extends IWBaseComponent {
 		this.caseStatus = caseStatus;
 	}
 
-	public String getRole() {
-		return role;
+	public String getRoleKey() {
+		return roleKey;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setRoleKey(String roleKey) {
+		this.roleKey = roleKey;
+	}
+
+	public String getProcessName() {
+		return processName;
+	}
+
+	public void setProcessName(String processName) {
+		this.processName = processName;
 	}
 
 }

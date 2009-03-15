@@ -1,8 +1,9 @@
 if (CasesBoardHelper == null) var CasesBoardHelper = {};
 
 CasesBoardHelper.localizations = {
-	savingMessage: 'Saving...',
-	select:			'Select'
+	savingMessage:	'Saving...',
+	remove:			'Remove',
+	edit:			'Edit'
 };
 
 CasesBoardHelper.initializeBoardCases = function(localizations) {
@@ -10,31 +11,22 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect'), function() {
 		CasesBoardHelper.initializeEditableCell(jQuery(this), {
-			data:		"{'no_value': '"+CasesBoardHelper.localizations.select+"', 'A': 'A', 'B': 'B', 'C': 'C'}",
+			data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A': 'A', 'B': 'B', 'C': 'C'}",
 			type:		'select',
-			caseId:		'',
-			variable:	'',
-			tooltip:	CasesBoardHelper.localizations.select,
-			onblur:	'submit'
+			rerender:	true
 		}, 'select');
 	});
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput'), function() {
 		CasesBoardHelper.initializeEditableCell(jQuery(this), {
-			caseId:		'',
-			variable:	'',
-			tooltip:	'',
-			onblur:		'submit'
+			rerender:	true
 		}, 'textinput');
 	});
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextarea'), function() {
 		CasesBoardHelper.initializeEditableCell(jQuery(this), {
 			type:		'textarea',
-			caseId:		'',
-			variable:	'',
-			tooltip:	'',
-			onblur:		'submit'
+			rerender:	false
 		}, 'textarea');
 	});
 }
@@ -44,23 +36,55 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 		return;
 	}
 
-	settings.caseId = jQuery('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCellCaseId\']', cell.parent()).attr('value');
-	settings.variable = jQuery('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+'VariableName\']').attr('value');
+	var container = cell.parent().parent().parent().parent();
+	var rowId = cell.parent().attr('id');
+	settings.caseId = rowId.replace('uniqueCaseId', '');
+	settings.variable =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+'VariableName\']', container);
+	settings.role =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableRoleKey\']', container);
+	
+	settings.uuid =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableUniqueIdKey\']', container);
+	settings.container = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableContainerKey\']', container);
+	
+	settings.placeholder = '';
+	settings.tooltip = CasesBoardHelper.localizations.edit;
+	settings.onblur	= 'submit';
 	
 	cell.editable(function(value, settings) {
 		var editableElement = jQuery(this);
 		
 		showLoadingMessage(CasesBoardHelper.localizations.savingMessage);
-		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, {
+		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, {
 			callback: function(result) {
-				closeAllLoadingMessages();
+				if (result != null && settings.rerender) {
+					IWCORE.renderComponent(settings.uuid, settings.container, function() {
+						closeAllLoadingMessages();
+					}, null);
+					return;
+				}
 				
-				editableElement.empty().text(result == null ? '': result);
+				closeAllLoadingMessages();
+				CasesBoardHelper.closeEditableField(editableElement, result);
+			}, errorHandler: function() {
+				closeAllLoadingMessages();
+				CasesBoardHelper.closeEditableField(editableElement, result);
 			}
 		});
 	}, settings);
 	
 	cell.addClass('casesBoardViewerTableEditableCellInitialized');
+}
+
+CasesBoardHelper.getValueFromHiddenInput = function(filter, container) {
+	var objects = jQuery(filter, container);
+	if (objects == null || objects.length == 0) {
+		return null;
+	}
+	
+	return jQuery(objects[objects.length -1]).attr('value');
+}
+
+CasesBoardHelper.closeEditableField = function(field, value) {
+	field.empty().text(value == null ? '': value);
 }
 
 CasesBoardHelper.getCaseVariableValueInput = function(cellId) {

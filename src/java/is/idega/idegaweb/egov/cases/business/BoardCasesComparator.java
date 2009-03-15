@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 
 public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 
@@ -31,7 +32,8 @@ public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 	private String getExpression(CaseBoardBean bean) {
 		if (ListUtil.isEmpty(sortingPreferences)) {
 			//	Using default sorting: category + applicant name	//	TODO: is this OK?
-			return bean.getCategory() + bean.getApplicantName();
+			String category = StringUtil.isEmpty(bean.getCategory()) ? "z" : bean.getCategory();
+			return category + bean.getApplicantName();
 		}
 		
 		return "";	//	TODO

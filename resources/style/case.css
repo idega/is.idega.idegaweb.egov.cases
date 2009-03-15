@@ -456,3 +456,38 @@ table.casesBoardViewerTable th, td {
     padding: 4px;
     border-width: 1px 1px 0 0;
 }
+
+table.casesBoardViewerTable th {
+	background-color: #c7c7c7;
+}
+
+table.casesBoardViewerTable tfoot {
+	background-color: #8c8c8c;
+}
+
+tr.odd {
+	background-color: #EFEFEF;
+}
+
+.casesBoardViewerBodyRows tr:HOVER {
+	background-color: #E8F1FC;
+}
+
+.casesBoardViewerTable thead tr .header {
+	background-image: url(../images/bg.gif);
+	background-position: right center;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+.casesBoardViewerTable thead tr .headerSortDown {
+	background-image: url(../images/desc.gif);
+}
+
+.casesBoardViewerTable thead tr .headerSortUp {
+	background-image: url(../images/asc.gif);
+}
+
+.casesBoardViewerTableEditableCellselect:HOVER {
+	background-color: transparent url(../images/text-edit.png) no-repeat scroll left top;
+}

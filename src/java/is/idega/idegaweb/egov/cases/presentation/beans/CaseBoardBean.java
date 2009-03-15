@@ -20,8 +20,8 @@ public class CaseBoardBean {
 	private String category;
 	
 	private String comment;
-	private Double grantAmountSuggestion;
-	private Double boardAmount;
+	private Long grantAmountSuggestion;
+	private Long boardAmount;
 	private String restrictions;
 	
 	private List<String> allValues;
@@ -114,19 +114,19 @@ public class CaseBoardBean {
 		this.comment = comment;
 	}
 
-	public Double getGrantAmountSuggestion() {
+	public Long getGrantAmountSuggestion() {
 		return grantAmountSuggestion;
 	}
 
-	public void setGrantAmountSuggestion(Double grantAmountSuggestion) {
+	public void setGrantAmountSuggestion(Long grantAmountSuggestion) {
 		this.grantAmountSuggestion = grantAmountSuggestion;
 	}
 
-	public Double getBoardAmount() {
+	public Long getBoardAmount() {
 		return boardAmount;
 	}
 
-	public void setBoardAmount(Double boardAmount) {
+	public void setBoardAmount(Long boardAmount) {
 		this.boardAmount = boardAmount;
 	}
 

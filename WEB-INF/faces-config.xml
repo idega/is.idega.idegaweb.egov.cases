@@ -36,17 +36,22 @@
 		<component-type>CasesBoardViewer</component-type>
 		<component-class>is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer</component-class>
 		<property>
+			<display-name>Users role</display-name>
+			<property-name>roleKey</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Process name</display-name>
+			<property-name>processName</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
 			<display-name>Case status</display-name>
 			<property-name>caseStatus</property-name>
 			<property-class>java.lang.String</property-class>
 			<property-extension>
 				<property-resolver>com.idega.block.process.business.CaseStatusHandler</property-resolver>
 			</property-extension>
-		</property>
-		<property>
-			<display-name>Users role</display-name>
-			<property-name>role</property-name>
-			<property-class>java.lang.String</property-class>
 		</property>
 		<component-extension>
 			<idegaweb-info>
