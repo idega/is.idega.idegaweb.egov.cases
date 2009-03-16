@@ -55,6 +55,8 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 		showLoadingMessage(CasesBoardHelper.localizations.savingMessage);
 		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, {
 			callback: function(result) {
+				CasesBoardHelper.closeEditableField(editableElement, result);
+				
 				if (result != null && settings.rerender) {
 					IWCORE.renderComponent(settings.uuid, settings.container, function() {
 						closeAllLoadingMessages();
@@ -63,7 +65,6 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 				}
 				
 				closeAllLoadingMessages();
-				CasesBoardHelper.closeEditableField(editableElement, result);
 			}, errorHandler: function() {
 				closeAllLoadingMessages();
 				CasesBoardHelper.closeEditableField(editableElement, result);
