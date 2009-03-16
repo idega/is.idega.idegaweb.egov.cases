@@ -259,3 +259,4 @@ case_board_viewer.saving_case_variable=Vista...
 cases_board_viewer.export_cases_list_to_excel=S\u00E6kja sem Excel
 cases_board_viewer.exporting_cases_list_to_excel=S\u00E6ki sem Excel skjal
 case_board_viewer.remove_value=Fjarl\u00E6gja
+cases_board_viewer.print_list=Prenta

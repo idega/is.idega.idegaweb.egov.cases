@@ -40,6 +40,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.PrintButton;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.PresentationUtil;
@@ -252,6 +253,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		buttonsContainer.add(exportToExcel);
 		exportToExcel.setOnClick(new StringBuilder("humanMsg.displayMsg('").append(iwrb.getLocalizedString("cases_board_viewer.exporting_cases_list_to_excel",
 				"Exporting to Excel")).append("');window.location.href='").append(getUriToExcelExporter(iwc)).append("';").toString());
+		
+		PrintButton printList = new PrintButton(iwrb.getLocalizedString("cases_board_viewer.print_list", "Print"));
+		buttonsContainer.add(printList);
 	}
 	
 	private String getUriToExcelExporter(IWContext iwc) {
