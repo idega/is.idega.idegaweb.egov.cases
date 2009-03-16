@@ -13,7 +13,7 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 		CasesBoardHelper.initializeEditableCell(jQuery(this), {
 			data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A': 'A', 'B': 'B', 'C': 'C'}",
 			type:		'select',
-			rerender:	true
+			rerender:	false
 		}, 'select');
 	});
 	
