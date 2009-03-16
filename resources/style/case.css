@@ -445,36 +445,45 @@ img.userProfilePictureInCasesList {
 }
 
 table.casesBoardViewerTable {
-    border-style: solid;
-    border-width: 0 0 1px 1px;
-    border-spacing: 0;
+	border-spacing: 0;
+	width: 100%;
+	margin-bottom: 12px;
 }
 
-table.casesBoardViewerTable th, td {
+table.casesBoardViewerTable th, table.casesBoardViewerTable td {
 	border-style: solid;
-    margin: 0;
-    border-width: 1px 1px 0 0;
+	margin: 0;
+	border-width: 0 0 1px 0;
+	padding: 3px 5px;
+	font-size: 0.8em;
+vertical-align: top;
 }
 
 table.casesBoardViewerTable th {
-	background-color: #c7c7c7;
+	padding-right: 20px;
+	text-align: left;
+	vertical-align: bottom;
 }
 
 table.casesBoardViewerTable tfoot {
-	background-color: #8c8c8c;
+	font-weight: bold;
 }
 
-tr.odd {
+table.casesBoardViewerTable tfoot td {
+	border: 0;
+}
+
+tr.even {
 	background-color: #EFEFEF;
 }
 
-.casesBoardViewerBodyRows tr:HOVER {
-	background-color: #E8F1FC;
+.casesBoardViewerBodyRows tr:hover {
+	background-color: #a8a8a8;
 }
 
 .casesBoardViewerTable thead tr .header {
 	background-image: url(../images/bg.gif);
-	background-position: right center;
+	background-position: right 17px;
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -487,10 +496,10 @@ tr.odd {
 	background-image: url(../images/asc.gif);
 }
 
-.casesBoardViewerTableEditableCellselect:HOVER {
+.casesBoardViewerTableEditableCellselect:hover {
 	background-color: transparent url(../images/text-edit.png) no-repeat scroll left top;
 }
 
-.casesBoardViewerTableWiderCell {
-	width: 150px;
+.casesBoardViewerTableEditableCelltextarea textarea {
+	width: 150px !important;
 }
