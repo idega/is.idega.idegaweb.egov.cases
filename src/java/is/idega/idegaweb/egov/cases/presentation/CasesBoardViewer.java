@@ -205,10 +205,19 @@ public class CasesBoardViewer extends IWBaseComponent {
 			rowsIndex++;
 		}
 		
+		index = 0;
+		String totalBoardAmountCellId = null;
 		TableFooterRowGroup footer = table.createFooterRowGroup();
 		TableRow footerRow = footer.createRow();
 		for (String footerLabel: data.getFooterValues()) {
-			footerRow.createCell().add(new Text(footerLabel));
+			TableCell2 footerCell = footerRow.createCell();
+			footerCell.add(new Text(footerLabel));
+			
+			if (CASE_FIELDS.size() - 2 == index) {
+				totalBoardAmountCellId = footerCell.getId();
+			}
+			
+			index++;
 		}
 		
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName")
@@ -221,6 +230,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", builderLogicWrapper.getBuilderService(iwc).getInstanceId(this)));
 		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
+		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", totalBoardAmountCellId));
 		
 		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter();").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {

@@ -19,7 +19,8 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput'), function() {
 		CasesBoardHelper.initializeEditableCell(jQuery(this), {
-			rerender:	true
+			rerender:	false,
+			recount:	true
 		}, 'textinput');
 	});
 	
@@ -44,10 +45,13 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 	
 	settings.uuid =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableUniqueIdKey\']', container);
 	settings.container = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableContainerKey\']', container);
+	settings.totalBoardAmountCellId = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableTotalBoardAmountCellIdKey\']',
+		container);
 	
 	settings.placeholder = '';
 	settings.tooltip = CasesBoardHelper.localizations.edit;
 	settings.onblur	= 'submit';
+	settings.previousValue = cell.text();
 	
 	cell.editable(function(value, settings) {
 		var editableElement = jQuery(this);
@@ -62,6 +66,22 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 						closeAllLoadingMessages();
 					}, null);
 					return;
+				}
+				
+				if (result != null && settings.recount) {
+					var previousValue = settings.previousValue;
+					previousValue++;
+					previousValue--;
+					
+					var totalSum = jQuery('#' + settings.totalBoardAmountCellId).text();
+					totalSum++;
+					totalSum--;
+					result++;
+					result--;
+					
+					totalSum = totalSum - previousValue + result;
+					jQuery('#' + settings.totalBoardAmountCellId).text(totalSum);
+					settings.previousValue = result;
 				}
 				
 				closeAllLoadingMessages();
