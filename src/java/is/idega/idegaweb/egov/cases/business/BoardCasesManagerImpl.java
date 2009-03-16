@@ -147,19 +147,20 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		value = value.replace("þús", CoreConstants.EMPTY);
 		value = value.replaceAll("kr", CoreConstants.EMPTY);
 		
-		Long numberValue = null;
+		Double numberValue = null;
 		try {
-			numberValue = Long.valueOf(Double.valueOf(value).longValue());
+			numberValue = Double.valueOf(value);
+			
+			if (dropThousands) {
+				return Long.valueOf(Double.valueOf(numberValue.doubleValue() / 1000).longValue());
+			}
+			
+			return Long.valueOf(numberValue.longValue());
 		} catch(Exception e) {
-			numberValue = null;
-			LOGGER.log(Level.WARNING, "Error converting to Long: " + value);
+			LOGGER.log(Level.WARNING, "Error getting number value from: " + value);
 		}
 		
-		if (dropThousands && numberValue != null) {
-			numberValue = numberValue / 1000;
-		}
-		
-		return numberValue == null ? Long.valueOf(0) : numberValue;
+		return Long.valueOf(0);
 	}
 	
 	private boolean isCaseAvailableForBoard(GeneralCase theCase) {
