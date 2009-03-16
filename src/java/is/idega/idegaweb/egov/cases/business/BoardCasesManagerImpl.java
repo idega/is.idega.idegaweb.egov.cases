@@ -114,16 +114,16 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		boardCase.setCaseIdentifier(getStringValue(values.get(2)));
 		boardCase.setCaseDescription(getStringValue(values.get(3)));
 		
-		boardCase.setTotalCost(String.valueOf(getNumberValue(values.get(4))));
-		boardCase.setAppliedAmount(String.valueOf(getNumberValue(values.get(5))));
+		boardCase.setTotalCost(String.valueOf(getNumberValue(values.get(4), true)));
+		boardCase.setAppliedAmount(String.valueOf(getNumberValue(values.get(5), true)));
 		
 		boardCase.setNutshell(getStringValue(values.get(6)));
 		//	Grading sums should be the 7th
 		boardCase.setCategory(getStringValue(values.get(8)));
 		
 		boardCase.setComment(getStringValue(values.get(9)));
-		boardCase.setGrantAmountSuggestion(getNumberValue(values.get(10)));
-		boardCase.setBoardAmount(getNumberValue(values.get(11)));
+		boardCase.setGrantAmountSuggestion(getNumberValue(values.get(10), false));
+		boardCase.setBoardAmount(getNumberValue(values.get(11), false));
 		boardCase.setRestrictions(getStringValue(values.get(12)));
 	
 		return boardCase;
@@ -137,18 +137,29 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		return value;
 	}
 	
-	private Long getNumberValue(String value) {
+	private Long getNumberValue(String value, boolean dropThousands) {
 		if (StringUtil.isEmpty(getStringValue(value))) {
 			return Long.valueOf(0);
 		}
 		
+		value = value.replaceAll(CoreConstants.SPACE, CoreConstants.EMPTY);
+		value = value.replace(CoreConstants.DOT, CoreConstants.EMPTY);
+		value = value.replace("þús", CoreConstants.EMPTY);
+		value = value.replaceAll("kr", CoreConstants.EMPTY);
+		
+		Long numberValue = null;
 		try {
-			return Long.valueOf(value);
+			numberValue = Long.valueOf(Double.valueOf(value).longValue());
 		} catch(Exception e) {
-			LOGGER.log(Level.WARNING, "Error converting to Double: " + value);
+			numberValue = null;
+			LOGGER.log(Level.WARNING, "Error converting to Long: " + value);
 		}
 		
-		return Long.valueOf(0);
+		if (dropThousands && numberValue != null) {
+			numberValue = numberValue / 1000;
+		}
+		
+		return numberValue == null ? Long.valueOf(0) : numberValue;
 	}
 	
 	private boolean isCaseAvailableForBoard(GeneralCase theCase) {
