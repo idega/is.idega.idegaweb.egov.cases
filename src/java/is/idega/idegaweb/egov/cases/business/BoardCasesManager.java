@@ -10,8 +10,6 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 
 public interface BoardCasesManager {
-
-	public static final String SPRING_BEAN_IDENTIFIER = "boardCasesManagerBean";
 	
 	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, IWResourceBundle iwrb, String caseStatus, String processName);
 	
