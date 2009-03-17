@@ -10,9 +10,5 @@
 			<include method="useTypes" />
 		</create>
 		
-		<create creator="spring" javascript="BoardCasesManager">
-			<param name="beanName" value="boardCasesManagerBean" />
-			<include method="setCaseVariableValue" />
-		</create>
 	</allow>
 </dwr>
