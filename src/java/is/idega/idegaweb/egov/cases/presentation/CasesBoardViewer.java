@@ -169,6 +169,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 
 		int rowsIndex = 0;
+		Link linkToTask = null;
 		TableBodyRowGroup body = table.createBodyRowGroup();
 		body.setStyleClass("casesBoardViewerBodyRows");
 		String taskViewerPage = boardCasesManager.getPageUriForTaskViewer(iwc);
@@ -183,7 +184,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 				
 				if (index == 2) {
 					//	Link to grading task
-					bodyRowCell.add(new Link(rowBean.getCaseIdentifier(), boardCasesManager.getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage)));
+					linkToTask = new Link(rowBean.getCaseIdentifier(), boardCasesManager.getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage));
+					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
+					bodyRowCell.add(linkToTask);
 				}
 				else {
 					bodyRowCell.add(new Text(value));

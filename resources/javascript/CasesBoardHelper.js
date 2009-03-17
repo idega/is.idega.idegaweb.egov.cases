@@ -40,7 +40,8 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 	var container = cell.parent().parent().parent().parent();
 	var rowId = cell.parent().attr('id');
 	settings.caseId = rowId.replace('uniqueCaseId', '');
-	settings.variable =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+'VariableName\']', container);
+	settings.variable =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+'VariableName\']',
+		container);
 	settings.role =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableRoleKey\']', container);
 	
 	settings.uuid =  CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableUniqueIdKey\']', container);
@@ -76,12 +77,17 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 					var totalSum = jQuery('#' + settings.totalBoardAmountCellId).text();
 					totalSum++;
 					totalSum--;
-					result++;
-					result--;
+					var newValue = result.id;
+					newValue++;
+					newValue--;
 					
-					totalSum = totalSum - previousValue + result;
+					totalSum = totalSum - previousValue + newValue;
 					jQuery('#' + settings.totalBoardAmountCellId).text(totalSum);
-					settings.previousValue = result;
+					settings.previousValue = newValue;
+				}
+				
+				if (result != null) {
+					jQuery('a.casesBoardViewerTableLinkToTaskStyle', editableElement.parent()).attr('href', result.value);
 				}
 				
 				closeAllLoadingMessages();
@@ -105,7 +111,7 @@ CasesBoardHelper.getValueFromHiddenInput = function(filter, container) {
 }
 
 CasesBoardHelper.closeEditableField = function(field, value) {
-	field.empty().text(value == null ? '': value);
+	field.empty().text(value == null ? '': value.id);
 }
 
 CasesBoardHelper.getCaseVariableValueInput = function(cellId) {

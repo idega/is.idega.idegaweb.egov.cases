@@ -290,7 +290,7 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		return variables;
 	}
 	
-	public String setCaseVariableValue(Integer caseId, String variableName, String value, String role) {
+	public AdvancedProperty setCaseVariableValue(Integer caseId, String variableName, String value, String role) {
 		if (caseId == null || StringUtil.isEmpty(variableName) || StringUtil.isEmpty(value)) {
 			return null;
 		}
@@ -308,8 +308,16 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 				value = CoreConstants.EMPTY;
 			}
 			
-			if (getCaseManager().setCaseVariable(getCasesBusiness(iwc).getCase(caseId), variableName, value)) {
-				return value;
+			CaseManager caseManager = getCaseManager();
+			Case theCase = getCasesBusiness(iwc).getCase(caseId);
+			if (caseManager.setCaseVariable(theCase, variableName, value)) {
+				Long currentTaskId = caseManager.getTaskInstanceIdForTask(theCase, "Grading");
+				String tokenName = caseManager.submitCaseTaskInstance(currentTaskId);
+				if (!StringUtil.isEmpty(tokenName)) {
+					Long newTaskInstanceId = caseManager.createNewTaskForCase(currentTaskId, tokenName);
+					return newTaskInstanceId == null ? null : new AdvancedProperty(value,
+							getLinkToTheTask(iwc, theCase.getPrimaryKey().toString(), getPageUriForTaskViewer(iwc), newTaskInstanceId.toString()));
+				}
 			}
 		} catch(Exception e) {
 			LOGGER.log(Level.SEVERE, "Error saving variable '"+variableName+"' with value '"+value+"' for case: " + caseId, e);
@@ -328,6 +336,10 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 			return iwc.getRequestURI();
 		}
 		
+		return getLinkToTheTask(iwc, caseId, basePage, taskId);
+	}
+	
+	private String getLinkToTheTask(IWContext iwc, String caseId, String basePage, String taskId) {
 		URIUtil uriUtil = new URIUtil(basePage);
 		
 		uriUtil.setParameter(CasesProcessor.PARAMETER_ACTION, String.valueOf(UserCases.ACTION_CASE_MANAGER_VIEW));
@@ -336,7 +348,7 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 		
 		return iwc.getIWMainApplication().getTranslatedURIWithContext(uriUtil.getUri());
 	}
-	
+		
 	private String getInstanceIdForGradingTask(IWContext iwc, String caseId) {
 		Long taskId = null;
 		try {
