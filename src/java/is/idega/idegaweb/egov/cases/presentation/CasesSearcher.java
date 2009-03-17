@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
@@ -258,7 +258,7 @@ public class CasesSearcher extends CasesBlock {
 		if (caseManagersProvider == null) {
 			return menu;
 		}
-		CaseManager caseManager = caseManagersProvider.getCaseManager();
+		CasesRetrievalManager caseManager = caseManagersProvider.getCaseManager();
 		if (caseManager == null) {
 			return menu;
 		}

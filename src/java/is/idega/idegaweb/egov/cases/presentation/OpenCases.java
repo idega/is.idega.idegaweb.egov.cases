@@ -17,7 +17,7 @@ import java.rmi.RemoteException;
 
 import javax.ejb.FinderException;
 
-import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
@@ -333,6 +333,6 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	@Override
 	protected String getCasesProcessorType() {
-		return CaseManager.CASE_LIST_TYPE_OPEN;
+		return CasesRetrievalManager.CASE_LIST_TYPE_OPEN;
 	}
 }

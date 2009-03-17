@@ -17,7 +17,7 @@ import java.util.Collection;
 
 import javax.ejb.FinderException;
 
-import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.web2.business.Web2Business;
@@ -382,6 +382,6 @@ public class MyCases extends CasesProcessor {
 	
 	@Override
 	protected String getCasesProcessorType() {
-		return CaseManager.CASE_LIST_TYPE_MY;
+		return CasesRetrievalManager.CASE_LIST_TYPE_MY;
 	}
 }

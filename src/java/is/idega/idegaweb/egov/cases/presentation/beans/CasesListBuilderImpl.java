@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
@@ -339,9 +339,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 		
 	private boolean isDescriptionEditable(String type, boolean isAdmin) {
-		boolean descriptionIsEditable = CaseManager.CASE_LIST_TYPE_OPEN.equals(type);
+		boolean descriptionIsEditable = CasesRetrievalManager.CASE_LIST_TYPE_OPEN.equals(type);
 		if (!descriptionIsEditable) {
-			descriptionIsEditable = CaseManager.CASE_LIST_TYPE_MY.equals(type) && isAdmin;
+			descriptionIsEditable = CasesRetrievalManager.CASE_LIST_TYPE_MY.equals(type) && isAdmin;
 		}
 		return descriptionIsEditable;
 	}
@@ -795,7 +795,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			
 			Case theCase = getCasesBusiness(iwc).getCase(caseId);
 			
-			CaseManager caseManager;
+			CasesRetrievalManager caseManager;
 			
 			if(theCase.getCaseManagerType() != null)
 				caseManager = getCaseManagersProvider().getCaseManager();

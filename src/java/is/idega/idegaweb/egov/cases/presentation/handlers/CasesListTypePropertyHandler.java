@@ -7,7 +7,7 @@ import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.util.List;
 
-import com.idega.block.process.business.CaseManager;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.core.builder.presentation.ICPropertyHandler;
 import com.idega.idegaweb.IWResourceBundle;
@@ -43,10 +43,10 @@ public class CasesListTypePropertyHandler implements ICPropertyHandler {
 //		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), getStringFromArray(casesBusiness.getStatusesForMyCases())));
 //		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("user_cases", "User cases"), UserCases.TYPE));
 		
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), CaseManager.CASE_LIST_TYPE_OPEN));
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"), CaseManager.CASE_LIST_TYPE_CLOSED));
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), CaseManager.CASE_LIST_TYPE_MY));
-		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("user_cases", "User cases"), CaseManager.CASE_LIST_TYPE_USER));
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), CasesRetrievalManager.CASE_LIST_TYPE_OPEN));
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"), CasesRetrievalManager.CASE_LIST_TYPE_CLOSED));
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), CasesRetrievalManager.CASE_LIST_TYPE_MY));
+		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("user_cases", "User cases"), CasesRetrievalManager.CASE_LIST_TYPE_USER));
 		
 		caseListTypes.setSelectedElement(stringValue);
 		
