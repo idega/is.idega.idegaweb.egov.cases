@@ -308,10 +308,16 @@ public class BoardCasesManagerImpl implements BoardCasesManager {
 				value = CoreConstants.EMPTY;
 			}
 			
+			String gradingTask = "Grading";
 			CaseManager caseManager = getCaseManager();
 			Case theCase = getCasesBusiness(iwc).getCase(caseId);
-			if (caseManager.setCaseVariable(theCase, variableName, value)) {
-				Long currentTaskId = caseManager.getTaskInstanceIdForTask(theCase, "Grading");
+			Long currentTaskId = caseManager.getTaskInstanceIdForTask(theCase, gradingTask);
+			if (currentTaskId == null) {
+				LOGGER.severe("Error getting task instance for case: " + + caseId + ", task: " + gradingTask);
+				return null;
+			}
+			
+			if (caseManager.setCaseVariable(currentTaskId, variableName, value)) {
 				String tokenName = caseManager.submitCaseTaskInstance(currentTaskId);
 				if (!StringUtil.isEmpty(tokenName)) {
 					Long newTaskInstanceId = caseManager.createNewTaskForCase(currentTaskId, tokenName);
