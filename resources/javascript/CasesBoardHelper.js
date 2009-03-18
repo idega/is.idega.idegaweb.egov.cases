@@ -113,6 +113,3 @@ CasesBoardHelper.getValueFromHiddenInput = function(filter, container) {
 CasesBoardHelper.closeEditableField = function(field, value) {
 	field.empty().text(value == null ? '': value.id);
 }
-
-CasesBoardHelper.getCaseVariableValueInput = function(cellId) {
-}
