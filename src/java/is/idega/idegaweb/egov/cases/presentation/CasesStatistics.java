@@ -218,7 +218,13 @@ public class CasesStatistics extends CasesBlock {
 				status = statIter.next();
 				cell = row.createHeaderCell();
 				cell.setStyleClass(status.getStatus());
-				cell.add(new Text(iwrb.getLocalizedString("case_status_key."+status.getStatus(), status.getStatus())));
+				String statusLabel = null;
+				try {
+					statusLabel = getCasesBusiness().getLocalizedCaseStatusDescription(null, status, iwc.getCurrentLocale());
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+				cell.add(new Text(StringUtil.isEmpty(statusLabel) ? status.getStatus() : statusLabel));
 			}
 			
 			cell = row.createHeaderCell();
