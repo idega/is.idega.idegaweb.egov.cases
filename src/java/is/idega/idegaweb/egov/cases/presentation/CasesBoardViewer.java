@@ -98,9 +98,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 		
 		if (!iwc.isLoggedOn()) {
 			LOGGER.warning("User must be logged to see cases!");
+			return;
 		}
 		if (!StringUtil.isEmpty(roleKey) && !iwc.hasRole(roleKey)) {
 			LOGGER.warning("User must have role '" + roleKey + "' to see cases!");
+			return;
 		}
 		
 		ELUtil.getInstance().autowire(this);
@@ -127,7 +129,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		getChildren().add(container);
 		container.setStyleClass("casesBoardViewerContainer");
 		
-		addCasesTable(container, iwc, iwrb);
+		if (!addCasesTable(container, iwc, iwrb)) {
+			return;
+		}
 		
 		container.add(new CSSSpacer());
 		
@@ -143,11 +147,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 	}
 	
-	private void addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
+	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName);
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
-			return;
+			return false;
 		}
 		
 		Table2 table = new Table2();
@@ -241,6 +245,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
+		
+		return true;
 	}
 	
 	private void makeCellEditable(TableCell2 cell, String type) {
