@@ -11,7 +11,6 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
@@ -438,16 +437,17 @@ public class CasesStatistics extends CasesBlock {
 	}
 	
 	private boolean canCaseBeUsedInStatistics(Case theCase) {
-		boolean result = false;
 		if (ListUtil.isEmpty(cases)) {
-			result = true;	//	No data set is set
+			return true;	//	No data set is set
 		}
 		
-		if (!result) {
-			result = cases.contains(theCase);
+		for (CasePresentation preCase: cases) {
+			if (theCase.getPrimaryKey().toString().equals(preCase.getId())) {
+				return true;
+			}
 		}
 
-		return result;
+		return false;
 	}
 	
 	private Map<String, List<Case>> getCasesByProcesses(Collection<Case> cases) {
@@ -885,11 +885,13 @@ public class CasesStatistics extends CasesBlock {
 		List<String> categoriesToUse = new ArrayList<String>();
 		for (CasePresentation theCase: cases) {
 			category = null;
-			if (theCase instanceof GeneralCase) {
-				category = ((GeneralCase) theCase).getCaseCategory();
-			}
-			else {
-				Logger.getLogger(this.getClass().getName()).warning("Case does not support categories: " + theCase);
+			
+			if (theCase.getCategoryId() != null) {
+				try {
+					category = getCaseCategory(theCase.getCategoryId());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			
 			if (category != null) {
