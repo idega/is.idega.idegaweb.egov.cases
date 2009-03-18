@@ -324,10 +324,6 @@ img.variableFieldDeleter {
 	margin-top: 4px;
 }
 
-.casesListCasesStatisticsContainer table.adminTable th.INPR, .casesListCasesStatisticsContainer table.adminTable td.INPR {
-	display: none;
-}
-
 .casesListCasesStatisticsContainer table.adminTable td, .casesListCasesStatisticsContainer table.adminTable th {
 	text-align: right;
 }
