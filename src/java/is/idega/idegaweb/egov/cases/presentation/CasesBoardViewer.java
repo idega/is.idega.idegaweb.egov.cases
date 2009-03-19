@@ -294,7 +294,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			uri.setParameter(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER, processName);
 		}
 		
-		return uri.toString();
+		return uri.getUri();
 	}
 
 	public String getCaseStatus() {
