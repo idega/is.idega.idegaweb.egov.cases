@@ -892,7 +892,7 @@ public class CasesStatistics extends CasesBlock {
 		for (CasePresentation theCase: cases) {
 			category = null;
 			
-			if (theCase.getCategoryId() != null) {
+			if (!StringUtil.isEmpty(theCase.getCategoryId())) {
 				try {
 					category = getCaseCategory(theCase.getCategoryId());
 				} catch (Exception e) {
