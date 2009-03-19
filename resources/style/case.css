@@ -452,7 +452,7 @@ table.casesBoardViewerTable th, table.casesBoardViewerTable td {
 	border-width: 0 0 1px 0;
 	padding: 3px 5px;
 	font-size: 0.8em;
-vertical-align: top;
+	vertical-align: top;
 }
 
 table.casesBoardViewerTable th {
@@ -498,4 +498,8 @@ tr.even {
 
 .casesBoardViewerTableEditableCelltextarea textarea {
 	width: 150px !important;
+}
+
+.casesBoardViewerTableEditableCellInitialized {
+	background: url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/style/images/text-edit.png) right 3px no-repeat;
 }
