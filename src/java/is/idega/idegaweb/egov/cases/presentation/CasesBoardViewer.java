@@ -9,6 +9,7 @@ import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
@@ -148,7 +149,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 	
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
-		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName);
+		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, caseStatus, processName);
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
 			return false;
@@ -176,7 +177,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		Link linkToTask = null;
 		TableBodyRowGroup body = table.createBodyRowGroup();
 		body.setStyleClass("casesBoardViewerBodyRows");
-		String taskViewerPage = boardCasesManager.getPageUriForTaskViewer(iwc);
+		String taskViewerPage = getBoardCasesManager().getPageUriForTaskViewer(iwc);
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			TableRow row = body.createRow();
 			row.setId(rowBean.getId());
@@ -188,7 +189,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 				
 				if (index == 2) {
 					//	Link to grading task
-					linkToTask = new Link(rowBean.getCaseIdentifier(), boardCasesManager.getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage));
+					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage));
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 					bodyRowCell.add(linkToTask);
 				}
@@ -236,7 +237,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 				.toString(), CASE_FIELDS.get(12).getId()));
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 		
-		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", builderLogicWrapper.getBuilderService(iwc).getInstanceId(this)));
+		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
 		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
 		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", totalBoardAmountCellId));
 		
@@ -247,6 +248,16 @@ public class CasesBoardViewer extends IWBaseComponent {
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 		
 		return true;
+	}
+	
+	private String getLinkToTheTask(IWContext iwc, String caseId,  String taskViewerPage) {
+		String uri = null;
+		try {
+			uri = getBoardCasesManager().getLinkToTheTask(iwc, caseId, taskViewerPage);
+		} catch(Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting uri to the task for case: " + caseId);
+		}
+		return StringUtil.isEmpty(uri) ? iwc.getRequestURI() : uri;
 	}
 	
 	private void makeCellEditable(TableCell2 cell, String type) {
@@ -303,6 +314,28 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	public void setProcessName(String processName) {
 		this.processName = processName;
+	}
+
+	public BoardCasesManager getBoardCasesManager() {
+		if (boardCasesManager == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return boardCasesManager;
+	}
+
+	public void setBoardCasesManager(BoardCasesManager boardCasesManager) {
+		this.boardCasesManager = boardCasesManager;
+	}
+
+	public BuilderLogicWrapper getBuilderLogicWrapper() {
+		if (builderLogicWrapper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return builderLogicWrapper;
+	}
+
+	public void setBuilderLogicWrapper(BuilderLogicWrapper builderLogicWrapper) {
+		this.builderLogicWrapper = builderLogicWrapper;
 	}
 
 }
