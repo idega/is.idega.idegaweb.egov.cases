@@ -3,11 +3,31 @@ if (CasesBoardHelper == null) var CasesBoardHelper = {};
 CasesBoardHelper.localizations = {
 	savingMessage:	'Saving...',
 	remove:			'Remove',
-	edit:			'Edit'
+	edit:			'Edit',
+	loading:		'Loading...'
 };
 
+CasesBoardHelper.linkInAction = null;
+
 CasesBoardHelper.initializeBoardCases = function(localizations) {
+	CasesBoardHelper.linkInAction = null;
 	CasesBoardHelper.localizations = localizations;
+	
+	jQuery.each(jQuery('a.casesBoardViewerTableLinkToTaskStyle'), function() {
+		var link = jQuery(this);
+		
+		link.click(function() {
+			if (CasesBoardHelper.linkInAction == this.id) {
+				return false;
+			}
+			
+			showLoadingMessage(CasesBoardHelper.localizations.loading);
+			CasesBoardHelper.linkInAction = this.id;
+		});
+		link.dblclick(function() {
+			return false;
+		});
+	});
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect'), function() {
 		CasesBoardHelper.initializeEditableCell(jQuery(this), {

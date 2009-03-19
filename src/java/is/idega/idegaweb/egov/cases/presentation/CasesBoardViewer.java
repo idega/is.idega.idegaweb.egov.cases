@@ -46,6 +46,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.URIUtil;
 import com.idega.util.expression.ELUtil;
 
 public class CasesBoardViewer extends IWBaseComponent {
@@ -141,7 +142,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		String initAction = new StringBuilder("CasesBoardHelper.initializeBoardCases({savingMessage: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.saving_case_variable", "Saving...")).append("', remove: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.remove_value", "Remove")).append("', edit: '")
-			.append(iwrb.getLocalizedString("case_board_viewer.edit_value", "Edit")).append("'});").toString();
+			.append(iwrb.getLocalizedString("case_board_viewer.edit_value", "Edit")).append("', loading: '")
+			.append(iwrb.getLocalizedString("case_board_viewer.loading", "Loading..."))
+			.append("'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
 		}
@@ -191,6 +194,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 					//	Link to grading task
 					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage));
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
+					linkToTask.getId();
 					bodyRowCell.add(linkToTask);
 				}
 				else {
@@ -279,14 +283,15 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 	
 	private String getUriToExcelExporter(IWContext iwc) {
-		StringBuilder uri = new StringBuilder(iwc.getIWMainApplication().getMediaServletURI()).append("?").append(MediaWritable.PRM_WRITABLE_CLASS)
-			.append("=").append(IWMainApplication.getEncryptedClassName(CasesBoardViewerExporter.class));
+		URIUtil uri = new URIUtil(iwc.getIWMainApplication().getMediaServletURI());
+		
+		uri.setParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(CasesBoardViewerExporter.class));
 		
 		if (!StringUtil.isEmpty(caseStatus)) {
-			uri.append("&").append(CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).append("=").append(caseStatus);
+			uri.setParameter(CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER, caseStatus);
 		}
 		if (!StringUtil.isEmpty(processName)) {
-			uri.append("&").append(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER).append("=").append(processName);
+			uri.setParameter(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER, processName);
 		}
 		
 		return uri.toString();
