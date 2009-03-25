@@ -371,7 +371,7 @@ div.formItem.checkboxFormItem input {
 	margin-right: 4px;
 }
 
-.processDefinitionVariablesWindowStyle, .processVariablesWindowNoVariablesText {
+.processDefinitionVariablesWindowStyle, .processVariablesWindowNoVariablesText, .casesSearchResultsSortingOptions {
 	border: 1px #a8a8a8 solid;
 	clear: both;
 	background-color: #efefef;
@@ -501,5 +501,33 @@ tr.even {
 }
 
 .casesBoardViewerTableEditableCellInitialized {
-	background: url(/idegaweb/bundles/is.idega.idegaweb.egov.cases.bundle/resources/style/images/text-edit.png) right 3px no-repeat;
+	background: url(../images/text-edit.png) right 3px no-repeat;
+}
+
+.casesSearcherAddSortingOptionImageStyle:HOVER {
+	cursor: pointer;
+}
+
+.casesSearchResultsSortingOptionsRemoveOption {
+	display:block;
+	height:16px;
+	text-align:center;
+	width:16px;
+	background: url(../images/remove.png) no-repeat scroll left top;
+	margin-left: 150px;
+ }
+ 
+.casesSearchResultsSortingOptionsRemoveOptionInnerSpan {
+	display: none;
+}
+
+.casesSearchResultsSortingOptionsRemoveOptionSpan {
+	margin-bottom: 0px !important;
+	width: 145px !important;
+	overflow: hidden;
+}
+
+.casesSearcherResultsSortingOptionsChooserStyle {
+	width: 92px !important;
+	margin-right: 3px !important;
 }

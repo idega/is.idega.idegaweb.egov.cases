@@ -341,6 +341,7 @@ function clearSearchForCases(parameters) {
 			jQuery('#' + parameters[12]).attr('checked', false);
 			
 			CasesListHelper.closeVariablesWindow();
+			CasesListHelper.closeSortingOptionsWindow();
 			
 			setDisplayPropertyToAllCasesLists(parameters[0], true);
 		}
@@ -406,6 +407,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.id = window.location.pathname;
 	this.instanceId = instanceId;
+	
+	this.sortingOptions = CasesListHelper.sortingOptions;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
@@ -459,6 +462,22 @@ CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
 					}
 					else {
 						variablesWindow.show('fast');
+					}
+					
+					var sortingOptionsDropdownId = jQuery(jQuery('select.casesSearcherResultsSortingOptionsChooserStyle')[0]).attr('id');
+					if (sortingOptionsDropdownId != null) {
+						jQuery.each(jQuery('div.processVariableSortingOption'), function() {
+							CasesListHelper.removeSelectedSearchResultsSortingOption(jQuery(this).attr('id'), sortingOptionsDropdownId, true);
+						});
+						jQuery.each(jQuery('option.processVariableSortingOption'), function() {
+							jQuery(this).remove();
+						});
+						
+						jQuery.each(jQuery('option', variablesWindow), function() {
+							var option = jQuery(this);
+							
+							CasesListHelper.addSortingOption(sortingOptionsDropdownId, option.attr('value'), option.text(), 'processVariableSortingOption');
+						});
 					}
 				},
 				append: true
@@ -577,4 +596,127 @@ CasesListHelper.exportSearchResults = function(message) {
 			closeAllLoadingMessages();
 		}
 	});
+}
+
+CasesListHelper.sortingOptions = [];
+
+CasesListHelper.closeSortingOptionsWindow = function() {
+	jQuery.each(jQuery('select.casesSearcherResultsSortingOptionsChooserStyle'), function() {
+		var dropdownId = jQuery(this).attr('id');
+		CasesListHelper.removeAllSearchResultsSortingOptions(dropdownId);
+		CasesListHelper.addSearchResultsSortingOption(dropdownId);
+	});
+	CasesListHelper.sortingOptions = [];
+}
+
+CasesListHelper.addSearchResultsSortingOption = function(dropdownId) {
+	dwr.util.setValue(dropdownId, '-1');
+}
+
+CasesListHelper.addSelectedSearchResultsSortingOption = function(dropdownId) {
+	var dropdown = jQuery('#' + dropdownId)[0];
+	var selectedOption = dropdown.options[dropdown.selectedIndex];
+	if (selectedOption.value == -1) {
+		return;
+	}
+	
+	var value = selectedOption.value;
+	if (value.indexOf('@') != -1) {
+		value = value.split('@')[0];
+	}
+	
+	CasesListHelper.sortingOptions.push({id: value, value: selectedOption.text,
+		selected: jQuery(selectedOption).hasClass('defaultCasesSearcherSortingOption')});
+	dropdown.remove(dropdown.selectedIndex);
+	CasesListHelper.addSearchResultsSortingOption(dropdownId);
+	
+	var selectedOptionsContainer = CasesListHelper.getSortingOptionsContainer(dropdownId);
+	var containerId = 'id' + value;
+	selectedOptionsContainer.append('<div id=\''+containerId+'\' style=\'display: none;\' class=\'casesSearchResultsSortingOptionContainer\'>' +
+		'<span class=\'casesSearchResultsSortingOptionsRemoveOptionSpan\' title=\''+selectedOption.text+'\'>'+selectedOption.text+'</span>' +
+		'<a class=\'casesSearchResultsSortingOptionsRemoveOption\' href=\'javascript:void(0);\' onclick=\''+
+		'CasesListHelper.removeSelectedSearchResultsSortingOption("'+containerId+'", "'+dropdownId+'", false);\'>'+
+		'<span class=\'casesSearchResultsSortingOptionsRemoveOptionInnerSpan\'></span></a></div>');
+	
+	selectedOptionsContainer.parent().show('fast', function() {
+		jQuery('#' + containerId).addClass(selectedOption.className);
+		jQuery('#' + containerId).show('normal');
+	});
+}
+
+CasesListHelper.removeAllSearchResultsSortingOptions = function(dropdownId) {
+	jQuery.each(jQuery('div.casesSearchResultsSortingOptionContainer', jQuery('#' + dropdownId).parent()), function() {
+		CasesListHelper.removeSelectedSearchResultsSortingOption(jQuery(this).attr('id'), dropdownId, true);
+	});
+}
+
+CasesListHelper.removeSelectedSearchResultsSortingOption = function(id, dropdownId, restoreOnlyDefault) {
+	var optionContainer = jQuery('#' + id);
+	var mainContainer = optionContainer.parent().parent();
+	
+	var defaultOption = false;
+	id = id.replace('id', '');
+	var index = 0;
+	var found = false;
+	for (var i = 0; (i < CasesListHelper.sortingOptions.length && !found); i++) {
+		if (id == CasesListHelper.sortingOptions[i].id) {
+			index = i;
+			defaultOption = CasesListHelper.sortingOptions[i].selected;
+			found = true;
+		}
+	}
+	CasesListHelper.sortingOptions.splice(index, 1);
+	
+	var restore = true;
+	if (restoreOnlyDefault) {
+		retore = defaultOption;
+	}
+	
+	if (restore) {
+		CasesListHelper.addSortingOption(dropdownId, id, optionContainer.text(), defaultOption ?
+			'defaultCasesSearcherSortingOption' : 'processVariableSortingOption');
+	}
+	
+	optionContainer.hide('nomal', function() {
+		optionContainer.remove();
+		
+		if (jQuery('div.casesSearchResultsSortingOptionContainer', mainContainer).length == 0) {
+			mainContainer.hide('normal', function() {
+				mainContainer.remove();
+			});	
+		}
+	});
+	
+	CasesListHelper.addSearchResultsSortingOption(dropdownId);
+}
+
+CasesListHelper.addSortingOption = function(dropdownId, value, text, styleClass) {
+	if (value == null || value == -1) {
+		return;
+	}
+	
+	var newOption = document.createElement('option');
+	newOption.value = value;
+	newOption.text = text;
+	if (styleClass != null) {
+		newOption.className = styleClass;
+	}
+	if (IE) {
+		document.getElementById(dropdownId).add(newOption);
+	} else {
+		document.getElementById(dropdownId).add(newOption, null);
+	}
+}
+
+CasesListHelper.getSortingOptionsContainer = function(dropdownId) {
+	var dropdown = jQuery('#' + dropdownId);
+	var windowStyle = 'casesSearchResultsSortingOptions';
+	var sortingOptionsWindow = jQuery('div.' + windowStyle, dropdown.parent());
+	if (sortingOptionsWindow.length == 0) {
+		dropdown.parent().append('<div class=\''+windowStyle+'\' style=\'display: none;\'><div class=\'casesSearchResultsSortingOptionsTable\'></div></div>');
+		
+		sortingOptionsWindow = jQuery('div.' + windowStyle, dropdown.parent());
+	}
+	
+	return jQuery('div.casesSearchResultsSortingOptionsTable', sortingOptionsWindow);
 }

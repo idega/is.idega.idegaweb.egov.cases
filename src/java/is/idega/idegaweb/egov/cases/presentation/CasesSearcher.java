@@ -4,15 +4,21 @@ import is.idega.idegaweb.egov.application.IWBundleStarter;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationType;
 import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.cases.business.CasesEngine;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
+
+import javax.faces.component.UIComponent;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CasesRetrievalManager;
@@ -28,6 +34,7 @@ import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.ui.CheckBox;
@@ -60,6 +67,7 @@ public class CasesSearcher extends CasesBlock {
 	private static final String PARAMETER_CASE_STATUS = "cf_prm_case_status";
 	private static final String PARAMETER_CASE_LIST_TYPE = "cf_prm_case_list_type";
 	private static final String PARAMETER_CASE_CONTACT = "cf_prm_case_contact";
+	private static final String PARAMETER_SORTING_OPTIONS = "cf_prm_sorting_options";
 
 	private String textInputStyleClass = "textinput";
 	private String buttonStyleClass = "button";
@@ -69,8 +77,13 @@ public class CasesSearcher extends CasesBlock {
 	private boolean showAllStatuses;
 	private boolean showExportButton = true;
 	
+	@Autowired
+	private CasesEngine casesEngine;
+	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
+		ELUtil.getInstance().autowire(this);
+		
 		IWBundle bundle = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
 		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		
@@ -139,6 +152,12 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu processes = getDropdownForProcess(iwc);
 		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
 
+		//	Sorting options
+		DropdownMenu sortingOptions = getDropdownForSortingOptions(iwc);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions, sortingOptions.getDisabled() ?
+				null : Arrays.asList(getPlusImageForSortingOptions(iwc, sortingOptions.getId()))
+		);
+		
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
 		addFormItem(inputsContainer, iwrb.getLocalizedString("status", "Status"), statuses);
@@ -225,6 +244,42 @@ public class CasesSearcher extends CasesBlock {
 		if (selectedElement != null) {
 			menu.setSelectedElement(selectedElement);
 		}
+	}
+	
+	private DropdownMenu getDropdownForSortingOptions(IWContext iwc) {
+		DropdownMenu sortingOptions = new DropdownMenu(PARAMETER_SORTING_OPTIONS);
+		sortingOptions.setTitle(getResourceBundle().getLocalizedString("cases_searcher_default_sorting_is_by_date", "By default sorting by case's creation date"));
+		sortingOptions.setStyleClass("casesSearcherResultsSortingOptionsChooserStyle");
+		
+		List<AdvancedProperty> defaultOptions = getCasesEngine().getDefaultSortingOptions(iwc);
+		if (ListUtil.isEmpty(defaultOptions)) {
+			sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_there_are_no_options", "There are no options"),
+					String.valueOf(-1)));
+			sortingOptions.setDisabled(true);
+			
+			return sortingOptions;
+		}
+		
+		for (AdvancedProperty sortingOption: defaultOptions) {
+			SelectOption option = new SelectOption(sortingOption.getValue(), sortingOption.getId());
+			option.setStyleClass("defaultCasesSearcherSortingOption");
+			sortingOptions.add(option);
+		}
+		sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_select_sorting_option", "Select option"),
+				String.valueOf(-1)));
+		
+		sortingOptions.setOnChange(new StringBuilder("CasesListHelper.addSelectedSearchResultsSortingOption('").append(sortingOptions.getId()).append("');")
+				.toString());
+				
+		return sortingOptions;
+	}
+	
+	private UIComponent getPlusImageForSortingOptions(IWContext iwc, String dropdownId) {
+		Image plus = new Image(getBundle().getVirtualPathWithFileNameString("images/add.png"), getResourceBundle()
+				.getLocalizedString("cases_searcher_add_sorting_option", "Add sorting option"));
+		plus.setStyleClass("casesSearcherAddSortingOptionImageStyle");
+		plus.setOnClick(new StringBuilder("CasesListHelper.addSearchResultsSortingOption('").append(dropdownId).append("');").toString());
+		return plus;
 	}
 	
 	private DropdownMenu getDropdownForProcess(IWContext iwc) {
@@ -373,6 +428,10 @@ public class CasesSearcher extends CasesBlock {
 	}
 	
 	private void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
+		addFormItem(layer, localizedLabelText, input, null);
+	}
+	
+	private void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
 		Layer element = new Layer(Layer.DIV);
 		layer.add(element);
 		element.setStyleClass("formItem shortFormItem");
@@ -380,7 +439,13 @@ public class CasesSearcher extends CasesBlock {
 		Label label = null;
 		label = new Label(localizedLabelText, input);
 		element.add(label);
-		element.add(input);		
+		element.add(input);	
+		
+		if (!ListUtil.isEmpty(additionalComponents)) {
+			for (UIComponent component: additionalComponents) {
+				element.add(component);
+			}
+		}
 	}
 
 	public String getListType() {
@@ -406,4 +471,16 @@ public class CasesSearcher extends CasesBlock {
 	public void setShowExportButton(boolean showExportButton) {
 		this.showExportButton = showExportButton;
 	}
+
+	private CasesEngine getCasesEngine() {
+		if (casesEngine == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return casesEngine;
+	}
+
+	public void setCasesEngine(CasesEngine casesEngine) {
+		this.casesEngine = casesEngine;
+	}
+	
 }
