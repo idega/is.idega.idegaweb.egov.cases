@@ -7,12 +7,12 @@ import com.idega.presentation.IWContext;
 
 public interface CasesEngine {
 
-	public boolean clearSearchResults(String id);
+	public abstract boolean clearSearchResults(String id);
 	
-	public AdvancedProperty getExportedSearchResults(String id);
+	public abstract AdvancedProperty getExportedSearchResults(String id);
 	
-	public boolean setCaseSubject(String caseId, String subject);
+	public abstract boolean setCaseSubject(String caseId, String subject);
 	
-	public List<AdvancedProperty> getDefaultSortingOptions(IWContext iwc);
+	public abstract List<AdvancedProperty> getDefaultSortingOptions(IWContext iwc);
 	
 }
