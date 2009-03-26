@@ -389,11 +389,15 @@ div.formItem.checkboxFormItem input {
 	clear: both !important;
 }
 
-.processDefinitionVariablesWindowStyle input, .processDefinitionVariablesWindowStyle select {
+.processDefinitionVariablesWindowStyle input {
 	width: 150px !important;
 	float: left !important;
 	clear: none !important;
 	margin: 0 !important;
+}
+
+.processDefinitionVariablesWindowStyle select {
+	width: 176px !important;
 }
 
 .processDefinitionVariablesWindowStyle img {
@@ -527,7 +531,13 @@ tr.even {
 	overflow: hidden;
 }
 
-.casesSearcherResultsSortingOptionsChooserStyle {
-	width: 92px !important;
-	margin-right: 3px !important;
+.casesSearchResultsSortingOptionsList {
+	list-style-type: none;
+	border-top-style: none !important;
+	padding-top: 0px !important;
+	padding-left: 1px !important;
+}
+
+.casesSearchResultsSortingOptionContainer:HOVER {
+	cursor: move;
 }

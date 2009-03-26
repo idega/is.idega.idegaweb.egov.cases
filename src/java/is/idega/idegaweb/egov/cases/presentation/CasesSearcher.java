@@ -21,8 +21,8 @@ import javax.faces.component.UIComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.Web2Business;
@@ -34,7 +34,6 @@ import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.ui.CheckBox;
@@ -87,20 +86,23 @@ public class CasesSearcher extends CasesBlock {
 		IWBundle bundle = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
 		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		
-		List<String> scripts = new ArrayList<String>();
-		scripts.add(web2Business.getBundleURIToJQueryLib());
-		scripts.add(web2Business.getBundleUriToHumanizedMessagesScript());
-		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
-		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
-		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
-		scripts.add("/dwr/interface/CasesEngine.js");
-		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
+		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+				web2Business.getBundleURIToJQueryLib(),
+				web2Business.getBundleUriToHumanizedMessagesScript(),
+				web2Business.getBundleURIToJQueryUILib("1.6rc5", "ui.core.js"),
+				web2Business.getBundleURIToJQueryUILib("1.6rc5", "ui.sortable.js"),
+				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
+				CoreConstants.DWR_ENGINE_SCRIPT,
+				CoreConstants.DWR_UTIL_SCRIPT,
+				"/dwr/interface/CasesEngine.js"
+		));
 		
-		List<String> css = new ArrayList<String>();
-		css.add(web2Business.getBundleUriToHumanizedMessagesStyleSheet());
-		css.add(iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"));
-		css.add(bundle.getVirtualPathWithFileNameString("style/case.css"));
-		PresentationUtil.addStyleSheetsToHeader(iwc, css);
+		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
+				web2Business.getBundleUriToHumanizedMessagesStyleSheet(),
+				iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"),
+				bundle.getVirtualPathWithFileNameString("style/case.css"),
+				web2Business.getBundleURIToJQueryUILib("1.6rc5/themes/base", "ui.core.css")
+		));
 		
 		IWResourceBundle iwrb = getResourceBundle();
 		
@@ -154,9 +156,7 @@ public class CasesSearcher extends CasesBlock {
 
 		//	Sorting options
 		DropdownMenu sortingOptions = getDropdownForSortingOptions(iwc);
-		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions, sortingOptions.getDisabled() ?
-				null : Arrays.asList(getPlusImageForSortingOptions(iwc, sortingOptions.getId()))
-		);
+		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions);
 		
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
@@ -273,15 +273,7 @@ public class CasesSearcher extends CasesBlock {
 				
 		return sortingOptions;
 	}
-	
-	private UIComponent getPlusImageForSortingOptions(IWContext iwc, String dropdownId) {
-		Image plus = new Image(getBundle().getVirtualPathWithFileNameString("images/add.png"), getResourceBundle()
-				.getLocalizedString("cases_searcher_add_sorting_option", "Add sorting option"));
-		plus.setStyleClass("casesSearcherAddSortingOptionImageStyle");
-		plus.setOnClick(new StringBuilder("CasesListHelper.addSearchResultsSortingOption('").append(dropdownId).append("');").toString());
-		return plus;
-	}
-	
+		
 	private DropdownMenu getDropdownForProcess(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_PROCESS_ID);
 		String selectedProcess = iwc.isParameterSet(PARAMETER_PROCESS_ID) ? iwc.getParameter(PARAMETER_PROCESS_ID) : null;

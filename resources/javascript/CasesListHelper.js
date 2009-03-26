@@ -408,7 +408,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.id = window.location.pathname;
 	this.instanceId = instanceId;
 	
-	this.sortingOptions = CasesListHelper.sortingOptions;
+	this.sortingOptions = CasesListHelper.getSortedSortingOptions();
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
@@ -540,6 +540,7 @@ CasesListHelper.addVariableInput = function() {
 		container: id2,
 		callback: function() {
 			closeAllLoadingMessages();
+			dwr.util.setValue(chooserId, '-1');
 			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 + '\').remove();" src=\''+deleteImage+'\' />').show('fast');
 		},
 		append: true
@@ -632,11 +633,11 @@ CasesListHelper.addSelectedSearchResultsSortingOption = function(dropdownId) {
 	
 	var selectedOptionsContainer = CasesListHelper.getSortingOptionsContainer(dropdownId);
 	var containerId = 'id' + value;
-	selectedOptionsContainer.append('<div id=\''+containerId+'\' style=\'display: none;\' class=\'casesSearchResultsSortingOptionContainer\'>' +
+	selectedOptionsContainer.append('<li id=\''+containerId+'\' style=\'display: none;\' class=\'casesSearchResultsSortingOptionContainer\'>' +
 		'<span class=\'casesSearchResultsSortingOptionsRemoveOptionSpan\' title=\''+selectedOption.text+'\'>'+selectedOption.text+'</span>' +
 		'<a class=\'casesSearchResultsSortingOptionsRemoveOption\' href=\'javascript:void(0);\' onclick=\''+
 		'CasesListHelper.removeSelectedSearchResultsSortingOption("'+containerId+'", "'+dropdownId+'", false);\'>'+
-		'<span class=\'casesSearchResultsSortingOptionsRemoveOptionInnerSpan\'></span></a></div>');
+		'<span class=\'casesSearchResultsSortingOptionsRemoveOptionInnerSpan\'></span></a></li>');
 	
 	selectedOptionsContainer.parent().show('fast', function() {
 		jQuery('#' + containerId).addClass(selectedOption.className);
@@ -645,7 +646,7 @@ CasesListHelper.addSelectedSearchResultsSortingOption = function(dropdownId) {
 }
 
 CasesListHelper.removeAllSearchResultsSortingOptions = function(dropdownId) {
-	jQuery.each(jQuery('div.casesSearchResultsSortingOptionContainer', jQuery('#' + dropdownId).parent()), function() {
+	jQuery.each(jQuery('li.casesSearchResultsSortingOptionContainer', jQuery('#' + dropdownId).parent()), function() {
 		CasesListHelper.removeSelectedSearchResultsSortingOption(jQuery(this).attr('id'), dropdownId, true);
 	});
 }
@@ -680,7 +681,7 @@ CasesListHelper.removeSelectedSearchResultsSortingOption = function(id, dropdown
 	optionContainer.hide('nomal', function() {
 		optionContainer.remove();
 		
-		if (jQuery('div.casesSearchResultsSortingOptionContainer', mainContainer).length == 0) {
+		if (jQuery('li.casesSearchResultsSortingOptionContainer', mainContainer).length == 0) {
 			mainContainer.hide('normal', function() {
 				mainContainer.remove();
 			});	
@@ -713,10 +714,44 @@ CasesListHelper.getSortingOptionsContainer = function(dropdownId) {
 	var windowStyle = 'casesSearchResultsSortingOptions';
 	var sortingOptionsWindow = jQuery('div.' + windowStyle, dropdown.parent());
 	if (sortingOptionsWindow.length == 0) {
-		dropdown.parent().append('<div class=\''+windowStyle+'\' style=\'display: none;\'><div class=\'casesSearchResultsSortingOptionsTable\'></div></div>');
+		dropdown.parent().append('<div class=\''+windowStyle+'\' style=\'display: none;\'><ul class=\'casesSearchResultsSortingOptionsList\'></ul></div>');
 		
 		sortingOptionsWindow = jQuery('div.' + windowStyle, dropdown.parent());
 	}
 	
-	return jQuery('div.casesSearchResultsSortingOptionsTable', sortingOptionsWindow);
+	var sortableList = jQuery('ul.casesSearchResultsSortingOptionsList', sortingOptionsWindow);
+	
+	var sortableOptionsListClassName = 'casesSearchResultsSortingOptionsListSortableList';
+	if (!sortableList.hasClass(sortableOptionsListClassName)) {
+		sortableList.sortable({
+			placeholder: 'ui-state-highlight'
+		});
+		sortableList.disableSelection();
+		sortableList.addClass(sortableOptionsListClassName);
+	}
+	
+	return sortableList;
+}
+
+CasesListHelper.getSortedSortingOptions = function() {
+	var dropdowns = jQuery('select.casesSearcherResultsSortingOptionsChooserStyle');
+	if (dropdowns.length == 0) {
+		return null;
+	}
+	
+	var sortingOptionsList = CasesListHelper.getSortingOptionsContainer(jQuery(dropdowns[0]).attr('id'));
+	var sortedOptions = sortingOptionsList.sortable('toArray');
+	if (sortedOptions == null || sortedOptions.length == 0) {
+		return null;
+	}
+	
+	var options = [];
+	for (var i = 0; i < sortedOptions.length; i++) {
+		var value = sortedOptions[i];
+		value = value.replace('id', '');
+		
+		options.push({id: value, value: value});
+	}
+	
+	return options;
 }
