@@ -412,7 +412,9 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
-	jQuery('.casesSearcherBoxStyleClass').remove().insertAfter('#sidebar').wrap('<div class="box" id="casesFilter"><div class="content"></div></div>');
+	if (jQuery('#sidebar').length > 0) {
+		jQuery('.casesSearcherBoxStyleClass').remove().insertAfter('#sidebar').wrap('<div class="box" id="casesFilter"><div class="content"></div></div>');
+	}
 	
 	if (id == null) {
 		return false;
