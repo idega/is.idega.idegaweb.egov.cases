@@ -505,20 +505,10 @@ CasesListHelper.addVariableInput = function() {
 	var variableLabel = jQuery(selectedOption).text();
 	
 	var variablesContainer = jQuery('#variableInputsContainer');
-	var emptyInputs = [];
-	
-	jQuery.each(jQuery('input.variableValueField', variablesContainer), function() {
-		var variableInput = jQuery(this);
-		
-		if (variableInput.attr('value') == null || variableInput.attr('value') == '') {
-			emptyInputs.push(variableInput);
-		}
-	});
-	
-	if (emptyInputs.length > 0) {
-		jQuery.each(emptyInputs, function() {
-			jQuery(this).parent().hide('fast').remove();
-		});
+	var chosenVariable = dwr.util.getValue(chooserId);
+	if (jQuery('input.variableValueField[name=\''+chosenVariable+'\']').length > 0) {
+		dwr.util.setValue(chooserId, '-1');
+		return;
 	}
 	
 	var id = 'id' + new Date().getTime();
@@ -543,7 +533,7 @@ CasesListHelper.addVariableInput = function() {
 		callback: function() {
 			closeAllLoadingMessages();
 			dwr.util.setValue(chooserId, '-1');
-			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 + '\').remove();" src=\''+deleteImage+'\' />').show('fast');
+			jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 + '\').hide(\'normal\', function() {jQuery(\'#' + id2 + '\').remove();});" src=\''+deleteImage+'\' />').show('fast');
 		},
 		append: true
 	};
