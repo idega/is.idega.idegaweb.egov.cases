@@ -14,19 +14,20 @@ public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 
 	private Locale locale;
 	private List<String> sortingPreferences;
+	private Collator theCollator;
 	
 	public BoardCasesComparator(Locale locale) {
 		this.locale = locale;
+		theCollator = Collator.getInstance(locale);
 	}
 	
 	public BoardCasesComparator(Locale locale, List<String> sortingPreferences) {
 		this(locale);
-		
 		this.sortingPreferences = sortingPreferences;
 	}
 	
 	public int compare(CaseBoardBean bean1, CaseBoardBean bean2) {
-		return Collator.getInstance(locale).compare(getExpression(bean1), getExpression(bean2));
+		return theCollator.compare(getExpression(bean1), getExpression(bean2));
 	}
 	
 	private String getExpression(CaseBoardBean bean) {
