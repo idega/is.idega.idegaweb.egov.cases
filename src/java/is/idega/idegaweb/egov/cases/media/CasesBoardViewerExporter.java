@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.DownloadWriter;
@@ -31,6 +32,7 @@ import com.idega.io.MediaWritable;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.StringHandler;
@@ -85,6 +87,8 @@ private MemoryFileBuffer memory;
 				
 				if (index == 2) {
 					bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
+				} else if (index == 13) {
+					bodyRowCell.setCellValue(getHandlerInfo(iwc, value));
 				}
 				else {
 					bodyRowCell.setCellValue(value);
@@ -110,6 +114,21 @@ private MemoryFileBuffer memory;
 		memory.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
 		setAsDownload(iwc, new StringBuilder(iwrb.getLocalizedString("cases_board_viewer.exported_data", "Exported cases board")).append(".xls").toString(),
 				memory.length());
+	}
+	
+	private String getHandlerInfo(IWContext iwc, String userId) {
+		AdvancedProperty info = null;
+		try {
+			info = boardCasesManager.getHandlerInfo(iwc, userId);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (info == null) {
+			return CoreConstants.EMPTY;
+		}
+		
+		return info.getId();
 	}
 	
 	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {

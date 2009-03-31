@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -199,6 +200,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 					linkToTask.getId();
 					bodyRowCell.add(linkToTask);
+				} else if (index == 13) {
+					//	E-mail link to handler
+					bodyRowCell.add(getHandlerInfo(iwc, value));
 				}
 				else {
 					bodyRowCell.add(new Text(value));
@@ -258,6 +262,25 @@ public class CasesBoardViewer extends IWBaseComponent {
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 		
 		return true;
+	}
+	
+	private UIComponent getHandlerInfo(IWContext iwc, String userId) {
+		AdvancedProperty info = null;
+		try {
+			info = getBoardCasesManager().getHandlerInfo(iwc, userId);
+		} catch(Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting handler info for user: " + userId);
+		}
+		
+		if (info == null) {
+			return new Text(CoreConstants.EMPTY);
+		}
+		
+		if (StringUtil.isEmpty(info.getValue())) {
+			return new Text(info.getId());
+		}
+		
+		return new Link(info.getId(), info.getValue());
 	}
 	
 	private String getLinkToTheTask(IWContext iwc, String caseId, String taskViewerPage) {

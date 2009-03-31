@@ -23,4 +23,6 @@ public interface BoardCasesManager {
 	
 	public CaseBoardTableBean getTableData(IWContext iwc, String caseStatus, String processName);
 	
+	public AdvancedProperty getHandlerInfo(IWContext iwc, String userId);
+	
 }
