@@ -78,6 +78,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	private boolean showCaseNumberColumn = true;
 	private boolean showCreationTimeInDateColumn = true;
 	
+	private String caseStatusesToHide;
+	private String caseStatusesToShow;
+	
 	protected abstract String getBlockID();
 	
 	@Override
@@ -203,6 +206,8 @@ public abstract class CasesProcessor extends CasesBlock {
 		list.setInstanceId(getBuilderService(iwc).getInstanceId(this));
 		list.setShowCaseNumberColumn(isShowCaseNumberColumn());
 		list.setShowCreationTimeInDateColumn(isShowCreationTimeInDateColumn());
+		list.setCaseStatusesToHide(getCaseStatusesToHide());
+		list.setCaseStatusesToShow(getCaseStatusesToShow());
 		
 		form.add(list);
 				
@@ -519,4 +524,19 @@ public abstract class CasesProcessor extends CasesBlock {
 		this.showCreationTimeInDateColumn = showCreationTimeInDateColumn;
 	}
 
+	public String getCaseStatusesToHide() {
+		return caseStatusesToHide;
+	}
+
+	public void setCaseStatusesToHide(String caseStatusesToHide) {
+		this.caseStatusesToHide = caseStatusesToHide;
+	}
+
+	public String getCaseStatusesToShow() {
+		return caseStatusesToShow;
+	}
+
+	public void setCaseStatusesToShow(String caseStatusesToShow) {
+		this.caseStatusesToShow = caseStatusesToShow;
+	}
 }
