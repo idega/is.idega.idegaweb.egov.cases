@@ -93,6 +93,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private String caseStatus;
 	private String roleKey;
 	private String processName;
+	private boolean useCurrentPageAsBackPageFromTaskViewer = Boolean.TRUE;
+	
+	private String currentPageUri;
 	
 	@Override
 	protected void initializeComponent(FacesContext context) {
@@ -244,6 +247,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
 		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
 		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", totalBoardAmountCellId));
+		if (useCurrentPageAsBackPageFromTaskViewer) {
+			container.add(new HiddenInput("casesBoardViewerTableSpecialBackPageFromTaskViewer", getCurrentPageUri(iwc)));
+		}
 		
 		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter();").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
@@ -254,10 +260,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 		return true;
 	}
 	
-	private String getLinkToTheTask(IWContext iwc, String caseId,  String taskViewerPage) {
+	private String getLinkToTheTask(IWContext iwc, String caseId, String taskViewerPage) {
 		String uri = null;
 		try {
-			uri = getBoardCasesManager().getLinkToTheTask(iwc, caseId, taskViewerPage);
+			uri = getBoardCasesManager().getLinkToTheTask(iwc, caseId, taskViewerPage, useCurrentPageAsBackPageFromTaskViewer ? getCurrentPageUri(iwc) : null);
 		} catch(Exception e) {
 			LOGGER.log(Level.WARNING, "Error getting uri to the task for case: " + caseId);
 		}
@@ -297,6 +303,22 @@ public class CasesBoardViewer extends IWBaseComponent {
 		return uri.getUri();
 	}
 
+	private String getCurrentPageUri(IWContext iwc) {
+		if (StringUtil.isEmpty(currentPageUri)) {
+			if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+				try {
+					currentPageUri = getBuilderLogicWrapper().getBuilderService(iwc).getCurrentPageURI(iwc);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (StringUtil.isEmpty(currentPageUri)) {
+				currentPageUri = iwc.getRequestURI();
+			}
+		}
+		return currentPageUri;
+	}
+	
 	public String getCaseStatus() {
 		return caseStatus;
 	}
@@ -341,6 +363,15 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	public void setBuilderLogicWrapper(BuilderLogicWrapper builderLogicWrapper) {
 		this.builderLogicWrapper = builderLogicWrapper;
+	}
+
+	public boolean isUseCurrentPageAsBackPageFromTaskViewer() {
+		return useCurrentPageAsBackPageFromTaskViewer;
+	}
+
+	public void setUseCurrentPageAsBackPageFromTaskViewer(
+			boolean useCurrentPageAsBackPageFromTaskViewer) {
+		this.useCurrentPageAsBackPageFromTaskViewer = useCurrentPageAsBackPageFromTaskViewer;
 	}
 
 }

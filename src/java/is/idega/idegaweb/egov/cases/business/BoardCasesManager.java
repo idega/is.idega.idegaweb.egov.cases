@@ -13,11 +13,11 @@ public interface BoardCasesManager {
 	
 	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, IWResourceBundle iwrb, String caseStatus, String processName);
 	
-	public AdvancedProperty setCaseVariableValue(Integer caseId, String variableName, String value, String role);
+	public AdvancedProperty setCaseVariableValue(Integer caseId, String variableName, String value, String role, String backPage);
 	
 	public String getPageUriForTaskViewer(IWContext iwc);
 	
-	public String getLinkToTheTask(IWContext iwc, String caseId, String basePage);
+	public String getLinkToTheTask(IWContext iwc, String caseId, String basePage, String backPage);
 	
 	public String getGradingSum(IWContext iwc, CaseBoardBean boardCase);
 	

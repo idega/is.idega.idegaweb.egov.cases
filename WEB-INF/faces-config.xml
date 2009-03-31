@@ -53,6 +53,11 @@
 				<property-resolver>com.idega.block.process.business.CaseStatusHandler</property-resolver>
 			</property-extension>
 		</property>
+		<property>
+			<display-name>Use current page as back page from task viewer</display-name>
+			<property-name>useCurrentPageAsBackPageFromTaskViewer</property-name>
+			<property-class>boolean</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

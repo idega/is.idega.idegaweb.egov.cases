@@ -23,6 +23,10 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 			
 			showLoadingMessage(CasesBoardHelper.localizations.loading);
 			CasesBoardHelper.linkInAction = this.id;
+			var id = window.setTimeout(function() {
+				window.clearTimeout(id);
+				closeAllLoadingMessages();
+			}, 3000);
 		});
 		link.dblclick(function() {
 			return false;
@@ -68,6 +72,8 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 	settings.container = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableContainerKey\']', container);
 	settings.totalBoardAmountCellId = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableTotalBoardAmountCellIdKey\']',
 		container);
+	settings.backPage = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableSpecialBackPageFromTaskViewer\']',
+		container);
 	
 	settings.placeholder = '';
 	settings.tooltip = CasesBoardHelper.localizations.edit;
@@ -78,7 +84,7 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 		var editableElement = jQuery(this);
 		
 		showLoadingMessage(CasesBoardHelper.localizations.savingMessage);
-		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, {
+		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, settings.backPage, {
 			callback: function(result) {
 				CasesBoardHelper.closeEditableField(editableElement, result);
 				
