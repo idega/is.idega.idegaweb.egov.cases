@@ -272,7 +272,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		//	Status
 		String localizedStatus = theCase.getLocalizedStatus();
-		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(localizedStatus == null ? CoreConstants.MINUS : localizedStatus), bodyItem, "Status");
+		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
+				bodyItem, "Status");
 		if (theCase.isBpm()) {
 			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
 		}

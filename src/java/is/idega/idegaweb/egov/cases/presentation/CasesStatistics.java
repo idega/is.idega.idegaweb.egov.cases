@@ -114,7 +114,7 @@ public class CasesStatistics extends CasesBlock {
 				CaseStatus status = null;
 				for (CasePresentation theCase: cases) {
 					status = theCase.getCaseStatus();
-					if (!statuses.contains(status)) {
+					if (status != null && !statuses.contains(status)) {
 						statuses.add(status);
 					}
 				}
@@ -939,7 +939,8 @@ public class CasesStatistics extends CasesBlock {
 		String status = null;
 		availableStatuses = new ArrayList<String>();
 		for (Iterator<CasePresentation> casesIter = cases.iterator(); casesIter.hasNext();) {
-			status = casesIter.next().getCaseStatus().getStatus();
+			CaseStatus caseStatus = casesIter.next().getCaseStatus();
+			status = caseStatus == null ? null : caseStatus.getStatus();
 			
 			if (!StringUtil.isEmpty(status) && !availableStatuses.contains(status)) {
 				availableStatuses.add(status);
