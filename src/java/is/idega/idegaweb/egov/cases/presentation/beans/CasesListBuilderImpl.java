@@ -399,8 +399,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
-	
-	
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {		
 		int pageSize = properties.getPageSize();
 		int page = properties.getPage();
