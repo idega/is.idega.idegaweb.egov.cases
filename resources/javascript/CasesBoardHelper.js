@@ -8,25 +8,40 @@ CasesBoardHelper.localizations = {
 };
 
 CasesBoardHelper.linkInAction = null;
+CasesBoardHelper.pressedKeyboardButton = null;
+CasesBoardHelper.pressedMouseRightClickButton = false;
 
 CasesBoardHelper.initializeBoardCases = function(localizations) {
 	CasesBoardHelper.linkInAction = null;
 	CasesBoardHelper.localizations = localizations;
 	
+	jQuery(document).bind('keydown', function(event) {
+		CasesBoardHelper.pressedKeyboardButton = event.keyCode;
+	});
+	jQuery(document).bind('keyup', function(event) {
+		CasesBoardHelper.pressedKeyboardButton = null;
+	});
+	
 	jQuery.each(jQuery('a.casesBoardViewerTableLinkToTaskStyle'), function() {
 		var link = jQuery(this);
 		
-		link.click(function() {
+		link.click(function(event) {
+			if (event && event.button && event.button == 2) {
+				CasesBoardHelper.pressedMouseRightClickButton = true;
+			}
+			
 			if (CasesBoardHelper.linkInAction == this.id) {
 				return false;
 			}
 			
 			showLoadingMessage(CasesBoardHelper.localizations.loading);
 			CasesBoardHelper.linkInAction = this.id;
-			var id = window.setTimeout(function() {
-				window.clearTimeout(id);
-				closeAllLoadingMessages();
-			}, 3000);
+			if (CasesBoardHelper.isLinkToBeOpenedInNewTab()) {
+				var id = window.setTimeout(function() {
+					window.clearTimeout(id);
+					closeAllLoadingMessages();
+				}, 3000);
+			}
 		});
 		link.dblclick(function() {
 			return false;
@@ -54,6 +69,19 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 			rerender:	false
 		}, 'textarea');
 	});
+}
+
+CasesBoardHelper.isLinkToBeOpenedInNewTab = function() {
+	if (CasesBoardHelper.pressedKeyboardButton == 17 || CasesBoardHelper.pressedKeyboardButton == 91 || CasesBoardHelper.pressedKeyboardButton == 224) {
+		//	Control or Command button is pressed also!
+		return true;
+	}
+	
+	if (CasesBoardHelper.pressedMouseRightClickButton) {
+		return true;
+	}
+	
+	return false;
 }
 
 CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
