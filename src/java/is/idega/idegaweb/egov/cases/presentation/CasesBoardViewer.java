@@ -280,7 +280,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 			return new Text(info.getId());
 		}
 		
-		return new Link(info.getId(), info.getValue());
+		Link mailTo = new Link(info.getId(), info.getValue());
+		mailTo.setToMaintainAllParameter(false);
+		return mailTo;
 	}
 	
 	private String getLinkToTheTask(IWContext iwc, String caseId, String taskViewerPage) {
