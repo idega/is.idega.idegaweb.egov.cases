@@ -1,5 +1,7 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
+import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +18,11 @@ public class CaseBoardBean {
 	private String appliedAmount;
 	
 	private String nutshell;
+	private String gradingSum;
 	
 	private String category;
-	
 	private String comment;
+	
 	private Long grantAmountSuggestion;
 	private Long boardAmount;
 	private String restrictions;
@@ -72,14 +75,6 @@ public class CaseBoardBean {
 
 	public void setCategory(String category) {
 		this.category = category;
-	}
-
-	public String getOwnerGrade() {
-		return comment;
-	}
-
-	public void setOwnerGrade(String ownerGrade) {
-		this.comment = ownerGrade;
 	}
 
 	public String getRestrictions() {
@@ -144,27 +139,35 @@ public class CaseBoardBean {
 
 	public List<String> getAllValues() {
 		if (allValues == null) {
-			allValues = new ArrayList<String>();
+			allValues = new ArrayList<String>(CasesBoardViewer.CASE_FIELDS.size());
 			
-			allValues.add(getApplicantName());
-			allValues.add(getPostalCode());
-			allValues.add(getCaseIdentifier());
-			allValues.add(getCaseDescription());
+			allValues.add(getApplicantName());					//	0
+			allValues.add(getPostalCode());						//	1
+			allValues.add(getCaseIdentifier());					//	2
+			allValues.add(getCaseDescription());				//	3
 			
-			allValues.add(String.valueOf(getTotalCost()));
-			allValues.add(String.valueOf(getAppliedAmount()));
+			allValues.add(String.valueOf(getTotalCost()));		//	4
+			allValues.add(String.valueOf(getAppliedAmount()));	//	5
 			
-			allValues.add(getNutshell());
+			allValues.add(getNutshell());						//	6
 			
-			allValues.add(getComment());
+			allValues.add(getGradingSum());						//	7
 			
-			allValues.add(getCategory());
+			allValues.add(getCategory());						//	8
+			allValues.add(getComment());						//	9
 			
-			allValues.add(getOwnerGrade());
-			allValues.add(String.valueOf(getGrantAmountSuggestion()));
-			allValues.add(String.valueOf(getBoardAmount()));
-			allValues.add(getRestrictions());
+			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	10
+			allValues.add(String.valueOf(getBoardAmount()));	//	11
+			allValues.add(getRestrictions());					//	12
 		}
 		return allValues;
+	}
+
+	public String getGradingSum() {
+		return gradingSum;
+	}
+
+	public void setGradingSum(String gradingSum) {
+		this.gradingSum = gradingSum;
 	}
 }

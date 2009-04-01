@@ -19,7 +19,7 @@ public interface BoardCasesManager {
 	
 	public String getLinkToTheTask(IWContext iwc, String caseId, String basePage, String backPage);
 	
-	public String getGradingSum(IWContext iwc, CaseBoardBean boardCase);
+	public String getGradingSum(CaseBoardBean boardCase, List<String> gradingValues);
 	
 	public CaseBoardTableBean getTableData(IWContext iwc, String caseStatus, String processName);
 	
