@@ -281,7 +281,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 		
 		Link mailTo = new Link(info.getId(), info.getValue());
-		mailTo.setToMaintainAllParameter(false);
+		mailTo.setSessionId(false);
 		return mailTo;
 	}
 	

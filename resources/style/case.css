@@ -541,3 +541,7 @@ tr.even {
 .casesSearchResultsSortingOptionContainer:HOVER {
 	cursor: move;
 }
+
+.casesBoardViewerContainer {
+	overflow: auto;
+}
