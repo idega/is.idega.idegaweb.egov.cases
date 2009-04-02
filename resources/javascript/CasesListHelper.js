@@ -409,6 +409,9 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.instanceId = instanceId;
 	
 	this.sortingOptions = CasesListHelper.getSortedSortingOptions();
+	
+	this.statusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
+	this.statusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {

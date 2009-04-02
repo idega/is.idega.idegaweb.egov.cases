@@ -504,6 +504,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			input.setStyleClass("casesListInstanceIdProperty");
 			container.add(input);
 		}
+		
+		addStatusesProperties(container, "casesListStatusesToShow", properties.getStatusesToShow());
+		addStatusesProperties(container, "casesListStatusesToHide", properties.getStatusesToHide());
+	}
+	
+	private void addStatusesProperties(Layer container, String className, List<String> statuses) {
+		HiddenInput status = new HiddenInput(className);
+		status.setStyleClass(className);
+		status.setValue(ListUtil.isEmpty(statuses) ? CoreConstants.EMPTY : ListUtil.convertListOfStringsToCommaseparatedString(statuses));
+		container.add(status);
 	}
 	
 	@SuppressWarnings("unchecked")
