@@ -25,6 +25,7 @@ import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
+import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.AdvancedPropertyComparator;
@@ -91,6 +92,7 @@ public class CasesSearcher extends CasesBlock {
 				web2Business.getBundleUriToHumanizedMessagesScript(),
 				web2Business.getBundleURIToJQueryUILib("1.6rc5", "ui.core.js"),
 				web2Business.getBundleURIToJQueryUILib("1.6rc5", "ui.sortable.js"),
+				web2Business.getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
 				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
 				CoreConstants.DWR_ENGINE_SCRIPT,
 				CoreConstants.DWR_UTIL_SCRIPT,
