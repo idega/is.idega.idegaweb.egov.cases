@@ -142,7 +142,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		container.add(new CSSSpacer());
 		
 		addButtons(container, iwc, iwrb);
-		
+
 		String initAction = new StringBuilder("CasesBoardHelper.initializeBoardCases({savingMessage: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.saving_case_variable", "Saving...")).append("', remove: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.remove_value", "Remove")).append("', edit: '")
@@ -335,7 +335,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 				try {
 					currentPageUri = getBuilderLogicWrapper().getBuilderService(iwc).getCurrentPageURI(iwc);
 				} catch(Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Error getting current page's uri!", e);
 				}
 			}
 			if (StringUtil.isEmpty(currentPageUri)) {

@@ -18,7 +18,8 @@ public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 	
 	public BoardCasesComparator(Locale locale) {
 		this.locale = locale;
-		theCollator = Collator.getInstance(locale);
+		
+		theCollator = Collator.getInstance(this.locale);
 	}
 	
 	public BoardCasesComparator(Locale locale, List<String> sortingPreferences) {
