@@ -1,10 +1,11 @@
 if (CasesBoardHelper == null) var CasesBoardHelper = {};
 
 CasesBoardHelper.localizations = {
-	savingMessage:	'Saving...',
-	remove:			'Remove',
-	edit:			'Edit',
-	loading:		'Loading...'
+	savingMessage:		'Saving...',
+	remove:				'Remove',
+	edit:				'Edit',
+	loading:			'Loading...',
+	enterNumericValue:	'Invalid value! Make sure entered value is numeric only.'
 };
 
 CasesBoardHelper.linkInAction = null;
@@ -111,6 +112,17 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 	cell.editable(function(value, settings) {
 		var editableElement = jQuery(this);
 		
+		if (settings.previousValue == value) {
+			CasesBoardHelper.closeEditableField(editableElement, value);
+			return;
+		}
+		
+		if (settings.recount && !IWCORE.isNumericValue(value)) {
+			humanMsg.displayMsg(CasesBoardHelper.localizations.enterNumericValue);
+			CasesBoardHelper.closeEditableField(editableElement, settings.previousValue);
+			return;
+		}
+		
 		showLoadingMessage(CasesBoardHelper.localizations.savingMessage);
 		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, settings.backPage, {
 			callback: function(result) {
@@ -165,5 +177,5 @@ CasesBoardHelper.getValueFromHiddenInput = function(filter, container) {
 }
 
 CasesBoardHelper.closeEditableField = function(field, value) {
-	field.empty().text(value == null ? '': value.id);
+	field.empty().text(value == null ? '' : value.id == null ? value : value.id);
 }

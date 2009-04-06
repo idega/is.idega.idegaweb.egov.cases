@@ -147,7 +147,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			.append(iwrb.getLocalizedString("case_board_viewer.saving_case_variable", "Saving...")).append("', remove: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.remove_value", "Remove")).append("', edit: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.edit_value", "Edit")).append("', loading: '")
-			.append(iwrb.getLocalizedString("case_board_viewer.loading", "Loading..."))
+			.append(iwrb.getLocalizedString("case_board_viewer.loading", "Loading...")).append("', enterNumericValue: '")
+			.append(iwrb.getLocalizedString("case_board_viewer.enter_numeric_value", "Invalid value! Make sure entered value is numeric only."))
 			.append("'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
