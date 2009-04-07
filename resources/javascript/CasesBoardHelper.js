@@ -135,21 +135,25 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 					return;
 				}
 				
-				if (result != null && settings.recount) {
-					var previousValue = settings.previousValue;
-					previousValue++;
-					previousValue--;
-					
-					var totalSum = jQuery('#' + settings.totalBoardAmountCellId).text();
-					totalSum++;
-					totalSum--;
-					var newValue = result.id;
-					newValue++;
-					newValue--;
-					
-					totalSum = totalSum - previousValue + newValue;
-					jQuery('#' + settings.totalBoardAmountCellId).text(totalSum);
-					settings.previousValue = newValue;
+				if (result != null) {
+					if (settings.recount) {
+						var previousValue = settings.previousValue;
+						previousValue++;
+						previousValue--;
+						
+						var totalSum = jQuery('#' + settings.totalBoardAmountCellId).text();
+						totalSum++;
+						totalSum--;
+						var newValue = result.id;
+						newValue++;
+						newValue--;
+						
+						totalSum = totalSum - previousValue + newValue;
+						jQuery('#' + settings.totalBoardAmountCellId).text(totalSum);
+						settings.previousValue = newValue;
+					} else {
+						settings.previousValue = result.id;
+					}
 				}
 				
 				if (result != null) {
