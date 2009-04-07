@@ -18,7 +18,6 @@ import javax.faces.context.FacesContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.web2.business.JQueryPlugin;
-import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.BuilderLogicWrapper;
@@ -119,7 +118,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 			web2.getBundleURIToJQueryLib(),
 			web2.getBundleUriToHumanizedMessagesScript(),
-			web2.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE),
+			web2.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
 			web2.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
 			CoreConstants.DWR_ENGINE_SCRIPT,
 			CoreConstants.DWR_UTIL_SCRIPT,

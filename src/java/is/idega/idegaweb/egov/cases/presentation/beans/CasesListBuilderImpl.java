@@ -33,7 +33,7 @@ import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseListPropertiesBean;
 import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
-import com.idega.block.web2.business.JQueryUIType;
+import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
@@ -708,7 +708,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(web2Business.getBundleURIToJQueryLib());
-		scripts.add(web2Business.getBundleURIToJQueryUILib(JQueryUIType.UI_EDITABLE));
+		scripts.add(web2Business.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
