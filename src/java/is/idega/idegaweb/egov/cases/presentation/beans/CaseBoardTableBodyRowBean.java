@@ -2,11 +2,23 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 
 import java.util.List;
 
+import com.idega.user.data.User;
+
 public class CaseBoardTableBodyRowBean {
 
 	private String id;
 	private String caseId;
-	private String caseIdentifier;	
+	private String caseIdentifier;
+	
+	private Long processInstanceId;
+	
+	private User handler;
+	
+	public CaseBoardTableBodyRowBean(String caseId, Long processInstanceId) {
+		this.caseId = caseId;
+		this.processInstanceId = processInstanceId;
+	}
+	
 	private List<String> values;
 
 	public List<String> getValues() {
@@ -32,6 +44,18 @@ public class CaseBoardTableBodyRowBean {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public Long getProcessInstanceId() {
+		return processInstanceId;
+	}
+	public void setProcessInstanceId(Long processInstanceId) {
+		this.processInstanceId = processInstanceId;
+	}
+	public User getHandler() {
+		return handler;
+	}
+	public void setHandler(User handler) {
+		this.handler = handler;
 	}
 	
 }

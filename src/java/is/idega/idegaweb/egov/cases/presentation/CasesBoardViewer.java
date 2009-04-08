@@ -42,6 +42,7 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.PrintButton;
+import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.PresentationUtil;
@@ -148,6 +149,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			.append(iwrb.getLocalizedString("case_board_viewer.edit_value", "Edit")).append("', loading: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.loading", "Loading...")).append("', enterNumericValue: '")
 			.append(iwrb.getLocalizedString("case_board_viewer.enter_numeric_value", "Invalid value! Make sure entered value is numeric only."))
+			.append("', errorSaving: '").append(iwrb.getLocalizedString("case_board_viewer.error_saving_value", "Error occurred while saving!"))
 			.append("'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
@@ -157,6 +159,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 	
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, caseStatus, processName);
+		
+		long start = System.currentTimeMillis();
+		
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
 			return false;
@@ -184,7 +189,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 		Link linkToTask = null;
 		TableBodyRowGroup body = table.createBodyRowGroup();
 		body.setStyleClass("casesBoardViewerBodyRows");
-		String taskViewerPage = getBoardCasesManager().getPageUriForTaskViewer(iwc);
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			TableRow row = body.createRow();
 			row.setId(rowBean.getId());
@@ -196,13 +200,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 				
 				if (index == 2) {
 					//	Link to grading task
-					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean.getCaseId(), taskViewerPage));
+					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean));
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 					linkToTask.getId();
 					bodyRowCell.add(linkToTask);
 				} else if (index == 13) {
 					//	E-mail link to handler
-					bodyRowCell.add(getHandlerInfo(iwc, value));
+					bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
 				}
 				else {
 					bodyRowCell.add(new Text(value));
@@ -261,15 +265,18 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 		
+		long end = System.currentTimeMillis();
+		LOGGER.info("Took time to PRINT data table: " + (end - start) + " ms");
+		
 		return true;
 	}
 	
-	private UIComponent getHandlerInfo(IWContext iwc, String userId) {
+	private UIComponent getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
-			info = getBoardCasesManager().getHandlerInfo(iwc, userId);
+			info = getBoardCasesManager().getHandlerInfo(iwc, handler);
 		} catch(Exception e) {
-			LOGGER.log(Level.WARNING, "Error getting handler info for user: " + userId);
+			LOGGER.log(Level.WARNING, "Error getting handler info for user: " + handler);
 		}
 		
 		if (info == null) {
@@ -285,12 +292,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 		return mailTo;
 	}
 	
-	private String getLinkToTheTask(IWContext iwc, String caseId, String taskViewerPage) {
+	private String getLinkToTheTask(IWContext iwc, CaseBoardTableBodyRowBean rowBean) {
 		String uri = null;
 		try {
-			uri = getBoardCasesManager().getLinkToTheTask(iwc, caseId, taskViewerPage, useCurrentPageAsBackPageFromTaskViewer ? getCurrentPageUri(iwc) : null);
+			String basePage = getCurrentPageUri(iwc);
+			uri = getBoardCasesManager().getLinkToTheTaskRedirector(iwc, basePage, rowBean.getCaseId(), rowBean.getProcessInstanceId(),
+					useCurrentPageAsBackPageFromTaskViewer ? basePage : null);
 		} catch(Exception e) {
-			LOGGER.log(Level.WARNING, "Error getting uri to the task for case: " + caseId);
+			LOGGER.log(Level.WARNING, "Error getting uri to the task for process: " + rowBean.getProcessInstanceId());
 		}
 		return StringUtil.isEmpty(uri) ? iwc.getRequestURI() : uri;
 	}

@@ -32,6 +32,7 @@ import com.idega.io.MediaWritable;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
@@ -88,7 +89,7 @@ private MemoryFileBuffer memory;
 				if (index == 2) {
 					bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
 				} else if (index == 13) {
-					bodyRowCell.setCellValue(getHandlerInfo(iwc, value));
+					bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 				}
 				else {
 					bodyRowCell.setCellValue(value);
@@ -116,10 +117,10 @@ private MemoryFileBuffer memory;
 				memory.length());
 	}
 	
-	private String getHandlerInfo(IWContext iwc, String userId) {
+	private String getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
-			info = boardCasesManager.getHandlerInfo(iwc, userId);
+			info = boardCasesManager.getHandlerInfo(iwc, handler);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

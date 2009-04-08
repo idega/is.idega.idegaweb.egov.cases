@@ -5,9 +5,12 @@ import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.idega.user.data.User;
+
 public class CaseBoardBean {
 
 	private String caseId;
+	private Long processInstanceId;
 	
 	private String applicantName;
 	private String postalCode;
@@ -29,6 +32,13 @@ public class CaseBoardBean {
 	
 	private List<String> allValues;
 
+	private User handler;
+	
+	public CaseBoardBean(String caseId, Long processInstanceId) {
+		this.caseId = caseId;
+		this.processInstanceId = processInstanceId;
+	}
+	
 	public String getApplicantName() {
 		return applicantName;
 	}
@@ -170,4 +180,21 @@ public class CaseBoardBean {
 	public void setGradingSum(String gradingSum) {
 		this.gradingSum = gradingSum;
 	}
+
+	public Long getProcessInstanceId() {
+		return processInstanceId;
+	}
+
+	public void setProcessInstanceId(Long processInstanceId) {
+		this.processInstanceId = processInstanceId;
+	}
+
+	public User getHandler() {
+		return handler;
+	}
+
+	public void setHandler(User handler) {
+		this.handler = handler;
+	}
+	
 }

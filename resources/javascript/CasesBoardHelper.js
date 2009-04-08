@@ -5,7 +5,8 @@ CasesBoardHelper.localizations = {
 	remove:				'Remove',
 	edit:				'Edit',
 	loading:			'Loading...',
-	enterNumericValue:	'Invalid value! Make sure entered value is numeric only.'
+	enterNumericValue:	'Invalid value! Make sure entered value is numeric only.',
+	errorSaving:		'Error occurred while saving!'
 };
 
 CasesBoardHelper.linkInAction = null;
@@ -128,35 +129,40 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 			callback: function(result) {
 				CasesBoardHelper.closeEditableField(editableElement, result);
 				
-				if (result != null && settings.rerender) {
+				if (result == null) {
+					closeAllLoadingMessages();
+					humanMsg.displayMsg(CasesBoardHelper.localizations.errorSaving);
+					return;
+				}
+				
+				if (settings.rerender) {
 					IWCORE.renderComponent(settings.uuid, settings.container, function() {
 						closeAllLoadingMessages();
 					}, null);
 					return;
 				}
 				
-				if (result != null) {
-					if (settings.recount) {
-						var previousValue = settings.previousValue;
-						previousValue++;
-						previousValue--;
-						
-						var totalSum = jQuery('#' + settings.totalBoardAmountCellId).text();
-						totalSum++;
-						totalSum--;
-						var newValue = result.id;
-						newValue++;
-						newValue--;
-						
-						totalSum = totalSum - previousValue + newValue;
-						jQuery('#' + settings.totalBoardAmountCellId).text(totalSum);
-						settings.previousValue = newValue;
-					} else {
-						settings.previousValue = result.id;
-					}
+				var newValue = null;
+				if (settings.recount) {
+					var previousValue = settings.previousValue;
+					previousValue++;
+					previousValue--;
+					
+					var totalSum = jQuery('#' + settings.totalBoardAmountCellId).text();
+					totalSum++;
+					totalSum--;
+					newValue = result.id;
+					newValue++;
+					newValue--;
+					
+					totalSum = totalSum - previousValue + newValue;
+					jQuery('#' + settings.totalBoardAmountCellId).text(totalSum);
+				} else {
+					newValue = result.id;
 				}
+				settings.previousValue = newValue;
 				
-				if (result != null) {
+				if (result.value) {
 					jQuery('a.casesBoardViewerTableLinkToTaskStyle', editableElement.parent()).attr('href', result.value);
 				}
 				
@@ -164,6 +170,7 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 			}, errorHandler: function() {
 				closeAllLoadingMessages();
 				CasesBoardHelper.closeEditableField(editableElement, result);
+				humanMsg.displayMsg(CasesBoardHelper.localizations.errorSaving);
 			}
 		});
 	}, settings);
