@@ -169,7 +169,7 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 				closeAllLoadingMessages();
 			}, errorHandler: function() {
 				closeAllLoadingMessages();
-				CasesBoardHelper.closeEditableField(editableElement, result);
+				CasesBoardHelper.closeEditableField(editableElement, null);
 				humanMsg.displayMsg(CasesBoardHelper.localizations.errorSaving);
 			}
 		});
