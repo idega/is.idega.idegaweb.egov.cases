@@ -58,6 +58,11 @@
 			<property-name>useCurrentPageAsBackPageFromTaskViewer</property-name>
 			<property-class>boolean</property-class>
 		</property>
+		<property>
+			<display-name>Task name</display-name>
+			<property-name>taskName</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

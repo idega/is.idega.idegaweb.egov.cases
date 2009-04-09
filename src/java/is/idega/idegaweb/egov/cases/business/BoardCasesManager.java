@@ -16,15 +16,9 @@ public interface BoardCasesManager {
 	
 	public AdvancedProperty setCaseVariableValue(Integer caseId, String variableName, String value, String role, String backPage);
 	
-	public String getPageUriForTaskViewer(IWContext iwc);
-	
-	public String getLinkToTheTaskRedirector(IWContext iwc, String basePage, String caseId, Long processInstanceId, String backPage);
-	
 	public CaseBoardTableBean getTableData(IWContext iwc, String caseStatus, String processName);
 	
 	public AdvancedProperty getHandlerInfo(IWContext iwc, User handler);
 	
-	public String getTaskInstanceIdForTask(Long processInstanceId, String taskName);
-	
-	public String getLinkToTheTask(IWContext iwc, String caseId, String taskInstanceId, String backPage);
+	public String getLinkToTheTaskRedirector(IWContext iwc, String basePage, String caseId, Long processInstanceId, String backPage, String taskName);
 }

@@ -94,6 +94,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private String caseStatus;
 	private String roleKey;
 	private String processName;
+	private String taskName = "Grading";
 	private boolean useCurrentPageAsBackPageFromTaskViewer = Boolean.TRUE;
 	
 	private String currentPageUri;
@@ -297,7 +298,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		try {
 			String basePage = getCurrentPageUri(iwc);
 			uri = getBoardCasesManager().getLinkToTheTaskRedirector(iwc, basePage, rowBean.getCaseId(), rowBean.getProcessInstanceId(),
-					useCurrentPageAsBackPageFromTaskViewer ? basePage : null);
+					useCurrentPageAsBackPageFromTaskViewer ? basePage : null, getTaskName());
 		} catch(Exception e) {
 			LOGGER.log(Level.WARNING, "Error getting uri to the task for process: " + rowBean.getProcessInstanceId());
 		}
@@ -403,9 +404,16 @@ public class CasesBoardViewer extends IWBaseComponent {
 		return useCurrentPageAsBackPageFromTaskViewer;
 	}
 
-	public void setUseCurrentPageAsBackPageFromTaskViewer(
-			boolean useCurrentPageAsBackPageFromTaskViewer) {
+	public void setUseCurrentPageAsBackPageFromTaskViewer(boolean useCurrentPageAsBackPageFromTaskViewer) {
 		this.useCurrentPageAsBackPageFromTaskViewer = useCurrentPageAsBackPageFromTaskViewer;
+	}
+
+	public String getTaskName() {
+		return taskName;
+	}
+
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
 	}
 
 }
