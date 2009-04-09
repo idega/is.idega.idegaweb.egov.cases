@@ -161,8 +161,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, caseStatus, processName);
 		
-		long start = System.currentTimeMillis();
-		
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
 			return false;
@@ -265,9 +263,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
-		
-		long end = System.currentTimeMillis();
-		LOGGER.info("Took time to PRINT data table: " + (end - start) + " ms");
 		
 		return true;
 	}
