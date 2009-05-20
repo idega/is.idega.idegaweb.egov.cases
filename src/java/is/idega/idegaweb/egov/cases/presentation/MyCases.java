@@ -17,10 +17,12 @@ import java.util.Collection;
 
 import javax.ejb.FinderException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
-import com.idega.block.web2.business.Web2Business;
+import com.idega.block.web2.business.JQuery;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
 import com.idega.presentation.IWContext;
@@ -53,7 +55,8 @@ public class MyCases extends CasesProcessor {
 	private boolean showStatistics;
 	private boolean hideEmptySection = true;
 	
-	
+	@Autowired
+	private JQuery jQuery;
 	
 	@Override
 	public boolean isUsePDFDownloadColumn() {
@@ -99,23 +102,15 @@ public class MyCases extends CasesProcessor {
 	protected String getBlockID() {
 		return "myCases";
 	}
-
-//	@SuppressWarnings("unchecked")
-//	protected Collection getCases(User user) {
-//		
-//		Collection<GeneralCase> cases = super.getCases(user);
-//		Collection<GeneralCase> myCases = getCasesBusiness().getMyCases(user);
-//		
-//		if(cases != null)
-//			myCases.addAll(cases);
-//		
-//		return myCases;
-//	}
+	
+	@Override
+	protected void present(IWContext iwc) throws Exception {
+		ELUtil.getInstance().autowire(this);
+	}
 
 	@Override
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
-		Web2Business business = ELUtil.getInstance().getBean(Web2Business.class);
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleURIToJQueryLib());
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, jQuery.getBundleURIToJQueryLib());
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_UTIL_SCRIPT);
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CasesBusiness.js");
@@ -372,12 +367,12 @@ public class MyCases extends CasesProcessor {
 	
 	@Override
 	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
-
-		if (getParentPage() != null) {
-			super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
-		}
+		StringBuilder buffer = new StringBuilder();
+		buffer.append("jQuery(window).load(function() { jQuery('#").append(getBlockID()).append("').tablesorter( { headers: { ")
+			.append((getCasesBusiness().useTypes() ? 3 : 2)).append(": { sorter: false }, ").append((getCasesBusiness().useTypes() ? 6 : 5))
+			.append(": { sorter: false}").append((showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : ""))
+			.append("}, sortList: [[0,0]] } ); } );");
+		PresentationUtil.addJavaScriptActionToBody(iwc, buffer.toString());
 	}
 	
 	@Override
