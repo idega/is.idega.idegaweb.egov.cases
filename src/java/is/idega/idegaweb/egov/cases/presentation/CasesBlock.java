@@ -26,6 +26,7 @@ import com.idega.core.location.data.PostalCode;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.io.MediaWritable;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -97,7 +98,7 @@ public abstract class CasesBlock extends Block {
 		return link;
 	}
 	
-	protected Link getDownloadButtonLink(String text, Class mediaWriterClass) {
+	protected Link getDownloadButtonLink(String text, Class<? extends MediaWritable> mediaWriterClass) {
 		Layer all = new Layer(Layer.SPAN);
 		all.setStyleClass("buttonSpan");
 
