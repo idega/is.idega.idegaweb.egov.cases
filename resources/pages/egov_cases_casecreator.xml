@@ -20,7 +20,7 @@
     		</property>
     		<property>
 				<name>:method:1:implied:void:setShowRoot:boolean:</name>
-				<value>N</value>
+				<value>Y</value>
 				<type>java.lang.String</type>
 			</property>
 			<property>
