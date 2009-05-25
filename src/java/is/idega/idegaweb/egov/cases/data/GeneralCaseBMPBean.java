@@ -22,16 +22,16 @@ import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.core.file.data.ICFile;
+import com.idega.data.IDOAddRelationshipException;
 import com.idega.data.IDOCompositePrimaryKeyException;
 import com.idega.data.IDOException;
-import com.idega.data.IDOQuery;
 import com.idega.data.IDORelationshipException;
+import com.idega.data.IDORemoveRelationshipException;
 import com.idega.data.query.BetweenCriteria;
 import com.idega.data.query.Column;
 import com.idega.data.query.CountColumn;
 import com.idega.data.query.InCriteria;
 import com.idega.data.query.MatchCriteria;
-import com.idega.data.query.OR;
 import com.idega.data.query.Order;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
@@ -61,7 +61,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_WANT_REPLY = "want_reply";
 	private static final String COLUMN_WANT_REPLY_EMAIL = "want_reply_email";
 	private static final String COLUMN_WANT_REPLY_PHONE = "want_reply_phone";
-
+	private static final String COLUMN_CASE_SUBSCRIBERS = ENTITY_NAME + "_subscribers";
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -106,6 +107,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToOneRelationship(COLUMN_CASE_TYPE, CaseType.class);
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
+		addManyToManyRelationShip(User.class, COLUMN_CASE_SUBSCRIBERS);
 		getEntityDefinition().setBeanCachingActiveByDefault(true, 1000);
 	}
 
@@ -577,6 +579,24 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		query.addOrder(casesTable, CaseBMPBean.COLUMN_CREATED, false);
 		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
+	}
+
+	public void addSubscriber(User subscriber) throws IDOAddRelationshipException {
+		this.idoAddTo(subscriber);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<User> getSubscribers() {
+		try {
+			return super.idoGetRelatedEntities(User.class);
+		} catch (IDORelationshipException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public void removeSubscriber(User subscriber) throws IDORemoveRelationshipException {
+		super.idoRemoveFrom(subscriber);
 	}
 	
 
