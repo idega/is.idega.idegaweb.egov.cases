@@ -11,6 +11,7 @@ import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
+import java.util.Arrays;
 
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
@@ -62,8 +63,10 @@ public abstract class CasesBlock extends Block {
 
 	@Override
 	public void main(IWContext iwc) throws Exception {
-		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"));
-		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
+		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
+				iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"),
+				iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/case.css")
+		));
 		initialize(iwc);
 		present(iwc);
 	}
