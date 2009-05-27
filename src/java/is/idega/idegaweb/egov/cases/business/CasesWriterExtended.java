@@ -132,6 +132,17 @@ public class CasesWriterExtended extends CasesWriter {
 				cell = row.createCell((short) 1);
 				cell.setCellValue(type.getName());
 			}
+			
+			if (element.getReference() != null) {
+				row = sheet.createRow(cellRow++);
+
+				cell = row.createCell((short) 0);
+				cell.setCellValue(this.iwrb.getLocalizedString("reference", "Reference"));
+				cell.setCellStyle(style);
+
+				cell = row.createCell((short) 1);
+				cell.setCellValue(element.getReference());
+			}
 
 			row = sheet.createRow(cellRow++);
 

@@ -6,9 +6,11 @@
 		<create creator="ibo" javascript="CasesBusiness" scope="application">
 			<param name="class" value="is.idega.idegaweb.egov.cases.business.CasesBusiness" />
 			<include method="getAllSubCategories" />
+			<include method="getUser" />
 			<include method="getUsers" />
 			<include method="useTypes" />
 		</create>
 		
+		<convert converter="bean" match="is.idega.idegaweb.egov.cases.business.UserDWR"/>
 	</allow>
 </dwr>

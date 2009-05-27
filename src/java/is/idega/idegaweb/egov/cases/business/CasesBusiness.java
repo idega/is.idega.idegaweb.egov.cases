@@ -54,6 +54,11 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	public Map<String, String> getUsers(String categoryPK) throws RemoteException;
 
 	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getUser
+	 */
+	public UserDWR getUser(String personalID);
+	
+	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#reactivateCase
 	 */
 	public void reactivateCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException, RemoteException;

@@ -204,12 +204,17 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 			table.addCell(new Phrase(created.getLocaleDateAndTime(locale, IWTimestamp.SHORT, IWTimestamp.SHORT), textFont));
 
 			if (theCase.getSubject() != null) {
-				table.addCell(new Phrase(iwrb.getLocalizedString("created_date", "Created date"), labelFont));
+				table.addCell(new Phrase(iwrb.getLocalizedString("subject", "Subject"), labelFont));
 				table.addCell(new Phrase(theCase.getSubject(), textFont));
 			}
 
 			table.addCell(new Phrase(iwrb.getLocalizedString("message", "Message"), labelFont));
 			table.addCell(new Phrase(theCase.getMessage(), textFont));
+			
+			if (theCase.getReference() != null) {
+				table.addCell(new Phrase(iwrb.getLocalizedString("reference", "Reference"), labelFont));
+				table.addCell(new Phrase(theCase.getReference(), textFont));
+			}
 
 			table.setWidthPercentage(100);
 			document.add(table);

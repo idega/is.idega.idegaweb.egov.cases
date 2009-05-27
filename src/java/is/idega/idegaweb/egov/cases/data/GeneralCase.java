@@ -1,9 +1,13 @@
 package is.idega.idegaweb.egov.cases.data;
 
-import com.idega.block.process.data.Case;
+
 import com.idega.core.file.data.ICFile;
-import com.idega.data.IDOEntity;
+import com.idega.data.IDOAddRelationshipException;
+import java.util.Collection;
+import com.idega.block.process.data.Case;
 import com.idega.user.data.User;
+import com.idega.data.IDORemoveRelationshipException;
+import com.idega.data.IDOEntity;
 
 public interface GeneralCase extends IDOEntity, Case {
 
@@ -56,7 +60,7 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#isPrivate
 	 */
 	public boolean isPrivate();
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#isAnonymous
 	 */
@@ -86,7 +90,32 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getWantReplyPhone
 	 */
 	public String getWantReplyPhone();
-	
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getName
+	 */
+	public String getName();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getPersonalID
+	 */
+	public String getPersonalID();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getEmail
+	 */
+	public String getEmail();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getPhone
+	 */
+	public String getPhone();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getReference
+	 */
+	public String getReference();
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setMessage
 	 */
@@ -126,8 +155,7 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAsPrivate
 	 */
 	public void setAsPrivate(boolean isPrivate);
-	
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAsAnonymous
 	 */
@@ -157,4 +185,44 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setWantReplyPhone
 	 */
 	public void setWantReplyPhone(String wantReplyPhone);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setName
+	 */
+	public void setName(String name);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setPersonalID
+	 */
+	public void setPersonalID(String personalID);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setEmail
+	 */
+	public void setEmail(String email);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setPhone
+	 */
+	public void setPhone(String phone);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setReference
+	 */
+	public void setReference(String reference);
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#addSubscriber
+	 */
+	public void addSubscriber(User subscriber) throws IDOAddRelationshipException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getSubscribers
+	 */
+	public Collection<User> getSubscribers();
+
+	/**
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#removeSubscriber
+	 */
+	public void removeSubscriber(User subscriber) throws IDORemoveRelationshipException;
 }

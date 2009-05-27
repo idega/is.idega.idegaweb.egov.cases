@@ -217,6 +217,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		}
 
 		cell = row.createCell(cellColumn++);
+		cell.setCellValue(this.iwrb.getLocalizedString("reference", "Reference"));
+		cell.setCellStyle(style);
+
+		cell = row.createCell(cellColumn++);
 		cell.setCellValue(this.iwrb.getLocalizedString("status", "Status"));
 		cell.setCellStyle(style);
 
@@ -281,6 +285,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 				cell.setCellValue(type.getName());
 				cell.setCellStyle(style2);
 			}
+			
+			cell = row.createCell(cellColumn++);
+			cell.setCellValue(element.getReference() != null ? element.getReference() : "");
+			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));

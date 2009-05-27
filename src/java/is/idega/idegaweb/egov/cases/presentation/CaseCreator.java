@@ -11,6 +11,7 @@ import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.io.FileInputStream;
@@ -19,6 +20,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import javax.ejb.CreateException;
@@ -38,6 +40,7 @@ import com.idega.idegaweb.IWUserContext;
 import com.idega.io.UploadFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Script;
 import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
@@ -52,10 +55,16 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.util.SelectorUtility;
+import com.idega.user.business.UserBusiness;
 import com.idega.user.business.UserSession;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
+import com.idega.util.EmailValidator;
 import com.idega.util.FileUtil;
+import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
+import com.idega.util.text.Name;
+import com.idega.util.text.SocialSecurityNumber;
 
 public class CaseCreator extends ApplicationForm {
 
@@ -69,6 +78,12 @@ public class CaseCreator extends ApplicationForm {
 	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	protected static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
 	protected static final String PARAMETER_PRIVATE = "prm_private";
+	
+	private static final String PARAMETER_NAME = "prm_name";
+	private static final String PARAMETER_PERSONAL_ID = "prm_personal_id";
+	private static final String PARAMETER_EMAIL = "prm_email";
+	private static final String PARAMETER_PHONE = "prm_phone";
+	private static final String PARAMETER_REFERENCE = "prm_reference";
 
 	protected static final int ACTION_PHASE_1 = 1;
 	protected static final int ACTION_OVERVIEW = 2;
@@ -79,6 +94,8 @@ public class CaseCreator extends ApplicationForm {
 	protected IWResourceBundle iwrb;
 	protected boolean iUseSessionUser = false;
 	protected boolean iUseAnonymous = false;
+	protected boolean iShowSenderInputs = false;
+	protected boolean iShowRegarding = true;
 
 	protected Collection iCategories;
 
@@ -280,7 +297,7 @@ public class CaseCreator extends ApplicationForm {
 		helpLayer.add(new Text(helperText));
 		section.add(helpLayer);
 
-		if (this.iUseAnonymous) {
+		if (this.iUseAnonymous && !iShowSenderInputs) {
 			Layer helpLayerExtra = new Layer(Layer.DIV);
 			helpLayerExtra.setStyleClass("helperTextExtra");
 			helpLayerExtra.add(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_creator.information_text_extra", "Please note that we can only answer notifications from registered users due to the fact that anonymous notifications do not include any information about the sender.")));
@@ -315,20 +332,6 @@ public class CaseCreator extends ApplicationForm {
 		section.add(formItem);
 
 		if (getCasesBusiness(iwc).useSubCategories()) {
-			// CANNOT USE THIS CRAP because we need the new category id to display stuff and have to reload to do so!
-			// If this is a must then use DWR not an IFrame... (Eiki)
-			// try {
-			// RemoteScriptHandler rsh = new RemoteScriptHandler(categories, subCategories);
-			// rsh.setRemoteScriptCollectionClass(CaseCategoryCollectionHandler.class);
-			// formItem.add(rsh);
-			// }
-			// catch (IllegalAccessException iae) {
-			// iae.printStackTrace();
-			// }
-			// catch (InstantiationException ie) {
-			// ie.printStackTrace();
-			// }
-
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
@@ -343,6 +346,7 @@ public class CaseCreator extends ApplicationForm {
 
 		if (getCasesBusiness(iwc).allowAttachments()) {
 			FileInput file = new FileInput();
+			file.keepStatusOnAction(true);
 
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
@@ -353,17 +357,31 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 		}
 
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		formItem.setStyleClass("required");
-		if (hasError(PARAMETER_REGARDING)) {
-			formItem.setStyleClass("hasError");
+		if (this.iShowRegarding) {
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_REGARDING)) {
+				formItem.setStyleClass("hasError");
+			}
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"))), regarding);
+			formItem.add(label);
+			formItem.add(regarding);
+			section.add(formItem);
 		}
-		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"))), regarding);
-		formItem.add(label);
-		formItem.add(regarding);
-		section.add(formItem);
+		
+		if (this.iShowSenderInputs) {
+			TextInput reference = new TextInput(PARAMETER_REFERENCE);
+			reference.keepStatusOnAction(true);
 
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("reference", "Reference"))), reference);
+			formItem.add(label);
+			formItem.add(reference);
+			section.add(formItem);
+		}
+		
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("required");
@@ -406,6 +424,106 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 
 			section.add(clear);
+		}
+		
+		if (iShowSenderInputs) {
+			List scripts = new ArrayList();
+			scripts.add("/dwr/interface/CasesBusiness.js");
+			scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
+			scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
+			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
+
+			StringBuffer script = new StringBuffer();
+			script.append("function readUser() {\n\tvar id = dwr.util.getValue(\"" + PARAMETER_PERSONAL_ID + "\");\n\tCasesBusiness.getUser(id, fillUser);\n}");
+
+			StringBuffer script2 = new StringBuffer();
+			script2.append("function fillUser(auser) {\n\tdwr.util.setValues(auser);\n}");
+
+			Script formScript = new Script();
+			formScript.addFunction("readUser", script.toString());
+			formScript.addFunction("fillUser", script2.toString());
+			form.add(formScript);
+
+			heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.sender_info", "Sender information"));
+			heading.setStyleClass("subHeader");
+			form.add(heading);
+
+			section = new Layer(Layer.DIV);
+			section.setStyleClass("formSection");
+			form.add(section);
+
+			TextInput personalID = new TextInput(PARAMETER_PERSONAL_ID);
+			personalID.setMaxlength(10);
+			personalID.keepStatusOnAction(true);
+			personalID.setOnKeyUp("readUser();");
+			personalID.setOnChange("readUser();");
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_PERSONAL_ID)) {
+				formItem.setStyleClass("hasError");
+			}
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("personal_id", "Personal ID"))), personalID);
+			formItem.add(label);
+			formItem.add(personalID);
+			section.add(formItem);
+			
+
+			TextInput name = new TextInput(PARAMETER_NAME);
+			name.setID("userName");
+			if (iwc.isParameterSet(PARAMETER_PERSONAL_ID)) {
+				try {
+					User sender = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_PERSONAL_ID));
+					name.setContent(new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName()).getName());
+				}
+				catch (FinderException fe) {
+					log(fe);
+				}
+			}
+			name.keepStatusOnAction(true);
+			name.setDisabled(true);
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_NAME)) {
+				formItem.setStyleClass("hasError");
+			}
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("name", "Name"))), name);
+			formItem.add(label);
+			formItem.add(name);
+			section.add(formItem);
+
+			TextInput email = new TextInput(PARAMETER_EMAIL);
+			email.setID("userEmail");
+			email.keepStatusOnAction(true);
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_EMAIL)) {
+				formItem.setStyleClass("hasError");
+			}
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("email", "Email"))), email);
+			formItem.add(label);
+			formItem.add(email);
+			section.add(formItem);
+
+			TextInput phone = new TextInput(PARAMETER_PHONE);
+			phone.setID("userPhone");
+			phone.keepStatusOnAction(true);
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("required");
+			if (hasError(PARAMETER_PHONE)) {
+				formItem.setStyleClass("hasError");
+			}
+			label = new Label(new Span(new Text(this.iwrb.getLocalizedString("phone", "Phone"))), phone);
+			formItem.add(label);
+			formItem.add(phone);
+			section.add(formItem);
 		}
 
 		Layer bottom = new Layer(Layer.DIV);
@@ -503,11 +621,38 @@ public class CaseCreator extends ApplicationForm {
 		if (!iwc.isParameterSet(PARAMETER_CASE_TYPE_PK)) {
 			setError(PARAMETER_CASE_TYPE_PK, this.iwrb.getLocalizedString("case_creator.type_empty", "You must select a type"));
 		}
-		if (!iwc.isParameterSet(PARAMETER_REGARDING)) {
+		if (this.iShowRegarding && !iwc.isParameterSet(PARAMETER_REGARDING)) {
 			setError(PARAMETER_REGARDING, this.iwrb.getLocalizedString(getPrefix() + "case_creator.regarding_empty", "You must enter what the case is regarding"));
 		}
 		if (!iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
+		}
+		
+		if (iShowSenderInputs) {
+			if (!iwc.isParameterSet(PARAMETER_PERSONAL_ID)) {
+				setError(PARAMETER_PERSONAL_ID, iwrb.getLocalizedString("case_creator.personal_id_empty", "You must enter personal ID"));
+			}
+			else if (!SocialSecurityNumber.isValidSocialSecurityNumber(iwc.getParameter(PARAMETER_PERSONAL_ID), iwc.getCurrentLocale())) {
+				setError(PARAMETER_PERSONAL_ID, iwrb.getLocalizedString("case_creator.personal_id_invalid", "You must enter a valid personal ID"));
+			}
+			else {
+				String personalID = iwc.getParameter(PARAMETER_PERSONAL_ID);
+				try {
+					getUserBusiness(iwc).getUser(personalID);
+				}
+				catch (FinderException fe) {
+					setError(PARAMETER_PERSONAL_ID, iwrb.getLocalizedString("case_creator.no_user_found", "No user found with supplied personal ID"));
+				}
+			}
+			if (!iwc.isParameterSet(PARAMETER_EMAIL)) {
+				setError(PARAMETER_EMAIL, iwrb.getLocalizedString("case_creator.email_empty", "You must enter email"));
+			}
+			else if (!EmailValidator.getInstance().validateEmail(iwc.getParameter(PARAMETER_EMAIL))) {
+				setError(PARAMETER_EMAIL, iwrb.getLocalizedString("case_creator.email_invalid", "You must enter a valid email"));
+			}
+			if (!iwc.isParameterSet(PARAMETER_PHONE)) {
+				setError(PARAMETER_PHONE, iwrb.getLocalizedString("case_creator.phone_empty", "You must enter phone"));
+			}
 		}
 
 		if (hasErrors()) {
@@ -529,6 +674,11 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		form.maintainParameter(PARAMETER_PRIVATE);
 		form.maintainParameter(PARAMETER_REGARDING);
+		form.maintainParameter(PARAMETER_NAME);
+		form.maintainParameter(PARAMETER_PERSONAL_ID);
+		form.maintainParameter(PARAMETER_EMAIL);
+		form.maintainParameter(PARAMETER_PHONE);
+		form.maintainParameter(PARAMETER_REFERENCE);
 		if (attachment != null) {
 			form.add(new HiddenInput(PARAMETER_ATTACHMENT_PK, attachment.getPrimaryKey().toString()));
 		}
@@ -613,14 +763,27 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 		}
 
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"));
-		formItem.add(label);
-		formItem.add(regardingSpan);
-		section.add(formItem);
+		if (this.iShowRegarding) {
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString(getPrefix() + "regarding", "Regarding"));
+			formItem.add(label);
+			formItem.add(regardingSpan);
+			section.add(formItem);
+		}
 
+		if (iwc.isParameterSet(PARAMETER_REFERENCE)) {
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("informationItem");
+			label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString("reference", "Reference"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(iwc.getParameter(PARAMETER_REFERENCE))));
+			section.add(formItem);
+		}
+		
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
@@ -633,6 +796,60 @@ public class CaseCreator extends ApplicationForm {
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		section.add(clear);
+		
+		if (iShowSenderInputs) {
+			heading = new Heading1(this.iwrb.getLocalizedString("case_creator.sender_overview", "Sender overview"));
+			heading.setStyleClass("subHeader");
+			form.add(heading);
+
+			section = new Layer(Layer.DIV);
+			section.setStyleClass("formSection");
+			form.add(section);
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("informationItem");
+			label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString("personal_id", "Personal ID"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(PersonalIDFormatter.format(iwc.getParameter(PARAMETER_PERSONAL_ID), iwc.getCurrentLocale()))));
+			section.add(formItem);
+
+			try {
+				User sender = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_PERSONAL_ID));
+				Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
+
+				formItem = new Layer(Layer.DIV);
+				formItem.setStyleClass("formItem");
+				formItem.setStyleClass("informationItem");
+				label = new Label();
+				label.setLabel(this.iwrb.getLocalizedString("name", "Name"));
+				formItem.add(label);
+				formItem.add(new Span(new Text(name.getName(iwc.getCurrentLocale()))));
+				section.add(formItem);
+			}
+			catch (FinderException fe) {
+				log(fe);
+			}
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("informationItem");
+			label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString("email", "Email"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(iwc.getParameter(PARAMETER_EMAIL))));
+			section.add(formItem);
+			
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("informationItem");
+			label = new Label();
+			label.setLabel(this.iwrb.getLocalizedString("phone", "phone"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(iwc.getParameter(PARAMETER_PHONE))));
+			section.add(formItem);
+		}
 
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
@@ -663,6 +880,11 @@ public class CaseCreator extends ApplicationForm {
 		Object attachmentPK = iwc.getParameter(PARAMETER_ATTACHMENT_PK);
 		boolean isPrivate = iwc.isParameterSet(PARAMETER_PRIVATE);
 		Locale locale = iwc.getCurrentLocale();
+		
+		String personalID = iwc.getParameter(PARAMETER_PERSONAL_ID);
+		String email = iwc.getParameter(PARAMETER_EMAIL);
+		String phone = iwc.getParameter(PARAMETER_PHONE);
+		String reference = iwc.getParameter(PARAMETER_REFERENCE);
 
 		CaseCategory category = null;
 		if (caseCategoryPK != null && !"".equals(caseCategoryPK)) {
@@ -676,8 +898,25 @@ public class CaseCreator extends ApplicationForm {
 
 		try {
 			User user = getUser(iwc);
-			getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
+			if (personalID != null) {
+				try {
+					user = getUserBusiness(iwc).getUser(personalID);
+				}
+				catch (FinderException fe) {
+					log(fe);
+				}
+			}
+			GeneralCase theCase = getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, iShowSenderInputs ? null : getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
+			if (iShowSenderInputs) {
+				theCase.setReference(reference);
+				theCase.store();
 
+				if (user != null) {
+					getUserBusiness(iwc).updateUserMail(user, email);
+					getUserBusiness(iwc).updateUserHomePhone(user, phone);
+				}
+			}
+			
 			String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
 			if (category != null) {
 				headingText += " - " + category.getLocalizedCategoryName(locale);
@@ -782,12 +1021,29 @@ public class CaseCreator extends ApplicationForm {
 		}
 	}
 
+	protected UserBusiness getUserBusiness(IWApplicationContext iwac) {
+		try {
+			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+
 	public void setUseSessionUser(boolean useSessionUser) {
 		this.iUseSessionUser = useSessionUser;
 	}
 
 	public void setUseAnonymous(boolean useAnonymous) {
 		this.iUseAnonymous = useAnonymous;
+	}
+
+	public void setShowSenderInputs(boolean showSenderInputs) {
+		this.iShowSenderInputs = showSenderInputs;
+	}
+
+	public void setShowRegarding(boolean showRegarding) {
+		this.iShowRegarding = showRegarding;
 	}
 
 	protected String getType() {

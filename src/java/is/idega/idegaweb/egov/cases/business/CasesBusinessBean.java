@@ -45,6 +45,8 @@ import com.idega.block.text.data.LocalizedTextHome;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.contact.data.Email;
+import com.idega.core.contact.data.Phone;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.localisation.business.ICLocaleBusiness;
@@ -56,6 +58,8 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.user.business.GroupBusiness;
+import com.idega.user.business.NoEmailFoundException;
+import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
@@ -155,6 +159,40 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			return map;
 		} catch (RemoteException re) {
 			throw new IBORuntimeException(re);
+		}
+	}
+	
+	public UserDWR getUser(String personalID) {
+		try {
+			User user = getUserBusiness().getUser(personalID);
+			
+			UserDWR dwr = new UserDWR();
+			dwr.setUserPersonalID(personalID);
+			dwr.setUserName(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName());
+
+			try {
+				Phone homePhone = getUserBusiness().getUsersHomePhone(user);
+				dwr.setUserPhone(homePhone.getNumber());
+			}
+			catch (NoPhoneFoundException e) {
+				// No phone found...
+			}
+
+			try {
+				Email email = getUserBusiness().getUsersMainEmail(user);
+				dwr.setUserEmail(email.getEmailAddress());
+			}
+			catch (NoEmailFoundException e) {
+				// No email found...
+			}
+			
+			return dwr;
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+		catch (FinderException e) {
+			return new UserDWR();
 		}
 	}
 
