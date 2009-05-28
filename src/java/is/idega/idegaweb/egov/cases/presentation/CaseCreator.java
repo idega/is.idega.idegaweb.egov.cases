@@ -209,7 +209,7 @@ public class CaseCreator extends ApplicationForm {
 			categories.setSelectedElement(category.getPrimaryKey().toString());
 		}
 		else {
-			categories.addMenuElementFirst("", this.iwrb.getLocalizedString("case_creator.select_category", "Select category"));
+			categories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_category", "Select category"));
 			Collection parentCategories = getCasesBusiness(iwc).getCaseCategories();
 			Iterator iter = parentCategories.iterator();
 			while (iter.hasNext()) {
@@ -326,7 +326,7 @@ public class CaseCreator extends ApplicationForm {
 		if (hasError(PARAMETER_CASE_CATEGORY_PK)) {
 			formItem.setStyleClass("hasError");
 		}
-		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString("case_category", "Case category"))), categories);
+		Label label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "case_category", "Case category"))), categories);
 		formItem.add(label);
 		formItem.add(categories);
 		section.add(formItem);
@@ -384,7 +384,9 @@ public class CaseCreator extends ApplicationForm {
 		
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
-		formItem.setStyleClass("required");
+		if (!this.iShowSenderInputs) {
+			formItem.setStyleClass("required");
+		}
 		if (hasError(PARAMETER_MESSAGE)) {
 			formItem.setStyleClass("hasError");
 		}
@@ -624,7 +626,7 @@ public class CaseCreator extends ApplicationForm {
 		if (this.iShowRegarding && !iwc.isParameterSet(PARAMETER_REGARDING)) {
 			setError(PARAMETER_REGARDING, this.iwrb.getLocalizedString(getPrefix() + "case_creator.regarding_empty", "You must enter what the case is regarding"));
 		}
-		if (!iwc.isParameterSet(PARAMETER_MESSAGE)) {
+		if (!this.iShowSenderInputs && !iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
 		}
 		
