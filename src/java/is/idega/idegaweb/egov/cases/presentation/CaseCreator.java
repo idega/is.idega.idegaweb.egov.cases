@@ -908,7 +908,7 @@ public class CaseCreator extends ApplicationForm {
 					log(fe);
 				}
 			}
-			GeneralCase theCase = getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, iShowSenderInputs ? null : getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)));
+			GeneralCase theCase = getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)), !iShowSenderInputs);
 			if (iShowSenderInputs) {
 				theCase.setReference(reference);
 				theCase.store();
