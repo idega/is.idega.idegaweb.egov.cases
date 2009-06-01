@@ -60,9 +60,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final String PARAMETER_USER = "prm_user";
 	protected static final String PARAMETER_MESSAGE = "prm_message";
 
-	protected static final int ACTION_VIEW = UserCases.ACTION_VIEW;
+	public static final int ACTION_VIEW = UserCases.ACTION_VIEW;
 	public static final int ACTION_PROCESS = 2;
-	protected static final int ACTION_SAVE = 3;
+	public static final int ACTION_SAVE = 3;
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
