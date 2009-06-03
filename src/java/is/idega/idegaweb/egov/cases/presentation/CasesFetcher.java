@@ -37,6 +37,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.presentation.ui.util.SelectorUtility;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
@@ -339,11 +340,17 @@ public class CasesFetcher extends CasesBlock {
 
 		group = table.createBodyRowGroup();
 		int iRow = 1;
+		
+		User currentUser = iwc.getCurrentUser();
 
 		Iterator iter = cases.iterator();
 		while (iter.hasNext()) {
 			GeneralCase theCase = (GeneralCase) iter.next();
 			CaseCategory category = theCase.getCaseCategory();
+			Group handlerGroup = category.getHandlerGroup();
+			if (!currentUser.hasRelationTo(handlerGroup)) {
+				continue;
+			}
 			CaseType type = theCase.getCaseType();
 			CaseStatus status = theCase.getCaseStatus();
 			if (status.equals(getCasesBusiness().getCaseStatusDeleted())) {
