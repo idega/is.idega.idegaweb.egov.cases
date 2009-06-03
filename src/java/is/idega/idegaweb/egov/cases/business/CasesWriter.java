@@ -44,6 +44,7 @@ import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -236,10 +237,16 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		cell.setCellValue(this.iwrb.getLocalizedString("reply", "Reply"));
 		cell.setCellStyle(style);
 
+		User currentUser = iwc.getCurrentUser();
+
 		Iterator iter = cases.iterator();
 		while (iter.hasNext()) {
 			GeneralCase element = (GeneralCase) iter.next();
 			CaseCategory category = element.getCaseCategory();
+			Group handlerGroup = category.getHandlerGroup();
+			if (!currentUser.hasRelationTo(handlerGroup)) {
+				continue;
+			}
 			CaseType type = element.getCaseType();
 			CaseStatus status = element.getCaseStatus();
 			if (status.equals(getBusiness(iwc).getCaseStatusDeleted())) {

@@ -28,6 +28,7 @@ import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -61,11 +62,17 @@ public class CasesWriterExtended extends CasesWriter {
 		style3.setBorderBottom(HSSFCellStyle.BORDER_THIN);
 		style3.setFont(font);
 
+		User currentUser = iwc.getCurrentUser();
+
 		int cellRow = 0;
 		Iterator iter = cases.iterator();
 		while (iter.hasNext()) {
 			GeneralCase element = (GeneralCase) iter.next();
 			CaseCategory category = element.getCaseCategory();
+			Group handlerGroup = category.getHandlerGroup();
+			if (!currentUser.hasRelationTo(handlerGroup)) {
+				continue;
+			}
 			CaseType type = element.getCaseType();
 			CaseStatus status = element.getCaseStatus();
 			if (status.equals(getBusiness(iwc).getCaseStatusDeleted())) {
