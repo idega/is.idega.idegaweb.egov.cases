@@ -92,26 +92,6 @@ public interface GeneralCase extends IDOEntity, Case {
 	public String getWantReplyPhone();
 
 	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getName
-	 */
-	public String getName();
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getPersonalID
-	 */
-	public String getPersonalID();
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getEmail
-	 */
-	public String getEmail();
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getPhone
-	 */
-	public String getPhone();
-
-	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getReference
 	 */
 	public String getReference();
@@ -185,26 +165,6 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setWantReplyPhone
 	 */
 	public void setWantReplyPhone(String wantReplyPhone);
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setName
-	 */
-	public void setName(String name);
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setPersonalID
-	 */
-	public void setPersonalID(String personalID);
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setEmail
-	 */
-	public void setEmail(String email);
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setPhone
-	 */
-	public void setPhone(String phone);
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setReference

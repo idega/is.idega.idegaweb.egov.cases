@@ -63,10 +63,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_WANT_REPLY_PHONE = "want_reply_phone";
 	private static final String COLUMN_CASE_SUBSCRIBERS = ENTITY_NAME + "_subscribers";
 	
-	private static final String COLUMN_NAME = "name";
-	private static final String COLUMN_PERSONAL_ID = "personal_id";
-	private static final String COLUMN_EMAIL = "email";
-	private static final String COLUMN_PHONE = "phone";
 	private static final String COLUMN_REFERENCE = "reference";
 	
 	/*
@@ -116,10 +112,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToManyRelationShip(User.class, COLUMN_CASE_SUBSCRIBERS);
 		getEntityDefinition().setBeanCachingActiveByDefault(true, 1000);
 		
-		addAttribute(COLUMN_NAME, "Name", String.class);
-		addAttribute(COLUMN_PERSONAL_ID, "Personal ID", String.class);
-		addAttribute(COLUMN_EMAIL, "Email", String.class);
-		addAttribute(COLUMN_PHONE, "Phone", String.class);
 		addAttribute(COLUMN_REFERENCE, "Reference", String.class);
 	}
 
@@ -189,22 +181,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return getStringColumnValue(COLUMN_WANT_REPLY_PHONE);
 	}
 	
-	public String getName() {
-		return getStringColumnValue(COLUMN_NAME);
-	}
-
-	public String getPersonalID() {
-		return getStringColumnValue(COLUMN_PERSONAL_ID);
-	}
-
-	public String getEmail() {
-		return getStringColumnValue(COLUMN_EMAIL);
-	}
-
-	public String getPhone() {
-		return getStringColumnValue(COLUMN_PHONE);
-	}
-
 	public String getReference() {
 		return getStringColumnValue(COLUMN_REFERENCE);
 	}
@@ -264,22 +240,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 	public void setWantReplyPhone(String wantReplyPhone) {
 		setColumn(COLUMN_WANT_REPLY_PHONE, wantReplyPhone);
-	}
-	
-	public void setName(String name) {
-		setColumn(COLUMN_NAME, name);
-	}
-	
-	public void setPersonalID(String personalID) {
-		setColumn(COLUMN_PERSONAL_ID, personalID);
-	}
-	
-	public void setEmail(String email) {
-		setColumn(COLUMN_EMAIL, email);
-	}
-	
-	public void setPhone(String phone) {
-		setColumn(COLUMN_PHONE, phone);
 	}
 	
 	public void setReference(String reference) {
