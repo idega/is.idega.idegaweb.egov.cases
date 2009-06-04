@@ -811,7 +811,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			sendMessage(theCase, owner, performer, subject, body);
 
 			// sending replay to users admin too.
-			Name name = new Name( theCase.getCreator().getFirstName(),  theCase.getCreator().getMiddleName(),  theCase.getCreator().getLastName());
+			Name name = new Name(performer.getFirstName(), performer.getMiddleName(), performer.getLastName());
 			Object[] arguments2 = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName(), name.getName(iwc.getCurrentLocale()) };
 			subject = iwrb.getLocalizedString(prefix + "case_reactivated_subject_for_admin", "Users case has been reactivated");
 			body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_reactivated_body_for_admin", "{3} case  with category {0} and type {1} has been reactivated by {2}"), arguments2);
