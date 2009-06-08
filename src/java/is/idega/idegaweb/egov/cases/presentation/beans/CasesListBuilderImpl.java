@@ -420,19 +420,24 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
 		for (CasePresentation casePresentation : casesInList) {
 			if (casePresentation.getCode().equals(CasesConstants.CASE_CODE_KEY)) {
-				try {
-					GeneralCase genCase = getCasesBusiness(iwc).getGeneralCase(casePresentation.getPrimaryKey());
-					CaseCategory category = genCase.getCaseCategory();
-					Group handlerGroup = category.getHandlerGroup();
-					if (currentUser.hasRelationTo(handlerGroup)) {
-						filteredList.add(casePresentation);
-					}
-				}
-				catch (FinderException e) {
+				if (casePresentation.getCaseManagerType() != null && casePresentation.getCaseManagerType().equals("CasesBPM")) {
 					filteredList.add(casePresentation);
 				}
-				catch (RemoteException re) {
-					throw new IBORuntimeException(re);
+				else {
+					try {
+						GeneralCase genCase = getCasesBusiness(iwc).getGeneralCase(casePresentation.getPrimaryKey());
+						CaseCategory category = genCase.getCaseCategory();
+						Group handlerGroup = category.getHandlerGroup();
+						if (currentUser.hasRelationTo(handlerGroup)) {
+							filteredList.add(casePresentation);
+						}
+					}
+					catch (FinderException e) {
+						filteredList.add(casePresentation);
+					}
+					catch (RemoteException re) {
+						throw new IBORuntimeException(re);
+					}
 				}
 			}
 			else {
