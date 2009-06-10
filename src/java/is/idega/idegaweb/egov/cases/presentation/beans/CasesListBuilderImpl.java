@@ -1,6 +1,8 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
@@ -15,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.EJBException;
+import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 
 import org.directwebremoting.WebContext;
@@ -38,6 +41,7 @@ import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.business.IBORuntimeException;
 import com.idega.core.accesscontrol.business.CredentialBusiness;
 import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWApplicationContext;
@@ -59,6 +63,7 @@ import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
@@ -409,11 +414,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean showStatistics = properties.isShowStatistics();
 		
-		/*User currentUser = iwc.getCurrentUser();
+		User currentUser = iwc.getCurrentUser();
 		
-		Collection<CasePresentation> filteredList = new ArrayList<CasePresentation>();*/
+		Collection<CasePresentation> filteredList = new ArrayList<CasePresentation>();
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		/*for (CasePresentation casePresentation : casesInList) {
+		for (CasePresentation casePresentation : casesInList) {
 			if (casePresentation.getCode().equals(CasesConstants.CASE_CODE_KEY)) {
 				if (casePresentation.getCaseManagerType() != null && casePresentation.getCaseManagerType().equals("CasesBPM")) {
 					filteredList.add(casePresentation);
@@ -439,7 +444,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				filteredList.add(casePresentation);
 			}
 		}
-		casesInList = filteredList;*/
+		casesInList = filteredList;
 		
 		String emailAddress = getDefaultEmail();
 		
