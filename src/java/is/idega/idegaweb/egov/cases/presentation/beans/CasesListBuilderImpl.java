@@ -23,6 +23,7 @@ import javax.faces.component.UIComponent;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +37,8 @@ import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseListPropertiesBean;
 import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
+import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
-import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -72,11 +73,13 @@ import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
-import com.idega.webface.WFUtil;
 
-@Scope("singleton")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER)
 public class CasesListBuilderImpl implements GeneralCasesListBuilder {
+	
+	@Autowired
+	private JQuery jQuery;
 	
 	private CaseManagersProvider caseManagersProvider;
 	
@@ -173,6 +176,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute(usePDFDownloadColumnParName, String.valueOf(properties.isUsePDFDownloadColumn()));
 		layer.setMarkupAttribute(allowPDFSigningParName, String.valueOf(properties.isAllowPDFSigning()));
 		layer.setMarkupAttribute("hideemptysection", String.valueOf(properties.isHideEmptySection()));
+		if (!StringUtil.isEmpty(properties.getCommentsManagerIdentifier())) {
+			layer.setMarkupAttribute("commentsmanageridentifier", properties.getCommentsManagerIdentifier());
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -739,11 +745,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	private void addResources(String caseId, IWContext iwc, IWBundle bundle, String type) {
-		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
-		
 		List<String> scripts = new ArrayList<String>();
-		scripts.add(web2Business.getBundleURIToJQueryLib());
-		scripts.add(web2Business.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE));
+		scripts.add(jQuery.getBundleURIToJQueryLib());
+		scripts.add(jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);

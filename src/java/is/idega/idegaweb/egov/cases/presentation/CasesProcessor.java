@@ -80,6 +80,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	
 	private String caseStatusesToHide;
 	private String caseStatusesToShow;
+	private String commentsManagerIdentifier;
 	
 	protected abstract String getBlockID();
 	
@@ -208,6 +209,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		list.setShowCreationTimeInDateColumn(isShowCreationTimeInDateColumn());
 		list.setCaseStatusesToHide(getCaseStatusesToHide());
 		list.setCaseStatusesToShow(getCaseStatusesToShow());
+		list.setCommentsManagerIdentifier(getCommentsManagerIdentifier());
 		
 		form.add(list);
 				
@@ -539,4 +541,13 @@ public abstract class CasesProcessor extends CasesBlock {
 	public void setCaseStatusesToShow(String caseStatusesToShow) {
 		this.caseStatusesToShow = caseStatusesToShow;
 	}
+
+	public String getCommentsManagerIdentifier() {
+		return commentsManagerIdentifier;
+	}
+
+	public void setCommentsManagerIdentifier(String commentsManagerIdentifier) {
+		this.commentsManagerIdentifier = commentsManagerIdentifier;
+	}
+	
 }

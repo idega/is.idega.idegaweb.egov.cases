@@ -182,7 +182,9 @@ function registerGridExpanderActionsForElement(event, element) {
 		var usePDFDownloadColumn = caseToExpand.attr('usepdfdownloadcolumn') == 'true';
 		var allowPDFSigning = caseToExpand.attr('allowpdfsigning') == 'true';
 		var hideEmptySection = caseToExpand.attr('hideemptysection') == 'true';
-		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning, hideEmptySection), {
+		var commentsManagerIdentifier = caseToExpand.attr('commentsmanageridentifier');
+		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning,
+			hideEmptySection, commentsManagerIdentifier), {
 			callback: function(component) {
 				
 				closeAllLoadingMessages();
@@ -203,13 +205,15 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 }
 
-function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection) {
+function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection, commentsManagerIdentifier) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
 	this.usePDFDownloadColumn = usePDFDownloadColumn;
 	this.allowPDFSigning = allowPDFSigning;
 	this.hideEmptySection = hideEmptySection;
+	
+	this.commentsPersistenceManagerIdentifier = commentsManagerIdentifier;
 }
 
 function navigateCasesList(instanceId, containerId, page, count) {
