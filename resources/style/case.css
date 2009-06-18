@@ -176,9 +176,59 @@ div.caseProcessResourceAccessRightsSetterStyle {
 	z-index: 1000;
 	position: absolute;
 	display: none;
-	border: 1px solid #D7D7D7;
-	padding: 3px;
+	border: 2px solid #666;
 	background-color: #fff;
+	margin-left: -166px;
+	width: 180px;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle h3 {
+	font-size: 0.75em;
+	border-bottom: 1px #d7d7d7 solid;
+	padding: 3px 5px;
+	background-color: #666;
+	color: #fff;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle table {
+	font-size: 0.6875em;
+	width: 100%;
+	border-collapse: separate;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle table th {
+	text-align: left;
+	padding: 2px 5px;
+	vertical-align: bottom;
+	border-bottom: 1px #ccc solid;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle table td {
+	padding: 2px 5px;
+	border-bottom: 1px #ccc solid;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle table input {
+	margin: 0;
+	vertical-align: middle;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle div.links {
+	font-size: 0.6875em;
+	padding: 2px 5px;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle div.links a {
+	padding-right: 5px;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle div.links a.setRoleDefaults {
+	padding-left: 0;
+}
+
+div.caseProcessResourceAccessRightsSetterStyle div.links img {
+	width: 16px;
+	vertical-align: top;
 }
 
 div.caseGrids {
