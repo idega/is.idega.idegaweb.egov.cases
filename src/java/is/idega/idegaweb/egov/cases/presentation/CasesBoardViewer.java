@@ -17,6 +17,7 @@ import javax.faces.context.FacesContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
@@ -89,6 +90,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private Web2Business web2;
 	
 	@Autowired
+	private JQuery jQuery;
+	
+	@Autowired
 	private BuilderLogicWrapper builderLogicWrapper;
 	
 	private String caseStatus;
@@ -118,10 +122,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
-			web2.getBundleURIToJQueryLib(),
+			jQuery.getBundleURIToJQueryLib(),
 			web2.getBundleUriToHumanizedMessagesScript(),
-			web2.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
-			web2.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
+			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
+			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
 			CoreConstants.DWR_ENGINE_SCRIPT,
 			CoreConstants.DWR_UTIL_SCRIPT,
 			"/dwr/interface/BoardCasesManager.js",
