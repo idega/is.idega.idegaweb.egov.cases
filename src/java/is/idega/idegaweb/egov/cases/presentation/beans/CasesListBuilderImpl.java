@@ -1,8 +1,6 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
@@ -17,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.EJBException;
-import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 
 import org.directwebremoting.WebContext;
@@ -42,7 +39,6 @@ import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.business.IBORuntimeException;
 import com.idega.core.accesscontrol.business.CredentialBusiness;
 import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWApplicationContext;
@@ -64,7 +60,6 @@ import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.HiddenInput;
-import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
@@ -420,37 +415,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		boolean showStatistics = properties.isShowStatistics();
 		
-		User currentUser = iwc.getCurrentUser();
-		
-		Collection<CasePresentation> filteredList = new ArrayList<CasePresentation>();
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		for (CasePresentation casePresentation : casesInList) {
-			if (casePresentation.getCode().equals(CasesConstants.CASE_CODE_KEY)) {
-				if (casePresentation.getCaseManagerType() != null && casePresentation.getCaseManagerType().equals("CasesBPM")) {
-					filteredList.add(casePresentation);
-				}
-				else {
-					try {
-						GeneralCase genCase = getCasesBusiness(iwc).getGeneralCase(casePresentation.getPrimaryKey());
-						CaseCategory category = genCase.getCaseCategory();
-						Group handlerGroup = category.getHandlerGroup();
-						if (currentUser.hasRelationTo(handlerGroup)) {
-							filteredList.add(casePresentation);
-						}
-					}
-					catch (FinderException e) {
-						filteredList.add(casePresentation);
-					}
-					catch (RemoteException re) {
-						throw new IBORuntimeException(re);
-					}
-				}
-			}
-			else {
-				filteredList.add(casePresentation);
-			}
-		}
-		casesInList = filteredList;
 		
 		String emailAddress = getDefaultEmail();
 		
@@ -474,7 +439,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(
 					ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 
-			ListNavigator navigator = new ListNavigator("userCases", totalCases);
+			ListNavigator navigator = new ListNavigator("userCases", cases.getTotalCount());
 			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
 			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
 			navigator.setPageSize(pageSize);
