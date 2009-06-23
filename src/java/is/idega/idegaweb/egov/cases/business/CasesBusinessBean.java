@@ -38,6 +38,7 @@ import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
+import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.text.data.LocalizedText;
@@ -490,23 +491,35 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		getCaseType(caseTypePK).remove();
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb, boolean setType) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb, boolean setType) throws CreateException, RemoteException {
 		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, null, isPrivate, iwrb, setType);
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean setType) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean setType) throws CreateException, RemoteException {
 		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, true, null, setType);
 	}
 
-	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType) throws CreateException {
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType) throws CreateException, RemoteException {
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, null);
+	}
+	
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey) throws CreateException, RemoteException {
 		GeneralCase theCase = getGeneralCaseHome().create();
-		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType);
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey);
 	}
 
 	/**
 	 * The iwrb is the users preferred locale
 	 */
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType) throws CreateException {
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, CaseBMPBean.CASE_STATUS_OPEN_KEY);
+	}
+	
+	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey) throws CreateException {
+		if (caseStatusKey == null) {
+			caseStatusKey = CaseBMPBean.CASE_STATUS_OPEN_KEY;
+		}
+		
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
 
@@ -545,7 +558,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		if (caseManagerType != null)
 			theCase.setCaseManagerType(caseManagerType);
 
-		changeCaseStatus(theCase, getCaseStatusOpen().getStatus(), sender, (Group) null);
+		changeCaseStatus(theCase, caseStatusKey, sender, (Group) null);
 
 		if (sendMessages) {
 
@@ -1131,6 +1144,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return null;
 	}
 
+	@Override
 	public Collection<Case> getCasesByIds(Collection<Integer> ids) {
 		if (ids == null || ids.isEmpty()) {
 			return null;
