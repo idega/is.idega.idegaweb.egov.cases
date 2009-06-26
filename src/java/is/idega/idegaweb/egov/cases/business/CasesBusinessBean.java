@@ -515,6 +515,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
+		
+		if (caseStatusKey == null) {
+			caseStatusKey = getCaseStatusOpenString();
+		}
 
 		CaseCategory category = null;
 		try {
