@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.faces.component.UIComponent;
@@ -25,6 +26,7 @@ import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
+import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
@@ -52,7 +54,6 @@ import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
-import com.idega.webface.WFUtil;
 
 /**
  * Cases searcher. MUST be included in the same page as CasesList!
@@ -80,19 +81,23 @@ public class CasesSearcher extends CasesBlock {
 	@Autowired
 	private CasesEngine casesEngine;
 	
+	@Autowired
+	private Web2Business web2;
+	@Autowired
+	private JQuery jQuery;
+	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		ELUtil.getInstance().autowire(this);
 		
 		IWBundle bundle = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
-		Web2Business web2Business = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
-				web2Business.getBundleURIToJQueryLib(),
-				web2Business.getBundleUriToHumanizedMessagesScript(),
-				web2Business.getBundleURIToJQueryUILib("1.6rc5", "ui.core.js"),
-				web2Business.getBundleURIToJQueryUILib("1.6rc5", "ui.sortable.js"),
-				web2Business.getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
+				jQuery.getBundleURIToJQueryLib(),
+				web2.getBundleUriToHumanizedMessagesScript(),
+				jQuery.getBundleURIToJQueryUILib("1.6rc5", "ui.core.js"),
+				jQuery.getBundleURIToJQueryUILib("1.6rc5", "ui.sortable.js"),
+				jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
 				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
 				CoreConstants.DWR_ENGINE_SCRIPT,
 				CoreConstants.DWR_UTIL_SCRIPT,
@@ -100,10 +105,10 @@ public class CasesSearcher extends CasesBlock {
 		));
 		
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
-				web2Business.getBundleUriToHumanizedMessagesStyleSheet(),
+				web2.getBundleUriToHumanizedMessagesStyleSheet(),
 				iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"),
 				bundle.getVirtualPathWithFileNameString("style/case.css"),
-				web2Business.getBundleURIToJQueryUILib("1.6rc5/themes/base", "ui.core.css")
+				jQuery.getBundleURIToJQueryUILib("1.6rc5/themes/base", "ui.core.css")
 		));
 		
 		IWResourceBundle iwrb = getResourceBundle();
@@ -477,4 +482,23 @@ public class CasesSearcher extends CasesBlock {
 		this.casesEngine = casesEngine;
 	}
 	
+	@Override
+	public String getCasesProcessorType() {
+		return null;
+	}
+
+	@Override
+	public Map<Object, Object> getUserCasesPageMap() {
+		return null;
+	}
+
+	@Override
+	public boolean showCheckBox() {
+		return false;
+	}
+
+	@Override
+	public boolean showCheckBoxes() {
+		return false;
+	}
 }

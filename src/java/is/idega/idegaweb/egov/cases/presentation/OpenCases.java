@@ -40,54 +40,9 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	protected ICPage iMyCasesPage;
 	
-	private boolean usePDFDownloadColumn = true;
-	private boolean allowPDFSigning = true;
-	private boolean showStatistics;
-	private boolean hideEmptySection;
-	
-	@Override
-	public boolean isUsePDFDownloadColumn() {
-		return usePDFDownloadColumn;
-	}
-	
-	@Override
-	public void setUsePDFDownloadColumn(boolean usePDFDownloadColumn) {
-		this.usePDFDownloadColumn = usePDFDownloadColumn;
-	}
-
-	@Override
-	public boolean isAllowPDFSigning() {
-		return allowPDFSigning;
-	}
-
-	@Override
-	public void setAllowPDFSigning(boolean allowPDFSigning) {
-		this.allowPDFSigning = allowPDFSigning;
-	}
-
-	@Override
-	public boolean isShowStatistics() {
-		return showStatistics;
-	}
-
-	@Override
-	public void setShowStatistics(boolean showStatistics) {
-		this.showStatistics = showStatistics;
-	}
-
-	@Override
-	public boolean isHideEmptySection() {
-		return hideEmptySection;
-	}
-
-	@Override
-	public void setHideEmptySection(boolean hideEmptySection) {
-		this.hideEmptySection = hideEmptySection;
-	}
-
 	@Override
 	protected String getBlockID() {
-		return "openCases";
+		return OpenCases.pageType;
 	}
 
 	public boolean actionPerformed(IWContext iwc) {
@@ -313,7 +268,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	}
 
 	@Override
-	protected boolean showCheckBox() {
+	public boolean showCheckBox() {
 		return true;
 	}
 
@@ -332,7 +287,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	}
 
 	@Override
-	protected String getCasesProcessorType() {
+	public String getCasesProcessorType() {
 		return CasesRetrievalManager.CASE_LIST_TYPE_OPEN;
 	}
 }

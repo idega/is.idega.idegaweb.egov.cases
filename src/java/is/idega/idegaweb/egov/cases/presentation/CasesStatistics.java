@@ -1010,4 +1010,23 @@ public class CasesStatistics extends CasesBlock {
 		this.useStatisticsByCaseType = useStatisticsByCaseType;
 	}
 	
+	@Override
+	public String getCasesProcessorType() {
+		return null;
+	}
+
+	@Override
+	public Map<Object, Object> getUserCasesPageMap() {
+		return null;
+	}
+
+	@Override
+	public boolean showCheckBox() {
+		return false;
+	}
+
+	@Override
+	public boolean showCheckBoxes() {
+		return false;
+	}
 }

@@ -16,6 +16,7 @@ import java.util.Arrays;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.presentation.CaseBlock;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -28,7 +29,6 @@ import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.MediaWritable;
-import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -50,7 +50,7 @@ import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
 
-public abstract class CasesBlock extends Block {
+public abstract class CasesBlock extends CaseBlock {
 
 	private CasesBusiness business;
 	private UserBusiness userBusiness;
@@ -71,6 +71,7 @@ public abstract class CasesBlock extends Block {
 		present(iwc);
 	}
 
+	@Override
 	protected abstract void present(IWContext iwc) throws Exception;
 
 	@Override
@@ -314,10 +315,12 @@ public abstract class CasesBlock extends Block {
 		return layer;
 	}
 
+	@Override
 	protected IWBundle getBundle() {
 		return this.iwb;
 	}
 
+	@Override
 	protected IWResourceBundle getResourceBundle() {
 		return this.iwrb;
 	}
@@ -335,6 +338,7 @@ public abstract class CasesBlock extends Block {
 		}
 	}
 
+	@Override
 	protected UserBusiness getUserBusiness() {
 		return this.userBusiness;
 	}

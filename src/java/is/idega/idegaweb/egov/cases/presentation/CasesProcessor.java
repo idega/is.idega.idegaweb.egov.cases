@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.block.process.presentation.beans.GeneralCaseManagerViewBuilder;
 import com.idega.business.IBORuntimeException;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Link;
@@ -67,20 +69,10 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
 	
-	@Autowired private CaseManagersProvider caseManagersProvider;
+	@Autowired
+	private CaseManagersProvider caseManagersProvider;
 	
 	private static final String caseManagerFacet = "caseManager";
-
-	private int pageSize = 20;
-	
-	private int page = 1;
-	
-	private boolean showCaseNumberColumn = true;
-	private boolean showCreationTimeInDateColumn = true;
-	
-	private String caseStatusesToHide;
-	private String caseStatusesToShow;
-	private String commentsManagerIdentifier;
 	
 	protected abstract String getBlockID();
 	
@@ -185,31 +177,25 @@ public abstract class CasesProcessor extends CasesBlock {
 		return ACTION_VIEW;
 	}
 	
+	@Override
+	public boolean showCheckBoxes() {
+		try {
+			return showCheckBox() && getCasesBusiness(IWMainApplication.getDefaultIWApplicationContext()).allowAnonymousCases();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return showCheckBox();
+	}
+	
 	protected void showList(IWContext iwc) throws RemoteException {
 		Layer topLayer = new Layer();
 		Form form = new Form();
 		form.addParameter(UserCases.PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
-		boolean showCheckBoxes = showCheckBox() && getCasesBusiness(iwc).allowAnonymousCases();
 		topLayer.add(form);
-		
+		boolean showCheckBoxes = showCheckBoxes();
 		add(topLayer);
 				
-		UICasesList list = (UICasesList)iwc.getApplication().createComponent(UICasesList.COMPONENT_TYPE);
-		list.setType(getCasesProcessorType());
-		list.setShowCheckBoxes(showCheckBoxes);
-		list.setUsePDFDownloadColumn(isUsePDFDownloadColumn());
-		list.setAllowPDFSigning(isAllowPDFSigning());
-		list.setShowStatistics(isShowStatistics());
-		list.setHideEmptySection(isHideEmptySection());
-		list.setPageSize(getPageSize());
-		list.setPage(getPage());
-		list.setComponentId(topLayer.getId());
-		list.setInstanceId(getBuilderService(iwc).getInstanceId(this));
-		list.setShowCaseNumberColumn(isShowCaseNumberColumn());
-		list.setShowCreationTimeInDateColumn(isShowCreationTimeInDateColumn());
-		list.setCaseStatusesToHide(getCaseStatusesToHide());
-		list.setCaseStatusesToShow(getCaseStatusesToShow());
-		list.setCommentsManagerIdentifier(getCommentsManagerIdentifier());
+		UICasesList list = getCasesList(iwc, topLayer.getId());
 		
 		form.add(list);
 				
@@ -458,49 +444,12 @@ public abstract class CasesProcessor extends CasesBlock {
 			}
 		}
 	}
-	
-			
-	public abstract boolean isUsePDFDownloadColumn();
-
-	public abstract void setUsePDFDownloadColumn(boolean usePDFDownloadColumn);
-
-	public abstract boolean isAllowPDFSigning();
-
-	public abstract void setAllowPDFSigning(boolean allowPDFSigning);
-	
-	public abstract boolean isShowStatistics();
-	
-	public abstract void setShowStatistics(boolean showStatistics);
-	
-	public abstract boolean isHideEmptySection();
-	
-	public abstract void setHideEmptySection(boolean hideEmptySection);
 
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
 	
-	protected abstract String getCasesProcessorType();
-
 	protected abstract void save(IWContext iwc) throws RemoteException;
-
-	protected abstract boolean showCheckBox();
 	
 	protected abstract void initializeTableSorter(IWContext iwc) throws RemoteException;
-
-	public int getPageSize() {
-		return pageSize;
-	}
-
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-
-	public int getPage() {
-		return page;
-	}
-
-	public void setPage(int page) {
-		this.page = page;
-	}
 
 	public CaseManagersProvider getCaseManagersProvider() {
 		return caseManagersProvider;
@@ -509,45 +458,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
 		this.caseManagersProvider = caseManagersProvider;
 	}
-
-	public boolean isShowCaseNumberColumn() {
-		return showCaseNumberColumn;
-	}
-
-	public void setShowCaseNumberColumn(boolean showCaseNumberColumn) {
-		this.showCaseNumberColumn = showCaseNumberColumn;
-	}
-
-	public boolean isShowCreationTimeInDateColumn() {
-		return showCreationTimeInDateColumn;
-	}
-
-	public void setShowCreationTimeInDateColumn(boolean showCreationTimeInDateColumn) {
-		this.showCreationTimeInDateColumn = showCreationTimeInDateColumn;
-	}
-
-	public String getCaseStatusesToHide() {
-		return caseStatusesToHide;
-	}
-
-	public void setCaseStatusesToHide(String caseStatusesToHide) {
-		this.caseStatusesToHide = caseStatusesToHide;
-	}
-
-	public String getCaseStatusesToShow() {
-		return caseStatusesToShow;
-	}
-
-	public void setCaseStatusesToShow(String caseStatusesToShow) {
-		this.caseStatusesToShow = caseStatusesToShow;
-	}
-
-	public String getCommentsManagerIdentifier() {
-		return commentsManagerIdentifier;
-	}
-
-	public void setCommentsManagerIdentifier(String commentsManagerIdentifier) {
-		this.commentsManagerIdentifier = commentsManagerIdentifier;
-	}
 	
+	@Override
+	public Map<Object, Object> getUserCasesPageMap() {
+		return null;
+	}
 }

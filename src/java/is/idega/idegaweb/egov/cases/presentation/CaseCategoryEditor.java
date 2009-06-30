@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -64,6 +65,7 @@ public class CaseCategoryEditor extends CasesBlock {
 	private static final int ACTION_SAVE = 4;
 	private static final int ACTION_DELETE = 5;
 
+	@Override
 	protected void present(IWContext iwc) throws Exception {
 			
 		switch (parseAction(iwc)) {
@@ -467,5 +469,25 @@ public class CaseCategoryEditor extends CasesBlock {
 		catch (FinderException fe) {
 			fe.printStackTrace();
 		}
+	}
+	
+	@Override
+	public String getCasesProcessorType() {
+		return null;
+	}
+
+	@Override
+	public Map<Object, Object> getUserCasesPageMap() {
+		return null;
+	}
+
+	@Override
+	public boolean showCheckBox() {
+		return false;
+	}
+
+	@Override
+	public boolean showCheckBoxes() {
+		return false;
 	}
 }

@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.ejb.FinderException;
 
@@ -337,5 +338,25 @@ public class CaseFinder extends CasesBlock {
 
 	public void setViewCasesPage(ICPage viewCasesPage) {
 		this.viewCasesPage = viewCasesPage;
+	}
+	
+	@Override
+	public String getCasesProcessorType() {
+		return null;
+	}
+
+	@Override
+	public Map<Object, Object> getUserCasesPageMap() {
+		return null;
+	}
+
+	@Override
+	public boolean showCheckBox() {
+		return false;
+	}
+
+	@Override
+	public boolean showCheckBoxes() {
+		return false;
 	}
 }

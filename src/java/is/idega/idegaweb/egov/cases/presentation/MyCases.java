@@ -361,7 +361,7 @@ public class MyCases extends CasesProcessor {
 	}
 
 	@Override
-	protected boolean showCheckBox() {
+	public boolean showCheckBox() {
 		return false;
 	}
 	
@@ -376,7 +376,7 @@ public class MyCases extends CasesProcessor {
 	}
 	
 	@Override
-	protected String getCasesProcessorType() {
+	public String getCasesProcessorType() {
 		return CasesRetrievalManager.CASE_LIST_TYPE_MY;
 	}
 }

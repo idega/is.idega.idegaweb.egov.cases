@@ -303,7 +303,7 @@ public class ClosedCases extends CasesProcessor {
 	}
 
 	@Override
-	protected boolean showCheckBox() {
+	public boolean showCheckBox() {
 		return false;
 	}
 	
@@ -318,30 +318,7 @@ public class ClosedCases extends CasesProcessor {
 	}
 	
 	@Override
-	protected String getCasesProcessorType() {
+	public String getCasesProcessorType() {
 		return CasesRetrievalManager.CASE_LIST_TYPE_CLOSED;
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	public static Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, UserBusiness userBusiness, CasesBusiness casesBusiness, String[] caseHandlers) {
-//		
-//		try {
-//			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
-//			
-//			Collection groups = userBusiness.getUserGroupsDirectlyRelated(user);
-//			Collection<GeneralCase> closedCases;
-//			
-//			if(caseHandlers == null) {
-//			
-//				closedCases = casesBusiness.getClosedCases(!isCaseSuperAdmin ? groups : null);
-//			} else {
-//				
-//				closedCases = casesBusiness.getClosedCases(!isCaseSuperAdmin ? groups : null, caseHandlers);
-//			}
-//			return closedCases;
-//			
-//		} catch (RemoteException e) {
-//			throw new IBORuntimeException(e);
-//		}
-//	}
 }
