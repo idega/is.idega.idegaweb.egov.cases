@@ -1,11 +1,13 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
+import is.idega.idegaweb.egov.cases.business.CaseArtifactsProvider;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,11 +69,14 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER)
 public class CasesListBuilderImpl implements GeneralCasesListBuilder {
+	
+	private static final Logger LOGGER = Logger.getLogger(CasesListBuilderImpl.class.getName());
 	
 	@Autowired
 	private JQuery jQuery;
@@ -129,13 +134,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		//	Sender
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
+		if (properties.isShowCreatorColumn()) {
+			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
+		}
 		
 		//	Description
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
 
 		//	Creation date
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("created_date", "Created date")), headerItem, "CreatedDate");
+		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties.getDateCustomLabelLocalizationKey()) ?
+				"created_date" : properties.getDateCustomLabelLocalizationKey(), "Created date")), headerItem, "CreatedDate");
 		
 		//	Status
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
@@ -176,6 +184,33 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 	}
 	
+	private IWTimestamp getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
+		if (StringUtil.isEmpty(properties.getDateCustomValueVariable())) {
+			return new IWTimestamp(theCase.getCreated());
+		}
+		
+		CaseArtifactsProvider artifactsProvider = getCaseArtifactsProvider();
+		if (artifactsProvider == null) {
+			return new IWTimestamp(theCase.getCreated());
+		}
+
+		Object value = artifactsProvider.getVariableValue(theCase.getId(), properties.getDateCustomValueVariable());
+		if (!(value instanceof Timestamp)) {
+			return new IWTimestamp(theCase.getCreated());
+		}
+		
+		return new IWTimestamp((Timestamp) value);
+	}
+	
+	private CaseArtifactsProvider getCaseArtifactsProvider() {
+		try {
+			return ELUtil.getInstance().getBean("bpmCaseArtifactsProvider");
+		} catch(Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting bean: " + CaseArtifactsProvider.class, e);
+		}
+		return null;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, CasePresentation theCase, CaseStatus caseStatusReview, Locale l,
 			boolean isUserList, int rowsCounter, Map pages, String emailAddress, boolean descriptionIsEditable, CaseListPropertiesBean properties) {
@@ -187,7 +222,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 					
 		User owner = theCase.getOwner();
-		IWTimestamp created = new IWTimestamp(theCase.getCreated());
+		IWTimestamp created = getCaseCreatedValue(theCase, properties);
 				
 		if (rowsCounter == 0) {
 			caseContainer.setStyleClass("firstRow");
@@ -246,11 +281,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 
 		//	Sender
-		Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
-		senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
-				owner.getLastName()).getName(l)));
-		if (theCase.isBpm()) {
-			prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
+		if (properties.isShowCreatorColumn()) {
+			Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
+			senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
+					owner.getLastName()).getName(l)));
+			if (theCase.isBpm()) {
+				prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
+			}
 		}
 		
 		//	Description
