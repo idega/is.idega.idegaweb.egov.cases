@@ -256,11 +256,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				numberContainer.add(theCase.getPrimaryKey().toString());
 			} else {
 				if (theCase.isBpm()) {
-					IWResourceBundle iwrb = getResourceBundle(iwc);
-					Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)),
-							getEmailAddressMailtoFormattedWithSubject(emailAddress, identifier));
-					numberContainer.add(sendEmail);
-					numberContainer.add(Text.getNonBrakingSpace());
+					String systemEmailAddress = getEmailAddressMailtoFormattedWithSubject(emailAddress, identifier);
+					if (!StringUtil.isEmpty(systemEmailAddress) && !systemEmailAddress.equals(identifier)) {
+						IWResourceBundle iwrb = getResourceBundle(iwc);
+						Link sendEmail = new Link(getBundle(iwc).getImage("images/email.png", getTitleSendEmail(iwrb)), systemEmailAddress);
+						numberContainer.add(sendEmail);
+						numberContainer.add(Text.getNonBrakingSpace());
+					}
 				}
 				numberContainer.add(identifier);
 			}
