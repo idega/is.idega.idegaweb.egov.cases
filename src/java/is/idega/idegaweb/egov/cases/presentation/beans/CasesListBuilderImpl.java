@@ -552,6 +552,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		addStatusesProperties(container, "casesListStatusesToShow", properties.getStatusesToShow());
 		addStatusesProperties(container, "casesListStatusesToHide", properties.getStatusesToHide());
+		if (!properties.getCaseCodes().isEmpty()) {
+			addStatusesProperties(container, "casesListCaseCodes", properties.getCaseCodes());
+		}
 	}
 	
 	private void addStatusesProperties(Layer container, String className, List<String> statuses) {

@@ -416,6 +416,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.statusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
 	this.statusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
+	this.caseCodes = jQuery('input.casesListCaseCodes').attr('value');
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
