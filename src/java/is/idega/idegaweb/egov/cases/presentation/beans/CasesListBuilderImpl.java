@@ -552,7 +552,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		addStatusesProperties(container, "casesListStatusesToShow", properties.getStatusesToShow());
 		addStatusesProperties(container, "casesListStatusesToHide", properties.getStatusesToHide());
-		if (!properties.getCaseCodes().isEmpty()) {
+		if (!ListUtil.isEmpty(properties.getCaseCodes())) {
 			addStatusesProperties(container, "casesListCaseCodes", properties.getCaseCodes());
 		}
 	}
