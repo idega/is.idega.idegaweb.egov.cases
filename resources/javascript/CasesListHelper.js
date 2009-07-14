@@ -36,6 +36,27 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 	continueInitializeCasesList(caseToOpenId);
 }
 
+CasesListHelper.openCaseView = function(caseToOpenId) {
+	if (caseToOpenId == null || caseToOpenId == '') {
+		return;
+	}
+	
+	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);
+	if (togglers == null || togglers.length > 0) {
+		return;
+	}
+	
+	var foundWhatToOpen = false;
+	for (var i = 0; (i < togglers.length && !foundWhatToOpen); i++) {
+		toggler = jQuery(togglers[i]);
+		
+		if (caseToOpenId == toggler.attr(caseIdPar)) {
+			foundWhatToOpen = true;
+			toggler.click();
+		}
+	}
+}
+
 function continueInitializeCasesList(caseToOpenId) {
 	var caseIdPar = 'caseid';
 	var togglers = jQuery(CASE_GRID_TOGGLERS_FILTER);
@@ -183,8 +204,9 @@ function registerGridExpanderActionsForElement(event, element) {
 		var allowPDFSigning = caseToExpand.attr('allowpdfsigning') == 'true';
 		var hideEmptySection = caseToExpand.attr('hideemptysection') == 'true';
 		var commentsManagerIdentifier = caseToExpand.attr('commentsmanageridentifier');
+		var showAttachmentStatistics = caseToExpand.attr('showattachmentstatistics') == 'true';
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning,
-			hideEmptySection, commentsManagerIdentifier), {
+			hideEmptySection, commentsManagerIdentifier, showAttachmentStatistics), {
 			callback: function(component) {
 				
 				closeAllLoadingMessages();
@@ -205,13 +227,15 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 }
 
-function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection, commentsManagerIdentifier) {
+function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection, commentsManagerIdentifier,
+								showAttachmentStatistics) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
 	this.usePDFDownloadColumn = usePDFDownloadColumn;
 	this.allowPDFSigning = allowPDFSigning;
 	this.hideEmptySection = hideEmptySection;
+	this.showAttachmentStatistics = showAttachmentStatistics;
 	
 	this.commentsPersistenceManagerIdentifier = commentsManagerIdentifier;
 }
