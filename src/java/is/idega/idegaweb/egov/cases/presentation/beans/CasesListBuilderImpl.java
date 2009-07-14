@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -81,6 +82,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	@Autowired
 	private JQuery jQuery;
 	
+	@Autowired
+	private CaseManagersProvider casesManagerProvider;
+	
 	private CaseManagersProvider caseManagersProvider;
 	
 	private String caseContainerStyle = "casesListCaseContainer";
@@ -91,6 +95,26 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String caseIdParName = "caseid";
 	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
 	private String allowPDFSigningParName = "allowpdfsigning";
+	
+	private String resolveCaseId(IWContext iwc) {
+		List<CasesRetrievalManager> managers = null;
+		try {
+			managers = getCaseManagersProvider().getCaseManagers();
+		} catch(Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting cases managers", e);
+		}
+		
+		if (ListUtil.isEmpty(managers)) {
+			return iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
+		}
+		
+		String caseId = null;
+		for (Iterator<CasesRetrievalManager> managersIter = managers.iterator(); (managersIter.hasNext() && StringUtil.isEmpty(caseId));) {
+			caseId = managersIter.next().resolveCaseId(iwc);
+		}
+		
+		return caseId;
+	}
 	
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean searchResults, CaseListPropertiesBean properties) {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
@@ -110,8 +134,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return container;
 		}
 		
-		String caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
-		addResources(caseId, iwc, getBundle(iwc), properties.getType());
+		addResources(resolveCaseId(iwc), iwc, getBundle(iwc), properties.getType());
 		
 		if (searchResults) {
 			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results")).append(CoreConstants.SPACE);
@@ -182,6 +205,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!StringUtil.isEmpty(properties.getCommentsManagerIdentifier())) {
 			layer.setMarkupAttribute("commentsmanageridentifier", properties.getCommentsManagerIdentifier());
 		}
+		layer.setMarkupAttribute("showattachmentstatistics", properties.isShowAttachmentStatistics());
 	}
 	
 	private IWTimestamp getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
@@ -903,5 +927,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	public String getTitleSendEmail() {
 		return getTitleSendEmail(getResourceBundle(CoreUtil.getIWContext()));
+	}
+
+	public CaseManagersProvider getCasesManagerProvider() {
+		return casesManagerProvider;
+	}
+
+	public void setCasesManagerProvider(CaseManagersProvider casesManagerProvider) {
+		this.casesManagerProvider = casesManagerProvider;
 	}
 }
