@@ -206,6 +206,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			layer.setMarkupAttribute("commentsmanageridentifier", properties.getCommentsManagerIdentifier());
 		}
 		layer.setMarkupAttribute("showattachmentstatistics", properties.isShowAttachmentStatistics());
+		layer.setMarkupAttribute("showonlycreatorincontacts", properties.isShowOnlyCreatorInContacts());
 	}
 	
 	private IWTimestamp getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {

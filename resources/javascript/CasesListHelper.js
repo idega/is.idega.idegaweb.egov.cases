@@ -205,8 +205,9 @@ function registerGridExpanderActionsForElement(event, element) {
 		var hideEmptySection = caseToExpand.attr('hideemptysection') == 'true';
 		var commentsManagerIdentifier = caseToExpand.attr('commentsmanageridentifier');
 		var showAttachmentStatistics = caseToExpand.attr('showattachmentstatistics') == 'true';
+		var showOnlyCreatorInContacts = caseToExpand.attr('showonlycreatorincontacts') == 'true';
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning,
-			hideEmptySection, commentsManagerIdentifier, showAttachmentStatistics), {
+			hideEmptySection, commentsManagerIdentifier, showAttachmentStatistics, showOnlyCreatorInContacts), {
 			callback: function(component) {
 				
 				closeAllLoadingMessages();
@@ -228,7 +229,7 @@ function registerGridExpanderActionsForElement(event, element) {
 }
 
 function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection, commentsManagerIdentifier,
-								showAttachmentStatistics) {
+								showAttachmentStatistics, showOnlyCreatorInContacts) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -236,6 +237,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 	this.allowPDFSigning = allowPDFSigning;
 	this.hideEmptySection = hideEmptySection;
 	this.showAttachmentStatistics = showAttachmentStatistics;
+	this.showOnlyCreatorInContacts = showOnlyCreatorInContacts;
 	
 	this.commentsPersistenceManagerIdentifier = commentsManagerIdentifier;
 }
