@@ -67,6 +67,8 @@ import com.idega.util.expression.ELUtil;
 
 public class CasesStatistics extends CasesBlock {
 	
+	private static final Logger LOGGER = Logger.getLogger(CasesStatistics.class.getName());
+	
 	public static final String UNKOWN_CATEGORY_ID = "case.unkown_category";
 	
 	private String visibleStatuses = null;
@@ -91,7 +93,7 @@ public class CasesStatistics extends CasesBlock {
 		try {
 			ELUtil.getInstance().autowire(this);
 		} catch(Exception e) {
-			Logger.getLogger(CasesStatistics.class.getName()).log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManagersProvider.class.getName(), e);
+			LOGGER.log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManagersProvider.class.getName() + ". Will skip BPM cases in statistics");
 		}
 	}
 
@@ -369,7 +371,12 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 	
-	@SuppressWarnings("unchecked") Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId) {
+	@SuppressWarnings("unchecked")
+	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId) {
+		if (getCaseManagersProvider() == null) {
+			return null;
+		}
+		
 		CaseCategory category = null;
 		try {
 			category = getCaseCategory(categoryId);
@@ -389,7 +396,7 @@ public class CasesStatistics extends CasesBlock {
 		
 		Map<String, List<Case>> casesByProcesses = getCasesByProcesses(cases);
 		if (casesByProcesses == null || ListUtil.isEmpty(casesByProcesses.keySet())) {
-			Logger.getLogger(this.getClass().getName()).info("Didn't find any custom category ('"+category+"') cases");
+			LOGGER.info("Didn't find any custom category ('"+category+"') cases");
 			return null;
 		}
 		
@@ -425,7 +432,7 @@ public class CasesStatistics extends CasesBlock {
 		for (Case theCase: cases) {
 			statusId = theCase.getStatus();
 			if (StringUtil.isEmpty(statusId)) {
-				Logger.getLogger(this.getClass().getName()).warning("There is no status set for case: " + theCase);
+				LOGGER.warning("There is no status set for case: " + theCase);
 			}
 			else {
 				Integer count = statuses.get(statusId);
@@ -474,7 +481,7 @@ public class CasesStatistics extends CasesBlock {
 				}
 				
 				if (StringUtil.isEmpty(processDefinitionName)) {
-					Logger.getLogger(this.getClass().getName()).warning("Unable to get process identifier for case: " + theCase);
+					LOGGER.warning("Unable to get process identifier for case: " + theCase);
 				}
 				else {
 					List<Case> casesByProcess = casesByProcesses.get(processDefinitionName);
@@ -705,7 +712,7 @@ public class CasesStatistics extends CasesBlock {
 		try {
 			category = getCaseCategory(categoryId);
 		} catch (Exception e) {
-			Logger.getLogger(this.getClass().getName()).warning("Unable to get category by: " + categoryId);
+			LOGGER.warning("Unable to get category by: " + categoryId);
 		}
 		
 		if (category == null) {
