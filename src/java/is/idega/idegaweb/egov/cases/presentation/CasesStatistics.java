@@ -89,12 +89,15 @@ public class CasesStatistics extends CasesBlock {
 	@Autowired(required = false)
 	private CaseManagersProvider caseManagersProvider;
 	
-	public CasesStatistics() {
+	@Override
+	public void main(IWContext iwc) throws Exception {
 		try {
 			ELUtil.getInstance().autowire(this);
 		} catch(Exception e) {
 			LOGGER.log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManagersProvider.class.getName() + ". Will skip BPM cases in statistics");
 		}
+		
+		super.main(iwc);
 	}
 
 	@SuppressWarnings("unchecked")
