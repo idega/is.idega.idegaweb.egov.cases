@@ -541,39 +541,34 @@ public class CasesStatistics extends CasesBlock {
 	private class Result {
 	
 		private int id;
-		private int count = 0;
 		private boolean useDefaultHandlerIfNotFoundResultsProvider = true;
 		private String name = null;
 		private Map<String, Integer> statusMap;
 		
-		public Result(int id, String name, Map<String, Integer> statusMap) {
+		private Result(int id, String name, Map<String, Integer> statusMap) {
 			this(id, name, statusMap, true);
 		}
 		
-		public Result(int id, String name, Map<String, Integer> statusMap, boolean useDefaultHandlerIfNotFoundResultsProvider) {
+		private Result(int id, String name, Map<String, Integer> statusMap, boolean useDefaultHandlerIfNotFoundResultsProvider) {
 			this.id = id;
 			this.name = name;
 			this.statusMap = statusMap;
 			this.useDefaultHandlerIfNotFoundResultsProvider = useDefaultHandlerIfNotFoundResultsProvider;
 		}
 		
-		public String getName() {
+		private String getName() {
 			return name;
 		}
 		
-		public int getCount() {
-			return count;
-		}
-		
-		public Map<String, Integer> getStatusMap() {
+		private Map<String, Integer> getStatusMap() {
 			return statusMap;
 		}
 		
-		public int getID(){
+		private int getID(){
 			return id;
 		}
 
-		public boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
+		private boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
 			return useDefaultHandlerIfNotFoundResultsProvider;
 		}
 	}
