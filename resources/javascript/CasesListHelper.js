@@ -297,6 +297,7 @@ function searchForCases(parameters) {
 	var hideEmptySection = false;
 	var instanceId = null;
 	var gridOpeners = jQuery('div.' + parameters[11]);
+	var onlySubscribedCases = false;
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
 		
@@ -305,6 +306,7 @@ function searchForCases(parameters) {
 		hideEmptySection = gridOpener.attr('hideEmptySection') == 'true';
 		
 		instanceId = jQuery('input.casesListInstanceIdProperty').attr('value');
+		onlySubscribedCases = gridOpener.attr('onlysubscribedcases') == 'true';
 	}
 	var showCaseNumberColumn = jQuery('div.casesListHeadersContainerItemCaseNumber').length == 0 ? false : true;
 	var showCreationTimeInDateColumn = jQuery('div.showOnlyDateValueForCaseInCasesListRow').length == 0 ? false : true;
@@ -316,7 +318,7 @@ function searchForCases(parameters) {
 	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
 																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
 																		allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection,
-																		showCaseNumberColumn, showCreationTimeInDateColumn, instanceId), {
+																		showCaseNumberColumn, showCreationTimeInDateColumn, instanceId, onlySubscribedCases), {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -415,7 +417,7 @@ function removePreviousSearchResults(className) {
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
 										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
-										instanceId) {
+										instanceId, onlySubscribedCases) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -443,6 +445,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.statusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
 	this.statusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
 	this.caseCodes = jQuery('input.casesListCaseCodes').attr('value');
+	this.onlySubscribedCases = onlySubscribedCases;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
