@@ -240,6 +240,8 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 	this.showOnlyCreatorInContacts = showOnlyCreatorInContacts;
 	
 	this.commentsPersistenceManagerIdentifier = commentsManagerIdentifier;
+	
+	this.autoShowComments = window.location.href.indexOf('autoShowComments=true') != -1;
 }
 
 function navigateCasesList(instanceId, containerId, page, count) {
