@@ -458,7 +458,7 @@ function registerCasesSearcherBoxActions(id, parameters) {
 		return;
 	}
 	
-	if (jQuery('#sidebar').length > 0) {
+	if (window.location.href.indexOf('impra') != -1 && jQuery('#sidebar').length > 0) {
 		jQuery('.casesSearcherBoxStyleClass').remove().insertAfter('#sidebar').wrap('<div class="box" id="casesFilter"><div class="content"></div></div>');
 	}
 	
