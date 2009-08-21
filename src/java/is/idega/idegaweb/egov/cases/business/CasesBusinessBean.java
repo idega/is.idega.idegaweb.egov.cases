@@ -290,8 +290,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) {
-		// Should not need to check the preferred locale for a user for now since the only method that uses it,handleCase
-		// passes the preferred locale in.
+		return getLocalizedCaseStatusDescription(theCase, status, locale, getBundleIdentifier());
+	}
+	
+	@Override
+	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale, String bundleIdentifier) {
 		try {
 			GeneralCase genCase = null;
 			if (theCase!= null && theCase instanceof GeneralCase) {
@@ -299,7 +302,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			} else {
 				genCase = theCase == null ? null : getGeneralCase(theCase.getPrimaryKey());
 			}
-			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
+			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
 			if (genCase == null) {
 				return iwrb.getLocalizedString("case_status_key." + status.getStatus(), status.getStatus());
 			}
