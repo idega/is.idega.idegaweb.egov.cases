@@ -1157,11 +1157,23 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			return null;
 		}
 
+		String errorMessage = "Error getting cases by ids: " + ids;
+		boolean reTry = false;
 		try {
 			return getGeneralCaseHome().getCasesByIds(ids);
+		} catch (FinderException e) {
+			reTry = true;
 		} catch (Exception e) {
-			log(Level.SEVERE, "Error getting cases by ids: " + ids, e);
+			log(Level.SEVERE, errorMessage, e);
 		}
+		if (reTry) {
+			try {
+				return getCaseHome().getCasesByIds(ids);
+			} catch (Exception e) {
+				log(Level.SEVERE, errorMessage, e);
+			}
+		}
+		
 		return null;
 	}
 	
