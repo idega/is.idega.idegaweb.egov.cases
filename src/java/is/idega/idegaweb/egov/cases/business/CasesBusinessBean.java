@@ -301,7 +301,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			
 			if (theCase instanceof GeneralCase) {
 				GeneralCase genCase = (GeneralCase) theCase;
-				typeKey = genCase.getType() != null ? genCase.getType() + "." : "";
+				typeKey = genCase.getType() != null ? genCase.getType() + CoreConstants.DOT : CoreConstants.EMPTY;
 			}
 			
 			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
