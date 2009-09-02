@@ -1133,14 +1133,18 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			try {
 				return getCaseHome().findByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
 			} catch (Exception e) {
-				log(Level.SEVERE, "Error getting cases by criteria: " + e);
+				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
+						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
+						groups + ", simple cases: " + simpleCases, e);
 			}
 		}
 		else {
 			try {
 				return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
 			} catch (Exception e) {
-				log(Level.SEVERE, "Error getting cases by criteria: " + e);
+				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
+						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
+						groups + ", simple cases: " + simpleCases, e);
 			}
 		}
 
@@ -1156,7 +1160,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		try {
 			return getGeneralCaseHome().getCasesByIds(ids);
 		} catch (Exception e) {
-			log(Level.SEVERE, "Error getting cases by criteria: " + e);
+			log(Level.SEVERE, "Error getting cases by ids: " + ids, e);
 		}
 		return null;
 	}
