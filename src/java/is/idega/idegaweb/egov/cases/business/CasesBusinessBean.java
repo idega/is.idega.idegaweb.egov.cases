@@ -65,6 +65,7 @@ import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
@@ -296,21 +297,24 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale, String bundleIdentifier) {
 		try {
-			GeneralCase genCase = null;
-			if (theCase!= null && theCase instanceof GeneralCase) {
-				genCase = (GeneralCase) theCase;
-			} else {
-				genCase = theCase == null ? null : getGeneralCase(theCase.getPrimaryKey());
+			String typeKey = null;
+			
+			if (theCase instanceof GeneralCase) {
+				GeneralCase genCase = (GeneralCase) theCase;
+				typeKey = genCase.getType() != null ? genCase.getType() + "." : "";
 			}
+			
 			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
-			if (genCase == null) {
+			if (theCase == null) {
 				return iwrb.getLocalizedString("case_status_key." + status.getStatus(), status.getStatus());
 			}
-			return iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_status_key." + status.getStatus(), status.getStatus());
-		} catch (FinderException fe) {
-			fe.printStackTrace();
-			return super.getLocalizedCaseStatusDescription(theCase, status, locale);
+			return iwrb.getLocalizedString((StringUtil.isEmpty(typeKey) ? CoreConstants.EMPTY : typeKey) + "case_status_key." + status.getStatus(),
+					status.getStatus());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		return theCase.getStatus();
 	}
 
 	public GeneralCase getGeneralCase(Object casePK) throws FinderException {
