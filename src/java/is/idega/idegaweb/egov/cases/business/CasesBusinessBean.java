@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -281,13 +282,20 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				CaseCategory type = genCase.getCaseCategory();
 				arguments = new Object [] {type.getLocalizedCategoryName(locale)};
 				typeOrCodeKey = genCase.getType();
-			}/* else {
-				typeOrCodeKey = theCase.getCode();
-			}*/
+			}
 			
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
-			return MessageFormat.format(iwrb.getLocalizedString((StringUtil.isEmpty(typeOrCodeKey) ? CoreConstants.EMPTY : CoreConstants.DOT) +
-					"case_code_key." + code, code), arguments);
+			String allKey = (StringUtil.isEmpty(typeOrCodeKey) ? CoreConstants.EMPTY : CoreConstants.DOT) + "case_code_key." + code;
+			String localizedDescription = iwrb.getLocalizedString(allKey, code);
+			if (StringUtil.isEmpty(localizedDescription) || localizedDescription.equals(code)) {
+				localizedDescription = super.getLocalizedString(allKey, code, locale, super.getBundleIdentifier());
+			}
+			if (StringUtil.isEmpty(localizedDescription) || localizedDescription.equals(code)) {
+				localizedDescription = super.getLocalizedCaseDescription(theCase, locale);
+			}
+			Logger.getLogger(CasesBusinessBean.class.getName()).info("Found localized CASE description '"+localizedDescription+"' with params: " + allKey + ", default value: " + code +
+					" resource bundle: " + iwrb + ", arguments: " + arguments);
+			return MessageFormat.format(localizedDescription, arguments);
 		} catch (FinderException fe) {
 			fe.printStackTrace();
 			return super.getLocalizedCaseDescription(theCase, locale);
