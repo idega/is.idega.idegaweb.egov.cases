@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
@@ -293,8 +291,6 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (StringUtil.isEmpty(localizedDescription) || localizedDescription.equals(code)) {
 				localizedDescription = super.getLocalizedCaseDescription(theCase, locale);
 			}
-			Logger.getLogger(CasesBusinessBean.class.getName()).info("Found localized CASE description '"+localizedDescription+"' with params: " + allKey + ", default value: " + code +
-					" resource bundle: " + iwrb + ", arguments: " + arguments);
 			return MessageFormat.format(localizedDescription, arguments);
 		} catch (FinderException fe) {
 			fe.printStackTrace();
