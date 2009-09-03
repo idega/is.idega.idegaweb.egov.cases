@@ -271,14 +271,23 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) {
-		// Should not need to check the preferred locale for a user for now since it isn't used in sending messages
 		try {
-			GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
-			CaseCategory type = genCase.getCaseCategory();
-			Object[] arguments = { type.getLocalizedCategoryName(locale) };
-
+			String code = theCase.getCode();
+			String typeOrCodeKey = null;
+			
+			Object[] arguments = null;
+			if (theCase instanceof GeneralCase) {
+				GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
+				CaseCategory type = genCase.getCaseCategory();
+				arguments = new Object [] {type.getLocalizedCategoryName(locale)};
+				typeOrCodeKey = genCase.getType();
+			} else {
+				typeOrCodeKey = theCase.getCode();
+			}
+			
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
-			return MessageFormat.format(iwrb.getLocalizedString((genCase.getType() != null ? genCase.getType() + "." : "") + "case_code_key." + theCase.getCode(), theCase.getCode()), arguments);
+			return MessageFormat.format(iwrb.getLocalizedString((StringUtil.isEmpty(typeOrCodeKey) ? CoreConstants.EMPTY : CoreConstants.DOT) +
+					"case_code_key." + code, code), arguments);
 		} catch (FinderException fe) {
 			fe.printStackTrace();
 			return super.getLocalizedCaseDescription(theCase, locale);
@@ -304,9 +313,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (theCase instanceof GeneralCase) {
 				GeneralCase genCase = (GeneralCase) theCase;
 				typeOrCodeKey = genCase.getType() == null ? CoreConstants.EMPTY : genCase.getType() + CoreConstants.DOT;
-			} else if (theCase != null) {
+			}/* else if (theCase != null) {
 				typeOrCodeKey = theCase.getCode();
-			}
+			}*/
 			
 			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
 			if (theCase == null) {
