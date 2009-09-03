@@ -297,19 +297,22 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale, String bundleIdentifier) {
 		try {
-			String typeKey = null;
+			String statusKey = status.getStatus();
+			String key = "case_status_key." + statusKey;
 			
+			String typeOrCodeKey = null;
 			if (theCase instanceof GeneralCase) {
 				GeneralCase genCase = (GeneralCase) theCase;
-				typeKey = genCase.getType() != null ? genCase.getType() + CoreConstants.DOT : CoreConstants.EMPTY;
+				typeOrCodeKey = genCase.getType() == null ? CoreConstants.EMPTY : genCase.getType() + CoreConstants.DOT;
+			} else if (theCase != null) {
+				typeOrCodeKey = theCase.getCode();
 			}
 			
 			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
 			if (theCase == null) {
-				return iwrb.getLocalizedString("case_status_key." + status.getStatus(), status.getStatus());
+				return iwrb.getLocalizedString(key, statusKey);
 			}
-			return iwrb.getLocalizedString((StringUtil.isEmpty(typeKey) ? CoreConstants.EMPTY : typeKey) + "case_status_key." + status.getStatus(),
-					status.getStatus());
+			return iwrb.getLocalizedString((StringUtil.isEmpty(typeOrCodeKey) ? CoreConstants.EMPTY : typeOrCodeKey) + key, statusKey);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
