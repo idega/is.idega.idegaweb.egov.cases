@@ -281,9 +281,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				CaseCategory type = genCase.getCaseCategory();
 				arguments = new Object [] {type.getLocalizedCategoryName(locale)};
 				typeOrCodeKey = genCase.getType();
-			} else {
+			}/* else {
 				typeOrCodeKey = theCase.getCode();
-			}
+			}*/
 			
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
 			return MessageFormat.format(iwrb.getLocalizedString((StringUtil.isEmpty(typeOrCodeKey) ? CoreConstants.EMPTY : CoreConstants.DOT) +
@@ -313,9 +313,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (theCase instanceof GeneralCase) {
 				GeneralCase genCase = (GeneralCase) theCase;
 				typeOrCodeKey = genCase.getType() == null ? CoreConstants.EMPTY : genCase.getType() + CoreConstants.DOT;
-			}/* else if (theCase != null) {
-				typeOrCodeKey = theCase.getCode();
-			}*/
+			}
 			
 			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
 			if (theCase == null) {
