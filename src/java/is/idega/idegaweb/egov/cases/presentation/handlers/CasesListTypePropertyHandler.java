@@ -1,14 +1,10 @@
 package is.idega.idegaweb.egov.cases.presentation.handlers;
 
-import is.idega.idegaweb.egov.cases.presentation.ClosedCases;
-import is.idega.idegaweb.egov.cases.presentation.MyCases;
-import is.idega.idegaweb.egov.cases.presentation.OpenCases;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.util.List;
 
 import com.idega.block.process.business.CasesRetrievalManager;
-import com.idega.block.process.presentation.UserCases;
 import com.idega.core.builder.presentation.ICPropertyHandler;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
