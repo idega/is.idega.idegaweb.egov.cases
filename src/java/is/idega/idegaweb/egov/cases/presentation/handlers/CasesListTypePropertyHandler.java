@@ -25,20 +25,6 @@ public class CasesListTypePropertyHandler implements ICPropertyHandler {
 		
 		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("select_list_type", "Select list type"), -1));
 		
-//		CasesBusiness casesBusiness = null;
-//		try {
-//			casesBusiness = (CasesBusiness) IBOLookup.getServiceInstance(iwc, CasesBusiness.class);
-//		} catch (IBOLookupException e) {
-//			e.printStackTrace();
-//			return caseListTypes;
-//		}
-		
-//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), getStringFromArray(casesBusiness.getStatusesForOpenCases())));
-//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"),
-//				getStringFromArray(casesBusiness.getStatusesForClosedCases())));
-//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), getStringFromArray(casesBusiness.getStatusesForMyCases())));
-//		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("user_cases", "User cases"), UserCases.TYPE));
-		
 		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("open_cases", "Open cases"), CasesRetrievalManager.CASE_LIST_TYPE_OPEN));
 		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("closed_cases", "Closed cases"), CasesRetrievalManager.CASE_LIST_TYPE_CLOSED));
 		caseListTypes.addOption(new SelectOption(iwrb.getLocalizedString("my_cases", "My cases"), CasesRetrievalManager.CASE_LIST_TYPE_MY));
@@ -48,24 +34,6 @@ public class CasesListTypePropertyHandler implements ICPropertyHandler {
 		
 		return caseListTypes;
 	}
-
-	/*
-	private String getStringFromArray(String[] values) {
-		if (values == null || values.length == 0) {
-			return String.valueOf(-1);
-		}
-		
-		StringBuilder value = new StringBuilder();
-		for (int i = 0; i < values.length; i++) {
-			value.append(values[i]);
-			
-			if ((i + 1) < values.length) {
-				value.append(ICBuilderConstants.BUILDER_MODULE_PROPERTY_VALUES_SEPARATOR);
-			}
-		}
-		return value.toString();
-	}
-	*/
 	
 	public void onUpdate(String[] values, IWContext iwc) {
 	}
