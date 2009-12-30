@@ -13,10 +13,12 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import javax.ejb.FinderException;
 
 import com.idega.block.process.business.CasesRetrievalManager;
+import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.file.data.ICFile;
@@ -268,6 +270,14 @@ public class ClosedCases extends CasesProcessor {
 
 		layer.add(clear);
 
+		@SuppressWarnings("unchecked")
+		Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
+		if (!logs.isEmpty()) {
+			for (CaseLog log : logs) {
+				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
+			}
+		}
+		
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);

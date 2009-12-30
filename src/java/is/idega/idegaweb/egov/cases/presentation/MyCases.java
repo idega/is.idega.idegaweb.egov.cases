@@ -317,10 +317,12 @@ public class MyCases extends CasesProcessor {
 
 		@SuppressWarnings("unchecked")
 		Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
-		if (!logs.isEmpty())
-			for (CaseLog log : logs)
+		if (!logs.isEmpty()) {
+			for (CaseLog log : logs) {
 				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
-
+			}
+		}
+		
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
