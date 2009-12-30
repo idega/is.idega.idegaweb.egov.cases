@@ -491,7 +491,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		addProperties(container, properties);
 		
-		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
+		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : casesInList.size();
 
 		if (pageSize > 0 && instanceId != null && componentId != null && totalCases > 0) {
 			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(
@@ -601,14 +601,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		boolean showStatistics = properties.isShowStatistics();
 		
-		Collection<CasePresentation> casesInList = cases.getCollection();
-		
 		String emailAddress = getDefaultEmail(); 
 		
 		boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
 		
 		boolean searchResults = isSearchResultsList(type);
 		Layer container = getCasesListContainer(searchResults);
+		
+		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
+		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : casesInList.size();
 		
 		addProperties(container, properties);
 		
@@ -623,7 +624,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(
 					ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 
-			ListNavigator navigator = new ListNavigator("userCases", cases.getTotalCount());
+			ListNavigator navigator = new ListNavigator("userCases", totalCases);
 			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
 			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
 			navigator.setPageSize(pageSize);
@@ -642,8 +643,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list", "Sorry, error occurred - can not generate cases list.")));
 			return container;
 		}
-		
-		int totalCases = (casesInList == null || casesInList.isEmpty()) ? 0 : casesInList.size();
 		
 		Layer casesContainer = createHeader(iwc, container, totalCases, searchResults, properties);
 		
