@@ -136,9 +136,6 @@ public class CaseViewer extends CaseCreator {
 
 			form.add(getPersonInfo(iwc, theCase.getOwner()));
 
-			Layer clearLayer = new Layer(Layer.DIV);
-			clearLayer.setStyleClass("Clear");
-
 			Layer caseType = new Layer(Layer.SPAN);
 			caseType.add(new Text(type.getName()));
 
