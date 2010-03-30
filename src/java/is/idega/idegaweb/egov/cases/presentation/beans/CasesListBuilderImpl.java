@@ -220,12 +220,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return new IWTimestamp(theCase.getCreated());
 		}
 
-		Object value = artifactsProvider.getVariableValue(theCase.getId(), properties.getDateCustomValueVariable());
-		if (!(value instanceof Timestamp)) {
+		Timestamp value = null;
+		try {
+			value = artifactsProvider.getVariableValue(theCase.getId(), properties.getDateCustomValueVariable());
+		} catch (ClassCastException e) {
+			LOGGER.log(Level.WARNING, "Error while resolving date!", e);
+		}
+		if (value == null) {
 			return new IWTimestamp(theCase.getCreated());
 		}
 		
-		return new IWTimestamp((Timestamp) value);
+		return new IWTimestamp(value);
 	}
 	
 	private CaseArtifactsProvider getCaseArtifactsProvider() {

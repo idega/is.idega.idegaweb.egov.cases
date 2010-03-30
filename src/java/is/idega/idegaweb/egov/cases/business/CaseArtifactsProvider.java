@@ -1,7 +1,9 @@
 package is.idega.idegaweb.egov.cases.business;
 
+import java.io.Serializable;
+
 public interface CaseArtifactsProvider {
 
-	public Object getVariableValue(Object caseId, String variableName);
+	public <T extends Serializable> T getVariableValue(Object caseId, String variableName);
 	
 }
