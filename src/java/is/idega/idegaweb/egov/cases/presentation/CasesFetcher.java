@@ -349,9 +349,11 @@ public class CasesFetcher extends CasesBlock {
 		while (iter.hasNext()) {
 			GeneralCase theCase = (GeneralCase) iter.next();
 			CaseCategory category = theCase.getCaseCategory();
-			Group handlerGroup = category.getHandlerGroup();
-			if (!currentUser.hasRelationTo(handlerGroup)) {
-				continue;
+			if (category != null) {
+				Group handlerGroup = category.getHandlerGroup();
+				if (handlerGroup != null && !currentUser.hasRelationTo(handlerGroup)) {
+					continue;
+				}
 			}
 			CaseType type = theCase.getCaseType();
 			CaseStatus status = theCase.getCaseStatus();
@@ -408,7 +410,12 @@ public class CasesFetcher extends CasesBlock {
 
 			cell = row.createCell();
 			cell.setStyleClass("category");
-			cell.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
+			if (category != null) {
+				cell.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
+			}
+			else {
+				cell.add(Text.getNonBrakingSpace());
+			}
 
 			if (getCasesBusiness(iwc).useTypes()) {
 				cell = row.createCell();

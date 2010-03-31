@@ -200,7 +200,12 @@ public class MyCases extends CasesProcessor {
 		statuses.setStyleClass("caseStatusDropdown");
 
 		Layer message = new Layer(Layer.SPAN);
-		message.add(new Text(TextSoap.formatText(theCase.getMessage())));
+		if (theCase.getMessage() != null) {
+			message.add(new Text(TextSoap.formatText(theCase.getMessage())));
+		}
+		else {
+			message.add(Text.getNonBrakingSpace());
+		}
 
 		Layer createdDate = new Layer(Layer.SPAN);
 		createdDate.add(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
