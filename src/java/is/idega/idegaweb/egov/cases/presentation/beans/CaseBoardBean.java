@@ -196,5 +196,9 @@ public class CaseBoardBean {
 	public void setHandler(User handler) {
 		this.handler = handler;
 	}
-	
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ").concat(String.valueOf(processInstanceId));
+	}
 }
