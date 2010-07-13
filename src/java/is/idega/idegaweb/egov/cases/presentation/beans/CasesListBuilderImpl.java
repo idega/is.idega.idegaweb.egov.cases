@@ -242,9 +242,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, CasePresentation theCase, CaseStatus caseStatusReview, Locale l,
-			boolean isUserList, int rowsCounter, Map pages, String emailAddress, boolean descriptionIsEditable, CaseListPropertiesBean properties) {
+			boolean isUserList, int rowsCounter, @SuppressWarnings("rawtypes") Map pages, String emailAddress, boolean descriptionIsEditable,
+			CaseListPropertiesBean properties) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -595,8 +595,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		container.add(status);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public UIComponent getUserCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, Map pages, CaseListPropertiesBean properties) {
+	public UIComponent getUserCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, @SuppressWarnings("rawtypes") Map pages,
+			CaseListPropertiesBean properties) {
 		int pageSize = properties.getPageSize();
 		int page = properties.getPage();
 		
@@ -690,8 +690,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Link getLinkToViewUserCase(IWContext iwc, CasePresentation theCase, Image viewCaseImage, Map pages, String caseCode,
+	private Link getLinkToViewUserCase(IWContext iwc, CasePresentation theCase, Image viewCaseImage, @SuppressWarnings("rawtypes") Map pages, String caseCode,
 			CaseStatus caseStatus, boolean addCredentialsToExernalUrls) {
 		CaseBusiness caseBusiness = null;
 		try {
@@ -737,8 +736,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private ICPage getPage(Map pages, String caseCode, String caseStatus) {
+	private ICPage getPage(@SuppressWarnings("rawtypes") Map pages, String caseCode, String caseStatus) {
 		if (pages == null) {
 			return null;
 		}
@@ -749,6 +747,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				return (ICPage) object;
 			}
 			else if (object instanceof Map) {
+				@SuppressWarnings("rawtypes")
 				Map statusMap = (Map) object;
 				return (ICPage) statusMap.get(caseStatus);
 			}
