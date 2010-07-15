@@ -591,3 +591,12 @@ tr.even {
 .casesSearchResultsSortingOptionContainer:HOVER {
 	cursor: move;
 }
+
+.reloadCaseStyleClass {
+	padding-top: 3px !important;
+	padding-left: 10px !important;
+}
+
+.reloadCaseStyleClass:HOVER {
+	cursor: pointer;
+}
