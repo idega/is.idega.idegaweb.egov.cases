@@ -589,7 +589,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			query.addCriteria(new InCriteria(generalCasesTable.getColumn(getIDColumnName()), ids));
 		}
 		query.addOrder(casesTable, CaseBMPBean.COLUMN_CREATED, false);
-		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
 
