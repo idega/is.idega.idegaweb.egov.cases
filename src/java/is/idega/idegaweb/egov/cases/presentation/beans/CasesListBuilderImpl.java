@@ -516,9 +516,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			navigator.setCurrentPage(page);
 			StringBuilder navigationParams = new StringBuilder();
 			navigationParams.append("'").append(instanceId).append("'");
-			navigationParams.append(",'").append(componentId).append("'");
-			navigator.setNavigationFunction("gotoCasesListPage('#PAGE#','" + pageSize + "'," + navigationParams + ");");
-			navigator.setDropdownFunction("changeCasesListPageSize(this.value, " + navigationParams + ");");
+			navigationParams.append(", '").append(componentId).append("'");
+			navigator.setNavigationFunction("gotoCasesListPage(this.id, '#PAGE#', '" + pageSize + "', " + navigationParams + ");");
+			navigator.setDropdownFunction("changeCasesListPageSize(this.id, this.value, " + navigationParams + ");");
 			navigationLayer.add(navigator);
 		}
 		IWResourceBundle iwrb = getResourceBundle(iwc);

@@ -1,6 +1,7 @@
 if (CasesListHelper == null) var CasesListHelper = {};
 
 CasesListHelper.processVariables = [];
+CasesListHelper.listPages = [];
 
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Out of cheese error! Please reboot the Universe and try again...or the page.';
@@ -244,20 +245,68 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 	this.autoShowComments = window.location.href.indexOf('autoShowComments=true') != -1;
 }
 
-function navigateCasesList(instanceId, containerId, page, count) {
+CasesListHelper.getPager = function(fromPager, page) {
+	if (fromPager == null || CasesListHelper.listPages == null) {
+		return null;
+	}
+	
+	CasesListHelper.listPages.push(fromPager);
+	
+	for (var i = 0; i < CasesListHelper.listPages.length; i++) {
+		var cachedPager = CasesListHelper.listPages[i];
+		if (cachedPager.instance == fromPager.instance && cachedPager.page == page && cachedPager.size == fromPager.size) {
+			return cachedPager;
+		}
+	}
+	
+	return null;
+}
+
+function navigateCasesList(id, instanceId, containerId, newPage, count) {
 	showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
-	var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
-	IWCORE.renderComponent(instanceId, containerId, function() {
-		closeAllLoadingMessages();
-	}, properties);
+	
+	var currentPage = -1;
+	var currentSize = -1;
+	if (jQuery('#' + id).hasClass('listNavigatorPager')) {
+		var currentPage = jQuery('a.currentPage', jQuery('#' + id).parent().parent()).text();
+		if (IWCORE.isNumericValue(currentPage)) {
+			currentPage++;
+			currentPage--;
+		}
+		
+		currentSize = dwr.util.getValue(jQuery('select.listPagerSize', jQuery('#' + id).parent().parent().parent()).attr('id'));
+	} else if (jQuery('#' + id).hasClass('listPagerSize')) {
+		currentSize = dwr.util.getValue(id);
+	}
+	
+	var fromPager = currentPage < 0 ? null : {instance: instanceId, container: containerId, page: currentPage, size: currentSize};
+	var toPager = CasesListHelper.getPager(fromPager, newPage);
+	
+	jQuery('#' + containerId).hide('fast', function() {
+		CasesListHelper.displayPager(instanceId, containerId, newPage, count, toPager);
+	});
 }
 
-function gotoCasesListPage(page, size, instanceId, containerId) {
-	navigateCasesList(instanceId, containerId, page, size);
+CasesListHelper.displayPager = function(instanceId, containerId, page, count, toPager) {
+	if (toPager == null) {
+		var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
+		IWCORE.renderComponent(instanceId, jQuery('#' + containerId).parent().attr('id'), function() {
+			closeAllLoadingMessages(toPager);
+		}, properties, {append: true});
+	} else {
+		jQuery('#' + toPager.container).show('fast', function() {
+			closeAllLoadingMessages();
+		});
+	}
 }
 
-function changeCasesListPageSize(size, instanceId, containerId) {
-	navigateCasesList(instanceId, containerId, 1, size);
+function gotoCasesListPage(id, page, size, instanceId, containerId) {
+	navigateCasesList(id, instanceId, containerId, page, size);
+}
+
+function changeCasesListPageSize(id, size, instanceId, containerId) {
+	CasesListHelper.listPages = [];
+	navigateCasesList(id, instanceId, containerId, 1, size);
 }
 
 function searchForCases(parameters) {
