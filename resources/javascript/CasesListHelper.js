@@ -320,6 +320,7 @@ CasesListHelper.displayPager = function(instanceId, containerId, page, count, to
 		} else {
 			criterias.page = page;
 			criterias.pageSize = count;
+			criterias.clearResults = false;
 			CasesListHelper.getRenderedCasesListByCriterias(criterias, 'mainCasesListContainerStyleClass', function() {
 				jQuery('div.mainCasesListContainerStyleClass').each(function() {
 					var caseList = jQuery(this);
@@ -412,6 +413,7 @@ function searchForCases(parameters) {
 		showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1, dwr.util.getValue(jQuery('select.listPagerSize').attr('id')),
 		jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'), criteriasId
 	);
+	criterias.clearResults = true;
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
 	CasesListHelper.getRenderedCasesListByCriterias(criterias, parameters[0], null);
 }

@@ -496,9 +496,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		addProperties(container, properties);
 		
-		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() : casesInList.size();
+		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() > 0 ? properties.getFoundResults() : casesInList.size()
+				: casesInList.size();
 
-		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases.getTotalCount(), cases, page, properties);
+		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases == null ? 0 : cases.getTotalCount(), cases, page,
+				properties);
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -624,11 +626,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer container = getCasesListContainer(searchResults);
 		
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() : casesInList.size();
+		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() > 0 ? properties.getFoundResults() : casesInList.size()
+				: casesInList.size();
 		
 		addProperties(container, properties);
 		
-		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases.getTotalCount(), cases, page, properties);
+		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases == null ? 0 : cases.getTotalCount(), cases, page,
+				properties);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
