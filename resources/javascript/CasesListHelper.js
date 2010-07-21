@@ -2,6 +2,7 @@ if (CasesListHelper == null) var CasesListHelper = {};
 
 CasesListHelper.processVariables = [];
 CasesListHelper.listPages = [];
+CasesListHelper.searchCriterias = [];
 
 var CASE_GRID_STRING_CLICK_TO_EDIT = 'Click to edit...';
 var CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = 'Oops! Out of cheese error! Please reboot the Universe and try again...or the page.';
@@ -265,6 +266,7 @@ CasesListHelper.getPager = function(fromPager, page) {
 function navigateCasesList(id, instanceId, containerId, newPage, count) {
 	showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
 	
+	var criteriasId = null;
 	var currentPage = -1;
 	var currentSize = -1;
 	if (jQuery('#' + id).hasClass('listNavigatorPager')) {
@@ -275,24 +277,61 @@ function navigateCasesList(id, instanceId, containerId, newPage, count) {
 		}
 		
 		currentSize = dwr.util.getValue(jQuery('select.listPagerSize', jQuery('#' + id).parent().parent().parent()).attr('id'));
+		criteriasId = jQuery('input.listNavigatorIdentifier', jQuery('#' + id).parent().parent().parent()).attr('value');
 	} else if (jQuery('#' + id).hasClass('listPagerSize')) {
 		currentSize = dwr.util.getValue(id);
+		criteriasId = jQuery('input.listNavigatorIdentifier', jQuery('#' + id).parent()).attr('value');
 	}
 	
 	var fromPager = currentPage < 0 ? null : {instance: instanceId, container: containerId, page: currentPage, size: currentSize};
 	var toPager = CasesListHelper.getPager(fromPager, newPage);
+	if (criteriasId != null) {
+		CasesListHelper.listPages = [];
+		toPager = null;
+	}
 	
 	jQuery('#' + containerId).hide('fast', function() {
-		CasesListHelper.displayPager(instanceId, containerId, newPage, count, toPager);
+		CasesListHelper.displayPager(instanceId, containerId, newPage, count, toPager, criteriasId);
 	});
 }
 
-CasesListHelper.displayPager = function(instanceId, containerId, page, count, toPager) {
+CasesListHelper.getCriterias = function(criteriasId) {
+	if (criteriasId == null || CasesListHelper.searchCriterias == null) {
+		return null;
+	}
+	
+	for (var i = 0; i < CasesListHelper.searchCriterias.length; i++) {
+		if (criteriasId == CasesListHelper.searchCriterias[i].id) {
+			return CasesListHelper.searchCriterias[i].criteria;
+		}
+	}
+	
+	return null;
+}
+
+CasesListHelper.displayPager = function(instanceId, containerId, page, count, toPager, criteriasId) {
 	if (toPager == null) {
-		var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
-		IWCORE.renderComponent(instanceId, jQuery('#' + containerId).parent().attr('id'), function() {
-			closeAllLoadingMessages(toPager);
-		}, properties, {append: true});
+		var criterias = CasesListHelper.getCriterias(criteriasId);
+		if (criterias == null) {
+			var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
+			IWCORE.renderComponent(instanceId, jQuery('#' + containerId).parent().attr('id'), function() {
+				closeAllLoadingMessages(toPager);
+			}, properties, {append: true});
+		} else {
+			criterias.page = page;
+			criterias.pageSize = count;
+			CasesListHelper.getRenderedCasesListByCriterias(criterias, 'mainCasesListContainerStyleClass', function() {
+				jQuery('div.mainCasesListContainerStyleClass').each(function() {
+					var caseList = jQuery(this);
+					if (caseList.attr('searchresult') == null) {
+						caseList.css('display', 'none');
+						
+						jQuery('ul.legend', caseList.parent()).css('display', 'none');
+					}
+				});
+				jQuery('#' + containerId).show('fast');
+			});
+		}
 	} else {
 		jQuery('#' + toPager.container).show('fast', function() {
 			closeAllLoadingMessages();
@@ -366,14 +405,23 @@ function searchForCases(parameters) {
 	CasesListHelper.addVariables();
 	
 	showLoadingMessage(parameters[7]);
-	CasesEngine.getCasesListByUserQuery(new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue,
-																		statusValue, dateRangeValue, caseListType, contact, usePDFDownloadColumn,
-																		allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection,
-																		showCaseNumberColumn, showCreationTimeInDateColumn, instanceId, onlySubscribedCases), {
+	
+	var criteriasId = 'id' + new Date().getTime() + '' + Math.floor(Math.random() * 10001);
+	var criterias = new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue, statusValue, dateRangeValue,
+		caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection, showCaseNumberColumn,
+		showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1, dwr.util.getValue(jQuery('select.listPagerSize').attr('id')),
+		jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'), criteriasId
+	);
+	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
+	CasesListHelper.getRenderedCasesListByCriterias(criterias, parameters[0], null);
+}
+
+CasesListHelper.getRenderedCasesListByCriterias = function(criterias, className, callback) {
+	CasesEngine.getCasesListByUserQuery(criterias, {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
-			var lastCaseList = setDisplayPropertyToAllCasesLists(parameters[0], false);
+			var lastCaseList = setDisplayPropertyToAllCasesLists(className, false);
 			if (lastCaseList == null) {
 				return false;
 			}
@@ -381,6 +429,10 @@ function searchForCases(parameters) {
 			var container = lastCaseList.parent()[0];
 			insertNodesToContainerBefore(component, container, lastCaseList[0]);
 			continueInitializeCasesList(null);
+			
+			if (callback) {
+				callback();
+			}
 		}
 	});
 }
@@ -392,16 +444,17 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 	if (casesLists == null || casesLists.length == 0) {
 		return null;
 	}
-			
+	
+	var fullListVisible = false;
 	var caseList = null;
 	for (var i = 0; i < casesLists.length; i++) {
 		caseList = jQuery(casesLists[i]);
 		
 		if (caseList.attr('searchresult') == null) {
-			if (show) {
+			if (show && !fullListVisible) {
+				fullListVisible = true;
 				caseList.show('fast');
-			}
-			else {
+			} else {
 				caseList.hide('fast');
 			}
 		}
@@ -427,6 +480,8 @@ function clearSearchForCases(parameters) {
 			CasesListHelper.closeSortingOptionsWindow();
 			
 			setDisplayPropertyToAllCasesLists(parameters[0], true);
+			
+			CasesListHelper.searchCriterias = [];
 		}
 	});
 }
@@ -468,7 +523,7 @@ function removePreviousSearchResults(className) {
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
 										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
-										instanceId, onlySubscribedCases) {
+										instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -497,6 +552,12 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.statusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
 	this.caseCodes = jQuery('input.casesListCaseCodes').attr('value');
 	this.onlySubscribedCases = onlySubscribedCases;
+	
+	this.page = page;
+	this.pageSize = pageSize;
+	
+	this.componentId = componentId;
+	this.criteriasId = criteriasId;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {

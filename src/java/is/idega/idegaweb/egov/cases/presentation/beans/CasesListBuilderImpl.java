@@ -496,31 +496,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		addProperties(container, properties);
 		
-		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : casesInList.size();
+		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() : casesInList.size();
 
-		if (pageSize > 0 && instanceId != null && componentId != null && totalCases > 0) {
-			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(
-					ProcessConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/process.css"));
-			Layer navigationLayer = new Layer(Layer.DIV);
-			navigationLayer.setStyleClass("caseNavigation");
-			container.add(navigationLayer);
-			container.add(new CSSSpacer());
-
-			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(
-					ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-
-			ListNavigator navigator = new ListNavigator("userCases", cases.getTotalCount());
-			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
-			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
-			navigator.setPageSize(pageSize);
-			navigator.setCurrentPage(page);
-			StringBuilder navigationParams = new StringBuilder();
-			navigationParams.append("'").append(instanceId).append("'");
-			navigationParams.append(", '").append(componentId).append("'");
-			navigator.setNavigationFunction("gotoCasesListPage(this.id, '#PAGE#', '" + pageSize + "', " + navigationParams + ");");
-			navigator.setDropdownFunction("changeCasesListPageSize(this.id, this.value, " + navigationParams + ");");
-			navigationLayer.add(navigator);
-		}
+		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases.getTotalCount(), cases, page, properties);
+		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
 		if (casesBusiness == null) {
@@ -560,6 +539,37 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		
 		return container;
+	}
+	
+	private void addNavigator(IWContext iwc, Layer container, int pageSize, String instanceId, String componentId, int totalCases,
+			PagedDataCollection<CasePresentation> cases, int page, CaseListPropertiesBean properties) {
+		
+		if (pageSize > 0 && instanceId != null && componentId != null && totalCases > 0) {
+			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(ProcessConstants.IW_BUNDLE_IDENTIFIER)
+					.getVirtualPathWithFileNameString("style/process.css"));
+			
+			Layer navigationLayer = new Layer(Layer.DIV);
+			navigationLayer.setStyleClass("caseNavigation");
+			container.add(navigationLayer);
+			container.add(new CSSSpacer());
+
+			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+
+			ListNavigator navigator = new ListNavigator("userCases", totalCases);
+			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
+			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
+			navigator.setPageSize(pageSize);
+			navigator.setCurrentPage(page);
+			StringBuilder navigationParams = new StringBuilder();
+			navigationParams.append("'").append(instanceId).append("'");
+			navigationParams.append(", '").append(componentId).append("'");
+			navigator.setNavigationFunction("gotoCasesListPage(this.id, '#PAGE#', '" + pageSize + "', " + navigationParams + ");");
+			navigator.setDropdownFunction("changeCasesListPageSize(this.id, this.value, " + navigationParams + ");");
+			if (!StringUtil.isEmpty(properties.getCriteriasId())) {
+				navigator.setNavigatorIdentifier(properties.getCriteriasId());
+			}
+			navigationLayer.add(navigator);
+		}
 	}
 	
 	private void addStatistics(IWContext iwc, Layer container, Collection<CasePresentation> cases) {
@@ -614,33 +624,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer container = getCasesListContainer(searchResults);
 		
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : casesInList.size();
+		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() : casesInList.size();
 		
 		addProperties(container, properties);
 		
-		if (pageSize > 0 && instanceId != null && componentId != null) {
-			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(
-					ProcessConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/process.css"));
-			Layer navigationLayer = new Layer(Layer.DIV);
-			navigationLayer.setStyleClass("caseNavigation");
-			container.add(navigationLayer);
-			container.add(new CSSSpacer());
-
-			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(
-					ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-
-			ListNavigator navigator = new ListNavigator("userCases", totalCases);
-			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
-			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
-			navigator.setPageSize(pageSize);
-			navigator.setCurrentPage(page);
-			StringBuilder navigationParams = new StringBuilder();
-			navigationParams.append("'").append(instanceId).append("'");
-			navigationParams.append(",'").append(componentId).append("'");
-			navigator.setNavigationFunction("gotoCasesListPage('#PAGE#','" + pageSize + "'," + navigationParams + ");");
-			navigator.setDropdownFunction("changeCasesListPageSize(this.value, " + navigationParams + ");");
-			navigationLayer.add(navigator);
-		}
+		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases.getTotalCount(), cases, page, properties);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
