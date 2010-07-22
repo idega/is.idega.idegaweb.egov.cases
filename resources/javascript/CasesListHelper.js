@@ -269,6 +269,7 @@ function navigateCasesList(id, instanceId, containerId, newPage, count) {
 	var criteriasId = null;
 	var currentPage = -1;
 	var currentSize = -1;
+	var searchResults = false;
 	if (jQuery('#' + id).hasClass('listNavigatorPager')) {
 		var currentPage = jQuery('a.currentPage', jQuery('#' + id).parent().parent()).text();
 		if (IWCORE.isNumericValue(currentPage)) {
@@ -278,20 +279,22 @@ function navigateCasesList(id, instanceId, containerId, newPage, count) {
 		
 		currentSize = dwr.util.getValue(jQuery('select.listPagerSize', jQuery('#' + id).parent().parent().parent()).attr('id'));
 		criteriasId = jQuery('input.listNavigatorIdentifier', jQuery('#' + id).parent().parent().parent()).attr('value');
+		searchResults = jQuery('input.casesListNavigatorForSearchResults', jQuery('#' + id).parent().parent().parent().parent()).attr('value') == 'true';
 	} else if (jQuery('#' + id).hasClass('listPagerSize')) {
 		currentSize = dwr.util.getValue(id);
 		criteriasId = jQuery('input.listNavigatorIdentifier', jQuery('#' + id).parent()).attr('value');
+		searchResults = jQuery('input.casesListNavigatorForSearchResults', jQuery('#' + id).parent().parent()).attr('value') == 'true';
 	}
 	
 	var fromPager = currentPage < 0 ? null : {instance: instanceId, container: containerId, page: currentPage, size: currentSize};
 	var toPager = CasesListHelper.getPager(fromPager, newPage);
-	if (criteriasId != null) {
+	if (criteriasId != null || searchResults) {
 		CasesListHelper.listPages = [];
 		toPager = null;
 	}
 	
 	jQuery('#' + containerId).hide('fast', function() {
-		CasesListHelper.displayPager(instanceId, containerId, newPage, count, toPager, criteriasId);
+		CasesListHelper.displayPager(instanceId, containerId, newPage, count, toPager, criteriasId, searchResults);
 	});
 }
 
@@ -309,11 +312,14 @@ CasesListHelper.getCriterias = function(criteriasId) {
 	return null;
 }
 
-CasesListHelper.displayPager = function(instanceId, containerId, page, count, toPager, criteriasId) {
+CasesListHelper.displayPager = function(instanceId, containerId, page, count, toPager, criteriasId, searchResults) {
 	if (toPager == null) {
 		var criterias = CasesListHelper.getCriterias(criteriasId);
 		if (criterias == null) {
 			var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
+			if (searchResults) {
+				properties.push({id: 'setSearchResultsId', value: window.location.pathname});
+			}
 			IWCORE.renderComponent(instanceId, jQuery('#' + containerId).parent().attr('id'), function() {
 				closeAllLoadingMessages(toPager);
 			}, properties, {append: true});

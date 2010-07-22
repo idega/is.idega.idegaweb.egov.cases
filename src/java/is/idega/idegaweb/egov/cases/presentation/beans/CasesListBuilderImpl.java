@@ -476,13 +476,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 	
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {		
-		int pageSize = properties.getPageSize();
-		int page = properties.getPage();
-		
 		String type = properties.getType();
-		String instanceId = properties.getInstanceId();
-		String componentId = properties.getComponentId();
-		
 		boolean showStatistics = properties.isShowStatistics();
 		
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
@@ -496,11 +490,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		addProperties(container, properties);
 		
-		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() > 0 ? properties.getFoundResults() : casesInList.size()
-				: casesInList.size();
+		int totalCases = getTotalCases(cases, searchResults, properties);
 
-		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases == null ? 0 : cases.getTotalCount(), cases, page,
-				properties);
+		addNavigator(iwc, container, cases, properties, totalCases, searchResults);
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -543,8 +535,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
-	private void addNavigator(IWContext iwc, Layer container, int pageSize, String instanceId, String componentId, int totalCases,
-			PagedDataCollection<CasePresentation> cases, int page, CaseListPropertiesBean properties) {
+	private void addNavigator(IWContext iwc, Layer container, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, int totalCases,
+			boolean searchResults) {
+		
+		int pageSize = properties.getPageSize();
+		int page = properties.getPage();
+		String instanceId = properties.getInstanceId();
+		String componentId = properties.getComponentId();
 		
 		if (pageSize > 0 && instanceId != null && componentId != null && totalCases > 0) {
 			PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(ProcessConstants.IW_BUNDLE_IDENTIFIER)
@@ -569,6 +566,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			navigator.setDropdownFunction("changeCasesListPageSize(this.id, this.value, " + navigationParams + ");");
 			if (!StringUtil.isEmpty(properties.getCriteriasId())) {
 				navigator.setNavigatorIdentifier(properties.getCriteriasId());
+			}
+			if (searchResults) {
+				HiddenInput search = new HiddenInput("casesSearchResults", Boolean.TRUE.toString());
+				search.setStyleClass("casesListNavigatorForSearchResults");
+				navigationLayer.add(search);
 			}
 			navigationLayer.add(navigator);
 		}
@@ -607,14 +609,18 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		container.add(status);
 	}
 	
+	private int getTotalCases(PagedDataCollection<CasePresentation> cases, boolean searchResults, CaseListPropertiesBean properties) {
+		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
+		int total = ListUtil.isEmpty(casesInList) ? 0 : searchResults ?
+													properties.getFoundResults() > 0 ?properties.getFoundResults() : casesInList == null ? 0 : cases.getTotalCount()
+				: casesInList == null ? 0 : casesInList.size();
+		return searchResults ? total : cases == null ? 0 : cases.getTotalCount();
+	}
+	
 	public UIComponent getUserCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, @SuppressWarnings("rawtypes") Map pages,
 			CaseListPropertiesBean properties) {
-		int pageSize = properties.getPageSize();
-		int page = properties.getPage();
 		
 		String type = properties.getType();
-		String instanceId = properties.getInstanceId();
-		String componentId = properties.getComponentId();
 
 		boolean showStatistics = properties.isShowStatistics();
 		
@@ -626,13 +632,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Layer container = getCasesListContainer(searchResults);
 		
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		int totalCases = ListUtil.isEmpty(casesInList) ? 0 : searchResults ? properties.getFoundResults() > 0 ? properties.getFoundResults() : casesInList.size()
-				: casesInList.size();
+		int totalCases = getTotalCases(cases, searchResults, properties);
 		
 		addProperties(container, properties);
 		
-		addNavigator(iwc, container, pageSize, instanceId, componentId, searchResults ? totalCases : cases == null ? 0 : cases.getTotalCount(), cases, page,
-				properties);
+		addNavigator(iwc, container, cases,	properties, totalCases, searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
