@@ -1101,7 +1101,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return (CaseManagersProvider) WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
 	}
 
-	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
+	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
 		Collection<User> owners = null;
@@ -1126,8 +1126,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		
 			if (ListUtil.isEmpty(owners)) {
 				owners = new ArrayList<User>(usersByName);
-			}
-			else {
+			} else {
 				for (User userByName: usersByName) {
 					if (!owners.contains(userByName)) {
 						owners.add(userByName);
@@ -1149,16 +1148,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		if (notGeneralCases) {
 			try {
-				return getCaseHome().findByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
+				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
 						groups + ", simple cases: " + simpleCases, e);
 			}
-		}
-		else {
+		} else {
 			try {
-				return getGeneralCaseHome().getCasesByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
+				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
@@ -1166,6 +1164,19 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		}
 
+		return null;
+	}
+	
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
+			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
+
+		Collection<Integer> ids = getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases,
+				notGeneralCases);
+		try {
+			return getCaseHome().findAllByIds(ids);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
