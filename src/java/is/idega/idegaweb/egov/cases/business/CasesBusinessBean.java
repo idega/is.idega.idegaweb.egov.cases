@@ -829,11 +829,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	public void reactivateCase(Object casePK, User performer, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
-		theCase.setHandledBy(performer);
+		User owner = theCase.getOwner();
+		if (owner == null || (owner != null && !owner.equals(performer))) {
+			theCase.setHandledBy(performer);
+		}
 
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group) null);
 
-		User owner = theCase.getOwner();
 		if (owner != null) {
 			IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
 
