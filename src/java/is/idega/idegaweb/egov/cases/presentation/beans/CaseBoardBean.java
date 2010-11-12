@@ -199,6 +199,7 @@ public class CaseBoardBean {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ").concat(String.valueOf(processInstanceId));
+		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ").concat(String.valueOf(processInstanceId)) +
+			", values: " + getAllValues();
 	}
 }
