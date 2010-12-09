@@ -13,6 +13,7 @@ public class CaseBoardBean {
 	private Long processInstanceId;
 	
 	private String applicantName;
+	private String address;
 	private String postalCode;
 	private String caseIdentifier;
 	private String caseDescription;
@@ -152,23 +153,24 @@ public class CaseBoardBean {
 			allValues = new ArrayList<String>(CasesBoardViewer.CASE_FIELDS.size());
 			
 			allValues.add(getApplicantName());					//	0
-			allValues.add(getPostalCode());						//	1
-			allValues.add(getCaseIdentifier());					//	2
-			allValues.add(getCaseDescription());				//	3
+			allValues.add(getAddress());						//	1
+			allValues.add(getPostalCode());						//	2
+			allValues.add(getCaseIdentifier());					//	3
+			allValues.add(getCaseDescription());				//	4
 			
-			allValues.add(String.valueOf(getTotalCost()));		//	4
-			allValues.add(String.valueOf(getAppliedAmount()));	//	5
+			allValues.add(String.valueOf(getTotalCost()));		//	5
+			allValues.add(String.valueOf(getAppliedAmount()));	//	6
 			
-			allValues.add(getNutshell());						//	6
+			allValues.add(getNutshell());						//	7
 			
-			allValues.add(getGradingSum());						//	7
+			allValues.add(getGradingSum());						//	8
 			
-			allValues.add(getCategory());						//	8
-			allValues.add(getComment());						//	9
+			allValues.add(getCategory());						//	9
+			allValues.add(getComment());						//	10
 			
-			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	10
-			allValues.add(String.valueOf(getBoardAmount()));	//	11
-			allValues.add(getRestrictions());					//	12
+			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	11
+			allValues.add(String.valueOf(getBoardAmount()));	//	12
+			allValues.add(getRestrictions());					//	13
 		}
 		return allValues;
 	}
@@ -195,6 +197,14 @@ public class CaseBoardBean {
 
 	public void setHandler(User handler) {
 		this.handler = handler;
+	}
+	
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	@Override

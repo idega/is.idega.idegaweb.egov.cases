@@ -61,23 +61,24 @@ public class CasesBoardViewer extends IWBaseComponent {
 	
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
 		new AdvancedProperty("string_ownerFullName", "Applicant"),						//	0
-		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	1
-		new AdvancedProperty("string_caseIdentifier", "Case nr."),						//	2
-		new AdvancedProperty("string_caseDescription", "Description"),					//	3
+		new AdvancedProperty("string_ownerAddress", "Address"),							//	1
+		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	2
+		new AdvancedProperty("string_caseIdentifier", "Case nr."),						//	3
+		new AdvancedProperty("string_caseDescription", "Description"),					//	4
 		
-		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	4
-		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	5
+		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	5
+		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	6
 		
-		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),			//	6
+		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),			//	7
 		
-		new AdvancedProperty("sum_all_grades", "Grade"),								//	7
+		new AdvancedProperty("sum_all_grades", "Grade"),								//	8
 		
-		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	8,	EDITABLE, select
+		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	9,	EDITABLE, select
 		
-		new AdvancedProperty("string_ownerGrade", "Comment"),							//	9
-		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	10
-		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	11,	EDITABLE, text input
-		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	12, EDITABLE, text area
+		new AdvancedProperty("string_ownerGrade", "Comment"),							//	10
+		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	11
+		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	12,	EDITABLE, text input
+		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	13, EDITABLE, text area
 	));
 	
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
@@ -201,13 +202,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 			for (String value: rowBean.getValues()) {
 				TableCell2 bodyRowCell = row.createCell();
 				
-				if (index == 2) {
+				if (index == 3) {
 					//	Link to grading task
 					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean));
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 					linkToTask.getId();
 					bodyRowCell.add(linkToTask);
-				} else if (index == 13) {
+				} else if (index == 14) {
 					//	E-mail link to handler
 					bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
 				}
@@ -216,13 +217,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 				}
 				
 				//	Editable fields
-				if (index == 8) {
+				if (index == 9) {
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_DROPDOWN);
 				}
-				if (index == 11) {
+				if (index == 12) {
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
 				}
-				if (index == 12) {
+				if (index == 13) {
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_AREA);
 				}
 				
@@ -248,11 +249,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 		
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName")
-				.toString(), CASE_FIELDS.get(8).getId()));
+				.toString(), CASE_FIELDS.get(9).getId()));
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName")
-				.toString(), CASE_FIELDS.get(11).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName")
 				.toString(), CASE_FIELDS.get(12).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName")
+				.toString(), CASE_FIELDS.get(13).getId()));
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 		
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
