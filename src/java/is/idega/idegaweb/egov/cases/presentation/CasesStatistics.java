@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseManagersProvider;
@@ -57,8 +58,14 @@ import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading2;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.IWDatePicker;
+import com.idega.presentation.ui.Label;
+import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
+import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.database.ConnectionBroker;
@@ -68,6 +75,9 @@ import com.idega.util.expression.ELUtil;
 public class CasesStatistics extends CasesBlock {
 	
 	private static final Logger LOGGER = Logger.getLogger(CasesStatistics.class.getName());
+
+	private static final String PARAMETER_FROM_DATE = "prm_from_date";
+	private static final String PARAMETER_TO_DATE = "prm_to_date";
 	
 	public static final String UNKOWN_CATEGORY_ID = "case.unkown_category";
 	
@@ -152,37 +162,86 @@ public class CasesStatistics extends CasesBlock {
 			}
 		}
 
+		Form form = new Form();
+		form.setID("casesStatistics");
+		form.setStyleClass("adminForm");
+		add(form);
+
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
+		form.add(section);
+		
+		IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
+		from.setUseCurrentDateIfNotSet(false);
+		from.keepStatusOnAction(true);
+
+		IWDatePicker to = new IWDatePicker(PARAMETER_TO_DATE);
+		to.setUseCurrentDateIfNotSet(false);
+		to.keepStatusOnAction(true);
+
+		Layer element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		Label label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
+		element.add(label);
+		element.add(from);
+		section.add(element);
+
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
+		element.add(label);
+		element.add(to);
+		section.add(element);
+
+		SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));
+		fetch.setStyleClass("indentedButton");
+		fetch.setStyleClass("button");
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		element.add(fetch);
+		section.add(element);
+
+		section = new Layer(Layer.DIV);
+		section.setStyleClass("formSection");
 		section.setStyleClass("statisticsLayer");
-		add(section);
+		form.add(section);
 		
 		Heading1 heading = new Heading1(iwrb.getLocalizedString("case.statistics", "Case statistics"));
 		section.add(heading);
 
-		Collection<Result> resultsByCaseCategories = getResults(iwc, useSubCats, -1, true);
+		IWTimestamp fromDate = null;
+		if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
+			fromDate = new IWTimestamp(IWDatePickerHandler.getParsedDate(iwc.getParameter(PARAMETER_FROM_DATE), iwc.getCurrentLocale()));
+		}
+
+		IWTimestamp toDate = null;
+		if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
+			toDate = new IWTimestamp(IWDatePickerHandler.getParsedDate(iwc.getParameter(PARAMETER_TO_DATE), iwc.getCurrentLocale()));
+		}
+
+		Collection<Result> resultsByCaseCategories = getResults(iwc, useSubCats, -1, true, fromDate, toDate);
 		addResults(null, null, null, iwc, iwrb, section, resultsByCaseCategories, statusesToUse, iwrb.getLocalizedString("case.cases_by_category",
-				"Cases by category"), useSubCats, false, 0);
+				"Cases by category"), useSubCats, false, 0, fromDate, toDate);
 		section.add(new CSSSpacer());
 
-		Collection<Result> resultsByUsers = getResultsUsers(iwc);
+		Collection<Result> resultsByUsers = getResultsUsers(iwc, fromDate, toDate);
 		addResults(null, null, null, iwc, iwrb, section, resultsByUsers, statusesToUse, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"),
-				false, false, 0);
+				false, false, 0, fromDate, toDate);
 		section.add(new CSSSpacer());
 		
 		if (useStatisticsByCaseType != null) {
 			useTypes = useStatisticsByCaseType;
 		}
 		if (useTypes) {
-			Collection<Result> resultsByCaseTypes = getResultsCode(iwc);
+			Collection<Result> resultsByCaseTypes = getResultsCode(iwc, fromDate, toDate);
 			addResults(null, null, null, iwc, iwrb, section, resultsByCaseTypes, statusesToUse, iwrb.getLocalizedString("case.cases_by_type", "Cases by type"),
-					false, false, 0);
+					false, false, 0, fromDate, toDate);
 			section.add(new CSSSpacer());
 		}
 	}
 
 	private int addResults(Map<CaseStatus, Integer> totals, Table2 table, TableRowGroup group, IWContext iwc, IWResourceBundle iwrb, Layer section,
-			Collection<Result> results, Collection<CaseStatus> statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow) {
+			Collection<Result> results, Collection<CaseStatus> statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow, IWTimestamp fromDate, IWTimestamp toDate) {
 		if (totals == null) {
 			totals = new LinkedHashMap<CaseStatus, Integer>();
 
@@ -246,12 +305,12 @@ public class CasesStatistics extends CasesBlock {
 				boolean hasSubCats = false;
 				Collection<Result> subCats = null;
 				if (useSubCats) {
-					subCats = getResults(iwc, true, res.getID(), res.isUseDefaultHandlerIfNotFoundResultsProvider());
+					subCats = getResults(iwc, true, res.getID(), res.isUseDefaultHandlerIfNotFoundResultsProvider(), fromDate, toDate);
 					hasSubCats = !ListUtil.isEmpty(subCats);
 				}
 				addResultToTable(totals, statuses, group, iRow, res, isSubCategory, !hasSubCats);
 				if (hasSubCats) {
-					iRow = addResults(totals, table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow);
+					iRow = addResults(totals, table, group, iwc, iwrb, section, subCats, statuses, header, useSubCats, true, iRow, fromDate, toDate);
 				}
 			}
 		}
@@ -342,22 +401,28 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 	
-	private Collection<Result> getResults(IWContext iwc, boolean useSubCats, int parentID, boolean useHandlerIfNotFoundCustom) {
+	private Collection<Result> getResults(IWContext iwc, boolean useSubCats, int parentID, boolean useHandlerIfNotFoundCustom, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		if (useHandlerIfNotFoundCustom) {
 			Handler handler = new CategoryHandler(useSubCats, parentID);
+			handler.setDateFrom(dateFrom);
+			handler.setDateTo(dateTo);
 			return getResults(iwc, handler);
 		}
 		
 		return null;
 	}
 	
-	private Collection<Result> getResultsUsers(IWContext iwc) {
+	private Collection<Result> getResultsUsers(IWContext iwc, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		Handler handler = new UserHandler(false, -1);
+		handler.setDateFrom(dateFrom);
+		handler.setDateTo(dateTo);
 		return getResults(iwc, handler);
 	}
 	
-	private Collection<Result> getResultsCode(IWContext iwc) {
+	private Collection<Result> getResultsCode(IWContext iwc, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		Handler handler = new CaseTypeHandler(false, -1);
+		handler.setDateFrom(dateFrom);
+		handler.setDateTo(dateTo);
 		return getResults(iwc, handler);
 	}
 	
@@ -581,6 +646,8 @@ public class CasesStatistics extends CasesBlock {
 		
 		private boolean useSubCats = false;
 		private int parentID = -1;
+		private IWTimestamp dateFrom;
+		private IWTimestamp dateTo;
 		
 		protected boolean isUseSubCats() {
 			return useSubCats;
@@ -593,6 +660,18 @@ public class CasesStatistics extends CasesBlock {
 		}
 		protected void setParentID(int parentID) {
 			this.parentID = parentID;
+		}
+		protected IWTimestamp getDateFrom() {
+			return dateFrom;
+		}
+		protected void setDateFrom(IWTimestamp dateFrom) {
+			this.dateFrom = dateFrom;
+		}
+		protected IWTimestamp getDateTo() {
+			return dateTo;
+		}
+		protected void setDateTo(IWTimestamp dateTo) {
+			this.dateTo = dateTo;
 		}
 	}
 	
@@ -617,6 +696,12 @@ public class CasesStatistics extends CasesBlock {
 				query.append("is null");							//	We weed ONLY top level categories
 				
 				query.append(getCategoriesIdsCriteria());			//	We need the very categories used by PROVIDED cases set
+			}
+			if (getDateFrom() != null) {
+				query.append(getDateFromCriteria(getDateFrom()));
+			}
+			if (getDateTo() != null) {
+				query.append(getDateToCriteria(getDateTo()));
 			}
 			
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
@@ -740,7 +825,16 @@ public class CasesStatistics extends CasesBlock {
 			StringBuilder query = new StringBuilder("select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
 				.append("left join comm_case_category cc on c.case_category = cc.comm_case_category_id ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.handler is not null ").append(getCasesIdsCriteria())
-				.append(getStatusesIdsCriteria()).append(" group by c.handler, p.case_status");
+				.append(getStatusesIdsCriteria());
+
+			if (getDateFrom() != null) {
+				query.append(getDateFromCriteria(getDateFrom()));
+			}
+			if (getDateTo() != null) {
+				query.append(getDateToCriteria(getDateTo()));
+			}
+			
+			query.append(" group by c.handler, p.case_status");
 			
 			return query.toString();
 		}
@@ -799,7 +893,16 @@ public class CasesStatistics extends CasesBlock {
 		public String getSQL() {
 			StringBuilder query =  new StringBuilder("select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.case_type = c.case_type ").append(getCasesIdsCriteria())
-				.append(getStatusesIdsCriteria()).append(" group by c.case_type, p.case_status order by case_type");
+				.append(getStatusesIdsCriteria());
+			
+			if (getDateFrom() != null) {
+				query.append(getDateFromCriteria(getDateFrom()));
+			}
+			if (getDateTo() != null) {
+				query.append(getDateToCriteria(getDateTo()));
+			}
+			
+			query.append(" group by c.case_type, p.case_status order by case_type");
 			
 			return query.toString();
 		}
@@ -856,6 +959,16 @@ public class CasesStatistics extends CasesBlock {
 		results.add(new Result(identifier, resultName, statuses));
 
 		return true;
+	}
+	
+	String getDateFromCriteria(IWTimestamp date) {
+		StringBuilder builder = new StringBuilder(" and p.created >= '").append(date.toSQLDateString()).append("'");
+		return builder.toString();
+	}
+	
+	String getDateToCriteria(IWTimestamp date) {
+		StringBuilder builder = new StringBuilder(" and p.created <= '").append(date.toSQLDateString()).append("'");
+		return builder.toString();
 	}
 	
 	String getCasesIdsCriteria() {
