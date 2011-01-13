@@ -286,6 +286,13 @@ span.watchUnwatchCase {
 	cursor: pointer;
 }
 
+.selectCaseHandlerLabelStyle {
+	font-size: 11px;
+	float: left;
+	clear: none;
+	margin-left: 10px;
+}
+
 div.casesSearcherInputsBoxStyleClass {
 	border-top: 1px #fff solid;
 	padding-top: 10px;
