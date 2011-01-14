@@ -82,9 +82,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	@Autowired
 	private JQuery jQuery;
 	
-	@Autowired
-	private CaseManagersProvider casesManagerProvider;
-	
 	private CaseManagersProvider caseManagersProvider;
 	
 	private String caseContainerStyle = "casesListCaseContainer";
@@ -930,11 +927,4 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return getTitleSendEmail(getResourceBundle(CoreUtil.getIWContext()));
 	}
 
-	public CaseManagersProvider getCasesManagerProvider() {
-		return casesManagerProvider;
-	}
-
-	public void setCasesManagerProvider(CaseManagersProvider casesManagerProvider) {
-		this.casesManagerProvider = casesManagerProvider;
-	}
 }
