@@ -15,4 +15,7 @@ public interface CasesEngine {
 	
 	public abstract List<AdvancedProperty> getDefaultSortingOptions(IWContext iwc);
 	
+//	public PagedDataCollection<CasePresentation> getCasesByQuery(CasesSearchCriteriaBean criteriaBean);
+	
+	public String getCaseStatus(Long processInstanceId);
 }
