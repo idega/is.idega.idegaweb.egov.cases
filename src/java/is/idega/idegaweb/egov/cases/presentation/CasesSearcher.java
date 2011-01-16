@@ -86,11 +86,18 @@ public class CasesSearcher extends CasesBlock {
 	@Autowired
 	private JQuery jQuery;
 	
-	@Override
-	protected void present(IWContext iwc) throws Exception {
-		ELUtil.getInstance().autowire(this);
+	protected IWBundle bundle;
+	protected IWResourceBundle iwrb;
+	
+	public CasesSearcher() {
+		super();
 		
-		IWBundle bundle = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
+		ELUtil.getInstance().autowire(this);
+	}
+	
+	protected void addResources(IWContext iwc) {
+		bundle = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
+		iwrb = bundle.getResourceBundle(iwc);
 		
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 				jQuery.getBundleURIToJQueryLib(),
@@ -110,18 +117,26 @@ public class CasesSearcher extends CasesBlock {
 				bundle.getVirtualPathWithFileNameString("style/case.css"),
 				jQuery.getBundleURIToJQueryUILib("1.6rc5/themes/base", "ui.core.css")
 		));
-		
-		IWResourceBundle iwrb = getResourceBundle();
-		
+	}
+	
+	protected Layer getContainer(String styleClass) {
 		Layer container = new Layer();
-		add(container);
-		container.setStyleClass("casesSearcherBoxStyleClass");
+		if (!StringUtil.isEmpty(styleClass)) {
+			container.setStyleClass(styleClass);
+		}
+		return container;
+	}
+	
+	@Override
+	protected void present(IWContext iwc) throws Exception {
+		addResources(iwc);
 		
+		Layer container = getContainer("casesSearcherBoxStyleClass");
+		add(container);
 		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
 		
-		Layer inputsContainer = new Layer();
+		Layer inputsContainer = getContainer("casesSearcherInputsBoxStyleClass");
 		container.add(inputsContainer);
-		inputsContainer.setStyleClass("casesSearcherInputsBoxStyleClass");
 		
 		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null);
 
@@ -170,13 +185,12 @@ public class CasesSearcher extends CasesBlock {
 		addFormItem(inputsContainer, iwrb.getLocalizedString("status", "Status"), statuses);
 		
 		//	Date range
-		IWDatePicker dateRange = getDateRange(iwc);
+		IWDatePicker dateRange = getDateRange(iwc, "dateRange");
 		addFormItem(inputsContainer, iwrb.getLocalizedString("date_range", "Date range"), dateRange);
 		
 		//	Show statistics
-		Layer element = new Layer(Layer.DIV);
+		Layer element = getContainer("formItem shortFormItem checkboxFormItem");
 		inputsContainer.add(element);
-		element.setStyleClass("formItem shortFormItem checkboxFormItem");
 		
 		Label label = null;
 		label = new Label(showStatisticsLabel, showStatistics);
@@ -185,8 +199,7 @@ public class CasesSearcher extends CasesBlock {
 		
 		inputsContainer.add(new CSSSpacer());
 
-		Layer buttonsContainer = new Layer(Layer.DIV);
-		buttonsContainer.setStyleClass("buttonLayer");
+		Layer buttonsContainer = getContainer("buttonLayer");
 		inputsContainer.add(buttonsContainer);
 
 		StringBuilder parameters  = new StringBuilder("['").append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '");
@@ -226,7 +239,7 @@ public class CasesSearcher extends CasesBlock {
 		}
 	}
 	
-	private TextInput getTextInput(String name, String toolTip) {
+	protected TextInput getTextInput(String name, String toolTip) {
 		TextInput input = new TextInput(name);
 		input.setStyleClass(textInputStyleClass);
 		
@@ -237,7 +250,7 @@ public class CasesSearcher extends CasesBlock {
 		return input;
 	}
 	
-	private void fillDropdown(Locale locale, DropdownMenu menu, List<AdvancedProperty> options, AdvancedProperty firstElement, String selectedElement) {
+	protected void fillDropdown(Locale locale, DropdownMenu menu, List<AdvancedProperty> options, AdvancedProperty firstElement, String selectedElement) {
 		if (locale == null) {
 			locale = Locale.ENGLISH;
 		}
@@ -246,7 +259,9 @@ public class CasesSearcher extends CasesBlock {
 		for (AdvancedProperty option: options) {
 			menu.addOption(new SelectOption(option.getValue(), option.getId()));
 		}
-		menu.addFirstOption(new SelectOption(firstElement.getValue(), firstElement.getId()));
+		if (firstElement != null) {
+			menu.addFirstOption(new SelectOption(firstElement.getValue(), firstElement.getId()));
+		}
 		
 		if (selectedElement != null) {
 			menu.setSelectedElement(selectedElement);
@@ -365,7 +380,7 @@ public class CasesSearcher extends CasesBlock {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private DropdownMenu getDropdownForStatus(IWContext iwc) {
+	protected DropdownMenu getDropdownForStatus(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_CASE_STATUS);
 		String selectedStatus = iwc.isParameterSet(PARAMETER_CASE_STATUS) ? iwc.getParameter(PARAMETER_CASE_STATUS) : null;
 		
@@ -417,8 +432,8 @@ public class CasesSearcher extends CasesBlock {
 		return menu;
 	}
 	
-	private IWDatePicker getDateRange(IWContext iwc) {
-		IWDatePicker datePicker = new IWDatePicker();
+	protected IWDatePicker getDateRange(IWContext iwc, String name) {
+		IWDatePicker datePicker = new IWDatePicker(name);
 		
 		datePicker.setDateRange(true);
 		datePicker.setUseCurrentDateIfNotSet(false);
@@ -426,11 +441,11 @@ public class CasesSearcher extends CasesBlock {
 		return datePicker;
 	}
 	
-	private void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
+	protected void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
 		addFormItem(layer, localizedLabelText, input, null);
 	}
 	
-	private void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
+	protected void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
 		Layer element = new Layer(Layer.DIV);
 		layer.add(element);
 		element.setStyleClass("formItem shortFormItem");

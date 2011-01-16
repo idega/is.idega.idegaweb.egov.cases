@@ -47,7 +47,7 @@ public class CaseFinder extends CasesBlock {
 	protected static final String PARAMETER_ACTION = "cf_prm_action";
 	protected static final String PARAMETER_CASE_NUMBER = "cf_prm_case_number";
 	protected static final String PARAMETER_NAME = "cf_prm_name";
-	protected static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
+	public static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
 	protected static final String PARAMETER_TEXT = "cf_prm_text";
 	protected static final String PARAMETER_SHOW_STATISTICS = "cf_prm_show_statistics";
 
