@@ -384,8 +384,9 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_CASE_STATUS);
 		String selectedStatus = iwc.isParameterSet(PARAMETER_CASE_STATUS) ? iwc.getParameter(PARAMETER_CASE_STATUS) : null;
 		
-		CaseBusiness caseBusiness = getCasesBusiness();
+		CaseBusiness caseBusiness = getCasesBusiness(iwc);
 		if (caseBusiness == null) {
+			logWarning("CaseBusiness (" + CaseBusiness.class.getName() + ") is unavailable!");
 			menu.setDisabled(true);
 			return menu;
 		}
@@ -396,7 +397,8 @@ public class CasesSearcher extends CasesBlock {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		if (allStatuses == null || allStatuses.isEmpty()) {
+		if (ListUtil.isEmpty(allStatuses)) {
+			logWarning("There are no statuses available");
 			menu.setDisabled(true);
 			return menu;
 		}
@@ -426,7 +428,7 @@ public class CasesSearcher extends CasesBlock {
 			}
 		}
 		
-		fillDropdown(l, menu, statuses, new AdvancedProperty(String.valueOf(-1), getResourceBundle().getLocalizedString("select_status", "Select status")),
+		fillDropdown(l, menu, statuses, new AdvancedProperty(String.valueOf(-1), getResourceBundle(iwc).getLocalizedString("select_status", "Select status")),
 				selectedStatus);
 		
 		return menu;
