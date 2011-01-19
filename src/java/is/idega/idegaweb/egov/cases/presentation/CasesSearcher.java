@@ -65,7 +65,7 @@ import com.idega.util.expression.ELUtil;
 public class CasesSearcher extends CasesBlock {
 
 	private static final String PARAMETER_PROCESS_ID = "cf_prm_process_id";
-	private static final String PARAMETER_CASE_STATUS = "cf_prm_case_status";
+	public static final String PARAMETER_CASE_STATUS = "cf_prm_case_status";
 	private static final String PARAMETER_CASE_LIST_TYPE = "cf_prm_case_list_type";
 	private static final String PARAMETER_CASE_CONTACT = "cf_prm_case_contact";
 	private static final String PARAMETER_SORTING_OPTIONS = "cf_prm_sorting_options";
@@ -265,6 +265,10 @@ public class CasesSearcher extends CasesBlock {
 		
 		if (selectedElement != null) {
 			menu.setSelectedElement(selectedElement);
+		}
+		
+		if (ListUtil.isEmpty(options)) {
+			menu.setDisabled(true);
 		}
 	}
 	
