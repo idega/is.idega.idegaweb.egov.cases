@@ -556,8 +556,12 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.sortingOptions = CasesListHelper.getSortedSortingOptions();
 	
-	this.statusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
-	this.statusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
+	var selectedStatusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
+	this.statusesToShow = selectedStatusesToShow == null || selectedStatusesToShow == '' || selectedStatusesToShow == -1 ? null : selectedStatusesToShow;
+	
+	var selectedStatusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
+	this.statusesToHide = selectedStatusesToHide == null || selectedStatusesToHide == '' || selectedStatusesToHide == -1 ? null : selectedStatusesToHide;
+	
 	this.caseCodes = jQuery('input.casesListCaseCodes').attr('value');
 	this.onlySubscribedCases = onlySubscribedCases;
 	
