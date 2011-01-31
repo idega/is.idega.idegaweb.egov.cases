@@ -423,6 +423,24 @@ public class CasesSearcher extends CasesBlock {
 				if (!showAllStatuses && localizedStatus.equals(status.getStatus())) {
 					addStatus = false;
 				}
+
+				if (this.getCaseStatusesToShow() != null) {
+					if (this.getCaseStatusesToShow().indexOf(status.getStatus()) != -1) {
+						addStatus = true;
+					}
+					else if (!showAllStatuses) {
+						addStatus = false;
+					}
+				}
+				
+				if (this.getCaseStatusesToHide() != null) {
+					if (this.getCaseStatusesToHide().indexOf(status.getStatus()) != -1) {
+						addStatus = false;
+					}
+					else if (showAllStatuses) {
+						addStatus = true;
+					}
+				}
 				
 				if (addStatus) {
 					statuses.add(new AdvancedProperty(status.getStatus(), localizedStatus));
