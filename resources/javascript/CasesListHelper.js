@@ -674,7 +674,7 @@ CasesListHelper.addVariableInput = function() {
 	
 	var variablesContainer = jQuery('#variableInputsContainer');
 	var chosenVariable = dwr.util.getValue(chooserId);
-	if (jQuery('input.variableValueField[name=\''+chosenVariable+'\']').length > 0) {
+	if (jQuery('.variableValueField[name=\''+chosenVariable+'\']').length > 0) {
 		dwr.util.setValue(chooserId, '-1');
 		return;
 	}
@@ -692,11 +692,20 @@ CasesListHelper.addVariableInput = function() {
 	showLoadingMessage(loadingMessage);
 	
 	var isDateField = optionValue[1] == 'D';
+	var isMultipleObjectsField = optionValue[1] == 'B';
+	var isHandlerVar = optionValue[0] == 'handlerUserId';
+	var procDefId = dwr.util.getValue(jQuery('select.availableVariablesChooserForProcess').attr('id'));
 	var options = {
-		className: isDateField ? 'com.idega.presentation.ui.IWDatePicker' : 'com.idega.presentation.ui.TextInput',
-		properties: [{id: 'setId', value: id}, {id: 'setStyleClass', value: 'variableValueField'}, {id: isDateField ? 'setInputName' : 'setName',
-					value: dwr.util.getValue(chooserId)},
-					{id: 'setOnKeyUp', value: 'if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;'}],
+		className: isDateField ? 'com.idega.presentation.ui.IWDatePicker' : isMultipleObjectsField || isHandlerVar ? 'com.idega.presentation.ui.SelectionBox' : 'com.idega.presentation.ui.TextInput',
+		properties: [
+						{id: 'setId', value: id},
+						{id: 'setStyleClass', value: 'variableValueField'},
+						{id: isDateField ? 'setInputName' : 'setName', value: dwr.util.getValue(chooserId)},
+						{id: 'setValue', value: isMultipleObjectsField || isHandlerVar ?
+													'#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}' :
+													null},
+						{id: 'setOnKeyUp', value: 'if (isEnterEvent(event)) { CasesListHelper.addVariablesAndSearch(); } return false;'}
+					],
 		container: id2,
 		callback: function() {
 			closeAllLoadingMessages();
@@ -713,12 +722,23 @@ CasesListHelper.addVariablesAndSearch = function() {
 }
 
 CasesListHelper.addVariables = function() {
-	jQuery.each(jQuery('input.variableValueField'), function() {
-		var input = jQuery(this);
+	jQuery.each(jQuery('.variableValueField'), function() {
+		var input = this;
 		
-		var variableValue = input.attr('value');
+		var variableValue = dwr.util.getValue(input.id);//input.attr('value');
 		if (variableValue != null && variableValue != '') {
-			var nameAttr = input.attr('name').split('@');
+			var nameAttr = input.name.split('@');
+			
+			if (typeof variableValue == 'object') {
+				var values = '';
+				for (var i = 0; i < variableValue.length; i++) {
+					values += variableValue[i];
+					if (i + 1 < variableValue.length) {
+						values += ';';
+					}
+				}
+				variableValue = values;
+			}
 			
 			var variableObject = {name: nameAttr[0], value: variableValue, type: nameAttr[1]};
 			if (!existsElementInArray(CasesListHelper.processVariables, variableObject)) {

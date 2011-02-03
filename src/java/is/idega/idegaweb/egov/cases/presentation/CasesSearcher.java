@@ -302,6 +302,7 @@ public class CasesSearcher extends CasesBlock {
 		
 	private DropdownMenu getDropdownForProcess(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_PROCESS_ID);
+		menu.setStyleClass("availableVariablesChooserForProcess");
 		String selectedProcess = iwc.isParameterSet(PARAMETER_PROCESS_ID) ? iwc.getParameter(PARAMETER_PROCESS_ID) : null;
 		
 		ApplicationBusiness appBusiness = null;
