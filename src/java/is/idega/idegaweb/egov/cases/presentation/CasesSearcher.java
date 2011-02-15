@@ -466,17 +466,17 @@ public class CasesSearcher extends CasesBlock {
 		return datePicker;
 	}
 	
-	protected void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
-		addFormItem(layer, localizedLabelText, input, null);
+	protected Layer addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
+		return addFormItem(layer, localizedLabelText, input, null);
 	}
 	
-	protected void addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
+	protected Layer addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
 		Layer element = new Layer(Layer.DIV);
 		layer.add(element);
 		element.setStyleClass("formItem shortFormItem");
 		
 		Label label = null;
-		label = new Label(localizedLabelText, input);
+		label = new Label(localizedLabelText == null ? CoreConstants.MINUS : localizedLabelText, input);
 		element.add(label);
 		element.add(input);	
 		
@@ -485,6 +485,7 @@ public class CasesSearcher extends CasesBlock {
 				element.add(component);
 			}
 		}
+		return element;
 	}
 
 	public String getListType() {
