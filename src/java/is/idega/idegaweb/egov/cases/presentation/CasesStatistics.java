@@ -173,10 +173,14 @@ public class CasesStatistics extends CasesBlock {
 		
 		IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
 		from.setUseCurrentDateIfNotSet(false);
+		from.setShowMonthChange(true);
+		from.setShowYearChange(true);
 		from.keepStatusOnAction(true);
 
 		IWDatePicker to = new IWDatePicker(PARAMETER_TO_DATE);
 		to.setUseCurrentDateIfNotSet(false);
+		to.setShowMonthChange(true);
+		to.setShowYearChange(true);
 		to.keepStatusOnAction(true);
 
 		Layer element = new Layer(Layer.DIV);
@@ -688,7 +692,16 @@ public class CasesStatistics extends CasesBlock {
 		public String getSQL() {
 			StringBuilder query = new StringBuilder("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
 				.append("from comm_case_category cc left join comm_case c on c.case_category = cc.comm_case_category_id ")
-				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where cc.parent_category ");
+				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
+
+			if (getDateFrom() != null) {
+				query.append(getDateFromCriteria(getDateFrom()));
+			}
+			if (getDateTo() != null) {
+				query.append(getDateToCriteria(getDateTo()));
+			}
+				
+			query.append(" where cc.parent_category ");
 			
 			if (isUseSubCats() && getParentID() > -1) {
 				query.append("= ").append(getParentID());			//	We seek for special category
@@ -697,15 +710,12 @@ public class CasesStatistics extends CasesBlock {
 				
 				query.append(getCategoriesIdsCriteria());			//	We need the very categories used by PROVIDED cases set
 			}
-			if (getDateFrom() != null) {
-				query.append(getDateFromCriteria(getDateFrom()));
-			}
-			if (getDateTo() != null) {
-				query.append(getDateToCriteria(getDateTo()));
-			}
 			
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
 			
+			if (getParentID() == -1) {
+				System.out.println("CategoryHandler: " + query.toString());
+			}
 			return query.toString();
 		}
 
@@ -824,7 +834,7 @@ public class CasesStatistics extends CasesBlock {
 		public String getSQL() {
 			StringBuilder query = new StringBuilder("select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
 				.append("left join comm_case_category cc on c.case_category = cc.comm_case_category_id ")
-				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.handler is not null ").append(getCasesIdsCriteria())
+				.append("left join proc_case p on p.proc_case_id = c.comm_case_id, ic_user u where c.handler = u.ic_user_id and c.handler is not null ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria());
 
 			if (getDateFrom() != null) {
@@ -834,8 +844,9 @@ public class CasesStatistics extends CasesBlock {
 				query.append(getDateToCriteria(getDateTo()));
 			}
 			
-			query.append(" group by c.handler, p.case_status");
+			query.append(" group by c.handler, p.case_status, u.display_name order by u.display_name, p.case_status");
 			
+			System.out.println("UserHandler: " + query.toString());
 			return query.toString();
 		}
 
@@ -904,6 +915,7 @@ public class CasesStatistics extends CasesBlock {
 			
 			query.append(" group by c.case_type, p.case_status order by case_type");
 			
+			System.out.println("CaseTypeHandler: " + query.toString());
 			return query.toString();
 		}
 
