@@ -211,10 +211,8 @@ function registerGridExpanderActionsForElement(event, element) {
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning,
 			hideEmptySection, commentsManagerIdentifier, showAttachmentStatistics, showOnlyCreatorInContacts), {
 			callback: function(component) {
-				
-				closeAllLoadingMessages();
-				
 				if (component == null) {
+					closeAllLoadingMessages();
 					return false;
 				}
 				
@@ -224,8 +222,7 @@ function registerGridExpanderActionsForElement(event, element) {
                 jQuery(customerView).show('fast');
 			}
 		});
-	}
-	else {
+	} else {
 		customerView.hide('fast');
 	}
 }
