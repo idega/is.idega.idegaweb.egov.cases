@@ -464,20 +464,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public Collection getCaseLogs(GeneralCase theCase) {
 		try {
 			Collection logs = getCaseLogsByCase(theCase);
-			Collection returner = new ArrayList(logs);
-			User owner = theCase.getOwner();
 
-			Iterator iter = logs.iterator();
-			while (iter.hasNext()) {
-				CaseLog log = (CaseLog) iter.next();
-				if (log.getPerformer().equals(owner)) {
-					returner.remove(log);
-				} else if (log.getComment() == null || log.getComment().length() == 0) {
-					returner.remove(log);
-				}
-			}
-
-			return returner;
+			return logs;
 		} catch (FinderException e) {
 			return new ArrayList();
 		}

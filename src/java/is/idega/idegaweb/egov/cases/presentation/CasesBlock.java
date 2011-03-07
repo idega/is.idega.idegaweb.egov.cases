@@ -241,15 +241,17 @@ public abstract class CasesBlock extends CaseBlock {
 		formItem.add(new Span(new Text(getCasesBusiness(iwc).getLocalizedCaseStatusDescription(theCase, status, iwc.getCurrentLocale()))));
 		section.add(formItem);
 
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		formItem.setStyleClass("informationItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
-		formItem.add(label);
-		formItem.add(new Span(new Text(reply)));
-		section.add(formItem);
-
+		if (reply != null && !reply.isEmpty()) {
+			formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			formItem.setStyleClass("informationItem");
+			label = new Label();
+			label.setLabel(iwrb.getLocalizedString("reply", "Reply"));
+			formItem.add(label);
+			formItem.add(new Span(new Text(reply)));
+			section.add(formItem);
+		}
+		
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		section.add(clear);
