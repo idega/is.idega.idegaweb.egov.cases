@@ -80,7 +80,6 @@ public class CasesSearcher extends CasesBlock {
 	
 	@Autowired
 	private CasesEngine casesEngine;
-	
 	@Autowired
 	private Web2Business web2;
 	@Autowired
@@ -88,6 +87,8 @@ public class CasesSearcher extends CasesBlock {
 	
 	protected IWBundle bundle;
 	protected IWResourceBundle iwrb;
+	
+	protected Layer container, inputsContainer;
 	
 	public CasesSearcher() {
 		super();
@@ -127,15 +128,19 @@ public class CasesSearcher extends CasesBlock {
 		return container;
 	}
 	
+	protected void addHeader() {
+		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
+	}
+	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		addResources(iwc);
 		
-		Layer container = getContainer("casesSearcherBoxStyleClass");
+		container = getContainer("casesSearcherBoxStyleClass");
 		add(container);
-		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
+		addHeader();
 		
-		Layer inputsContainer = getContainer("casesSearcherInputsBoxStyleClass");
+		inputsContainer = getContainer("casesSearcherInputsBoxStyleClass");
 		container.add(inputsContainer);
 		
 		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null);
@@ -197,19 +202,32 @@ public class CasesSearcher extends CasesBlock {
 		element.add(showStatistics);		
 		element.add(label);
 		
-		inputsContainer.add(new CSSSpacer());
-
-		Layer buttonsContainer = getContainer("buttonLayer");
-		inputsContainer.add(buttonsContainer);
-
 		StringBuilder parameters  = new StringBuilder("['").append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '");
 		parameters.append(caseNumber.getId()).append("', '").append(name.getId()).append("', '").append(personalID.getId()).append("', '");
 		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
 		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '").append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS)
 		.append("', '").append(showStatistics.getId()).append("']");
+		addCasesFilterButtons(iwc, parameters.toString());
+	}
+	
+	protected String getSearchAction(String jsParams) {
+		return "searchForCases(".concat(jsParams).concat(");");
+	}
+	
+	protected String getClearAction(String jsParams) {
+		return "clearSearchForCases(".concat(jsParams).concat(");");
+	}
+	
+	protected void addCasesFilterButtons(IWContext iwc, String jsParams) {
+		inputsContainer.add(new CSSSpacer());
+
+		Layer buttonsContainer = getContainer("buttonLayer");
+		inputsContainer.add(buttonsContainer);
+		
+		jsParams = jsParams == null ? CoreConstants.EMPTY : jsParams;
 		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(inputsContainer.getId()).append("', ")
-												.append(parameters.toString()).append(");");
+			.append(StringUtil.isEmpty(jsParams) ? "null" : jsParams).append(");");
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			action = new StringBuilder("jQuery(window).load(function() {").append(action.toString()).append("});");
 		}
@@ -219,13 +237,12 @@ public class CasesSearcher extends CasesBlock {
 		searchButton.setTitle(iwrb.getLocalizedString("search_for_cases_by_selected_parameters", "Search for cases by selected parameters"));
 		searchButton.setStyleClass(buttonStyleClass);
 		searchButton.setStyleClass("seachForCasesButton");
-		StringBuilder searchAction = new StringBuilder("searchForCases(").append(parameters.toString()).append(");");
-		searchButton.setOnClick(searchAction.toString());
+		searchButton.setOnClick(getSearchAction(jsParams));
 		buttonsContainer.add(searchButton);
 		
 		GenericButton clearSearch = new GenericButton(iwrb.getLocalizedString("clear_search_results", "Clear"));
 		clearSearch.setTitle(iwrb.getLocalizedString("clear_all_search_results", "Clear search resutls"));
-		clearSearch.setOnClick(new StringBuilder("clearSearchForCases(").append(parameters.toString()).append(");").toString());
+		clearSearch.setOnClick(getClearAction(jsParams));
 		clearSearch.setStyleClass(buttonStyleClass);
 		buttonsContainer.add(clearSearch);
 		

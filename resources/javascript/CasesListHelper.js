@@ -424,22 +424,26 @@ function searchForCases(parameters) {
 CasesListHelper.getRenderedCasesListByCriterias = function(criterias, className, callback) {
 	CasesEngine.getCasesListByUserQuery(criterias, {
 		callback: function(component) {
-			closeAllLoadingMessages();
-			
-			var lastCaseList = setDisplayPropertyToAllCasesLists(className, false);
-			if (lastCaseList == null) {
-				return false;
-			}
-			
-			var container = lastCaseList.parent()[0];
-			insertNodesToContainerBefore(component, container, lastCaseList[0]);
-			continueInitializeCasesList(null);
-			
-			if (callback) {
-				callback();
-			}
+			CasesListHelper.insertRenderedCasesList(component, criterias[0], callback);
 		}
 	});
+}
+
+CasesListHelper.insertRenderedCasesList = function(component, className, callback) {
+	closeAllLoadingMessages();
+	
+	var lastCaseList = setDisplayPropertyToAllCasesLists(className, false);
+	if (lastCaseList == null) {
+		return false;
+	}
+	
+	var container = lastCaseList.parent()[0];
+	insertNodesToContainerBefore(component, container, lastCaseList[0]);
+	continueInitializeCasesList(null);
+	
+	if (callback) {
+		callback();
+	}
 }
 
 function setDisplayPropertyToAllCasesLists(className, show) {
@@ -471,20 +475,27 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 function clearSearchForCases(parameters) {
 	CasesEngine.clearSearchResults(window.location.pathname, {
 		callback: function(result) {
-			dwr.util.setValue(parameters[1], '');
-			dwr.util.setValue(parameters[8], '');
-			dwr.util.setValue(parameters[2], '');
-			dwr.util.setValue(parameters[3], '');
-			dwr.util.setValue(parameters[4], '-1');
-			dwr.util.setValue(parameters[5], '-1');
-			dwr.util.setValue(parameters[6], '');
-			dwr.util.setValue(parameters[10], '');
-			jQuery('#' + parameters[12]).attr('checked', false);
+			var cssClassName = null;
+			try {
+				if (parameters != null && parameters.length >= 13) {
+					cssClassName = parameters[0];
+					dwr.util.setValue(parameters[1], '');
+					dwr.util.setValue(parameters[8], '');
+					dwr.util.setValue(parameters[2], '');
+					dwr.util.setValue(parameters[3], '');
+					dwr.util.setValue(parameters[4], '-1');
+					dwr.util.setValue(parameters[5], '-1');
+					dwr.util.setValue(parameters[6], '');
+					dwr.util.setValue(parameters[10], '');
+					jQuery('#' + parameters[12]).attr('checked', false);
+				}
+			} catch (e) {}
+			cssClassName = cssClassName == null ? parameters.cssClassName : cssClassName;
 			
 			CasesListHelper.closeVariablesWindow();
 			CasesListHelper.closeSortingOptionsWindow();
 			
-			setDisplayPropertyToAllCasesLists(parameters[0], true);
+			setDisplayPropertyToAllCasesLists(cssClassName, true);
 			
 			CasesListHelper.searchCriterias = [];
 		}
