@@ -424,7 +424,7 @@ function searchForCases(parameters) {
 CasesListHelper.getRenderedCasesListByCriterias = function(criterias, className, callback) {
 	CasesEngine.getCasesListByUserQuery(criterias, {
 		callback: function(component) {
-			CasesListHelper.insertRenderedCasesList(component, criterias[0], callback);
+			CasesListHelper.insertRenderedCasesList(component, className, callback);
 		}
 	});
 }
@@ -432,6 +432,7 @@ CasesListHelper.getRenderedCasesListByCriterias = function(criterias, className,
 CasesListHelper.insertRenderedCasesList = function(component, className, callback) {
 	closeAllLoadingMessages();
 	
+	className = className == null ? 'mainCasesListContainerStyleClass' : className;
 	var lastCaseList = setDisplayPropertyToAllCasesLists(className, false);
 	if (lastCaseList == null) {
 		return false;
