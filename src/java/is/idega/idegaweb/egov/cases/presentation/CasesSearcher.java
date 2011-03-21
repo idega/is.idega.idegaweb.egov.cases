@@ -163,38 +163,38 @@ public class CasesSearcher extends CasesBlock {
 		inputsContainer.add(listTypeInput);
 
 		//	Case number
-		addFormItem(inputsContainer, iwrb.getLocalizedString("case_nr", "Case nr."), caseNumber);
+		addFormItem(inputsContainer, "caseIdentifier", iwrb.getLocalizedString("case_nr", "Case nr."), caseNumber);
 		
 		// Case description
-		addFormItem(inputsContainer, iwrb.getLocalizedString("description", "Description"), caseDescription);
+		addFormItem(inputsContainer, "caseDescription", iwrb.getLocalizedString("description", "Description"), caseDescription);
 
 		//	Case name
-		addFormItem(inputsContainer, iwrb.getLocalizedString("name", "Name"), name);
+		addFormItem(inputsContainer, "senderName", iwrb.getLocalizedString("name", "Name"), name);
 
 		//	Case personal id
-		addFormItem(inputsContainer, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID);
+		addFormItem(inputsContainer, "senderPersonalID", iwrb.getLocalizedString("personal_id", "Personal ID"), personalID);
 		
 		//	Case contacts
-		addFormItem(inputsContainer, iwrb.getLocalizedString("contact", "Contact"), contact);
+		addFormItem(inputsContainer, "contact", iwrb.getLocalizedString("contact", "Contact"), contact);
 		
 		//	Process
 		DropdownMenu processes = getDropdownForProcess(iwc);
-		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
+		addFormItem(inputsContainer, "process", iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
 
 		//	Sorting options
 		DropdownMenu sortingOptions = getDropdownForSortingOptions(iwc);
-		addFormItem(inputsContainer, iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions);
+		addFormItem(inputsContainer, "sorting", iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions);
 		
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
-		addFormItem(inputsContainer, iwrb.getLocalizedString("status", "Status"), statuses);
+		addFormItem(inputsContainer, "status", iwrb.getLocalizedString("status", "Status"), statuses);
 		
 		//	Date range
 		IWDatePicker dateRange = getDateRange(iwc, "dateRange");
-		addFormItem(inputsContainer, iwrb.getLocalizedString("date_range", "Date range"), dateRange);
+		addFormItem(inputsContainer, "dateRange", iwrb.getLocalizedString("date_range", "Date range"), dateRange);
 		
 		//	Show statistics
-		Layer element = getContainer("formItem shortFormItem checkboxFormItem");
+		Layer element = getContainer("formItem shortFormItem checkboxFormItem showStatistics");
 		inputsContainer.add(element);
 		
 		Label label = null;
@@ -482,12 +482,20 @@ public class CasesSearcher extends CasesBlock {
 		
 		return datePicker;
 	}
-	
+
 	protected Layer addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
-		return addFormItem(layer, localizedLabelText, input, null);
+		return addFormItem(layer, null, localizedLabelText, input);
 	}
 	
+	protected Layer addFormItem(Layer layer, String styleClass, String localizedLabelText, InterfaceObject input) {
+		return addFormItem(layer, styleClass, localizedLabelText, input, null);
+	}
+
 	protected Layer addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
+		return addFormItem(layer, null, localizedLabelText, input, additionalComponents);
+	}
+	
+	protected Layer addFormItem(Layer layer, String styleClass, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
 		Layer element = new Layer(Layer.DIV);
 		layer.add(element);
 		element.setStyleClass("formItem shortFormItem");
