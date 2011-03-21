@@ -41,7 +41,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	public static final String pageType = "openCases";
 
 	protected ICPage iMyCasesPage;
-	
+		
 	@Override
 	protected String getBlockID() {
 		return OpenCases.pageType;

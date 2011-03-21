@@ -556,11 +556,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
 			navigator.setPageSize(pageSize);
 			navigator.setCurrentPage(page);
-			StringBuilder navigationParams = new StringBuilder();
-			navigationParams.append("'").append(instanceId).append("'");
-			navigationParams.append(", '").append(componentId).append("'");
-			navigator.setNavigationFunction("gotoCasesListPage(this.id, '#PAGE#', '" + pageSize + "', " + navigationParams + ");");
-			navigator.setDropdownFunction("changeCasesListPageSize(this.id, this.value, " + navigationParams + ");");
+			if (properties.getUseJavascriptForPageSwitching()) {
+				StringBuilder navigationParams = new StringBuilder();
+				navigationParams.append("'").append(instanceId).append("'");
+				navigationParams.append(", '").append(componentId).append("'");
+				navigator.setNavigationFunction("gotoCasesListPage(this.id, '#PAGE#', '" + pageSize + "', " + navigationParams + ");");
+				navigator.setDropdownFunction("changeCasesListPageSize(this.id, this.value, " + navigationParams + ");");				
+			}
 			if (!StringUtil.isEmpty(properties.getCriteriasId())) {
 				navigator.setNavigatorIdentifier(properties.getCriteriasId());
 			}
