@@ -198,8 +198,10 @@ public abstract class CasesProcessor extends CasesBlock {
 		UICasesList list = getCasesList(iwc, topLayer.getId());
 		
 		form.add(list);
-				
-		form.add(getLegend(iwc));
+		
+		if (list.isShowLegend()) {
+			form.add(getLegend(iwc));
+		}
 		
 		if (showCheckBoxes) {
 			Layer layer = new Layer();
