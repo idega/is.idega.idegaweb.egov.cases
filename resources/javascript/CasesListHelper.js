@@ -208,8 +208,10 @@ function registerGridExpanderActionsForElement(event, element) {
 		var commentsManagerIdentifier = caseToExpand.attr('commentsmanageridentifier');
 		var showAttachmentStatistics = caseToExpand.attr('showattachmentstatistics') == 'true';
 		var showOnlyCreatorInContacts = caseToExpand.attr('showonlycreatorincontacts') == 'true';
+		var showLogExportButton = caseToExpand.attr('showlogexportbutton') == 'true';
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, allowPDFSigning,
-			hideEmptySection, commentsManagerIdentifier, showAttachmentStatistics, showOnlyCreatorInContacts), {
+			hideEmptySection, commentsManagerIdentifier, showAttachmentStatistics, showOnlyCreatorInContacts,
+			showLogExportButton), {
 			callback: function(component) {
 				if (component == null) {
 					closeAllLoadingMessages();
@@ -228,7 +230,7 @@ function registerGridExpanderActionsForElement(event, element) {
 }
 
 function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection, commentsManagerIdentifier,
-								showAttachmentStatistics, showOnlyCreatorInContacts) {
+								showAttachmentStatistics, showOnlyCreatorInContacts, showLogExportButton) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -241,6 +243,8 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 	this.commentsPersistenceManagerIdentifier = commentsManagerIdentifier;
 	
 	this.autoShowComments = window.location.href.indexOf('autoShowComments=true') != -1;
+	
+	this.showLogExportButton = showLogExportButton;
 }
 
 CasesListHelper.getPager = function(fromPager, page) {
