@@ -133,7 +133,7 @@ div.casesListHeadersContainerItemMultiHandle, div.casesListBodyContainerItemMult
 	width: 3%;
 }
 
-div.casesListGridExpanderStyleClass {
+div.casesListGridExpanderStyleClass, .caseLogsAsPDFStyleClass {
 	cursor: pointer;
 }
 
