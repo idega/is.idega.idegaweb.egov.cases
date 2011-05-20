@@ -184,7 +184,14 @@ public class CaseBoardBean {
 	public void setGradingSum(String gradingSum) {
 		this.gradingSum = gradingSum;
 	}
-
+	/**
+	 * sets grading sums with the values on array
+	 * @param gradingSum an array of grading sum values
+	 * 0 value	- 	gradingSum
+	 * 1 value	-	negativeGradingSum
+	 *
+	 *
+	 */
 	public void setGradingSums(String [] gradingSum) {
 		if(gradingSum == null){
 			return;
