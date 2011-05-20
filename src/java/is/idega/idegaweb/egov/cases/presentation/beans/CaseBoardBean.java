@@ -11,35 +11,36 @@ public class CaseBoardBean {
 
 	private String caseId;
 	private Long processInstanceId;
-	
+
 	private String applicantName;
 	private String address;
 	private String postalCode;
 	private String caseIdentifier;
 	private String caseDescription;
-	
+
 	private String totalCost;
 	private String appliedAmount;
-	
+
 	private String nutshell;
 	private String gradingSum;
-	
+	private String negativeGradingSum = null;
+
 	private String category;
 	private String comment;
-	
+
 	private Long grantAmountSuggestion;
 	private Long boardAmount;
 	private String restrictions;
-	
+
 	private List<String> allValues;
 
 	private User handler;
-	
+
 	public CaseBoardBean(String caseId, Long processInstanceId) {
 		this.caseId = caseId;
 		this.processInstanceId = processInstanceId;
 	}
-	
+
 	public String getApplicantName() {
 		return applicantName;
 	}
@@ -139,7 +140,7 @@ public class CaseBoardBean {
 	public void setAllValues(List<String> allValues) {
 		this.allValues = allValues;
 	}
-	
+
 	public String getCaseId() {
 		return caseId;
 	}
@@ -151,26 +152,27 @@ public class CaseBoardBean {
 	public List<String> getAllValues() {
 		if (allValues == null) {
 			allValues = new ArrayList<String>(CasesBoardViewer.CASE_FIELDS.size());
-			
+
 			allValues.add(getApplicantName());					//	0
 			allValues.add(getAddress());						//	1
 			allValues.add(getPostalCode());						//	2
 			allValues.add(getCaseIdentifier());					//	3
 			allValues.add(getCaseDescription());				//	4
-			
+
 			allValues.add(String.valueOf(getTotalCost()));		//	5
 			allValues.add(String.valueOf(getAppliedAmount()));	//	6
-			
+
 			allValues.add(getNutshell());						//	7
-			
-			allValues.add(getGradingSum());						//	8
-			
-			allValues.add(getCategory());						//	9
-			allValues.add(getComment());						//	10
-			
-			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	11
-			allValues.add(String.valueOf(getBoardAmount()));	//	12
-			allValues.add(getRestrictions());					//	13
+
+			allValues.add(getNegativeGradingSum());				//	8
+			allValues.add(getGradingSum());						//	9
+
+			allValues.add(getCategory());						//	10
+			allValues.add(getComment());						//	11
+
+			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	12
+			allValues.add(String.valueOf(getBoardAmount()));	//	13
+			allValues.add(getRestrictions());					//	14
 		}
 		return allValues;
 	}
@@ -181,6 +183,21 @@ public class CaseBoardBean {
 
 	public void setGradingSum(String gradingSum) {
 		this.gradingSum = gradingSum;
+	}
+
+	public void setGradingSums(String [] gradingSum) {
+		if(gradingSum == null){
+			return;
+		}
+		if(gradingSum.length > 1){
+			this.gradingSum = gradingSum[0];
+			this.negativeGradingSum = gradingSum[1];
+			return;
+		}
+		if(gradingSum.length > 0){
+			this.gradingSum = gradingSum[0];
+		}
+		return;
 	}
 
 	public Long getProcessInstanceId() {
@@ -198,7 +215,7 @@ public class CaseBoardBean {
 	public void setHandler(User handler) {
 		this.handler = handler;
 	}
-	
+
 	public String getAddress() {
 		return address;
 	}
@@ -211,5 +228,8 @@ public class CaseBoardBean {
 	public String toString() {
 		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ").concat(String.valueOf(processInstanceId)) +
 			", values: " + getAllValues();
+	}
+	public String getNegativeGradingSum(){
+		return this.negativeGradingSum;
 	}
 }
