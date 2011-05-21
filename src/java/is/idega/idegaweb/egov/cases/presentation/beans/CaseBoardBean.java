@@ -184,27 +184,9 @@ public class CaseBoardBean {
 	public void setGradingSum(String gradingSum) {
 		this.gradingSum = gradingSum;
 	}
-	/**
-	 * sets grading sums with the values on array
-	 * @param gradingSum an array of grading sum values
-	 * 0 value	- 	gradingSum
-	 * 1 value	-	negativeGradingSum
-	 *
-	 *
-	 */
-	public void setGradingSums(String [] gradingSum) {
-		if(gradingSum == null){
-			return;
-		}
-		if(gradingSum.length > 1){
-			this.gradingSum = gradingSum[0];
-			this.negativeGradingSum = gradingSum[1];
-			return;
-		}
-		if(gradingSum.length > 0){
-			this.gradingSum = gradingSum[0];
-		}
-		return;
+
+	public void setNegativeGradingSum(String negativeGradingSum){
+		this.negativeGradingSum = negativeGradingSum;
 	}
 
 	public Long getProcessInstanceId() {
