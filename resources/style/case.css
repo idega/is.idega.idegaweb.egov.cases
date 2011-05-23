@@ -607,6 +607,3 @@ tr.even {
 .reloadCaseStyleClass:HOVER {
 	cursor: pointer;
 }
-.casesBoardViewerContainer {
-	overflow: auto;
-}
