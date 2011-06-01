@@ -207,7 +207,7 @@ public class CasesSearcher extends CasesBlock {
 		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
 		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '").append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS)
-		.append("', '").append(showStatistics.getId()).append("']");
+		.append("', '").append(showStatistics.getId()).append("', ").append(isShowAllStatuses()).append("]");
 		addCasesFilterButtons(iwc, parameters.toString());
 	}
 	

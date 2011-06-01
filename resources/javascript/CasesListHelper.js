@@ -357,7 +357,7 @@ function changeCasesListPageSize(id, size, instanceId, containerId) {
 }
 
 function searchForCases(parameters) {
-	if (parameters == null || parameters.length < 13) {
+	if (parameters == null || parameters.length < 14) {
 		return false;
 	}
 	
@@ -369,6 +369,7 @@ function searchForCases(parameters) {
 	var statusId = parameters[5];
 	var dateRangeId = parameters[6];
 	var showStatisticsId = parameters[12];
+	var showAllCases = parameters[13];
 	
 	var caseNumberValue = dwr.util.getValue(caseNumberId);
 	var caseDescriptionValue = dwr.util.getValue(caseDescriptionId);
@@ -418,7 +419,7 @@ function searchForCases(parameters) {
 	var criterias = new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue, statusValue, dateRangeValue,
 		caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection, showCaseNumberColumn,
 		showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1, dwr.util.getValue(jQuery('select.listPagerSize').attr('id')),
-		jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'), criteriasId
+		jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'), criteriasId, showAllCases
 	);
 	criterias.clearResults = true;
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
@@ -544,7 +545,7 @@ function removePreviousSearchResults(className) {
 
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
 										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
-										instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId) {
+										instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases) {
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -583,6 +584,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.componentId = componentId;
 	this.criteriasId = criteriasId;
+	
+	this.showAllCases = showAllCases;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {

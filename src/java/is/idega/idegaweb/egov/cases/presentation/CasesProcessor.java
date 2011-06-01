@@ -351,7 +351,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
 		
-		@SuppressWarnings("unchecked")
 		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
 		users.setID(PARAMETER_USER);
