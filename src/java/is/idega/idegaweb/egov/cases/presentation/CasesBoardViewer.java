@@ -183,9 +183,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			TableHeaderCell headerCell = headerRow.createHeaderCell();
 			headerCell.add(new Text(headerLabel));
 
-			if (index == 6 || index == 12) {
+			if (index == 6 || index == 12)
 				headerCell.setStyleClass("casesBoardViewerTableWiderCell");
-			}
 
 			index++;
 		}
@@ -209,7 +208,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 					linkToTask.getId();
 					bodyRowCell.add(linkToTask);
-				} else if (index == 14) {
+				} else if (index == 15) {
 					//	E-mail link to handler
 					bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
 				}
@@ -218,15 +217,15 @@ public class CasesBoardViewer extends IWBaseComponent {
 				}
 
 				//	Editable fields
-				if (index == 9) {
+				if (index == 10)
+					//	Category: {A, B, C}
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_DROPDOWN);
-				}
-				if (index == 12) {
+				if (index == 13)
+					//	Board amount
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-				}
-				if (index == 13) {
+				if (index == 14)
+					//	Restrictions
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_AREA);
-				}
 
 				index++;
 			}
@@ -242,32 +241,29 @@ public class CasesBoardViewer extends IWBaseComponent {
 			TableCell2 footerCell = footerRow.createCell();
 			footerCell.add(new Text(footerLabel));
 
-			if (CASE_FIELDS.size() - 2 == index) {
+			if (CASE_FIELDS.size() - 3 == index)
 				totalBoardAmountCellId = footerCell.getId();
-			}
 
 			index++;
 		}
 
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName")
-				.toString(), CASE_FIELDS.get(10).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName")
-				.toString(), CASE_FIELDS.get(13).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName")
-				.toString(), CASE_FIELDS.get(14).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName").toString(),
+				CASE_FIELDS.get(10).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName").toString(),
+				CASE_FIELDS.get(13).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName").toString(),
+				CASE_FIELDS.get(14).getId()));
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
 		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
 		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", totalBoardAmountCellId));
-		if (useCurrentPageAsBackPageFromTaskViewer) {
+		if (useCurrentPageAsBackPageFromTaskViewer)
 			container.add(new HiddenInput("casesBoardViewerTableSpecialBackPageFromTaskViewer", getCurrentPageUri(iwc)));
-		}
 
 		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter();").toString();
-		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+		if (!CoreUtil.isSingleComponentRenderingProcess(iwc))
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
-		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 
 		return true;
