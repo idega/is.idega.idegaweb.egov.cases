@@ -183,7 +183,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			TableHeaderCell headerCell = headerRow.createHeaderCell();
 			headerCell.add(new Text(headerLabel));
 
-			if (index == 6 || index == 12)
+			if (index == 7 || index == 11)
 				headerCell.setStyleClass("casesBoardViewerTableWiderCell");
 
 			index++;
