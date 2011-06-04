@@ -88,7 +88,7 @@ private MemoryFileBuffer memory;
 				
 				if (index == 3) {
 					bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-				} else if (index == 14) {
+				} else if (index == 15) {
 					bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 				} else {
 					bodyRowCell.setCellValue(value);

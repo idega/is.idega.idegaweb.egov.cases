@@ -77,8 +77,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	10,	EDITABLE, select
 
 		new AdvancedProperty("string_ownerGrade", "Comment"),							//	11
-		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	12
-		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	13,	EDITABLE, text input
+		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	12,	EDITABLE, text input
+		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	13
 		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	14, EDITABLE, text area
 	));
 
@@ -220,10 +220,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 				if (index == 10)
 					//	Category: {A, B, C}
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_DROPDOWN);
-				if (index == 13)
+				else if (index == 12)
 					//	Board amount
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-				if (index == 14)
+				else if (index == 14)
 					//	Restrictions
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_AREA);
 
@@ -250,7 +250,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName").toString(),
 				CASE_FIELDS.get(10).getId()));
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName").toString(),
-				CASE_FIELDS.get(13).getId()));
+				CASE_FIELDS.get(12).getId()));
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName").toString(),
 				CASE_FIELDS.get(14).getId()));
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
