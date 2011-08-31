@@ -589,12 +589,14 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
-	if (jQuery.url.param('tiId') != null) {
-		jQuery('.casesSearcherBoxStyleClass').hide('fast', function() {
-			jQuery('.casesSearcherBoxStyleClass').remove();
-		});
-		return;
-	}
+	try {
+		if (jQuery.url.param('tiId') != null) {
+			jQuery('.casesSearcherBoxStyleClass').hide('fast', function() {
+				jQuery('.casesSearcherBoxStyleClass').remove();
+			});
+			return;
+		}
+	} catch (e) {}
 	
 	if (window.location.href.indexOf('impra') != -1 && jQuery('#sidebar').length > 0) {
 		jQuery('.casesSearcherBoxStyleClass').remove().insertAfter('#sidebar').wrap('<div class="box" id="casesFilter"><div class="content"></div></div>');
