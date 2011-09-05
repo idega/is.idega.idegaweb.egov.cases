@@ -914,6 +914,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		CasesStatistics statistics = new CasesStatistics();
 		statistics.setCases(cases);
 		statistics.setUseStatisticsByCaseType(Boolean.FALSE);
+		statistics.setShowDateRange(Boolean.FALSE);
 		return statistics;
 	}
 

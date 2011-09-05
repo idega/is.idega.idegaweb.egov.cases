@@ -42,6 +42,8 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.data.CaseStatusHome;
 import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.business.IBORuntimeException;
+import com.idega.core.builder.data.ICPage;
+import com.idega.core.builder.data.ICPageHome;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWMainApplication;
@@ -65,6 +67,7 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
@@ -83,7 +86,8 @@ public class CasesStatistics extends CasesBlock {
 	
 	private String visibleStatuses = null;
 	
-	private Boolean useStatisticsByCaseType;
+	private Boolean useStatisticsByCaseType,
+					showDateRange = Boolean.TRUE;
 	
 	private Collection<CasePresentation> cases;
 	
@@ -113,7 +117,6 @@ public class CasesStatistics extends CasesBlock {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void present(IWContext iwc) throws Exception {
-		
 		boolean useSubCats = super.getCasesBusiness(iwc).useSubCategories();
 		boolean useTypes = super.getCasesBusiness(iwc).useTypes();
 		
@@ -122,8 +125,7 @@ public class CasesStatistics extends CasesBlock {
 		if (visibleStatuses == null) {
 			if (ListUtil.isEmpty(cases)) {
 				statuses = getCasesBusiness().getCaseStatuses();
-			}
-			else {
+			} else {
 				//	Will be used statuses provided by cases
 				statuses = new ArrayList<CaseStatus>();
 				CaseStatus status = null;
@@ -166,6 +168,20 @@ public class CasesStatistics extends CasesBlock {
 		form.setID("casesStatistics");
 		form.setStyleClass("adminForm");
 		add(form);
+		boolean addDateIntervalChooser = isShowDateRange();
+		if (addDateIntervalChooser) {
+			if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+				try {
+					int pageId = iwc.getCurrentIBPageID();
+					ICPageHome pageHome = (ICPageHome) IDOLookup.getHome(ICPage.class);
+					ICPage page = pageHome.findByPrimaryKey(pageId);
+					form.setAction(CoreConstants.PAGES_URI_PREFIX.concat(page.getDefaultPageURI()));
+				} catch (Exception e) {
+					e.printStackTrace();
+					addDateIntervalChooser = false;
+				}
+			}
+		}
 
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
@@ -183,28 +199,30 @@ public class CasesStatistics extends CasesBlock {
 		to.setShowYearChange(true);
 		to.keepStatusOnAction(true);
 
-		Layer element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		Label label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
-		element.add(label);
-		element.add(from);
-		section.add(element);
-
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
-		element.add(label);
-		element.add(to);
-		section.add(element);
-
-		SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));
-		fetch.setStyleClass("indentedButton");
-		fetch.setStyleClass("button");
-		element = new Layer(Layer.DIV);
-		element.setStyleClass("formItem");
-		element.add(fetch);
-		section.add(element);
-
+		if (addDateIntervalChooser) {
+			Layer element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			Label label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.from_date", "From date"), from);
+			element.add(label);
+			element.add(from);
+			section.add(element);
+	
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
+			element.add(label);
+			element.add(to);
+			section.add(element);
+	
+			SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));
+			fetch.setStyleClass("indentedButton");
+			fetch.setStyleClass("button");
+			element = new Layer(Layer.DIV);
+			element.setStyleClass("formItem");
+			element.add(fetch);
+			section.add(element);
+		}
+		
 		section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		section.setStyleClass("statisticsLayer");
@@ -1159,4 +1177,13 @@ public class CasesStatistics extends CasesBlock {
 	public boolean showCheckBoxes() {
 		return false;
 	}
+
+	public Boolean isShowDateRange() {
+		return showDateRange;
+	}
+
+	public void setShowDateRange(Boolean showDateRange) {
+		this.showDateRange = showDateRange;
+	}
+	
 }

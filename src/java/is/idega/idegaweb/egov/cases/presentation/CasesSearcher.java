@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseStatus;
+import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
@@ -136,6 +138,11 @@ public class CasesSearcher extends CasesBlock {
 	protected void present(IWContext iwc) throws Exception {
 		addResources(iwc);
 		
+		CasesSearchCriteriaBean searchSettings = null;
+		Object o = iwc.getSessionAttribute(GeneralCasesListBuilder.USER_CASES_SEARCH_SETTINGS_ATTRIBUTE);
+		if (o instanceof CasesSearchCriteriaBean)
+			searchSettings = (CasesSearchCriteriaBean) o;
+		
 		container = getContainer("casesSearcherBoxStyleClass");
 		add(container);
 		addHeader();
@@ -143,19 +150,20 @@ public class CasesSearcher extends CasesBlock {
 		inputsContainer = getContainer("casesSearcherInputsBoxStyleClass");
 		container.add(inputsContainer);
 		
-		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null);
+		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null, searchSettings == null ? null : searchSettings.getCaseNumber());
 
-		TextInput caseDescription = getTextInput(CaseFinder.PARAMETER_TEXT, null);
+		TextInput caseDescription = getTextInput(CaseFinder.PARAMETER_TEXT, null, searchSettings == null ? null : searchSettings.getDescription());
 		
-		TextInput name = getTextInput(CaseFinder.PARAMETER_NAME, null);
+		TextInput name = getTextInput(CaseFinder.PARAMETER_NAME, null, searchSettings == null ? null : searchSettings.getName());
 
-		TextInput personalID = getTextInput(CaseFinder.PARAMETER_PERSONAL_ID, null);
+		TextInput personalID = getTextInput(CaseFinder.PARAMETER_PERSONAL_ID, null, searchSettings == null ? null : searchSettings.getPersonalId());
 		
 		TextInput contact = getTextInput(PARAMETER_CASE_CONTACT, iwrb.getLocalizedString("cases_search_enter_name_email_or_phone",
-				"Contact's name, e-mail or phone number"));
+				"Contact's name, e-mail or phone number"), searchSettings == null ? null : searchSettings.getContact());
 		
 		String showStatisticsLabel = iwrb.getLocalizedString("show_cases_statistics", "Show statistics");
 		CheckBox showStatistics = new CheckBox(CaseFinder.PARAMETER_SHOW_STATISTICS);
+		showStatistics.setChecked(searchSettings != null && searchSettings.isShowStatistics());
 		showStatistics.setTitle(showStatisticsLabel);
 		
 		String listType = getListType();
@@ -190,7 +198,13 @@ public class CasesSearcher extends CasesBlock {
 		addFormItem(inputsContainer, "status", iwrb.getLocalizedString("status", "Status"), statuses);
 		
 		//	Date range
-		IWDatePicker dateRange = getDateRange(iwc, "dateRange");
+		Date from = null;
+		Date to = null;
+		if (searchSettings != null) {
+			from = searchSettings.getDateFrom() == null ? null : searchSettings.getDateFrom().getDate();
+			to = searchSettings.getDateTo() == null ? null : searchSettings.getDateTo().getDate();
+		}
+		IWDatePicker dateRange = getDateRange(iwc, "dateRange", from, to);
 		addFormItem(inputsContainer, "dateRange", iwrb.getLocalizedString("date_range", "Date range"), dateRange);
 		
 		//	Show statistics
@@ -257,12 +271,17 @@ public class CasesSearcher extends CasesBlock {
 	}
 	
 	protected TextInput getTextInput(String name, String toolTip) {
+		return getTextInput(name, toolTip, null);
+	}
+	
+	protected TextInput getTextInput(String name, String toolTip, String value) {
 		TextInput input = new TextInput(name);
 		input.setStyleClass(textInputStyleClass);
 		
-		if (!StringUtil.isEmpty(toolTip)) {
+		if (!StringUtil.isEmpty(toolTip))
 			input.setTitle(toolTip);
-		}
+		if (!StringUtil.isEmpty(value))
+			input.setValue(value);
 		
 		return input;
 	}
@@ -474,9 +493,13 @@ public class CasesSearcher extends CasesBlock {
 		return menu;
 	}
 	
-	protected IWDatePicker getDateRange(IWContext iwc, String name) {
+	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
 		IWDatePicker datePicker = new IWDatePicker(name);
 		
+		if (from != null)
+			datePicker.setDate(from);
+		if (to != null)
+			datePicker.setDateTo(to);
 		datePicker.setDateRange(true);
 		datePicker.setUseCurrentDateIfNotSet(false);
 		
