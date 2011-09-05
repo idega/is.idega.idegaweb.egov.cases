@@ -59,6 +59,7 @@ case_finder.information_heading=Search
 case_finder.information_text=To search for a certain case, please enter name or social security number or case number and click on 'Next'
 case_handled_body=Your case with category {0} and type {1} has been handled by {2}.  The reply was as follows\:\n\n{3}
 case_handled_subject=Your case has been handled
+case_handler_set=Case handler set
 case_nr=Case nr.
 case_number=Case number
 case_overview=Case overview

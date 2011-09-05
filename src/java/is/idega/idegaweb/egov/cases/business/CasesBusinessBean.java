@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.ejb.RemoveException;
@@ -39,7 +40,6 @@ import com.idega.block.process.business.CaseBusinessBean;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseBMPBean;
-import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextHome;
@@ -784,9 +784,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	public void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges, boolean sendMessages) {
+		String comment = getLocalizedString("case_handler_set", "Case handler set", iwc.getApplicationSettings().getDefaultLocale()) + ": " + new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getApplicationSettings().getDefaultLocale());
 
 		theCase.setHandledBy(user);
-		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), user, (Group) null);
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), comment, user, (Group) null);
 
 		if (sendMessages) {
 

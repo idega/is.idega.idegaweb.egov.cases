@@ -79,6 +79,7 @@ case_finder.information_heading=Leit
 case_finder.information_text=H\u00E9r er h\u00E6gt a\u00F0 leita a\u00F0 \u00E1kve\u00F0nu erindi. Skrifi\u00F0 inn nafn e\u00F0a kennit\u00F6lu e\u00F0a n\u00FAmer erindis og smelli\u00F0 \u00E1 \u00C1fram.
 case_handled_body=M\u00E1laflokkur\: {0}\r\nTegund erindis\: {1} \r\nUmsj\u00F3narma\u00F0ur\: {2}\r\n\r\nErindi \u00FEitt hefur veri\u00F0 me\u00F0h\u00F6ndla\u00F0 af ofangreindum umsj\u00F3narmanni sem sendir eftirfarandi svar\: {3}
 case_handled_subject=Erindi \u00FEitt hefur veri\u00F0 me\u00F0h\u00F6ndla\u00F0
+case_handler_set=Umsj\u00F3narma\u00F0ur settur \u00E1 m\u00E1li\u00F0
 case_nr=Erindi nr.
 case_number=Erindi nr.
 case_overview=Yfirlit erindis
