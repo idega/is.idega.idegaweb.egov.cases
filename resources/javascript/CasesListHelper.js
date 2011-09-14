@@ -440,6 +440,7 @@ CasesListHelper.insertRenderedCasesList = function(component, className, callbac
 	className = className == null ? 'mainCasesListContainerStyleClass' : className;
 	var lastCaseList = setDisplayPropertyToAllCasesLists(className, false);
 	if (lastCaseList == null) {
+		reloadPage();
 		return false;
 	}
 	
@@ -457,6 +458,7 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 	
 	var casesLists = jQuery('div.' + className);
 	if (casesLists == null || casesLists.length == 0) {
+		reloadPage();
 		return null;
 	}
 	
@@ -511,6 +513,7 @@ function clearSearchForCases(parameters) {
 function removePreviousSearchResults(className) {
 	var casesLists = jQuery('div.' + className);
 	if (casesLists == null || casesLists.length == 0) {
+		reloadPage();
 		return false;
 	}
 	
