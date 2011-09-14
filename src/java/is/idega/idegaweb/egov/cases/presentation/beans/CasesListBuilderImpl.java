@@ -552,9 +552,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 
-			ListNavigator navigator = new ListNavigator("userCases", totalCases);
+			String key = "userCases";
+			ListNavigator navigator = new ListNavigator(key, totalCases);
 			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
 			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
+			iwc.setSessionAttribute(ListNavigator.PARAMETER_CURRENT_PAGE + "_" + key, page);
 			navigator.setPageSize(pageSize);
 			navigator.setCurrentPage(page);
 			if (properties.getUseJavascriptForPageSwitching()) {
