@@ -787,7 +787,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		String comment = getLocalizedString("case_handler_set", "Case handler set", iwc.getApplicationSettings().getDefaultLocale()) + ": " + new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getApplicationSettings().getDefaultLocale());
 
 		theCase.setHandledBy(user);
-		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), comment, user, (Group) null);
+		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), comment, performer, (Group) null);
 
 		if (sendMessages) {
 
