@@ -315,36 +315,40 @@ CasesListHelper.getCriterias = function(criteriasId) {
 
 CasesListHelper.displayPager = function(instanceId, containerId, page, count, toPager, criteriasId, searchResults) {
 	if (toPager == null) {
-		var criterias = CasesListHelper.getCriterias(criteriasId);
-		if (criterias == null) {
-			var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
-			if (searchResults) {
-				properties.push({id: 'setSearchResultsId', value: window.location.pathname});
-			}
-			
-			var parentContainer = jQuery('#' + containerId).parent();
-			var parentContainerId = parentContainer.attr('id');
-			if (parentContainerId != null && parentContainerId != '')
-				parentContainer = parentContainerId;
-			IWCORE.renderComponent(instanceId, parentContainer, function() {
-				closeAllLoadingMessages(toPager);
-			}, properties, {append: true});
-		} else {
-			criterias.page = page;
-			criterias.pageSize = count;
-			criterias.clearResults = false;
-			CasesListHelper.getRenderedCasesListByCriterias(criterias, 'mainCasesListContainerStyleClass', function() {
-				jQuery('div.mainCasesListContainerStyleClass').each(function() {
-					var caseList = jQuery(this);
-					if (caseList.attr('searchresult') == null) {
-						caseList.css('display', 'none');
-						
-						jQuery('ul.legend', caseList.parent()).css('display', 'none');
+		CasesEngine.setCasesPagerAttributes(page, count, {
+			callback: function(result) {
+				var criterias = CasesListHelper.getCriterias(criteriasId);
+				if (criterias == null) {
+					var properties = [{id: 'setPage', value: page}, {id: 'setPageSize', value: count}];
+					if (searchResults) {
+						properties.push({id: 'setSearchResultsId', value: window.location.pathname});
 					}
-				});
-				jQuery('#' + containerId).show('fast');
-			});
-		}
+					
+					var parentContainer = jQuery('#' + containerId).parent();
+					var parentContainerId = parentContainer.attr('id');
+					if (parentContainerId != null && parentContainerId != '')
+						parentContainer = parentContainerId;
+					IWCORE.renderComponent(instanceId, parentContainer, function() {
+						closeAllLoadingMessages(toPager);
+					}, properties, {append: true});
+				} else {
+					criterias.page = page;
+					criterias.pageSize = count;
+					criterias.clearResults = false;
+					CasesListHelper.getRenderedCasesListByCriterias(criterias, 'mainCasesListContainerStyleClass', function() {
+						jQuery('div.mainCasesListContainerStyleClass').each(function() {
+							var caseList = jQuery(this);
+							if (caseList.attr('searchresult') == null) {
+								caseList.css('display', 'none');
+								
+								jQuery('ul.legend', caseList.parent()).css('display', 'none');
+							}
+						});
+						jQuery('#' + containerId).show('fast');
+					});
+				}
+			}
+		});
 	} else {
 		jQuery('#' + toPager.container).show('fast', function() {
 			closeAllLoadingMessages();

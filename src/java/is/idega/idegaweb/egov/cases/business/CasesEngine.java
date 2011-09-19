@@ -25,4 +25,6 @@ public interface CasesEngine {
 	public Document getRenderedCasesByQuery(CasesSearchCriteriaBean criteriaBean);
 	
 	public String getCaseStatus(Long processInstanceId);
+	
+	public boolean setCasesPagerAttributes(int page, int pageSize);
 }

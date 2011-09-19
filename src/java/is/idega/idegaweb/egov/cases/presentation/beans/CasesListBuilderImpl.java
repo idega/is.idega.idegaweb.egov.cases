@@ -538,6 +538,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		int pageSize = properties.getPageSize();
 		int page = properties.getPage();
+		
 		String instanceId = properties.getInstanceId();
 		String componentId = properties.getComponentId();
 		
@@ -557,6 +558,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
 			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
 			iwc.setSessionAttribute(ListNavigator.PARAMETER_CURRENT_PAGE + "_" + key, page);
+			iwc.setSessionAttribute(ListNavigator.PARAMETER_NUMBER_OF_ENTRIES + "_" + key, pageSize);
 			navigator.setPageSize(pageSize);
 			navigator.setCurrentPage(page);
 			if (properties.getUseJavascriptForPageSwitching()) {
