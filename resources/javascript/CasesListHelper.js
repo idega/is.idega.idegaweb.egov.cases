@@ -444,7 +444,7 @@ CasesListHelper.insertRenderedCasesList = function(component, className, callbac
 	
 	className = className == null ? 'mainCasesListContainerStyleClass' : className;
 	var lastCaseList = setDisplayPropertyToAllCasesLists(className, false);
-	if (lastCaseList == null) {
+	if (lastCaseList == null || lastCaseList.length == 0) {
 		reloadPage();
 		return false;
 	}
