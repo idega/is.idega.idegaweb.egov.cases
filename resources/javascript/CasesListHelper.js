@@ -321,7 +321,12 @@ CasesListHelper.displayPager = function(instanceId, containerId, page, count, to
 			if (searchResults) {
 				properties.push({id: 'setSearchResultsId', value: window.location.pathname});
 			}
-			IWCORE.renderComponent(instanceId, jQuery('#' + containerId).parent().attr('id'), function() {
+			
+			var parentContainer = jQuery('#' + containerId).parent();
+			var parentContainerId = parentContainer.attr('id');
+			if (parentContainerId != null && parentContainerId != '')
+				parentContainer = parentContainerId;
+			IWCORE.renderComponent(instanceId, parentContainer, function() {
 				closeAllLoadingMessages(toPager);
 			}, properties, {append: true});
 		} else {
