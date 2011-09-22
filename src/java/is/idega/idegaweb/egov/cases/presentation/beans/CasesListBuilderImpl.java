@@ -199,13 +199,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute(usePDFDownloadColumnParName, String.valueOf(properties.isUsePDFDownloadColumn()));
 		layer.setMarkupAttribute(allowPDFSigningParName, String.valueOf(properties.isAllowPDFSigning()));
 		layer.setMarkupAttribute("hideemptysection", String.valueOf(properties.isHideEmptySection()));
-		if (!StringUtil.isEmpty(properties.getCommentsManagerIdentifier())) {
+		if (!StringUtil.isEmpty(properties.getCommentsManagerIdentifier()))
 			layer.setMarkupAttribute("commentsmanageridentifier", properties.getCommentsManagerIdentifier());
-		}
 		layer.setMarkupAttribute("showattachmentstatistics", properties.isShowAttachmentStatistics());
 		layer.setMarkupAttribute("showonlycreatorincontacts", properties.isShowOnlyCreatorInContacts());
 		layer.setMarkupAttribute("onlysubscribedcases", properties.isOnlySubscribedCases());
 		layer.setMarkupAttribute("showlogexportbutton", properties.isShowLogExportButton());
+		if (!StringUtil.isEmpty(properties.getSpecialBackPage()))
+			layer.setMarkupAttribute("specialbackpage", properties.getSpecialBackPage());
 	}
 	
 	private IWTimestamp getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
@@ -601,9 +602,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		
 		addStatusesProperties(container, "casesListStatusesToShow", properties.getStatusesToShow());
 		addStatusesProperties(container, "casesListStatusesToHide", properties.getStatusesToHide());
-		if (!ListUtil.isEmpty(properties.getCaseCodes())) {
+		if (!ListUtil.isEmpty(properties.getCaseCodes()))
 			addStatusesProperties(container, "casesListCaseCodes", properties.getCaseCodes());
-		}
 	}
 	
 	private void addStatusesProperties(Layer container, String className, List<String> statuses) {
