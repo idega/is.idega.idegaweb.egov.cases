@@ -724,7 +724,7 @@ CasesListHelper.addVariableInput = function() {
 	showLoadingMessage(loadingMessage);
 	
 	var isDateField = optionValue[1] == 'D';
-	var isMultipleObjectsField = optionValue[1] == 'B';
+	var isMultipleObjectsField = optionValue[1] == 'B' || optionValue[0] == 'string_harbourNr';
 	var isHandlerVar = optionValue[0] == 'handlerUserId';
 	var procDefId = dwr.util.getValue(jQuery('select.availableVariablesChooserForProcess').attr('id'));
 	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/WebUtil.js'], function() {
