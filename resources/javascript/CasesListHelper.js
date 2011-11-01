@@ -770,10 +770,11 @@ CasesListHelper.addVariables = function() {
 	jQuery.each(jQuery('.variableValueField'), function() {
 		var input = this;
 		
-		var variableValue = dwr.util.getValue(input.id);//input.attr('value');
+		var variableValue = dwr.util.getValue(input.id);
 		if (variableValue != null && variableValue != '') {
 			var nameAttr = input.name.split('@');
 			
+			var multipleValues = false;
 			if (typeof variableValue == 'object') {
 				var values = '';
 				for (var i = 0; i < variableValue.length; i++) {
@@ -783,9 +784,10 @@ CasesListHelper.addVariables = function() {
 					}
 				}
 				variableValue = values;
+				multipleValues = true;
 			}
 			
-			var variableObject = {name: nameAttr[0], value: variableValue, type: nameAttr[1]};
+			var variableObject = {name: nameAttr[0], value: variableValue, type: nameAttr[1], multiple: multipleValues};
 			if (!existsElementInArray(CasesListHelper.processVariables, variableObject)) {
 				CasesListHelper.processVariables.push(variableObject);
 			}
