@@ -725,7 +725,7 @@ CasesListHelper.addVariableInput = function() {
 	
 	var isDateField = optionValue[1] == 'D';
 	var isMultipleObjectsField = optionValue[1] == 'B' || optionValue[0] == 'string_harbourNr';
-	var isHandlerVar = optionValue[0] == 'handlerUserId';
+	var singleSelectMenu = optionValue[0] == 'handlerUserId' || optionValue[0] == 'string_responsibleInspector';
 	var procDefId = dwr.util.getValue(jQuery('select.availableVariablesChooserForProcess').attr('id'));
 	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/WebUtil.js'], function() {
 		WebUtil.getBooleanApplicationProperty("advanced_bpm_cases_search", true, {
@@ -747,13 +747,12 @@ CasesListHelper.addVariableInput = function() {
 					append: true
 				};
 				var valueToSet = null;
-				if (isHandlerVar) {
+				if (singleSelectMenu) {
 					options.className = 'com.idega.presentation.ui.DropdownMenu';
-					valueToSet = '#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
 				} else if (isMultipleObjectsField && result) {
 					options.className = 'com.idega.presentation.ui.SelectionBox';
-					valueToSet = '#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
 				}
+				valueToSet = '#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
 				if (valueToSet != null)
 					options.properties.push({id: 'setValue', value: valueToSet});
 				IWCORE.getRenderedComponentByClassName(options);
