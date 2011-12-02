@@ -13,8 +13,10 @@ public class CaseBoardBean {
 	private Long processInstanceId;
 
 	private String applicantName;
+	private String personalID;
 	private String address;
 	private String postalCode;
+	private String municipality;
 	private String caseIdentifier;
 	private String caseDescription;
 
@@ -49,12 +51,28 @@ public class CaseBoardBean {
 		this.applicantName = applicantName;
 	}
 
+	public String getPersonalID() {
+		return personalID;
+	}
+
+	public void setPersonalID(String personalID) {
+		this.personalID = personalID;
+	}
+
 	public String getPostalCode() {
 		return postalCode;
 	}
 
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
+	}
+
+	public String getMunicipality() {
+		return municipality;
+	}
+
+	public void setMunicipality(String municipality) {
+		this.municipality = municipality;
 	}
 
 	public String getCaseIdentifier() {
@@ -154,25 +172,27 @@ public class CaseBoardBean {
 			allValues = new ArrayList<String>(CasesBoardViewer.CASE_FIELDS.size());
 
 			allValues.add(getApplicantName());					//	0
-			allValues.add(getAddress());						//	1
-			allValues.add(getPostalCode());						//	2
-			allValues.add(getCaseIdentifier());					//	3
-			allValues.add(getCaseDescription());				//	4
+			allValues.add(getPersonalID());						//	1
+			allValues.add(getAddress());						//	2
+			allValues.add(getPostalCode());						//	3
+			allValues.add(getMunicipality());					//	4
+			allValues.add(getCaseIdentifier());					//	5
+			allValues.add(getCaseDescription());				//	6
 
-			allValues.add(String.valueOf(getTotalCost()));		//	5
-			allValues.add(String.valueOf(getAppliedAmount()));	//	6
+			allValues.add(String.valueOf(getTotalCost()));		//	7
+			allValues.add(String.valueOf(getAppliedAmount()));	//	8
 
-			allValues.add(getNutshell());						//	7
+			allValues.add(getNutshell());						//	9
 
-			allValues.add(getNegativeGradingSum());				//	8
-			allValues.add(getGradingSum());						//	9
+			allValues.add(getNegativeGradingSum());				//	10
+			allValues.add(getGradingSum());						//	11
 
-			allValues.add(getCategory());						//	10
-			allValues.add(getComment());						//	11
+			allValues.add(getCategory());						//	12
+			allValues.add(getComment());						//	13
 
-			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	12
-			allValues.add(String.valueOf(getBoardAmount()));	//	13
-			allValues.add(getRestrictions());					//	14
+			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	14
+			allValues.add(String.valueOf(getBoardAmount()));	//	15
+			allValues.add(getRestrictions());					//	16
 		}
 		return allValues;
 	}

@@ -86,9 +86,9 @@ private MemoryFileBuffer memory;
 			for (String value: rowBean.getValues()) {
 				HSSFCell bodyRowCell = row.createCell(index);
 				
-				if (index == 3) {
+				if (index == 5) {
 					bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-				} else if (index == 15) {
+				} else if (index == 17) {
 					bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 				} else {
 					bodyRowCell.setCellValue(value);

@@ -61,25 +61,27 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
 		new AdvancedProperty("string_ownerFullName", "Applicant"),						//	0
-		new AdvancedProperty("string_ownerAddress", "Address"),							//	1
-		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	2
-		new AdvancedProperty("string_caseIdentifier", "Case nr."),						//	3
-		new AdvancedProperty("string_caseDescription", "Description"),					//	4
+		new AdvancedProperty("string_ownerKennitala", "Personal ID"),					//	1
+		new AdvancedProperty("string_ownerAddress", "Address"),							//	2
+		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	3
+		new AdvancedProperty("string_ownerMunicipality", "Municipality"),				//	4
+		new AdvancedProperty("string_caseIdentifier", "Case nr."),						//	5
+		new AdvancedProperty("string_caseDescription", "Description"),					//	6
 
-		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	5
-		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	6
+		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	7
+		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	8
 
-		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),			//	7
+		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),			//	9
 
-		new AdvancedProperty("sum_all_negaive_grades", "Negative grade"),				//	8
-		new AdvancedProperty("sum_all_grades", "Grade"),								//	9
+		new AdvancedProperty("sum_all_negaive_grades", "Negative grade"),				//	10
+		new AdvancedProperty("sum_all_grades", "Grade"),								//	11
 
-		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	10,	EDITABLE, select
+		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	12,	EDITABLE, select
 
-		new AdvancedProperty("string_ownerGrade", "Comment"),							//	11
-		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	12,	EDITABLE, text input
-		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	13
-		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	14, EDITABLE, text area
+		new AdvancedProperty("string_ownerGrade", "Comment"),							//	13
+		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	14,	EDITABLE, text input
+		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	15
+		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	16, EDITABLE, text area
 	));
 
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
@@ -183,7 +185,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			TableHeaderCell headerCell = headerRow.createHeaderCell();
 			headerCell.add(new Text(headerLabel));
 
-			if (index == 7 || index == 11)
+			if (index == 9 || index == 13)
 				headerCell.setStyleClass("casesBoardViewerTableWiderCell");
 
 			index++;
@@ -202,13 +204,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 			for (String value: rowBean.getValues()) {
 				TableCell2 bodyRowCell = row.createCell();
 
-				if (index == 3) {
+				if (index == 5) {
 					//	Link to grading task
 					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean));
 					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 					linkToTask.getId();
 					bodyRowCell.add(linkToTask);
-				} else if (index == 15) {
+				} else if (index == 17) {
 					//	E-mail link to handler
 					bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
 				}
@@ -217,13 +219,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 				}
 
 				//	Editable fields
-				if (index == 10)
+				if (index == 12)
 					//	Category: {A, B, C}
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_DROPDOWN);
-				else if (index == 12)
+				else if (index == 14)
 					//	Board amount
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-				else if (index == 14)
+				else if (index == 16)
 					//	Restrictions
 					makeCellEditable(bodyRowCell, EDITABLE_FIELD_TYPE_TEXT_AREA);
 
@@ -248,11 +250,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName").toString(),
-				CASE_FIELDS.get(10).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName").toString(),
 				CASE_FIELDS.get(12).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName").toString(),
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName").toString(),
 				CASE_FIELDS.get(14).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName").toString(),
+				CASE_FIELDS.get(16).getId()));
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
