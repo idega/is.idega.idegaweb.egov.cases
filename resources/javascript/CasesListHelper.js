@@ -747,12 +747,16 @@ CasesListHelper.addVariableInput = function() {
 					append: true
 				};
 				var valueToSet = null;
+				var useResolver = false;
 				if (singleSelectMenu) {
 					options.className = 'com.idega.presentation.ui.DropdownMenu';
+					useResolver = true;
 				} else if (isMultipleObjectsField && result) {
 					options.className = 'com.idega.presentation.ui.SelectionBox';
+					useResolver = true;
 				}
-				valueToSet = '#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
+				if (useResolver)
+					valueToSet = '#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
 				if (valueToSet != null)
 					options.properties.push({id: 'setValue', value: valueToSet});
 				IWCORE.getRenderedComponentByClassName(options);
