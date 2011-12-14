@@ -165,8 +165,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties.getDateCustomLabelLocalizationKey()) ?
 				"created_date" : properties.getDateCustomLabelLocalizationKey(), "Created date")), headerItem, "CreatedDate");
 		
-		//	Status
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
+		if (properties.isShowCaseStatus())
+			//	Status
+			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
 		
 		//	Toggler - controller
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("view", "View")), headerItem, "Toggler");
@@ -345,15 +346,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, properties);
 		}
 
-		//	Status
-		String localizedStatus = theCase.getLocalizedStatus();
-		Layer statusContainer = addLayerToCasesList(caseContainer, new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
-				bodyItem, "Status");
-		if (theCase.isBpm()) {
-			prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
-		}
-		if (!StringUtil.isEmpty(caseStatusCode)) {
-			statusContainer.setStyleClass(caseStatusCode);
+		if (properties.isShowCaseStatus()) {
+			//	Status
+			String localizedStatus = theCase.getLocalizedStatus();
+			Layer statusContainer = addLayerToCasesList(caseContainer, new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
+					bodyItem, "Status");
+			if (theCase.isBpm()) {
+				prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
+			}
+			if (!StringUtil.isEmpty(caseStatusCode)) {
+				statusContainer.setStyleClass(caseStatusCode);
+			}
 		}
 		
 		//	Controller
