@@ -71,6 +71,15 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 			rerender:	false
 		}, 'textarea');
 	});
+	
+	jQuery('a.casesBoardViewCustomizer').each(function() {
+		var customizeLink = jQuery(this);
+		customizeLink.fancybox();
+	});
+}
+
+CasesBoardHelper.openCustomizeWindow = function(linkId, link) {
+	jQuery('#' + linkId).attr('href', link).trigger('click');
 }
 
 CasesBoardHelper.isLinkToBeOpenedInNewTab = function() {
@@ -189,4 +198,36 @@ CasesBoardHelper.getValueFromHiddenInput = function(filter, container) {
 
 CasesBoardHelper.closeEditableField = function(field, value) {
 	field.empty().text(value == null ? '' : value.id == null ? value : value.id);
+}
+
+CasesBoardHelper.saveCustomizedColumns = function(message, id, uuid) {
+	showLoadingMessage(message);
+	var selectedColumns = [];
+	jQuery('#' + id + ' option').each(function() {
+		selectedColumns.push(jQuery(this).attr('value'));
+	});
+	BoardCasesManager.saveCustomizedColumns(uuid, selectedColumns, {
+		callback: function(result) {
+			if (result == null) {
+				reloadPage();
+				return;
+			}
+			
+			humanMsg.displayMsg(result);
+		}
+	});
+}
+
+CasesBoardHelper.resetCustomizedColumns = function(message, uuid) {
+	showLoadingMessage(message);
+	BoardCasesManager.resetCustomizedColumns(uuid, {
+		callback: function(result) {
+			if (result == null) {
+				reloadPage();
+				return;
+			}
+			
+			humanMsg.displayMsg(result);
+		}
+	});
 }

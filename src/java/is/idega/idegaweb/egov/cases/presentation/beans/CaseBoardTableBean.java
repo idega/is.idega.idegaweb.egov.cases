@@ -1,10 +1,13 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
 import java.util.List;
+import java.util.Map;
+
+import com.idega.builder.bean.AdvancedProperty;
 
 public class CaseBoardTableBean {
 	
-	private List<String> headerLabels;
+	private Map<Integer, AdvancedProperty> headerLabels;
 	private List<CaseBoardTableBodyRowBean> bodyBeans;
 	private List<String> footerValues;
 	
@@ -12,10 +15,10 @@ public class CaseBoardTableBean {
 	
 	private boolean filledWithData;
 	
-	public List<String> getHeaderLabels() {
+	public Map<Integer, AdvancedProperty> getHeaderLabels() {
 		return headerLabels;
 	}
-	public void setHeaderLabels(List<String> headerLabels) {
+	public void setHeaderLabels(Map<Integer, AdvancedProperty> headerLabels) {
 		this.headerLabels = headerLabels;
 	}
 	public List<String> getFooterValues() {

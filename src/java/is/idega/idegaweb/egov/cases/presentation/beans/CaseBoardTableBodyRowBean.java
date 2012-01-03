@@ -1,7 +1,8 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
-import java.util.List;
+import java.util.Map;
 
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.user.data.User;
 
 public class CaseBoardTableBodyRowBean {
@@ -19,12 +20,12 @@ public class CaseBoardTableBodyRowBean {
 		this.processInstanceId = processInstanceId;
 	}
 	
-	private List<String> values;
+	private Map<Integer, AdvancedProperty> values;
 
-	public List<String> getValues() {
+	public Map<Integer, AdvancedProperty> getValues() {
 		return values;
 	}
-	public void setValues(List<String> values) {
+	public void setValues(Map<Integer, AdvancedProperty> values) {
 		this.values = values;
 	}
 	public String getCaseId() {

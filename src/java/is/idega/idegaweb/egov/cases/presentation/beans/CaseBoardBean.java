@@ -3,7 +3,9 @@ package is.idega.idegaweb.egov.cases.presentation.beans;
 import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.idega.user.data.User;
 
@@ -35,6 +37,8 @@ public class CaseBoardBean {
 	private String restrictions;
 
 	private List<String> allValues;
+	
+	private Map<String, String> values = new HashMap<String, String>();
 
 	private User handler;
 
@@ -171,28 +175,28 @@ public class CaseBoardBean {
 		if (allValues == null) {
 			allValues = new ArrayList<String>(CasesBoardViewer.CASE_FIELDS.size());
 
-			allValues.add(getApplicantName());					//	0
-			allValues.add(getPersonalID());						//	1
-			allValues.add(getAddress());						//	2
-			allValues.add(getPostalCode());						//	3
-			allValues.add(getMunicipality());					//	4
-			allValues.add(getCaseIdentifier());					//	5
-			allValues.add(getCaseDescription());				//	6
+			allValues.add(getApplicantName());							//	0
+			allValues.add(getPersonalID());								//	1
+			allValues.add(getAddress());								//	2
+			allValues.add(getPostalCode());								//	3
+			allValues.add(getMunicipality());							//	4
+			allValues.add(getCaseIdentifier());							//	5
+			allValues.add(getCaseDescription());						//	6
 
-			allValues.add(String.valueOf(getTotalCost()));		//	7
-			allValues.add(String.valueOf(getAppliedAmount()));	//	8
+			allValues.add(String.valueOf(getTotalCost()));				//	7
+			allValues.add(String.valueOf(getAppliedAmount()));			//	8
 
-			allValues.add(getNutshell());						//	9
+			allValues.add(getNutshell());								//	9
 
-			allValues.add(getNegativeGradingSum());				//	10
-			allValues.add(getGradingSum());						//	11
+			allValues.add(getNegativeGradingSum());						//	10
+			allValues.add(getGradingSum());								//	11
 
-			allValues.add(getCategory());						//	12
-			allValues.add(getComment());						//	13
+			allValues.add(getCategory());								//	12
+			allValues.add(getComment());								//	13
 
 			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	14
-			allValues.add(String.valueOf(getBoardAmount()));	//	15
-			allValues.add(getRestrictions());					//	16
+			allValues.add(String.valueOf(getBoardAmount()));			//	15
+			allValues.add(getRestrictions());							//	16
 		}
 		return allValues;
 	}
@@ -233,6 +237,20 @@ public class CaseBoardBean {
 		this.address = address;
 	}
 
+	public void addValue(String name, String value) {
+		if (name == null || value == null)
+			return;
+		
+		values.put(name, value);
+	}
+	
+	public String getValue(String name) {
+		if (name == null)
+			return null;
+		
+		return values.get(name);
+	}
+	
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ").concat(String.valueOf(processInstanceId)) +

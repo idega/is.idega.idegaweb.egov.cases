@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +25,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.block.process.business.ProcessConstants;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.idegaweb.IWResourceBundle;
@@ -57,8 +59,9 @@ private MemoryFileBuffer memory;
 		
 		String processName = iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER);
 		String caseStatus = iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER);
+		String uuid = iwc.getParameter(CasesBoardViewer.PARAMETER_UUID);
 		
-		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName);
+		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName, uuid);
 		if (data == null || !data.isFilledWithData()) {
 			return;
 		}
@@ -83,15 +86,17 @@ private MemoryFileBuffer memory;
 			HSSFRow row = sheet.createRow(rowNumber);
 			
 			short index = 0;
-			for (String value: rowBean.getValues()) {
+			Map<Integer, AdvancedProperty> values = rowBean.getValues();
+			for (Integer key: values.keySet()) {
 				HSSFCell bodyRowCell = row.createCell(index);
+				AdvancedProperty entry = values.get(key);
 				
-				if (index == 5) {
+				if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(5).getId())) {
 					bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-				} else if (index == 17) {
+				} else if (boardCasesManager.isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
 					bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 				} else {
-					bodyRowCell.setCellValue(value);
+					bodyRowCell.setCellValue(entry.getValue());
 				}
 				
 				index++;
@@ -139,9 +144,21 @@ private MemoryFileBuffer memory;
 			HSSFCell cell = row.createCell(cellIndex++);
 			cell.setCellValue(label);
 			
-			if (cellStyle != null) {
+			if (cellStyle != null)
 				cell.setCellStyle(cellStyle);
-			}
+		}
+	}
+	
+	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, AdvancedProperty> headers, int rowNumber) {
+		HSSFRow row = sheet.createRow(rowNumber);
+		
+		short cellIndex = 0;
+		for (Integer key: headers.keySet()) {
+			HSSFCell cell = row.createCell(cellIndex++);
+			cell.setCellValue(headers.get(key).getValue());
+			
+			if (cellStyle != null)
+				cell.setCellStyle(cellStyle);
 		}
 	}
 
