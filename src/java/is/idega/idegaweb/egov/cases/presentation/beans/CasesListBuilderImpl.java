@@ -36,6 +36,7 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseListPropertiesBean;
 import com.idega.block.process.presentation.beans.CasePresentation;
+import com.idega.block.process.presentation.beans.CasesListCustomizer;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
@@ -70,6 +71,7 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
 
@@ -113,6 +115,20 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return caseId;
 	}
 	
+	private CasesListCustomizer getCasesListCustomizer(CaseListPropertiesBean properties) {
+		if (StringUtil.isEmpty(properties.getCasesListCustomizer()))
+			return null;
+		
+		try {
+			CasesListCustomizer customizer = ELUtil.getInstance().getBean(properties.getCasesListCustomizer());
+			return customizer;
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting cases list customizer: " + properties.getCasesListCustomizer(), e);
+		}
+		
+		return null;
+	}
+	
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean searchResults, CaseListPropertiesBean properties) {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 		
@@ -124,10 +140,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (searchResults) {
 				container.add(new Heading3(iwrb.getLocalizedString("no_cases_found", "No cases were found by your query!")));
 				container.add(searchInfo);
-			}
-			else {
+			} else
 				container.add(new Heading3(iwrb.getLocalizedString("no_case_exist", "There are no cases")));
-			}
 			return container;
 		}
 		
@@ -148,34 +162,43 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		headers.setStyleClass("casesListHeadersContainer");
 		String headerItem = "casesListHeadersContainerItem";
 
-		if (properties.isShowCaseNumberColumn()) {
-			//	Number
+		//	Number
+		if (properties.isShowCaseNumberColumn())
 			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("case_nr", "Case nr.")), headerItem, "CaseNumber");
+		
+		List<String> customColumns = properties.getCustomColumns();
+		if (ListUtil.isEmpty(customColumns)) {
+			//	Sender
+			if (properties.isShowCreatorColumn())
+				addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
+			
+			//	Description
+			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
+		} else {
+			CasesListCustomizer customizer = getCasesListCustomizer(properties);
+			if (customizer != null)
+				customColumns = customizer.getHeaders(customColumns);
+			if (!ListUtil.isEmpty(customColumns)) {
+				for (String column: customColumns) {
+					addLayerToCasesList(headers, new Text(column), headerItem, "CustomHeader");
+				}
+			}
 		}
 		
-		//	Sender
-		if (properties.isShowCreatorColumn()) {
-			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
-		}
-		
-		//	Description
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
-
 		//	Creation date
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties.getDateCustomLabelLocalizationKey()) ?
 				"created_date" : properties.getDateCustomLabelLocalizationKey(), "Created date")), headerItem, "CreatedDate");
 		
+		//	Status
 		if (properties.isShowCaseStatus())
-			//	Status
 			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
 		
 		//	Toggler - controller
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("view", "View")), headerItem, "Toggler");
 
 		//	Handle case
-		if (properties.isShowCheckBoxes()) {
+		if (properties.isShowCheckBoxes())
 			addLayerToCasesList(headers, Text.getNonBrakingSpace(), headerItem, "MultiHandle");
-		}
 		
 		headers.add(new CSSSpacer());
 		
@@ -208,6 +231,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute("showlogexportbutton", properties.isShowLogExportButton());
 		if (!StringUtil.isEmpty(properties.getSpecialBackPage()))
 			layer.setMarkupAttribute("specialbackpage", properties.getSpecialBackPage());
+		if (!StringUtil.isEmpty(properties.getCasesListCustomizer()))
+			layer.setMarkupAttribute("caseslistcustomizer", properties.getCasesListCustomizer());
+		if (!ListUtil.isEmpty(properties.getCustomColumns()))
+			layer.setMarkupAttribute("customcolumns", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCustomColumns()));
 	}
 	
 	private IWTimestamp getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
@@ -244,7 +271,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, CasePresentation theCase, CaseStatus caseStatusReview, Locale l,
 			boolean isUserList, int rowsCounter, @SuppressWarnings("rawtypes") Map pages, String emailAddress, boolean descriptionIsEditable,
-			CaseListPropertiesBean properties) {
+			CaseListPropertiesBean properties, Map<String, Map<String, String>> labels) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -255,27 +282,32 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		User owner = theCase.getOwner();
 		IWTimestamp created = getCaseCreatedValue(theCase, properties);
 				
-		if (rowsCounter == 0) {
+		if (rowsCounter == 0)
 			caseContainer.setStyleClass("firstRow");
-		}
-
-		if (theCase.isPrivate()) {
+		if (theCase.isPrivate())
 			caseContainer.setStyleClass("isPrivate");
-		}
 		String caseStatusCode = null;
 		CaseStatus status = theCase.getCaseStatus(); 
 		if (status != null && caseStatusReview != null) {
-			if (status.equals(caseStatusReview)) {
+			if (status.equals(caseStatusReview))
 				caseContainer.setStyleClass("isReview");
-			}
 			
 			caseStatusCode = status.getStatus();
-			if (!StringUtil.isEmpty(caseStatusCode)) {
+			if (!StringUtil.isEmpty(caseStatusCode))
 				caseContainer.setStyleClass(caseStatusCode);
-			}
 		}
 		
 		Layer numberContainer = null;
+		boolean showCheckBoxes = !theCase.isBpm() ? properties.isShowCheckBoxes() : false;
+		
+		Layer customerView = null;
+		String caseId = theCase.getPrimaryKey().toString();
+		String gridViewerId = null;
+		if (theCase.isBpm()) {
+			customerView = new Layer();
+			gridViewerId = customerView.getId();
+		}
+		
 		if (properties.isShowCaseNumberColumn()) {
 			//	Number
 			numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
@@ -298,65 +330,61 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				numberContainer.add(identifier);
 			}
 		}
-		
-		boolean showCheckBoxes = !theCase.isBpm() ? properties.isShowCheckBoxes() : false;
-		
-		Layer customerView = null;
-		String caseId = theCase.getPrimaryKey().toString();
-		String gridViewerId = null;
-		if (theCase.isBpm()) {
-			customerView = new Layer();
-			gridViewerId = customerView.getId();
-		}
-		
-		if (theCase.isBpm()) {
+		if (theCase.isBpm())
 			prepareCellToBeGridExpander(numberContainer, caseId, gridViewerId, properties);
-		}
-
-		//	Sender
-		if (properties.isShowCreatorColumn()) {
-			Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
-			senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
-					owner.getLastName()).getName(l)));
-			if (theCase.isBpm()) {
-				prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
+		
+		List<String> customColumns = properties.getCustomColumns();
+		if (ListUtil.isEmpty(customColumns)) {
+			//	Sender
+			if (properties.isShowCreatorColumn()) {
+				Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
+				senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
+						owner.getLastName()).getName(l)));
+				if (theCase.isBpm()) {
+					prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
+				}
+			}
+			
+			//	Description
+			Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
+			if (descriptionIsEditable) {
+				descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
+				descriptionContainer.setMarkupAttribute(caseIdParName, caseId);
+			}
+			String subject = theCase.getSubject();
+			if (subject != null && subject.length() > 100) {
+				subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT).append(CoreConstants.DOT).toString();
+			}
+			descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
+		} else if (!MapUtil.isEmpty(labels)) {
+			Map<String, String> caseLabels = labels.get(caseId);
+			if (!MapUtil.isEmpty(caseLabels)) {
+				for (String column: customColumns) {
+					Layer columnContainer = addLayerToCasesList(caseContainer, new Text(caseLabels.get(column)), bodyItem, "CustomLabel");
+					if (theCase.isBpm())
+						prepareCellToBeGridExpander(columnContainer, caseId, gridViewerId, properties);
+				}
 			}
 		}
 		
-		//	Description
-		Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
-		if (descriptionIsEditable) {
-			descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
-			descriptionContainer.setMarkupAttribute(caseIdParName, caseId);
-		}
-		String subject = theCase.getSubject();
-		if (subject != null && subject.length() > 100) {
-			subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT).append(CoreConstants.DOT).toString();
-		}
-		descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
-
 		//	Creation date
 		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
-		if (properties.isShowCreationTimeInDateColumn()) {
+		if (properties.isShowCreationTimeInDateColumn())
 			creationDateContainer.setStyleClass("showOnlyDateValueForCaseInCasesListRow");
-		}
 		creationDateContainer.add(new Text(properties.isShowCreationTimeInDateColumn() ? created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT) :
 			created.getLocaleDate(l, IWTimestamp.SHORT)));
-		if (theCase.isBpm()) {
+		if (theCase.isBpm())
 			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, properties);
-		}
 
 		if (properties.isShowCaseStatus()) {
 			//	Status
 			String localizedStatus = theCase.getLocalizedStatus();
 			Layer statusContainer = addLayerToCasesList(caseContainer, new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
 					bodyItem, "Status");
-			if (theCase.isBpm()) {
+			if (theCase.isBpm())
 				prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
-			}
-			if (!StringUtil.isEmpty(caseStatusCode)) {
+			if (!StringUtil.isEmpty(caseStatusCode))
 				statusContainer.setStyleClass(caseStatusCode);
-			}
 		}
 		
 		//	Controller
@@ -365,12 +393,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString("view_case", "View case"));
 			if (isUserList) {
 				childForContainer = getLinkToViewUserCase(iwc, theCase, view, pages, theCase.getCode(), status, properties.isAddCredentialsToExernalUrls());
-			}
-			else {
+			} else {
 				childForContainer = getProcessLink(iwc, view, theCase);
 			}
-		}
-		else {
+		} else {
 			childForContainer = Text.getNonBrakingSpace(10);
 		}
 		Layer togglerContainer = addLayerToCasesList(caseContainer, childForContainer, !theCase.isBpm() ? oldBodyItem : bodyItem, "Toggler");
@@ -390,8 +416,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		if (rowsCounter % 2 == 0) {
 			caseContainer.setStyleClass("evenRow");
-		}
-		else {
+		} else {
 			caseContainer.setStyleClass("oddRow");
 		}
 		
@@ -477,6 +502,23 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 	
+	private Map<String, Map<String, String>> getCustomLabels(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {
+		CasesListCustomizer customizer = getCasesListCustomizer(properties);
+		if (customizer == null)
+			return null;
+		
+		Collection<CasePresentation> theCases = cases.getCollection();
+		if (ListUtil.isEmpty(theCases))
+			return null;
+		
+		List<String> casesIds = new ArrayList<String>();
+		for (CasePresentation theCase: theCases) {
+			casesIds.add(theCase.getId());
+		}
+		
+		return customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
+	}
+	
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {		
 		String type = properties.getType();
 		boolean showStatistics = properties.isShowStatistics();
@@ -521,9 +563,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			e.printStackTrace();
 		}
 
+		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
 		for (CasePresentation theCase: casesInList) {
 			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, rowsCounter, null, emailAddress, descriptionIsEditable,
-					properties);
+					properties, customLabels);
 			rowsCounter++;
 		}
 		if (caseContainer != null) {
@@ -669,9 +712,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		
+		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
 		for (CasePresentation theCase: casesInList) {			
 			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, true, rowsCounter, pages, emailAddress, descriptionIsEditable,
-					properties);
+					properties, customLabels);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);

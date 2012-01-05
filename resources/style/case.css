@@ -99,6 +99,10 @@ div.casesListHeadersContainerItemCaseNumber, div.casesListBodyContainerItemCaseN
 	width: 22%;
 }
 
+div.casesListHeadersContainerItemCustomHeader, div.casesListBodyContainerItemCustomLabel {
+	width: 14%;
+}
+
 div.casesListBodyContainerItemCaseNumber img {
 	float: left;
 }
