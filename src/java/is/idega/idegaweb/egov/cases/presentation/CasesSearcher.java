@@ -1,9 +1,6 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.application.IWBundleStarter;
-import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
-import is.idega.idegaweb.egov.application.business.ApplicationType;
-import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.cases.business.CasesEngine;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
@@ -16,15 +13,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.faces.component.UIComponent;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.business.CaseManagersProvider;
-import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
@@ -33,8 +27,6 @@ import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.AdvancedPropertyComparator;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
@@ -74,12 +66,15 @@ public class CasesSearcher extends CasesBlock {
 
 	private String textInputStyleClass = "textinput";
 	private String buttonStyleClass = "button";
-	
+
+
 	private String listType;
-	
+
 	private boolean showAllStatuses;
 	private boolean showExportButton = true;
-	
+
+	private String processProperty = null;
+
 	@Autowired
 	private CasesEngine casesEngine;
 	@Autowired
@@ -181,22 +176,37 @@ public class CasesSearcher extends CasesBlock {
 
 		//	Case personal id
 		addFormItem(inputsContainer, "senderPersonalID", iwrb.getLocalizedString("personal_id", "Personal ID"), personalID);
-		
+
 		//	Case contacts
 		addFormItem(inputsContainer, "contact", iwrb.getLocalizedString("contact", "Contact"), contact);
-		
+
 		//	Process
 		DropdownMenu processes = getDropdownForProcess(iwc);
-		addFormItem(inputsContainer, "process", iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
+
+		if (this.processProperty == null) {
+			addFormItem(inputsContainer, "process", iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
+		} 
+		else {
+			Layer layer = new Layer();
+			layer.setStyleClass("variablesSelectorDropdown");
+			inputsContainer.add(layer);
+			String action = "CasesListHelper.getProcessDefinitionVariablesByProcessID('"+iwrb.getLocalizedString("loading", "Loading")+"', '"+ this.processProperty +"');";
+			
+			if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+				action = "jQuery(window).load(function() {" + action + "});";
+			}
+			
+			PresentationUtil.addJavaScriptActionOnLoad(iwc, action);
+		}
 
 		//	Sorting options
 		DropdownMenu sortingOptions = getDropdownForSortingOptions(iwc);
 		addFormItem(inputsContainer, "sorting", iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions);
-		
+
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
 		addFormItem(inputsContainer, "status", iwrb.getLocalizedString("status", "Status"), statuses);
-		
+
 		//	Date range
 		Date from = null;
 		Date to = null;
@@ -206,19 +216,25 @@ public class CasesSearcher extends CasesBlock {
 		}
 		IWDatePicker dateRange = getDateRange(iwc, "dateRange", from, to);
 		addFormItem(inputsContainer, "dateRange", iwrb.getLocalizedString("date_range", "Date range"), dateRange);
-		
+
 		//	Show statistics
 		Layer element = getContainer("formItem shortFormItem checkboxFormItem showStatistics");
 		inputsContainer.add(element);
-		
+
 		Label label = null;
 		label = new Label(showStatisticsLabel, showStatistics);
-		element.add(showStatistics);		
+		element.add(showStatistics);
 		element.add(label);
-		
+
 		StringBuilder parameters  = new StringBuilder("['").append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '");
 		parameters.append(caseNumber.getId()).append("', '").append(name.getId()).append("', '").append(personalID.getId()).append("', '");
-		parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
+
+		if (this.processProperty == null) {
+			parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
+		} else {
+			parameters.append(this.processProperty).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
+		}
+
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
 		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '").append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS)
 		.append("', '").append(showStatistics.getId()).append("', ").append(isShowAllStatuses()).append("]");
@@ -340,83 +356,24 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_PROCESS_ID);
 		menu.setStyleClass("availableVariablesChooserForProcess");
 		String selectedProcess = iwc.isParameterSet(PARAMETER_PROCESS_ID) ? iwc.getParameter(PARAMETER_PROCESS_ID) : null;
-		
-		ApplicationBusiness appBusiness = null;
-		try {
-			appBusiness = (ApplicationBusiness) IBOLookup.getServiceInstance(iwc, ApplicationBusiness.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
-		if (appBusiness == null) {
-			return menu;
-		}
-		
-		ApplicationType appType = null;
-		try {
-			appType = ELUtil.getInstance().getBean("appTypeBPM");
-		} catch(Exception e) {
-			e.printStackTrace();
-			return menu;
-		}
-		
-		Collection<Application> bpmApps = appBusiness.getApplicationsByType(appType.getType());
-		if (ListUtil.isEmpty(bpmApps)) {
-			return menu;
-		}
-		
-		CaseManagersProvider caseManagersProvider = ELUtil.getInstance().getBean(CaseManagersProvider.beanIdentifier);
-		if (caseManagersProvider == null) {
-			return menu;
-		}
-		CasesRetrievalManager caseManager = caseManagersProvider.getCaseManager();
-		if (caseManager == null) {
-			return menu;
-		}
-		
-		List<AdvancedProperty> allProcesses = new ArrayList<AdvancedProperty>();
-		
-		String processId = null;
-		String processName = null;
-		String localizedName = null;
-		Locale locale = iwc.getCurrentLocale();
-		for (Application bpmApp: bpmApps) {
-			processId = null;
-			processName = bpmApp.getUrl();
-			localizedName = processName;
-			
-			if (appType.isVisible(bpmApp)) {
-					
-				if (StringUtil.isEmpty(processId)) {
-					processId = String.valueOf(caseManager.getLatestProcessDefinitionIdByProcessName(processName));
-				}
-					
-				localizedName = caseManager.getProcessName(processName, locale);
-				
-				if (!StringUtil.isEmpty(processId)) {
-					allProcesses.add(new AdvancedProperty(processId, localizedName));
-				}
-			}
-			else {
-				Logger.getLogger(this.getClass().getName()).warning(new StringBuilder("Application '").append(bpmApp.getName()).append("' is not accessible")
-						.append((iwc.isLoggedOn() ? " for user: " + iwc.getCurrentUser() : ": user must be logged in!")).toString());
-			}
-		}
-		
+
+		List<AdvancedProperty> allProcesses = casesEngine.getAvailableProcesses(iwc);
+
 		if (ListUtil.isEmpty(allProcesses)) {
 			return menu;
 		}
-		
+
 		IWResourceBundle iwrb = getResourceBundle();
-		
+
 		allProcesses.add(0, new AdvancedProperty(CasesConstants.GENERAL_CASES_TYPE, iwrb.getLocalizedString("general_cases", "General cases")));
 		Collections.sort(allProcesses, new AdvancedPropertyComparator(iwc.getCurrentLocale()));
-		
+
 		fillDropdown(iwc.getCurrentLocale(), menu, allProcesses, new AdvancedProperty(String.valueOf(-1),
 				iwrb.getLocalizedString("cases_search_select_process", "Select process")), selectedProcess);
-		
-		menu.setOnChange(new StringBuilder("CasesListHelper.getProcessDefinitionVariables('").append(iwrb.getLocalizedString("loading", "Loading..."))
+
+		menu.setOnChange(new StringBuilder("CasesListHelper.getProcessDefinitionVariablesByIwID('").append(iwrb.getLocalizedString("loading", "Loading..."))
 							.append("', '").append(menu.getId()).append("');").toString());
-		
+
 		return menu;
 	}
 	
@@ -562,6 +519,7 @@ public class CasesSearcher extends CasesBlock {
 
 	private CasesEngine getCasesEngine() {
 		if (casesEngine == null) {
+		
 			ELUtil.getInstance().autowire(this);
 		}
 		return casesEngine;
@@ -589,5 +547,19 @@ public class CasesSearcher extends CasesBlock {
 	@Override
 	public boolean showCheckBoxes() {
 		return false;
+	}
+
+	/**
+	 * @return the processProperty
+	 */
+	public String getProcessProperty() {
+		return processProperty;
+	}
+
+	/**
+	 * @param processProperty the processProperty to set
+	 */
+	public void setProcessProperty(String processProperty) {
+		this.processProperty = processProperty;
 	}
 }

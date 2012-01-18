@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jdom.Document;
 
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.builder.bean.AdvancedProperty;
@@ -13,18 +14,28 @@ import com.idega.presentation.paging.PagedDataCollection;
 public interface CasesEngine {
 
 	public abstract boolean clearSearchResults(String id);
-	
+
 	public abstract AdvancedProperty getExportedSearchResults(String id);
-	
+
 	public abstract boolean setCaseSubject(String caseId, String subject);
-	
+
 	public abstract List<AdvancedProperty> getDefaultSortingOptions(IWContext iwc);
-	
+
 	public PagedDataCollection<CasePresentation> getCasesByQuery(CasesSearchCriteriaBean criteriaBean);
-	
+
 	public Document getRenderedCasesByQuery(CasesSearchCriteriaBean criteriaBean);
-	
+
 	public String getCaseStatus(Long processInstanceId);
-	
+
 	public boolean setCasesPagerAttributes(int page, int pageSize);
+
+	/**
+	 * <p>Method for getting available processes in simplified form.</p>
+	 * @param iwc {@link IWContext}.
+	 * @return {@link List} of {@link AdvancedProperty}(
+	 * {@link CasesRetrievalManager#getLatestProcessDefinitionIdByProcessName(String)},
+	 * {@link CasesRetrievalManager#getProcessName(String, java.util.Locale)}
+	 * ).
+	 */
+	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc);
 }

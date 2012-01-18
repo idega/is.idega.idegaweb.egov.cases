@@ -16,25 +16,25 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 		CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE = localizations[1];	//	1
 		CASE_GRID_STRING_LOADING_PLEASE_WAIT = localizations[2];				//	2
 	}
-	
+
 	dwr.engine.setErrorHandler(function(message, exception) {
 		closeAllLoadingMessages();
-		
+
 		var loadingLabels = jQuery('div.loading');
 		if (loadingLabels != null && loadingLabels.length > 0) {
 			for (var i = 0; i < loadingLabels.length; i++) {
 				jQuery(loadingLabels[i]).css('display', 'none');
 			}
 		}
-		
+
 		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception.message + '\n' +
-																											CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
+																							CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
 		if (window.confirm(debug ? text : CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE)) {
 			reloadPage();
 			return false;
 		}
 	});
-	
+
 	continueInitializeCasesList(caseToOpenId);
 }
 
@@ -386,7 +386,14 @@ function searchForCases(parameters) {
 	var caseDescriptionValue = dwr.util.getValue(caseDescriptionId);
 	var nameValue = dwr.util.getValue(nameId);
 	var personalIdValue = dwr.util.getValue(personalId);
-	var processValue = dwr.util.getValue(processId);
+
+	var processValue = null;
+	if (isNaN(processId)) {
+		processValue = dwr.util.getValue(processId);
+	} else {
+		processValue = processId;
+	}
+	
 	if (processValue == '' || processValue == -1) {
 		processValue = null;
 	}
@@ -517,12 +524,17 @@ function clearSearchForCases(parameters) {
 				}
 			} catch (e) {}
 			cssClassName = cssClassName == null ? parameters.cssClassName : cssClassName;
-			
-			CasesListHelper.closeVariablesWindow();
+
+			if (isNaN(parameters[4])) {
+				CasesListHelper.closeVariablesWindow();
+			} else {
+				jQuery('div', jQuery('#variableInputsContainer')).hide('normal', function() {jQuery('div', jQuery('#variableInputsContainer')).empty();});
+			}
+
 			CasesListHelper.closeSortingOptionsWindow();
-			
+
 			setDisplayPropertyToAllCasesLists(cssClassName, true);
-			
+
 			CasesListHelper.searchCriterias = [];
 		}
 	});
@@ -647,25 +659,46 @@ function registerCasesSearcherBoxActions(id, parameters) {
 	}
 }
 
-CasesListHelper.getProcessDefinitionVariables = function(message, chooserId) {
+CasesListHelper.getProcessDefinitionVariablesByIwID = function(message, chooserId) {
 	CasesListHelper.closeVariablesWindow();
-	
-	var windowId = '#processDefinitionVariablesWindow';
+
+	var placeSelector = jQuery('#' + chooserId).parent();
 	var processDefinitionId = dwr.util.getValue(chooserId);
-	
-	if (processDefinitionId == null || processDefinitionId == -1 || processDefinitionId == '') {
+
+	CasesListHelper.getProcessDefinitionVariables(message, processDefinitionId, placeSelector);
+}
+
+CasesListHelper.getProcessDefinitionVariablesByProcessID = function(message, processDefinitionId) {
+	CasesListHelper.closeVariablesWindow();
+
+	var placeSelector = jQuery('div.variablesSelectorDropdown');
+
+	if (message == null || message == '') {
+		message = "";
+	}
+
+	CasesListHelper.getProcessDefinitionVariables(message, processDefinitionId, placeSelector);
+}
+
+CasesListHelper.getProcessDefinitionVariables = function(message, processDefinitionId, placeSelector) {
+	var windowId = '#processDefinitionVariablesWindow';
+
+	if (processDefinitionId == null || processDefinitionId == -1 || processDefinitionId == '' ||
+		placeSelector == null || placeSelector == -1 || placeSelector == '') {
+		
 		jQuery(windowId).hide('fast');
 		return false;
 	}
-	
+
 	showLoadingMessage(message);
+
 	CasesEngine.getVariablesWindow(processDefinitionId, {
 		callback: function(component) {
 			closeAllLoadingMessages();
-			
-			jQuery('#' + chooserId).parent().append('<div id=\'processDefinitionVariablesWindow\' class=\'processDefinitionVariablesWindowStyle\' />');
+
+			jQuery(placeSelector).append('<div id=\'processDefinitionVariablesWindow\' class=\'processDefinitionVariablesWindowStyle\' />');
 			var variablesWindow = jQuery(windowId);
-			
+
 			IWCORE.insertRenderedComponent(component, {
 				container: variablesWindow,
 				callback: function() {
@@ -710,10 +743,10 @@ CasesListHelper.addVariableInput = function() {
 	if (chooserId == null || dwr.util.getValue(chooserId) == -1) {
 		return false;
 	}
-	
+
 	var selectedOption = document.getElementById(chooserId).options[jQuery('#' + chooserId).attr('selectedIndex')];
 	var variableLabel = jQuery(selectedOption).text();
-	
+
 	var variablesContainer = jQuery('#variableInputsContainer');
 	var chosenVariable = dwr.util.getValue(chooserId);
 	if (jQuery('.variableValueField[name=\''+chosenVariable+'\']').length > 0) {
