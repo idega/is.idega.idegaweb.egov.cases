@@ -611,3 +611,11 @@ tr.even {
 .reloadCaseStyleClass:HOVER {
 	cursor: pointer;
 }
+
+div.casesBoardViewCustomizerButtons {
+	float: right;
+}
+
+div.caseViewBackButtonStyle {
+	float: right;
+}

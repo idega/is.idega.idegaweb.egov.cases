@@ -72,8 +72,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		new AdvancedProperty("string_ownerAddress", "Address"),							//	2
 		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	3
 		new AdvancedProperty("string_ownerMunicipality", "Municipality"),				//	4
-		new AdvancedProperty("string_caseIdentifier", "Case nr."),						//	5
-		new AdvancedProperty("string_caseDescription", "Description"),					//	6
+		new AdvancedProperty(ProcessConstants.CASE_IDENTIFIER, "Case nr."),				//	5
+		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),			//	6
 
 		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	7
 		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	8
