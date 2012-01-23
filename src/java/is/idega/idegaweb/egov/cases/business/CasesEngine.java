@@ -38,4 +38,15 @@ public interface CasesEngine {
 	 * ).
 	 */
 	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc);
+	
+	/**
+	 * <p>Check if there is Spring bean registered in cache with such name, 
+	 * which has value <code>true</code>. If not registered in cache, it checks
+	 * if exist and registers answer to cache. Cache is found in 
+	 * {@link DefaultSpringBean#getCache(String)} method.</p>
+	 * @param beanName {@link String} representation of bean name to check.
+	 * @return <code>true</code> if there is Spring bean with given name, 
+	 * <code>false</code> otherwise.
+	 */
+	public boolean isResolverExist(String beanName);
 }

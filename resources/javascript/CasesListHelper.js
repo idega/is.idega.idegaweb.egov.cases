@@ -10,6 +10,8 @@ var CASE_GRID_STRING_LOADING_PLEASE_WAIT = 'Loading...';
 
 var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
+CasesListHelper.PROCESS_ID = null;
+
 function initializeCasesList(caseToOpenId, localizations, debug) {
 	if (localizations != null && localizations.length >= 3) {
 		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];						//	0
@@ -672,6 +674,7 @@ CasesListHelper.getProcessDefinitionVariablesByProcessID = function(message, pro
 	CasesListHelper.closeVariablesWindow();
 
 	var placeSelector = jQuery('div.variablesSelectorDropdown');
+	CasesListHelper.PROCESS_ID = processDefinitionId;
 
 	if (message == null || message == '') {
 		message = "";
@@ -738,6 +741,21 @@ CasesListHelper.closeVariablesWindow = function() {
 	jQuery('#processDefinitionVariablesWindow').remove();
 }
 
+/**
+ * <p>
+ * Procedure that inserts a one section <code>div</code> of:
+ * <ul>
+ * 	<li>{@link com.idega.presentation.ui.IWDatePicker}</li>
+ * 	<li>{@link com.idega.presentation.ui.TextInput}</li>
+ * 	<li>{@link com.idega.presentation.ui.DropdownMenu}</li>
+ * 	<li>{@link com.idega.presentation.ui.SelectionBox}</li>
+ * </ul>
+ * into {@link is.idega.idegaweb.egov.bpm.facelets.UIProcessVariables} section.
+ * In cases of last two, it fills lists with data found in:
+ * {@link MultipleSelectionVariablesResolver#getValues(String, String)} 
+ * implementations.
+ * </p>
+ */
 CasesListHelper.addVariableInput = function() {
 	var chooserId = 'availableVariablesForProcess';
 	if (chooserId == null || dwr.util.getValue(chooserId) == -1) {
@@ -768,11 +786,17 @@ CasesListHelper.addVariableInput = function() {
 	
 	var isDateField = optionValue[1] == 'D';
 	var isMultipleObjectsField = optionValue[1] == 'B' || optionValue[0] == 'string_harbourNr';
-	var singleSelectMenu = optionValue[0] == 'handlerUserId' || optionValue[0] == 'string_responsibleInspector';
-	var procDefId = dwr.util.getValue(jQuery('select.availableVariablesChooserForProcess').attr('id'));
+
+	var procDefId = null;
+	if (CasesListHelper.PROCESS_ID == null) {
+		procDefId = dwr.util.getValue(jQuery('select.availableVariablesChooserForProcess').attr('id'));
+	} else {
+		procDefId = CasesListHelper.PROCESS_ID;
+	}
+
 	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/WebUtil.js'], function() {
 		WebUtil.getBooleanApplicationProperty("advanced_bpm_cases_search", true, {
-			callback: function(result) {
+			callback: function(advancedSearch) {
 				var options = {
 					className: isDateField ? 'com.idega.presentation.ui.IWDatePicker' : 'com.idega.presentation.ui.TextInput',
 					properties: [
@@ -790,19 +814,28 @@ CasesListHelper.addVariableInput = function() {
 					append: true
 				};
 				var valueToSet = null;
-				var useResolver = false;
-				if (singleSelectMenu) {
-					options.className = 'com.idega.presentation.ui.DropdownMenu';
-					useResolver = true;
-				} else if (isMultipleObjectsField && result) {
-					options.className = 'com.idega.presentation.ui.SelectionBox';
-					useResolver = true;
-				}
-				if (useResolver)
-					valueToSet = '#{bpmVariableValueResolver' + optionValue[0] + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
-				if (valueToSet != null)
-					options.properties.push({id: 'setValue', value: valueToSet});
-				IWCORE.getRenderedComponentByClassName(options);
+
+				
+
+				var beanName = 'bpmVariableValueResolver'+optionValue[0];
+				CasesEngine.isResolverExist(beanName, {
+					callback: function(resolverExist) {
+						if (resolverExist){
+							if (isMultipleObjectsField && advancedSearch) {
+								options.className = 'com.idega.presentation.ui.SelectionBox';
+							} else {
+								options.className = 'com.idega.presentation.ui.DropdownMenu';
+							}
+
+							valueToSet = '#{' + beanName + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
+						}
+
+						if (valueToSet != null)
+							options.properties.push({id: 'setValue', value: valueToSet});
+
+						IWCORE.getRenderedComponentByClassName(options);
+					}
+				});				
 			}
 		});
 	}, null);	
