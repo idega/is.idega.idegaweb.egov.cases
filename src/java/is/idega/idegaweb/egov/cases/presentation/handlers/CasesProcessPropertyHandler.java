@@ -117,7 +117,6 @@ public class CasesProcessPropertyHandler implements ICPropertyHandler {
 	/* (non-Javadoc)
 	 * @see com.idega.core.builder.presentation.ICPropertyHandler#getDefaultHandlerTypes()
 	 */
-	@Override
 	public List<?> getDefaultHandlerTypes() {
 		return null;
 	}
@@ -125,7 +124,6 @@ public class CasesProcessPropertyHandler implements ICPropertyHandler {
 	/* (non-Javadoc)
 	 * @see com.idega.core.builder.presentation.ICPropertyHandler#getHandlerObject(java.lang.String, java.lang.String, com.idega.presentation.IWContext, boolean, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public PresentationObject getHandlerObject(String name, String stringValue,
 			IWContext iwc, boolean oldGenerationHandler, String instanceId,
 			String method) {
@@ -162,7 +160,6 @@ public class CasesProcessPropertyHandler implements ICPropertyHandler {
 	/* (non-Javadoc)
 	 * @see com.idega.core.builder.presentation.ICPropertyHandler#onUpdate(java.lang.String[], com.idega.presentation.IWContext)
 	 */
-	@Override
 	public void onUpdate(String[] values, IWContext iwc) {}
 	
 	private CasesEngine getCasesEngine() {
