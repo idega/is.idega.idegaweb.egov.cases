@@ -81,26 +81,28 @@ public class CasesSearcher extends CasesBlock {
 	private Web2Business web2;
 	@Autowired
 	private JQuery jQuery;
-	
+
 	protected IWBundle bundle;
 	protected IWResourceBundle iwrb;
-	
+
 	protected Layer container, inputsContainer;
-	
+
 	public CasesSearcher() {
 		super();
-		
+
 		ELUtil.getInstance().autowire(this);
 	}
-	
+
 	protected void addResources(IWContext iwc) {
 		bundle = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER);
 		iwrb = bundle.getResourceBundle(iwc);
-		
+
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 				jQuery.getBundleURIToJQueryLib(),
 				web2.getBundleUriToHumanizedMessagesScript(),
 				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.core.js"),
+				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.widget.js"),
+				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.mouse.js"),
 				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.sortable.js"),
 				jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
 				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
@@ -108,7 +110,7 @@ public class CasesSearcher extends CasesBlock {
 				CoreConstants.DWR_UTIL_SCRIPT,
 				"/dwr/interface/CasesEngine.js"
 		));
-		
+
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
 				web2.getBundleUriToHumanizedMessagesStyleSheet(),
 				iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"),
@@ -116,7 +118,7 @@ public class CasesSearcher extends CasesBlock {
 				jQuery.getBundleURIToJQueryUILib("1.8.17/themes/base", "ui.core.css")
 		));
 	}
-	
+
 	protected Layer getContainer(String styleClass) {
 		Layer container = new Layer();
 		if (!StringUtil.isEmpty(styleClass)) {
@@ -124,50 +126,50 @@ public class CasesSearcher extends CasesBlock {
 		}
 		return container;
 	}
-	
+
 	protected void addHeader() {
 		container.add(new Heading1(iwrb.getLocalizedString("search_for_cases", "Search")));
 	}
-	
+
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		addResources(iwc);
-		
+
 		CasesSearchCriteriaBean searchSettings = null;
 		Object o = iwc.getSessionAttribute(GeneralCasesListBuilder.USER_CASES_SEARCH_SETTINGS_ATTRIBUTE);
 		if (o instanceof CasesSearchCriteriaBean)
 			searchSettings = (CasesSearchCriteriaBean) o;
-		
+
 		container = getContainer("casesSearcherBoxStyleClass");
 		add(container);
 		addHeader();
-		
+
 		inputsContainer = getContainer("casesSearcherInputsBoxStyleClass");
 		container.add(inputsContainer);
-		
+
 		TextInput caseNumber = getTextInput(CaseFinder.PARAMETER_CASE_NUMBER, null, searchSettings == null ? null : searchSettings.getCaseNumber());
 
 		TextInput caseDescription = getTextInput(CaseFinder.PARAMETER_TEXT, null, searchSettings == null ? null : searchSettings.getDescription());
-		
+
 		TextInput name = getTextInput(CaseFinder.PARAMETER_NAME, null, searchSettings == null ? null : searchSettings.getName());
 
 		TextInput personalID = getTextInput(CaseFinder.PARAMETER_PERSONAL_ID, null, searchSettings == null ? null : searchSettings.getPersonalId());
-		
+
 		TextInput contact = getTextInput(PARAMETER_CASE_CONTACT, iwrb.getLocalizedString("cases_search_enter_name_email_or_phone",
 				"Contact's name, e-mail or phone number"), searchSettings == null ? null : searchSettings.getContact());
-		
+
 		String showStatisticsLabel = iwrb.getLocalizedString("show_cases_statistics", "Show statistics");
 		CheckBox showStatistics = new CheckBox(CaseFinder.PARAMETER_SHOW_STATISTICS);
 		showStatistics.setChecked(searchSettings != null && searchSettings.isShowStatistics());
 		showStatistics.setTitle(showStatisticsLabel);
-		
+
 		String listType = getListType();
 		HiddenInput listTypeInput = new HiddenInput(PARAMETER_CASE_LIST_TYPE, StringUtil.isEmpty(listType) ? CoreConstants.EMPTY : listType);
 		inputsContainer.add(listTypeInput);
 
 		//	Case number
 		addFormItem(inputsContainer, "caseIdentifier", iwrb.getLocalizedString("case_nr", "Case nr."), caseNumber);
-		
+
 		// Case description
 		addFormItem(inputsContainer, "caseDescription", iwrb.getLocalizedString("description", "Description"), caseDescription);
 
@@ -185,17 +187,17 @@ public class CasesSearcher extends CasesBlock {
 
 		if (this.processProperty == null) {
 			addFormItem(inputsContainer, "process", iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
-		} 
+		}
 		else {
 			Layer layer = new Layer();
 			layer.setStyleClass("variablesSelectorDropdown");
 			inputsContainer.add(layer);
 			String action = "CasesListHelper.getProcessDefinitionVariablesByProcessID('"+iwrb.getLocalizedString("loading", "Loading")+"', '"+ this.processProperty +"');";
-			
+
 			if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 				action = "jQuery(window).load(function() {" + action + "});";
 			}
-			
+
 			PresentationUtil.addJavaScriptActionOnLoad(iwc, action);
 		}
 
@@ -240,21 +242,21 @@ public class CasesSearcher extends CasesBlock {
 		.append("', '").append(showStatistics.getId()).append("', ").append(isShowAllStatuses()).append("]");
 		addCasesFilterButtons(iwc, parameters.toString());
 	}
-	
+
 	protected String getSearchAction(String jsParams) {
 		return "searchForCases(".concat(jsParams).concat(");");
 	}
-	
+
 	protected String getClearAction(String jsParams) {
 		return "clearSearchForCases(".concat(jsParams).concat(");");
 	}
-	
+
 	protected void addCasesFilterButtons(IWContext iwc, String jsParams) {
 		inputsContainer.add(new CSSSpacer());
 
 		Layer buttonsContainer = getContainer("buttonLayer");
 		inputsContainer.add(buttonsContainer);
-		
+
 		jsParams = jsParams == null ? CoreConstants.EMPTY : jsParams;
 		StringBuilder action = new StringBuilder("registerCasesSearcherBoxActions('").append(inputsContainer.getId()).append("', ")
 			.append(StringUtil.isEmpty(jsParams) ? "null" : jsParams).append(");");
@@ -262,20 +264,20 @@ public class CasesSearcher extends CasesBlock {
 			action = new StringBuilder("jQuery(window).load(function() {").append(action.toString()).append("});");
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
-		
+
 		GenericButton searchButton = new GenericButton(iwrb.getLocalizedString("search_for_cases", "Search"));
 		searchButton.setTitle(iwrb.getLocalizedString("search_for_cases_by_selected_parameters", "Search for cases by selected parameters"));
 		searchButton.setStyleClass(buttonStyleClass);
 		searchButton.setStyleClass("seachForCasesButton");
 		searchButton.setOnClick(getSearchAction(jsParams));
 		buttonsContainer.add(searchButton);
-		
+
 		GenericButton clearSearch = new GenericButton(iwrb.getLocalizedString("clear_search_results", "Clear"));
 		clearSearch.setTitle(iwrb.getLocalizedString("clear_all_search_results", "Clear search resutls"));
 		clearSearch.setOnClick(getClearAction(jsParams));
 		clearSearch.setStyleClass(buttonStyleClass);
 		buttonsContainer.add(clearSearch);
-		
+
 		if (isShowExportButton()) {
 			GenericButton export = new GenericButton(iwrb.getLocalizedString("export_search_results", "Export"));
 			export.setTitle(iwrb.getLocalizedString("export_search_results_to_excel", "Export search results to Excel"));
@@ -285,59 +287,59 @@ public class CasesSearcher extends CasesBlock {
 			buttonsContainer.add(export);
 		}
 	}
-	
+
 	protected TextInput getTextInput(String name, String toolTip) {
 		return getTextInput(name, toolTip, null);
 	}
-	
+
 	protected TextInput getTextInput(String name, String toolTip, String value) {
 		TextInput input = new TextInput(name);
 		input.setStyleClass(textInputStyleClass);
-		
+
 		if (!StringUtil.isEmpty(toolTip))
 			input.setTitle(toolTip);
 		if (!StringUtil.isEmpty(value))
 			input.setValue(value);
-		
+
 		return input;
 	}
-	
+
 	protected void fillDropdown(Locale locale, DropdownMenu menu, List<AdvancedProperty> options, AdvancedProperty firstElement, String selectedElement) {
 		if (locale == null) {
 			locale = Locale.ENGLISH;
 		}
 		Collections.sort(options, new AdvancedPropertyComparator(locale));
-		
+
 		for (AdvancedProperty option: options) {
 			menu.addOption(new SelectOption(option.getValue(), option.getId()));
 		}
 		if (firstElement != null) {
 			menu.addFirstOption(new SelectOption(firstElement.getValue(), firstElement.getId()));
 		}
-		
+
 		if (selectedElement != null) {
 			menu.setSelectedElement(selectedElement);
 		}
-		
+
 		if (ListUtil.isEmpty(options)) {
 			menu.setDisabled(true);
 		}
 	}
-	
+
 	private DropdownMenu getDropdownForSortingOptions(IWContext iwc) {
 		DropdownMenu sortingOptions = new DropdownMenu(PARAMETER_SORTING_OPTIONS);
 		sortingOptions.setTitle(getResourceBundle().getLocalizedString("cases_searcher_default_sorting_is_by_date", "By default sorting by case's creation date"));
 		sortingOptions.setStyleClass("casesSearcherResultsSortingOptionsChooserStyle");
-		
+
 		List<AdvancedProperty> defaultOptions = getCasesEngine().getDefaultSortingOptions(iwc);
 		if (ListUtil.isEmpty(defaultOptions)) {
 			sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_there_are_no_options", "There are no options"),
 					String.valueOf(-1)));
 			sortingOptions.setDisabled(true);
-			
+
 			return sortingOptions;
 		}
-		
+
 		for (AdvancedProperty sortingOption: defaultOptions) {
 			SelectOption option = new SelectOption(sortingOption.getValue(), sortingOption.getId());
 			option.setStyleClass("defaultCasesSearcherSortingOption");
@@ -345,13 +347,13 @@ public class CasesSearcher extends CasesBlock {
 		}
 		sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_select_sorting_option", "Select option"),
 				String.valueOf(-1)));
-		
+
 		sortingOptions.setOnChange(new StringBuilder("CasesListHelper.addSelectedSearchResultsSortingOption('").append(sortingOptions.getId()).append("');")
 				.toString());
-				
+
 		return sortingOptions;
 	}
-		
+
 	private DropdownMenu getDropdownForProcess(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_PROCESS_ID);
 		menu.setStyleClass("availableVariablesChooserForProcess");
@@ -376,19 +378,19 @@ public class CasesSearcher extends CasesBlock {
 
 		return menu;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	protected DropdownMenu getDropdownForStatus(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_CASE_STATUS);
 		String selectedStatus = iwc.isParameterSet(PARAMETER_CASE_STATUS) ? iwc.getParameter(PARAMETER_CASE_STATUS) : null;
-		
+
 		CaseBusiness caseBusiness = getCasesBusiness(iwc);
 		if (caseBusiness == null) {
 			logWarning("CaseBusiness (" + CaseBusiness.class.getName() + ") is unavailable!");
 			menu.setDisabled(true);
 			return menu;
 		}
-		
+
 		Collection<CaseStatus> allStatuses = null;
 		try {
 			allStatuses = caseBusiness.getCaseStatuses();
@@ -400,18 +402,18 @@ public class CasesSearcher extends CasesBlock {
 			menu.setDisabled(true);
 			return menu;
 		}
-		
+
 		Locale l = iwc.getCurrentLocale();
 		if (l == null) {
 			l = Locale.ENGLISH;
 		}
-		
+
 		boolean addStatus = true;
 		String localizedStatus = null;
 		List<AdvancedProperty> statuses = new ArrayList<AdvancedProperty>();
 		for (CaseStatus status: allStatuses) {
 			addStatus = true;
-			
+
 			try {
 				localizedStatus = caseBusiness.getLocalizedCaseStatusDescription(null, status, l);
 				if (!showAllStatuses && localizedStatus.equals(status.getStatus())) {
@@ -426,7 +428,7 @@ public class CasesSearcher extends CasesBlock {
 						addStatus = false;
 					}
 				}
-				
+
 				if (this.getCaseStatusesToHide() != null) {
 					if (this.getCaseStatusesToHide().indexOf(status.getStatus()) != -1) {
 						addStatus = false;
@@ -435,7 +437,7 @@ public class CasesSearcher extends CasesBlock {
 						addStatus = true;
 					}
 				}
-				
+
 				if (addStatus) {
 					statuses.add(new AdvancedProperty(status.getStatus(), localizedStatus));
 				}
@@ -443,30 +445,30 @@ public class CasesSearcher extends CasesBlock {
 				e.printStackTrace();
 			}
 		}
-		
+
 		fillDropdown(l, menu, statuses, new AdvancedProperty(String.valueOf(-1), getResourceBundle(iwc).getLocalizedString("select_status", "Select status")),
 				selectedStatus);
-		
+
 		return menu;
 	}
-	
+
 	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
 		IWDatePicker datePicker = new IWDatePicker(name);
-		
+
 		if (from != null)
 			datePicker.setDate(from);
 		if (to != null)
 			datePicker.setDateTo(to);
 		datePicker.setDateRange(true);
 		datePicker.setUseCurrentDateIfNotSet(false);
-		
+
 		return datePicker;
 	}
 
 	protected Layer addFormItem(Layer layer, String localizedLabelText, InterfaceObject input) {
 		return addFormItem(layer, null, localizedLabelText, input);
 	}
-	
+
 	protected Layer addFormItem(Layer layer, String styleClass, String localizedLabelText, InterfaceObject input) {
 		return addFormItem(layer, styleClass, localizedLabelText, input, null);
 	}
@@ -474,17 +476,17 @@ public class CasesSearcher extends CasesBlock {
 	protected Layer addFormItem(Layer layer, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
 		return addFormItem(layer, null, localizedLabelText, input, additionalComponents);
 	}
-	
+
 	protected Layer addFormItem(Layer layer, String styleClass, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
 		Layer element = new Layer(Layer.DIV);
 		layer.add(element);
 		element.setStyleClass("formItem shortFormItem");
-		
+
 		Label label = null;
 		label = new Label(localizedLabelText == null ? CoreConstants.MINUS : localizedLabelText, input);
 		element.add(label);
-		element.add(input);	
-		
+		element.add(input);
+
 		if (!ListUtil.isEmpty(additionalComponents)) {
 			for (UIComponent component: additionalComponents) {
 				element.add(component);
@@ -519,7 +521,7 @@ public class CasesSearcher extends CasesBlock {
 
 	private CasesEngine getCasesEngine() {
 		if (casesEngine == null) {
-		
+
 			ELUtil.getInstance().autowire(this);
 		}
 		return casesEngine;
@@ -528,7 +530,7 @@ public class CasesSearcher extends CasesBlock {
 	public void setCasesEngine(CasesEngine casesEngine) {
 		this.casesEngine = casesEngine;
 	}
-	
+
 	@Override
 	public String getCasesProcessorType() {
 		return null;
