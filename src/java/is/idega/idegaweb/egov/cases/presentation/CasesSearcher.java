@@ -100,8 +100,8 @@ public class CasesSearcher extends CasesBlock {
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 				jQuery.getBundleURIToJQueryLib(),
 				web2.getBundleUriToHumanizedMessagesScript(),
-				jQuery.getBundleURIToJQueryUILib("1.6rc5", "ui.core.js"),
-				jQuery.getBundleURIToJQueryUILib("1.6rc5", "ui.sortable.js"),
+				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.core.js"),
+				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.sortable.js"),
 				jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
 				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
 				CoreConstants.DWR_ENGINE_SCRIPT,
@@ -113,7 +113,7 @@ public class CasesSearcher extends CasesBlock {
 				web2.getBundleUriToHumanizedMessagesStyleSheet(),
 				iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"),
 				bundle.getVirtualPathWithFileNameString("style/case.css"),
-				jQuery.getBundleURIToJQueryUILib("1.6rc5/themes/base", "ui.core.css")
+				jQuery.getBundleURIToJQueryUILib("1.8.17/themes/base", "ui.core.css")
 		));
 	}
 	
