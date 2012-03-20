@@ -758,11 +758,11 @@ CasesListHelper.closeVariablesWindow = function() {
  */
 CasesListHelper.addVariableInput = function() {
 	var chooserId = 'availableVariablesForProcess';
-	if (chooserId == null || dwr.util.getValue(chooserId) == -1) {
+	if (chooserId == null || dwr.util.getValue(chooserId) == -1)
 		return false;
-	}
 
-	var selectedOption = document.getElementById(chooserId).options[jQuery('#' + chooserId).attr('selectedIndex')];
+	var variablesList = document.getElementById(chooserId);
+	var selectedOption = variablesList.options[variablesList.selectedIndex];
 	var variableLabel = jQuery(selectedOption).text();
 
 	var variablesContainer = jQuery('#variableInputsContainer');
