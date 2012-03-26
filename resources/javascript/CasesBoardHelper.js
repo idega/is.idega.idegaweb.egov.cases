@@ -74,6 +74,7 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 	
 	jQuery('a.casesBoardViewCustomizer').each(function() {
 		var customizeLink = jQuery(this);
+		customizeLink.attr('type', 'ajax');
 		customizeLink.fancybox();
 	});
 }
