@@ -237,11 +237,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 			row.setId(rowBean.getId());
 			row.setStyleClass(rowsIndex % 2 == 0 ? "even" : "odd");
 
+			List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
+
+			int rowSpan = ListUtil.isEmpty(financingInfo) ? 0 : financingInfo.size() + 2;
+
 			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
 				if (key < CASE_FIELDS.size() && ProcessConstants.FINANCING_OF_THE_TASKS.equals(CASE_FIELDS.get(key).getId())) {
 					//	Financing table
-					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
 						financingInfo = new ArrayList<Map<String,String>>();
 						Map<String, String> emptyValues = new HashMap<String, String>();
@@ -256,16 +259,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 					long estimationTotal = 0;
 					long suggestionTotal = 0;
 					long decisionTotal = 0;
-					boolean firstTime = true;
 					TableRow financingTableRow = row;
 					for (Iterator<Map<String, String>> infoIter = financingInfo.iterator(); infoIter.hasNext();) {
 						Map<String, String> info = infoIter.next();
-
-						if (!firstTime) {
-							for (int i = 0; i < key; i++) {
-								financingTableRow.createCell().add(new Text(CoreConstants.EMPTY));
-							}
-						}
 
 						TableCell2 cell = financingTableRow.createCell();
 						cell.add(new Text(info.get(WORK_ITEM)));
@@ -299,31 +295,27 @@ public class CasesBoardViewer extends IWBaseComponent {
 							financingTableRow = body.createRow();
 							financingTableRow.setId(rowBean.getId());
 						}
-						firstTime = false;
 						index++;
 					}
 
 					//	Totals
 					financingTableRow = body.createRow();
-					for (int i = 0; i < values.size(); i++)
+					for (int i = 0; i < 4; i++)
 						financingTableRow.createCell().add(new Text(CoreConstants.SPACE));
 
 					financingTableRow = body.createRow();
-					for (int i = 0; i < key; i++)
-						financingTableRow.createCell().add(new Text(CoreConstants.EMPTY));
 
 					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
 					financingTableRow.createCell().add(new Text(String.valueOf(estimationTotal)));
 					financingTableRow.createCell().add(new Text(String.valueOf(suggestionTotal)));
 					financingTableRow.createCell().add(new Text(String.valueOf(decisionTotal)));
 
-					//	Filling the rest of the cells with empty values
-					for (int i = 0; i < (values.size() - (key + 1)); i++)
-						financingTableRow.createCell().add(new Text(CoreConstants.EMPTY));
-
 				//	"Simple" values
 				} else {
 					TableCell2 bodyRowCell = row.createCell();
+					if (rowSpan > 0)
+						bodyRowCell.setRowSpan(rowSpan);
+
 					List<AdvancedProperty> entries = values.get(key);
 					for (AdvancedProperty entry: entries) {
 						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), CASE_FIELDS.get(5).getId())) {
