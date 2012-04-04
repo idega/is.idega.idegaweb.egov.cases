@@ -260,6 +260,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 					long suggestionTotal = 0;
 					long decisionTotal = 0;
 					TableRow financingTableRow = row;
+					List<TableCell2> suggestionCells = new ArrayList<TableCell2>();
+					List<TableCell2> decisionCells = new ArrayList<TableCell2>();
 					for (Iterator<Map<String, String>> infoIter = financingInfo.iterator(); infoIter.hasNext();) {
 						Map<String, String> info = infoIter.next();
 
@@ -271,25 +273,27 @@ public class CasesBoardViewer extends IWBaseComponent {
 						estimationTotal += getBoardCasesManager().getNumberValue(estimation);
 						cell.add(new Text(estimation));
 
-						cell = financingTableRow.createCell();
+						TableCell2 suggestionCell = financingTableRow.createCell();
 						String suggestion = info.get(BOARD_SUGGESTION);
 						long sugg = getBoardCasesManager().getNumberValue(suggestion);
 						suggestionTotal += sugg;
-						cell.add(new Text(String.valueOf(sugg)));
-						makeCellEditable(cell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-						cell.setStyleClass(BOARD_SUGGESTION);
-						cell.setMarkupAttribute("task_index", index);
-						cell.setMarkupAttribute("total_values", financingInfo.size());
+						suggestionCell.add(new Text(String.valueOf(sugg)));
+						makeCellEditable(suggestionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						suggestionCell.setStyleClass(BOARD_SUGGESTION);
+						suggestionCell.setMarkupAttribute("task_index", index);
+						suggestionCell.setMarkupAttribute("total_values", financingInfo.size());
+						suggestionCells.add(suggestionCell);
 
-						cell = financingTableRow.createCell();
+						TableCell2 decisionCell = financingTableRow.createCell();
 						String decision = info.get(BOARD_DECISION);
 						long dec = getBoardCasesManager().getNumberValue(decision);
 						decisionTotal += dec;
-						cell.add(new Text(String.valueOf(dec)));
-						makeCellEditable(cell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-						cell.setStyleClass(BOARD_DECISION);
-						cell.setMarkupAttribute("task_index", index);
-						cell.setMarkupAttribute("total_values", financingInfo.size());
+						decisionCell.add(new Text(String.valueOf(dec)));
+						makeCellEditable(decisionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						decisionCell.setStyleClass(BOARD_DECISION);
+						decisionCell.setMarkupAttribute("task_index", index);
+						decisionCell.setMarkupAttribute("total_values", financingInfo.size());
+						decisionCells.add(decisionCell);
 
 						if (infoIter.hasNext()) {
 							financingTableRow = body.createRow();
@@ -307,8 +311,18 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
 					financingTableRow.createCell().add(new Text(String.valueOf(estimationTotal)));
-					financingTableRow.createCell().add(new Text(String.valueOf(suggestionTotal)));
-					financingTableRow.createCell().add(new Text(String.valueOf(decisionTotal)));
+
+					TableCell2 localSuggestionTotalCell = financingTableRow.createCell();
+					localSuggestionTotalCell.add(new Text(String.valueOf(suggestionTotal)));
+					String suggestionTotalCellId  = localSuggestionTotalCell.getId();
+					for (TableCell2 suggestionCell: suggestionCells)
+						suggestionCell.setMarkupAttribute("local_total", suggestionTotalCellId);
+
+					TableCell2 localDecisionTotalCell = financingTableRow.createCell();
+					localDecisionTotalCell.add(new Text(String.valueOf(decisionTotal)));
+					String decisionTotalCellId = localDecisionTotalCell.getId();
+					for (TableCell2 decisionCell: decisionCells)
+						decisionCell.setMarkupAttribute("local_total", decisionTotalCellId);
 
 				//	"Simple" values
 				} else {
@@ -356,7 +370,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			if (totalBoardDecisionCellIndex == index)
 				boardDecisionTotalCellId = footerCell.getId();
 			else if (totalBoardSuggestionCellIndex == index)
-				boardDecisionTotalCellId = footerCell.getId();
+				boardSuggestionTotalCellId = footerCell.getId();
 
 			index++;
 		}
