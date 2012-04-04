@@ -199,8 +199,6 @@ public class CaseBoardBean {
 			allValues.add(CoreConstants.EMPTY);							//	13	should be a table here...
 
 			allValues.add(getComment());								//	14
-//			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//
-//			allValues.add(String.valueOf(getBoardAmount()));			//
 			allValues.add(getRestrictions());							//	15
 		}
 		return allValues;
