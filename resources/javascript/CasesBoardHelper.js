@@ -97,15 +97,35 @@ CasesBoardHelper.isLinkToBeOpenedInNewTab = function() {
 }
 
 CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
-	if (cell.hasClass('casesBoardViewerTableEditableCellInitialized')) {
+	if (cell.hasClass('casesBoardViewerTableEditableCellInitialized'))
 		return;
-	}
 
 	var container = cell.parent().parent().parent().parent();
 	var rowId = cell.parent().attr('id');
 	settings.caseId = rowId.replace('uniqueCaseId', '');
-	settings.variable = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+'VariableName\']',
-		container);
+	
+	var customName = cell.hasClass('string_ownerGradeComment') ?
+		'string_ownerGradeComment' :
+		cell.hasClass('string_ownerGrantAmauntValue') ?
+			'string_ownerGrantAmauntValue' :
+			null;
+	
+	if (customName == null)
+		settings.variable = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+
+			'VariableName\']', container);
+	else {
+		settings.variable = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+
+			customName+ '\']', container);
+			
+		settings.valueIndex = cell.attr('task_index');
+		if (settings.valueIndex == null)
+			settings.valueIndex = 0;
+			
+		settings.totalValues = cell.attr('total_values');
+		if (settings.totalValues == null)
+			settings.totalValues = 1;
+	}
+	
 	settings.role = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableRoleKey\']', container);
 	
 	settings.uuid = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableUniqueIdKey\']', container);
@@ -135,7 +155,8 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 		}
 		
 		showLoadingMessage(CasesBoardHelper.localizations.savingMessage);
-		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, settings.backPage, {
+		BoardCasesManager.setCaseVariableValue(settings.caseId, settings.variable, value, settings.role, settings.backPage, settings.valueIndex,
+			settings.totalValues, {
 			callback: function(result) {
 				CasesBoardHelper.closeEditableField(editableElement, result);
 				
@@ -144,6 +165,8 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 					humanMsg.displayMsg(CasesBoardHelper.localizations.errorSaving);
 					return;
 				}
+				
+				reloadPage();
 				
 				if (settings.rerender) {
 					IWCORE.renderComponent(settings.uuid, settings.container, function() {

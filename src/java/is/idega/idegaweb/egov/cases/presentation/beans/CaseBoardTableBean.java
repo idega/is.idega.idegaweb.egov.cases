@@ -6,19 +6,19 @@ import java.util.Map;
 import com.idega.builder.bean.AdvancedProperty;
 
 public class CaseBoardTableBean {
-	
-	private Map<Integer, AdvancedProperty> headerLabels;
+
+	private Map<Integer, List<AdvancedProperty>> headerLabels;
 	private List<CaseBoardTableBodyRowBean> bodyBeans;
 	private List<String> footerValues;
-	
+
 	private String errorMessage;
-	
+
 	private boolean filledWithData;
-	
-	public Map<Integer, AdvancedProperty> getHeaderLabels() {
+
+	public Map<Integer, List<AdvancedProperty>> getHeaderLabels() {
 		return headerLabels;
 	}
-	public void setHeaderLabels(Map<Integer, AdvancedProperty> headerLabels) {
+	public void setHeaderLabels(Map<Integer, List<AdvancedProperty>> headerLabels) {
 		this.headerLabels = headerLabels;
 	}
 	public List<String> getFooterValues() {
@@ -45,5 +45,5 @@ public class CaseBoardTableBean {
 	public void setBodyBeans(List<CaseBoardTableBodyRowBean> bodyBeans) {
 		this.bodyBeans = bodyBeans;
 	}
-	
+
 }

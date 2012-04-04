@@ -1,5 +1,6 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
+import java.util.List;
 import java.util.Map;
 
 import com.idega.builder.bean.AdvancedProperty;
@@ -10,22 +11,24 @@ public class CaseBoardTableBodyRowBean {
 	private String id;
 	private String caseId;
 	private String caseIdentifier;
-	
+
 	private Long processInstanceId;
-	
+
 	private User handler;
-	
+
+	private Map<Integer, List<AdvancedProperty>> values;
+
+	private List<Map<String, String>> financingInfo;
+
 	public CaseBoardTableBodyRowBean(String caseId, Long processInstanceId) {
 		this.caseId = caseId;
 		this.processInstanceId = processInstanceId;
 	}
-	
-	private Map<Integer, AdvancedProperty> values;
 
-	public Map<Integer, AdvancedProperty> getValues() {
+	public Map<Integer, List<AdvancedProperty>> getValues() {
 		return values;
 	}
-	public void setValues(Map<Integer, AdvancedProperty> values) {
+	public void setValues(Map<Integer, List<AdvancedProperty>> values) {
 		this.values = values;
 	}
 	public String getCaseId() {
@@ -58,5 +61,13 @@ public class CaseBoardTableBodyRowBean {
 	public void setHandler(User handler) {
 		this.handler = handler;
 	}
-	
+
+	public List<Map<String, String>> getFinancingInfo() {
+		return financingInfo;
+	}
+
+	public void setFinancingInfo(List<Map<String, String>> financingInfo) {
+		this.financingInfo = financingInfo;
+	}
+
 }

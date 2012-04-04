@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 
 public class CaseBoardBean {
 
@@ -36,8 +37,10 @@ public class CaseBoardBean {
 	private Long boardAmount;
 	private String restrictions;
 
+	private List<Map<String, String>> financingOfTheTasks;
+
 	private List<String> allValues;
-	
+
 	private Map<String, String> values = new HashMap<String, String>();
 
 	private User handler;
@@ -192,11 +195,13 @@ public class CaseBoardBean {
 			allValues.add(getGradingSum());								//	11
 
 			allValues.add(getCategory());								//	12
-			allValues.add(getComment());								//	13
 
-			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//	14
-			allValues.add(String.valueOf(getBoardAmount()));			//	15
-			allValues.add(getRestrictions());							//	16
+			allValues.add(CoreConstants.EMPTY);							//	13	should be a table here...
+
+			allValues.add(getComment());								//	14
+//			allValues.add(String.valueOf(getGrantAmountSuggestion()));	//
+//			allValues.add(String.valueOf(getBoardAmount()));			//
+			allValues.add(getRestrictions());							//	15
 		}
 		return allValues;
 	}
@@ -240,23 +245,33 @@ public class CaseBoardBean {
 	public void addValue(String name, String value) {
 		if (name == null || value == null)
 			return;
-		
+
 		values.put(name, value);
 	}
-	
+
 	public String getValue(String name) {
 		if (name == null)
 			return null;
-		
+
 		return values.get(name);
 	}
-	
+
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ").concat(String.valueOf(processInstanceId)) +
-			", values: " + getAllValues();
+		return this.getClass().getSimpleName().concat(": case ID: ").concat(caseId).concat(", process instance ID: ")
+				.concat(String.valueOf(processInstanceId)) + ", values: " + getAllValues();
 	}
+
 	public String getNegativeGradingSum(){
 		return this.negativeGradingSum;
 	}
+
+	public List<Map<String, String>> getFinancingOfTheTasks() {
+		return financingOfTheTasks;
+	}
+
+	public void setFinancingOfTheTasks(List<Map<String, String>> financingOfTheTasks) {
+		this.financingOfTheTasks = financingOfTheTasks;
+	}
+
 }

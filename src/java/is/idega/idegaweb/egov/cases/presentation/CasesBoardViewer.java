@@ -6,9 +6,11 @@ import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -49,6 +51,7 @@ import com.idega.presentation.ui.PrintButton;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.URIUtil;
@@ -61,44 +64,55 @@ public class CasesBoardViewer extends IWBaseComponent {
 	public static final String	PARAMETER_PROCESS_NAME = "prmProcessName",
 								PARAMETER_UUID = "uuid",
 								PARAMETER_CUSTOM_COLUMNS = "customCasesBoardViewerColumns";
-	
-	private static final String EDITABLE_FIELD_TYPE_TEXT_INPUT = "textinput";
-	private static final String EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea";
-	private static final String EDITABLE_FIELD_TYPE_DROPDOWN = "select";
+
+	private static final String EDITABLE_FIELD_TYPE_TEXT_INPUT = "textinput",
+								EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea",
+								EDITABLE_FIELD_TYPE_DROPDOWN = "select";
+
+
+	public static final String	WORK_ITEM = "work_item",
+								ESTIMATED_COST = "estimated_cost",
+								BOARD_SUGGESTION = ProcessConstants.BOARD_FINANCING_SUGGESTION,
+								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION;
 
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
-		new AdvancedProperty("string_ownerFullName", "Applicant"),						//	0
-		new AdvancedProperty("string_ownerKennitala", "Personal ID"),					//	1
-		new AdvancedProperty("string_ownerAddress", "Address"),							//	2
-		new AdvancedProperty("string_ownerPostCode", "Zip"),							//	3
-		new AdvancedProperty("string_ownerMunicipality", "Municipality"),				//	4
-		new AdvancedProperty(ProcessConstants.CASE_IDENTIFIER, "Case nr."),				//	5
-		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),			//	6
+		new AdvancedProperty("string_ownerFullName", "Applicant"),									//	0
+		new AdvancedProperty("string_ownerKennitala", "Personal ID"),								//	1
+		new AdvancedProperty("string_ownerAddress", "Address"),										//	2
+		new AdvancedProperty("string_ownerPostCode", "Zip"),										//	3
+		new AdvancedProperty("string_ownerMunicipality", "Municipality"),							//	4
+		new AdvancedProperty(ProcessConstants.CASE_IDENTIFIER, "Case nr."),							//	5
+		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),						//	6
 
-		new AdvancedProperty("string_ownerTotalCost", "Total cost"),					//	7
-		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),				//	8
+		new AdvancedProperty("string_ownerTotalCost", "Total cost"),								//	7
+		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),							//	8
 
-		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),			//	9
+		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),						//	9
 
-		new AdvancedProperty("sum_all_negative_grades", "Negative grade"),				//	10
-		new AdvancedProperty("sum_all_grades", "Grade"),								//	11
+		new AdvancedProperty("sum_all_negative_grades", "Negative grade"),							//	10
+		new AdvancedProperty("sum_all_grades", "Grade"),											//	11
 
-		new AdvancedProperty("string_ownerProjectLead", "Category"),					//	12,	EDITABLE, select
+		new AdvancedProperty("string_ownerProjectLead", "Category"),								//	12,	EDITABLE, select
 
-		new AdvancedProperty("string_ownerGrade", "Comment"),							//	13
-		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),			//	14,	EDITABLE, text input
-		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),	//	15
-		new AdvancedProperty("string_ownerAnswer", "Restrictions")						//	16, EDITABLE, text area
+		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	13, table
+
+		new AdvancedProperty("string_ownerGrade", "Comment"),										//	14
+//		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),						//	,	EDITABLE, text input
+//		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),				//
+		new AdvancedProperty("string_ownerAnswer", "Restrictions")									//	15, EDITABLE, text area
 	));
-	
+
 	private static Map<String, String> EDITABLE_FIELDS;
 	static {
 		EDITABLE_FIELDS = new HashMap<String, String>();
 		EDITABLE_FIELDS.put(CASE_FIELDS.get(12).getId(), EDITABLE_FIELD_TYPE_DROPDOWN);
-		EDITABLE_FIELDS.put(CASE_FIELDS.get(14).getId(), EDITABLE_FIELD_TYPE_TEXT_INPUT);
-		EDITABLE_FIELDS.put(CASE_FIELDS.get(16).getId(), EDITABLE_FIELD_TYPE_TEXT_AREA);
+
+		EDITABLE_FIELDS.put(ProcessConstants.BOARD_FINANCING_SUGGESTION, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+		EDITABLE_FIELDS.put(ProcessConstants.BOARD_FINANCING_DECISION, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+
+		EDITABLE_FIELDS.put(CASE_FIELDS.get(15).getId(), EDITABLE_FIELD_TYPE_TEXT_AREA);
 	}
-	
+
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
 	public static final String CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER = "casesBoardViewerProcessNameParameter";
 
@@ -120,7 +134,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 					taskName = "Grading",
 					currentPageUri,
 					uuid;
-	
+
 	private boolean useCurrentPageAsBackPageFromTaskViewer = Boolean.TRUE;
 
 	@Override
@@ -140,7 +154,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		uuid = getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this);
 		if (StringUtil.isEmpty(uuid))
 			uuid = CoreConstants.MINUS;
-		
+
 		IWBundle bundle = getBundle(context, CasesConstants.IW_BUNDLE_IDENTIFIER);
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 
@@ -201,15 +215,17 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 		TableHeaderRowGroup headerGroup = table.createHeaderRowGroup();
 		TableRow headerRow = headerGroup.createRow();
-		Map<Integer, AdvancedProperty> headers = data.getHeaderLabels();
+		Map<Integer, List<AdvancedProperty>> headers = data.getHeaderLabels();
 		for (Integer key: headers.keySet()) {
-			TableHeaderCell headerCell = headerRow.createHeaderCell();
-			AdvancedProperty header = headers.get(key);
-			headerCell.add(new Text(header.getValue()));
+			List<AdvancedProperty> headerLabels = headers.get(key);
+			for (AdvancedProperty header: headerLabels) {
+				TableHeaderCell headerCell = headerRow.createHeaderCell();
+				headerCell.add(new Text(header.getValue()));
 
-			if (getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(9).getId()) ||
-				getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(13).getId()))
-				headerCell.setStyleClass("casesBoardViewerTableWiderCell");
+				if (getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(9).getId()) ||
+					getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(14).getId()))
+					headerCell.setStyleClass("casesBoardViewerTableWiderCell");
+			}
 		}
 
 		int rowsIndex = 0;
@@ -221,60 +237,152 @@ public class CasesBoardViewer extends IWBaseComponent {
 			row.setId(rowBean.getId());
 			row.setStyleClass(rowsIndex % 2 == 0 ? "even" : "odd");
 
-			Map<Integer, AdvancedProperty> values = rowBean.getValues();
+			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
-				TableCell2 bodyRowCell = row.createCell();
-				AdvancedProperty entry = values.get(key);
-				
-				if (getBoardCasesManager().isColumnOfDomain(entry.getId(), CASE_FIELDS.get(5).getId())) {
-					//	Link to grading task
-					linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean));
-					linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
-					linkToTask.getId();
-					bodyRowCell.add(linkToTask);
-				} else if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
-					//	E-mail link to handler
-					bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
-				}
-				else {
-					bodyRowCell.add(new Text(entry.getValue()));
-				}
+				if (key < CASE_FIELDS.size() && ProcessConstants.FINANCING_OF_THE_TASKS.equals(CASE_FIELDS.get(key).getId())) {
+					//	Financing table
+					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
+					if (ListUtil.isEmpty(financingInfo)) {
+						financingInfo = new ArrayList<Map<String,String>>();
+						Map<String, String> emptyValues = new HashMap<String, String>();
+						emptyValues.put(WORK_ITEM, CoreConstants.MINUS);
+						emptyValues.put(ESTIMATED_COST, CoreConstants.MINUS);
+						emptyValues.put(BOARD_SUGGESTION, CoreConstants.MINUS);
+						emptyValues.put(BOARD_DECISION, CoreConstants.MINUS);
+						financingInfo.add(emptyValues);
+					}
 
-				//	Editable fields
-				String editableType = EDITABLE_FIELDS.get(entry.getId());
-				if (!StringUtil.isEmpty(editableType))
-					makeCellEditable(bodyRowCell, editableType);
+					int index = 0;
+					long estimationTotal = 0;
+					long suggestionTotal = 0;
+					long decisionTotal = 0;
+					boolean firstTime = true;
+					TableRow financingTableRow = row;
+					for (Iterator<Map<String, String>> infoIter = financingInfo.iterator(); infoIter.hasNext();) {
+						Map<String, String> info = infoIter.next();
+
+						if (!firstTime) {
+							for (int i = 0; i < key; i++) {
+								financingTableRow.createCell().add(new Text(CoreConstants.EMPTY));
+							}
+						}
+
+						TableCell2 cell = financingTableRow.createCell();
+						cell.add(new Text(info.get(WORK_ITEM)));
+
+						cell = financingTableRow.createCell();
+						String estimation = info.get(ESTIMATED_COST);
+						estimationTotal += getBoardCasesManager().getNumberValue(estimation);
+						cell.add(new Text(estimation));
+
+						cell = financingTableRow.createCell();
+						String suggestion = info.get(BOARD_SUGGESTION);
+						long sugg = getBoardCasesManager().getNumberValue(suggestion);
+						suggestionTotal += sugg;
+						cell.add(new Text(String.valueOf(sugg)));
+						makeCellEditable(cell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						cell.setStyleClass(BOARD_SUGGESTION);
+						cell.setMarkupAttribute("task_index", index);
+						cell.setMarkupAttribute("total_values", financingInfo.size());
+
+						cell = financingTableRow.createCell();
+						String decision = info.get(BOARD_DECISION);
+						long dec = getBoardCasesManager().getNumberValue(decision);
+						decisionTotal += dec;
+						cell.add(new Text(String.valueOf(dec)));
+						makeCellEditable(cell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						cell.setStyleClass(BOARD_DECISION);
+						cell.setMarkupAttribute("task_index", index);
+						cell.setMarkupAttribute("total_values", financingInfo.size());
+
+						if (infoIter.hasNext()) {
+							financingTableRow = body.createRow();
+							financingTableRow.setId(rowBean.getId());
+						}
+						firstTime = false;
+						index++;
+					}
+
+					//	Totals
+					financingTableRow = body.createRow();
+					for (int i = 0; i < values.size(); i++)
+						financingTableRow.createCell().add(new Text(CoreConstants.SPACE));
+
+					financingTableRow = body.createRow();
+					for (int i = 0; i < key; i++)
+						financingTableRow.createCell().add(new Text(CoreConstants.EMPTY));
+
+					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
+					financingTableRow.createCell().add(new Text(String.valueOf(estimationTotal)));
+					financingTableRow.createCell().add(new Text(String.valueOf(suggestionTotal)));
+					financingTableRow.createCell().add(new Text(String.valueOf(decisionTotal)));
+
+					//	Filling the rest of the cells with empty values
+					for (int i = 0; i < (values.size() - (key + 1)); i++)
+						financingTableRow.createCell().add(new Text(CoreConstants.EMPTY));
+
+				//	"Simple" values
+				} else {
+					TableCell2 bodyRowCell = row.createCell();
+					List<AdvancedProperty> entries = values.get(key);
+					for (AdvancedProperty entry: entries) {
+						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), CASE_FIELDS.get(5).getId())) {
+							//	Link to grading task
+							linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean));
+							linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
+							linkToTask.getId();
+							bodyRowCell.add(linkToTask);
+						} else if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
+							//	E-mail link to handler
+							bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
+						} else {
+							bodyRowCell.add(new Text(entry.getValue()));
+						}
+
+						//	Editable fields
+						String editableType = EDITABLE_FIELDS.get(entry.getId());
+						if (!StringUtil.isEmpty(editableType))
+							makeCellEditable(bodyRowCell, editableType);
+						}
+				}
 			}
 
 			rowsIndex++;
 		}
 
 		int index = 0;
-		String totalBoardAmountCellId = null;
+		String boardSuggestionTotalCellId = null;
+		String boardDecisionTotalCellId = null;
 		TableFooterRowGroup footer = table.createFooterRowGroup();
 		TableRow footerRow = footer.createRow();
-		int totalBoardAmountCellIndex = getBoardCasesManager().getIndexOfColumn(CASE_FIELDS.get(14).getId(), uuid);
+		int totalBoardSuggestionCellIndex = getBoardCasesManager().getIndexOfColumn(ProcessConstants.BOARD_FINANCING_SUGGESTION, uuid) - 1;
+		int totalBoardDecisionCellIndex = getBoardCasesManager().getIndexOfColumn(ProcessConstants.BOARD_FINANCING_DECISION, uuid) - 1;
 		for (String footerLabel: data.getFooterValues()) {
 			TableCell2 footerCell = footerRow.createCell();
 			footerCell.add(new Text(footerLabel));
 
-			if (totalBoardAmountCellIndex == index)
-				totalBoardAmountCellId = footerCell.getId();
+			if (totalBoardDecisionCellIndex == index)
+				boardDecisionTotalCellId = footerCell.getId();
+			else if (totalBoardSuggestionCellIndex == index)
+				boardDecisionTotalCellId = footerCell.getId();
 
 			index++;
 		}
 
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName").toString(),
-				CASE_FIELDS.get(12).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append("VariableName").toString(),
-				CASE_FIELDS.get(14).getId()));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName").toString(),
-				CASE_FIELDS.get(16).getId()));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN)
+				.append("VariableName").toString(), CASE_FIELDS.get(12).getId()));
+
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT)
+				.append(ProcessConstants.BOARD_FINANCING_SUGGESTION).toString(), ProcessConstants.BOARD_FINANCING_SUGGESTION));
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT)
+				.append(ProcessConstants.BOARD_FINANCING_DECISION).toString(),	ProcessConstants.BOARD_FINANCING_DECISION));
+
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
 		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
-		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", totalBoardAmountCellId));
+		container.add(new HiddenInput("casesBoardViewerTableTotalBoardSuggestionCellIdKey", boardSuggestionTotalCellId));
+		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", boardDecisionTotalCellId));
 		if (useCurrentPageAsBackPageFromTaskViewer)
 			container.add(new HiddenInput("casesBoardViewerTableSpecialBackPageFromTaskViewer", getCurrentPageUri(iwc)));
 
@@ -331,22 +439,23 @@ public class CasesBoardViewer extends IWBaseComponent {
 		//	Export to excel
 		GenericButton exportToExcel = new GenericButton(iwrb.getLocalizedString("cases_board_viewer.export_cases_list_to_excel", "Export to Excel"));
 		buttonsContainer.add(exportToExcel);
-		exportToExcel.setOnClick(new StringBuilder("humanMsg.displayMsg('").append(iwrb.getLocalizedString("cases_board_viewer.exporting_cases_list_to_excel",
-				"Exporting to Excel")).append("');window.location.href='").append(getUriToExcelExporter(iwc)).append("';").toString());
+		exportToExcel.setOnClick(new StringBuilder("humanMsg.displayMsg('")
+			.append(iwrb.getLocalizedString("cases_board_viewer.exporting_cases_list_to_excel",	"Exporting to Excel"))
+			.append("');window.location.href='").append(getUriToExcelExporter(iwc)).append("';").toString());
 
 		//	Print
 		PrintButton printList = new PrintButton(iwrb.getLocalizedString("cases_board_viewer.print_list", "Print"));
 		buttonsContainer.add(printList);
-		
+
 		//	Customize
 		GenericButton customize = new GenericButton(iwrb.getLocalizedString("cases_board_viewer.customize_columns", "Customize"));
 		buttonsContainer.add(customize);
-		
+
 		Link customizeWindow = new Link(CasesBoardViewCustomizer.class);
 		customizeWindow.setStyleClass("casesBoardViewCustomizer");
 		customizeWindow.setStyleAttribute("display", "none");
 		buttonsContainer.add(customizeWindow);
-		
+
 		String link = getBuilderLogicWrapper().getBuilderService(iwc).getUriToObject(CasesBoardViewCustomizer.class, Arrays.asList(
 				new AdvancedProperty(PARAMETER_PROCESS_NAME, processName),
 				new AdvancedProperty(PARAMETER_UUID, uuid)

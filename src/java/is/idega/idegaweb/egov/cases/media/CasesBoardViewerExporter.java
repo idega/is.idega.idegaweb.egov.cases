@@ -42,9 +42,9 @@ import com.idega.util.StringHandler;
 import com.idega.util.expression.ELUtil;
 
 public class CasesBoardViewerExporter extends DownloadWriter implements MediaWritable {
-	
+
 private MemoryFileBuffer memory;
-	
+
 	@Autowired
 	private BoardCasesManager boardCasesManager;
 
@@ -56,18 +56,18 @@ private MemoryFileBuffer memory;
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
 		ELUtil.getInstance().autowire(this);
-		
+
 		String processName = iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER);
 		String caseStatus = iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER);
 		String uuid = iwc.getParameter(CasesBoardViewer.PARAMETER_UUID);
-		
+
 		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName, uuid);
 		if (data == null || !data.isFilledWithData()) {
 			return;
 		}
-		
+
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-		
+
 		memory = new MemoryFileBuffer();
 		OutputStream streamOut = new MemoryOutputStream(memory);
 		HSSFWorkbook workBook = new HSSFWorkbook();
@@ -77,36 +77,39 @@ private MemoryFileBuffer memory;
 		bigFont.setFontHeightInPoints((short) 13);
 		HSSFCellStyle bigStyle = workBook.createCellStyle();
 		bigStyle.setFont(bigFont);
-		
+
 		HSSFSheet sheet = workBook.createSheet(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_board_viewer.cases_board", "Cases board"), 30));
 		int rowNumber = 0;
 		createHeaders(sheet, bigStyle, data.getHeaderLabels(), rowNumber);
 		rowNumber++;
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			HSSFRow row = sheet.createRow(rowNumber);
-			
+
 			short index = 0;
-			Map<Integer, AdvancedProperty> values = rowBean.getValues();
+			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
 				HSSFCell bodyRowCell = row.createCell(index);
-				AdvancedProperty entry = values.get(key);
-				
-				if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(5).getId())) {
-					bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-				} else if (boardCasesManager.isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
-					bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
-				} else {
-					bodyRowCell.setCellValue(entry.getValue());
+				List<AdvancedProperty> entries = values.get(key);
+				for (AdvancedProperty entry: entries) {
+					if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(5).getId())) {
+						bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
+					} else if (boardCasesManager.isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
+						bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
+					} else if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(13).getId())) {
+						System.out.println(getClass().getName() + ": add table!");	//	TODO
+					} else {
+						bodyRowCell.setCellValue(entry.getValue());
+					}
 				}
-				
+
 				index++;
 			}
 
 			rowNumber++;
 		}
-		
+
 		createHeaders(sheet, null, data.getFooterValues(), rowNumber);
-		
+
 		try {
 			workBook.write(streamOut);
 		} catch (Exception e) {
@@ -115,12 +118,12 @@ private MemoryFileBuffer memory;
 		} finally {
 			IOUtil.closeOutputStream(streamOut);
 		}
-		
+
 		memory.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
 		setAsDownload(iwc, new StringBuilder(iwrb.getLocalizedString("cases_board_viewer.exported_data", "Exported cases board")).append(".xls").toString(),
 				memory.length());
 	}
-	
+
 	private String getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
@@ -128,37 +131,40 @@ private MemoryFileBuffer memory;
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		if (info == null) {
 			return CoreConstants.EMPTY;
 		}
-		
+
 		return info.getId();
 	}
-	
+
 	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
-		
+
 		short cellIndex = 0;
 		for (String label: labels) {
 			HSSFCell cell = row.createCell(cellIndex++);
 			cell.setCellValue(label);
-			
+
 			if (cellStyle != null)
 				cell.setCellStyle(cellStyle);
 		}
 	}
-	
-	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, AdvancedProperty> headers, int rowNumber) {
+
+	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
-		
+
 		short cellIndex = 0;
 		for (Integer key: headers.keySet()) {
-			HSSFCell cell = row.createCell(cellIndex++);
-			cell.setCellValue(headers.get(key).getValue());
-			
-			if (cellStyle != null)
-				cell.setCellStyle(cellStyle);
+			List<AdvancedProperty> labels = headers.get(key);
+			for (AdvancedProperty label: labels) {
+				HSSFCell cell = row.createCell(cellIndex++);
+				cell.setCellValue(label.getValue());
+
+				if (cellStyle != null)
+					cell.setCellStyle(cellStyle);
+			}
 		}
 	}
 
@@ -166,7 +172,7 @@ private MemoryFileBuffer memory;
 	public void writeTo(OutputStream streamOut) throws IOException {
 		InputStream streamIn = new ByteArrayInputStream(memory.buffer());
 		FileUtil.streamToOutputStream(streamIn, streamOut);
-		
+
 		streamOut.flush();
 		streamOut.close();
 		streamIn.close();
