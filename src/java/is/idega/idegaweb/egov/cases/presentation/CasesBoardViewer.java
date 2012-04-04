@@ -237,14 +237,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 			row.setId(rowBean.getId());
 			row.setStyleClass(rowsIndex % 2 == 0 ? "even" : "odd");
 
-			List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
-
-			int rowSpan = ListUtil.isEmpty(financingInfo) ? 0 : financingInfo.size() + 2;
-
 			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
 				if (key < CASE_FIELDS.size() && ProcessConstants.FINANCING_OF_THE_TASKS.equals(CASE_FIELDS.get(key).getId())) {
 					//	Financing table
+					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
 						financingInfo = new ArrayList<Map<String,String>>();
 						Map<String, String> emptyValues = new HashMap<String, String>();
@@ -253,6 +250,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 						emptyValues.put(BOARD_SUGGESTION, CoreConstants.MINUS);
 						emptyValues.put(BOARD_DECISION, CoreConstants.MINUS);
 						financingInfo.add(emptyValues);
+						rowBean.setFinancingInfo(financingInfo);
 					}
 
 					int index = 0;
@@ -327,8 +325,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 				//	"Simple" values
 				} else {
 					TableCell2 bodyRowCell = row.createCell();
-					if (rowSpan > 0)
-						bodyRowCell.setRowSpan(rowSpan);
+					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
+					int rowSpan = ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
+					bodyRowCell.setRowSpan(rowSpan);
 
 					List<AdvancedProperty> entries = values.get(key);
 					for (AdvancedProperty entry: entries) {
