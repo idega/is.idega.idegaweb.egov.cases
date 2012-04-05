@@ -385,6 +385,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT)
 				.append(ProcessConstants.BOARD_FINANCING_DECISION).toString(),	ProcessConstants.BOARD_FINANCING_DECISION));
 
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA)
+				.append("VariableName").toString(), CASE_FIELDS.get(15).getId()));
+
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
