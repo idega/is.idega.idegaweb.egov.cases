@@ -295,6 +295,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 						if (infoIter.hasNext()) {
 							financingTableRow = body.createRow();
+							financingTableRow.setStyleClass("childRow");
 							financingTableRow.setId(rowBean.getId());
 						}
 						index++;
@@ -302,10 +303,12 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 					//	Totals
 					financingTableRow = body.createRow();
+					financingTableRow.setStyleClass("childRow");
 					for (int i = 0; i < 4; i++)
 						financingTableRow.createCell().add(new Text(CoreConstants.SPACE));
 
 					financingTableRow = body.createRow();
+					financingTableRow.setStyleClass("childRow");
 
 					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
 					financingTableRow.createCell().add(new Text(String.valueOf(estimationTotal)));
@@ -391,7 +394,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (useCurrentPageAsBackPageFromTaskViewer)
 			container.add(new HiddenInput("casesBoardViewerTableSpecialBackPageFromTaskViewer", getCurrentPageUri(iwc)));
 
-		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter();").toString();
+		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter({cssChildRow: 'childRow'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc))
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
