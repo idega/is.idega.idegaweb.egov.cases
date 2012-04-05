@@ -27,6 +27,7 @@ import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.BuilderLogicWrapper;
+import com.idega.core.idgenerator.business.UUIDGenerator;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
@@ -296,7 +297,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 						if (infoIter.hasNext()) {
 							financingTableRow = body.createRow();
 							financingTableRow.setStyleClass("childRow");
-							financingTableRow.setId(rowBean.getId());
+							financingTableRow.setId(rowBean.getId() + "_" + UUIDGenerator.getInstance().generateId());
 						}
 						index++;
 					}

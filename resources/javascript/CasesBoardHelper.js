@@ -102,7 +102,9 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 
 	var container = cell.parent().parent().parent().parent();
 	var rowId = cell.parent().attr('id');
-	settings.caseId = rowId.replace('uniqueCaseId', '');
+	var caseId = rowId.replace('uniqueCaseId', '');
+	caseId = caseId.split('_')[0];
+	settings.caseId = caseId;
 	
 	var customName = cell.hasClass('string_ownerGradeComment') ?
 		'string_ownerGradeComment' :
