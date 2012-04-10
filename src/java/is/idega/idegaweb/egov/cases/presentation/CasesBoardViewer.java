@@ -95,11 +95,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 		new AdvancedProperty("string_ownerProjectLead", "Category"),								//	12,	EDITABLE, select
 
-		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	13, table
+		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	13, table of 4 columns
 
 		new AdvancedProperty("string_ownerGrade", "Comment"),										//	14
-//		new AdvancedProperty("string_ownerGrantAmauntValue", "Board amount"),						//	,	EDITABLE, text input
-//		new AdvancedProperty("string_ownerGradeComment", "Grant amount suggestion"),				//
 		new AdvancedProperty("string_ownerAnswer", "Restrictions")									//	15, EDITABLE, text area
 	));
 
@@ -240,7 +238,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
-				if (key < CASE_FIELDS.size() && ProcessConstants.FINANCING_OF_THE_TASKS.equals(CASE_FIELDS.get(key).getId())) {
+				List<AdvancedProperty> entries = values.get(key);
+				if (ListUtil.isEmpty(entries))
+					continue;
+
+				if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(entries.get(0).getId())) {
 					//	Financing table
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
@@ -297,7 +299,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 						if (infoIter.hasNext()) {
 							financingTableRow = body.createRow();
 							financingTableRow.setStyleClass("childRow");
-							financingTableRow.setId(rowBean.getId() + "_" + UUIDGenerator.getInstance().generateId());
+							financingTableRow.setId(rowBean.getId().concat(CoreConstants.UNDER).concat(UUIDGenerator.getInstance().generateId()));
 						}
 						index++;
 					}
@@ -333,7 +335,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 					int rowSpan = ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
 					bodyRowCell.setRowSpan(rowSpan);
 
-					List<AdvancedProperty> entries = values.get(key);
 					for (AdvancedProperty entry: entries) {
 						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), CASE_FIELDS.get(5).getId())) {
 							//	Link to grading task

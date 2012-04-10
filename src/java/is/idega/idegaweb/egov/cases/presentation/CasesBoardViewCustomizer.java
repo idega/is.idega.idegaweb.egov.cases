@@ -25,6 +25,8 @@ import com.idega.util.expression.ELUtil;
 
 public class CasesBoardViewCustomizer extends Block {
 
+	public static final String FINANCING_TABLE_COLUMN = "financing_table_column";
+
 	@Autowired
 	private BoardCasesManager boardCaseManager;
 
@@ -56,8 +58,16 @@ public class CasesBoardViewCustomizer extends Block {
 		for (Integer key: currentColumns.keySet()) {
 			List<AdvancedProperty> columns = currentColumns.get(key);
 			for (AdvancedProperty column: columns) {
-				selectedColumns.addMenuElement(column.getId(), column.getValue());
-				keys.add(column.getId());
+				if (CasesBoardViewer.WORK_ITEM.equals(column.getId())) {
+					selectedColumns.addMenuElement(FINANCING_TABLE_COLUMN, iwrb.getLocalizedString("financing_table", "Financing table"));
+					keys.add(FINANCING_TABLE_COLUMN);
+				} else if (CasesBoardViewer.ESTIMATED_COST.equals(column.getId()) || CasesBoardViewer.BOARD_SUGGESTION.equals(column.getId()) ||
+						CasesBoardViewer.BOARD_DECISION.equals(column.getId())) {
+					continue;
+				} else {
+					selectedColumns.addMenuElement(column.getId(), column.getValue());
+					keys.add(column.getId());
+				}
 			}
 		}
 
@@ -67,7 +77,8 @@ public class CasesBoardViewCustomizer extends Block {
 			List<AdvancedProperty> columns = defaultColumns.get(key);
 			for (AdvancedProperty defaultColumn: columns) {
 				String columnKey = defaultColumn.getId();
-				if (keys.contains(columnKey))
+				if (keys.contains(columnKey) || CasesBoardViewer.WORK_ITEM.equals(columnKey) || CasesBoardViewer.ESTIMATED_COST.equals(columnKey) ||
+						CasesBoardViewer.BOARD_SUGGESTION.equals(columnKey) || CasesBoardViewer.BOARD_DECISION.equals(columnKey))
 					continue;
 
 				options.addMenuElement(columnKey, defaultColumn.getValue());
