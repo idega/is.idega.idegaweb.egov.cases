@@ -92,8 +92,11 @@ private MemoryFileBuffer memory;
 			int cellIndex = 0;
 			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
-				if (key < CasesBoardViewer.CASE_FIELDS.size() &&
-						ProcessConstants.FINANCING_OF_THE_TASKS.equals(CasesBoardViewer.CASE_FIELDS.get(key).getId())) {
+				List<AdvancedProperty> entries = values.get(key);
+				if (ListUtil.isEmpty(entries))
+					continue;
+
+				if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(entries.get(0).getId())) {
 					//	Financing table
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
@@ -162,7 +165,7 @@ private MemoryFileBuffer memory;
 				} else {
 					//	Simple values
 					HSSFCell bodyRowCell = row.createCell(cellIndex);
-					List<AdvancedProperty> entries = values.get(key);
+
 					for (AdvancedProperty entry: entries) {
 						if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(5).getId())) {
 							bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
@@ -178,7 +181,7 @@ private MemoryFileBuffer memory;
 			}
 		}
 
-		createHeaders(sheet, null, data.getFooterValues(), rowNumber);
+		createCellsWithValues(sheet, null, data.getFooterValues(), rowNumber);
 
 		for (int i = 0; i < rowNumber; i++) {
 			HSSFRow row = sheet.getRow(i);
@@ -221,7 +224,7 @@ private MemoryFileBuffer memory;
 		return info.getId();
 	}
 
-	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
+	private void createCellsWithValues(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
