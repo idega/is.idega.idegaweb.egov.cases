@@ -893,9 +893,31 @@ CasesListHelper.exportSearchResults = function(message) {
 	showLoadingMessage(message);
 	CasesEngine.getExportedSearchResults(window.location.pathname, {
 		callback: function(result) {
-			if (result.id != 'true') {
+			if (result == null || result.id != 'true') {
 				closeAllLoadingMessages();
-				humanMsg.displayMsg(result.value);
+				
+				if (result != null && result.value != null)
+					humanMsg.displayMsg(result.value);
+				
+				return;
+			}
+			
+			window.location.href = result.value;
+			closeAllLoadingMessages();
+		}
+	});
+}
+
+CasesListHelper.exportAllCases = function(message, containerId, instanceId) {
+	showLoadingMessage(message);
+	CasesEngine.getExportedCases(instanceId, window.location.pathname, {
+		callback: function(result) {
+			if (result == null || result.id != 'true') {
+				closeAllLoadingMessages();
+				
+				if (result != null && result.value != null)
+					humanMsg.displayMsg(result.value);
+				
 				return;
 			}
 			
