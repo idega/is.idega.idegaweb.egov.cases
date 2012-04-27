@@ -550,9 +550,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		Layer casesContainer = createHeader(iwc, container, totalCases, searchResults, properties);
 
-		if (totalCases < 1) {
+		if (totalCases < 1)
 			return container;
-		}
 
 		Layer casesBodyContainer = createBody(casesContainer);
 
@@ -572,21 +571,14 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 					properties, customLabels);
 			rowsCounter++;
 		}
-		if (caseContainer != null) {
+		if (caseContainer != null)
 			caseContainer.setStyleClass(lastRowStyle);
-		}
 
-		if (showStatistics) {
+		if (properties.isShowExportAllCasesButton())
+			container.add(getExportAllCasesButton(properties, iwrb));
+
+		if (showStatistics)
 			addStatistics(iwc, container, casesInList);
-		}
-
-		Layer buttonsLayer = new Layer(Layer.DIV);
-		buttonsLayer.setStyleClass("exportAllCasesButtonStyle");
-		GenericButton exportButton = new GenericButton(iwrb.getLocalizedString("export_cases_data", "Export data to Excel"));
-		exportButton.setOnClick("CasesListHelper.exportAllCases('" + iwrb.getLocalizedString("exporting", "Exporting...") + "', '" +
-		buttonsLayer.getId() + "', '" + properties.getInstanceId() +  "');");
-		buttonsLayer.add(exportButton);
-		container.add(buttonsLayer);
 
 		return container;
 	}
@@ -710,9 +702,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		Layer casesContainer = createHeader(iwc, container, totalCases, searchResults, properties);
 
-		if (totalCases < 1) {
+		if (totalCases < 1)
 			return container;
-		}
 
 		Layer casesBodyContainer = createBody(casesContainer);
 
@@ -734,19 +725,23 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		caseContainer.setStyleClass(lastRowStyle);
 
-		if (showStatistics) {
-			addStatistics(iwc, container, casesInList);
-		}
+		if (properties.isShowExportAllCasesButton())
+			container.add(getExportAllCasesButton(properties, iwrb));
 
+		if (showStatistics)
+			addStatistics(iwc, container, casesInList);
+
+		return container;
+	}
+
+	private Layer getExportAllCasesButton(CaseListPropertiesBean properties, IWResourceBundle iwrb) {
 		Layer buttonsLayer = new Layer(Layer.DIV);
 		buttonsLayer.setStyleClass("exportAllCasesButtonStyle");
 		GenericButton exportButton = new GenericButton(iwrb.getLocalizedString("export_cases_data", "Export data to Excel"));
 		exportButton.setOnClick("CasesListHelper.exportAllCases('" + iwrb.getLocalizedString("exporting", "Exporting...") + "', '" +
-		buttonsLayer.getId() + "', '" + properties.getInstanceId() +  "');");
+				buttonsLayer.getId() + "', '" + properties.getInstanceId() +  "');");
 		buttonsLayer.add(exportButton);
-		container.add(buttonsLayer);
-
-		return container;
+		return buttonsLayer;
 	}
 
 	private String getDefaultEmail() {
@@ -759,8 +754,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 
-	private Link getLinkToViewUserCase(IWContext iwc, CasePresentation theCase, Image viewCaseImage, @SuppressWarnings("rawtypes") Map pages, String caseCode,
-			CaseStatus caseStatus, boolean addCredentialsToExernalUrls) {
+	private Link getLinkToViewUserCase(IWContext iwc, CasePresentation theCase, Image viewCaseImage, @SuppressWarnings("rawtypes") Map pages,
+			String caseCode, CaseStatus caseStatus, boolean addCredentialsToExernalUrls) {
 		CaseBusiness caseBusiness = null;
 		try {
 			caseBusiness = (CaseBusiness) IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
