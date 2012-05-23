@@ -89,8 +89,18 @@ public class CasesSearcher extends CasesBlock {
 
 	public CasesSearcher() {
 		super();
+	}
 
-		ELUtil.getInstance().autowire(this);
+	private Web2Business getWeb2Business() {
+		if (web2 == null)
+			ELUtil.getInstance().autowire(this);
+		return web2;
+	}
+
+	private JQuery getJQuery() {
+		if (jQuery == null)
+			ELUtil.getInstance().autowire(this);
+		return jQuery;
 	}
 
 	protected void addResources(IWContext iwc) {
@@ -98,13 +108,13 @@ public class CasesSearcher extends CasesBlock {
 		iwrb = bundle.getResourceBundle(iwc);
 
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
-				jQuery.getBundleURIToJQueryLib(),
-				web2.getBundleUriToHumanizedMessagesScript(),
-				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.core.js"),
-				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.widget.js"),
-				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.mouse.js"),
-				jQuery.getBundleURIToJQueryUILib("1.8.17", "ui.sortable.js"),
-				jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
+				getJQuery().getBundleURIToJQueryLib(),
+				getWeb2Business().getBundleUriToHumanizedMessagesScript(),
+				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.core.js"),
+				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.widget.js"),
+				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.mouse.js"),
+				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.sortable.js"),
+				getJQuery().getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
 				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
 				CoreConstants.DWR_ENGINE_SCRIPT,
 				CoreConstants.DWR_UTIL_SCRIPT,
@@ -112,10 +122,10 @@ public class CasesSearcher extends CasesBlock {
 		));
 
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
-				web2.getBundleUriToHumanizedMessagesStyleSheet(),
+				getWeb2Business().getBundleUriToHumanizedMessagesStyleSheet(),
 				iwc.getIWMainApplication().getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/application.css"),
 				bundle.getVirtualPathWithFileNameString("style/case.css"),
-				jQuery.getBundleURIToJQueryUILib("1.8.17/themes/base", "ui.core.css")
+				getJQuery().getBundleURIToJQueryUILib("1.8.17/themes/base", "ui.core.css")
 		));
 	}
 
@@ -359,7 +369,7 @@ public class CasesSearcher extends CasesBlock {
 		menu.setStyleClass("availableVariablesChooserForProcess");
 		String selectedProcess = iwc.isParameterSet(PARAMETER_PROCESS_ID) ? iwc.getParameter(PARAMETER_PROCESS_ID) : null;
 
-		List<AdvancedProperty> allProcesses = casesEngine.getAvailableProcesses(iwc);
+		List<AdvancedProperty> allProcesses = getCasesEngine().getAvailableProcesses(iwc);
 
 		if (ListUtil.isEmpty(allProcesses)) {
 			return menu;
@@ -520,10 +530,8 @@ public class CasesSearcher extends CasesBlock {
 	}
 
 	private CasesEngine getCasesEngine() {
-		if (casesEngine == null) {
-
+		if (casesEngine == null)
 			ELUtil.getInstance().autowire(this);
-		}
 		return casesEngine;
 	}
 
