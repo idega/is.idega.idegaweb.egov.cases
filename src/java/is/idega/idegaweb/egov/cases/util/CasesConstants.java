@@ -20,6 +20,7 @@ public class CasesConstants {
 	public static final String PROPERTY_ALLOW_PRIVATE_CASES = "egov.cases.allow.private.cases";
 	public static final String PROPERTY_ALLOW_ANONYMOUS_CASES = "egov.cases.allow.anonymous.cases";
 	public static final String PROPERTY_ALLOW_ATTACHMENTS = "egov.cases.allow.attachments";
+	public static final String PROPERTY_WAIT_FOR_ALL_CASE_PARTS_LOADED = "wait_for_all_case_parts_loaded";
 	
 	public static final String CASES_LIST_HELPER_JAVA_SCRIPT_FILE = "javascript/CasesListHelper.js";
 	
