@@ -167,7 +167,9 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 	
 	var parentElement = jQuery(element).parent();
-	var allTogglersInTheSameContainer = jQuery(CASE_GRID_TOGGLERS_FILTER, parentElement);
+	if (parentElement == null || parentElement.length == 0)
+		return false;
+	var allTogglersInTheSameContainer = jQuery(CASE_GRID_TOGGLERS_FILTER, parentElement[0]);
 	
 	var caseIdPar = 'caseid';
 	var classExpanded = 'expandedWithNoImage';
