@@ -95,6 +95,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String caseIdParName = "caseid";
 	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
 	private String allowPDFSigningParName = "allowpdfsigning";
+	
+	public static final String VARIABLE_CASE_NR = "string_caseIdentifier";
+	public static final String VARIABLE_SENDER = "string_ownerFullName";
+	public static final String VARIABLE_DESCRIPTION = "string_caseDescription";
+	public static final String VARIABLE_CREATION_DATE = "string_caseCreatedDateString";
+	public static final String VARIABLE_STATUS = "string_caseStatus";
 
 	private String resolveCaseId(IWContext iwc) {
 		List<CasesRetrievalManager> managers = null;
@@ -129,7 +135,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		return null;
 	}
-
+	
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean searchResults, CaseListPropertiesBean properties) {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 
@@ -164,35 +170,51 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		String headerItem = "casesListHeadersContainerItem";
 
 		//	Number
-		if (properties.isShowCaseNumberColumn())
-			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("case_nr", "Case nr.")), headerItem, "CaseNumber");
-
+		if (properties.isShowCaseNumberColumn()) {
+			Layer layer = addLayerToCasesList(headers, new Text(
+					iwrb.getLocalizedString("case_nr", "Case nr.")), headerItem, "CaseNumber");
+			layer.setStyleClass(VARIABLE_CASE_NR);
+		}
+			
 		List<String> customColumns = properties.getCustomColumns();
 		if (ListUtil.isEmpty(customColumns)) {
 			//	Sender
-			if (properties.isShowCreatorColumn())
-				addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
+			if (properties.isShowCreatorColumn()) {
+				Layer layer = addLayerToCasesList(headers, new Text(
+						iwrb.getLocalizedString("sender", "Sender")), headerItem, "Sender");
+				layer.setStyleClass(VARIABLE_SENDER);
+			}
 
 			//	Description
-			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
+			Layer layer = addLayerToCasesList(headers, new Text(
+					iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
+			layer.setStyleClass(VARIABLE_DESCRIPTION);
+			
 		} else {
 			CasesListCustomizer customizer = getCasesListCustomizer(properties);
+			Map<String, String> columns = null;
 			if (customizer != null)
-				customColumns = customizer.getHeaders(customColumns);
-			if (!ListUtil.isEmpty(customColumns)) {
-				for (String column: customColumns) {
-					addLayerToCasesList(headers, new Text(column), headerItem, "CustomHeader");
+				columns = customizer.getHeadersAndVariables(customColumns);
+			if (!MapUtil.isEmpty(columns)) {
+				for (String column: columns.keySet()) {
+					Layer customLayer = addLayerToCasesList(headers, 
+							new Text(columns.get(column)), headerItem, "CustomHeader");
+					customLayer.setStyleClass(column);
 				}
 			}
 		}
 
 		//	Creation date
-		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties.getDateCustomLabelLocalizationKey()) ?
+		Layer layer =  addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties.getDateCustomLabelLocalizationKey()) ?
 				"created_date" : properties.getDateCustomLabelLocalizationKey(), "Created date")), headerItem, "CreatedDate");
+		layer.setStyleClass(VARIABLE_CREATION_DATE);
 
 		//	Status
-		if (properties.isShowCaseStatus())
-			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
+		if (properties.isShowCaseStatus()) {
+			Layer statusLayer = addLayerToCasesList(headers, new Text(
+					iwrb.getLocalizedString("status", "Status")), headerItem, "Status");
+			statusLayer.setStyleClass(VARIABLE_STATUS);
+		}
 
 		//	Toggler - controller
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("view", "View")), headerItem, "Toggler");
@@ -281,7 +303,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!StringUtil.isEmpty(theCase.getProcessName())) {
 			caseContainer.setStyleClass(theCase.getProcessName());
 		}
-
+		
 		User owner = theCase.getOwner();
 		IWTimestamp created = getCaseCreatedValue(theCase, properties);
 
@@ -314,6 +336,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (properties.isShowCaseNumberColumn()) {
 			//	Number
 			numberContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CaseNumber");
+			numberContainer.setStyleClass(VARIABLE_CASE_NR);
 
 			String identifier = theCase.getCaseIdentifier();
 
@@ -341,6 +364,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			//	Sender
 			if (properties.isShowCreatorColumn()) {
 				Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
+				senderContainer.setStyleClass(VARIABLE_SENDER);
 				senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
 						owner.getLastName()).getName(l)));
 				if (theCase.isBpm()) {
@@ -350,6 +374,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			//	Description
 			Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
+			descriptionContainer.setStyleClass(VARIABLE_DESCRIPTION);
 			if (descriptionIsEditable) {
 				descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
 				descriptionContainer.setMarkupAttribute(caseIdParName, caseId);
@@ -364,6 +389,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (!MapUtil.isEmpty(caseLabels)) {
 				for (String column: customColumns) {
 					Layer columnContainer = addLayerToCasesList(caseContainer, new Text(caseLabels.get(column)), bodyItem, "CustomLabel");
+					columnContainer.setStyleClass(column);
 					if (theCase.isBpm())
 						prepareCellToBeGridExpander(columnContainer, caseId, gridViewerId, properties);
 				}
@@ -372,6 +398,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		//	Creation date
 		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
+		creationDateContainer.setStyleClass(VARIABLE_CREATION_DATE);
 		if (properties.isShowCreationTimeInDateColumn())
 			creationDateContainer.setStyleClass("showOnlyDateValueForCaseInCasesListRow");
 		creationDateContainer.add(new Text(properties.isShowCreationTimeInDateColumn() ? created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT) :
@@ -384,6 +411,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			String localizedStatus = theCase.getLocalizedStatus();
 			Layer statusContainer = addLayerToCasesList(caseContainer, new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
 					bodyItem, "Status");
+			statusContainer.setStyleClass(VARIABLE_STATUS);
 			if (theCase.isBpm())
 				prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
 			if (!StringUtil.isEmpty(caseStatusCode))
