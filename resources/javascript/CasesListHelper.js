@@ -12,16 +12,7 @@ var CASE_GRID_TOGGLERS_FILTER = 'div.casesListGridExpanderStyleClass';
 
 CasesListHelper.PROCESS_ID = null;
 
-CasesListHelper.SHOW_LOADING_MESSAGE = true;
-
 function initializeCasesList(caseToOpenId, localizations, debug) {
-	LazyLoader.loadMultiple(['/dwr/interface/CasesService.js'], function() {
-		CasesService.isLoadingMessageInOpenCasesShouldBeShown({
-			callback: function(result) {
-				CasesListHelper.SHOW_LOADING_MESSAGE = result;
-			}
-		});
-	}, null);
 		
 	if (localizations != null && localizations.length >= 3) {
 		CASE_GRID_STRING_CLICK_TO_EDIT = localizations[0];						//	0
@@ -214,7 +205,7 @@ function registerGridExpanderActionsForElement(event, element) {
 			return false;
 		}
 		
-		if (CasesListHelper.SHOW_LOADING_MESSAGE == true) {
+		if (caseToExpand.attr('showLoadingMessage') == 'true') {
 			showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
 		}
 		var caseId = caseToExpand.attr(caseIdPar);
