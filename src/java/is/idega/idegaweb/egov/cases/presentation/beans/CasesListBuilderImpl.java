@@ -242,6 +242,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		layer.setStyleClass(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS);
 		layer.setMarkupAttribute("showLoadingMessage", properties.isShowLoadingMessage());
+		layer.setMarkupAttribute("waitForAllCasePartsLoaded", properties.isWaitForAllCasePartsLoaded());
 		layer.setMarkupAttribute(caseIdParName, caseId);
 		layer.setMarkupAttribute("customerviewid", gridViewerId);
 		layer.setMarkupAttribute(usePDFDownloadColumnParName, String.valueOf(properties.isUsePDFDownloadColumn()));

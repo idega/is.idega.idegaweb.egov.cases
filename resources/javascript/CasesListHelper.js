@@ -228,6 +228,10 @@ function registerGridExpanderActionsForElement(event, element) {
 					return false;
 				}
 				
+				if (caseToExpand.attr('waitForAllCasePartsLoaded') == 'false') {
+					closeAllLoadingMessages();
+				}
+				
 				IWCORE.insertHtml(component, customerView[0]);
 				
 				customerView.addClass(classCaseWithInfo);
