@@ -835,7 +835,7 @@ CasesListHelper.addVariableInput = function() {
 				CasesEngine.isResolverExist(beanName, {
 					callback: function(resolverExist) {
 						if (resolverExist){
-							if (isMultipleObjectsField && advancedSearch) {
+							if (isMultipleObjectsField && advancedSearch && 'list_ticketViolationsNumbers'!=optionValue[0]) {
 								options.className = 'com.idega.presentation.ui.SelectionBox';
 							} else {
 								options.className = 'com.idega.presentation.ui.DropdownMenu';
