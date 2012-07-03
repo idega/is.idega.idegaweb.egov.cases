@@ -52,4 +52,7 @@ public interface CasesEngine {
 	public boolean isResolverExist(String beanName);
 
 	public AdvancedProperty getExportedCases(String instanceId, String uri);
+
+	public boolean showCaseAssets();
+
 }
