@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Oct 30, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.data;
@@ -62,12 +62,12 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_WANT_REPLY_EMAIL = "want_reply_email";
 	private static final String COLUMN_WANT_REPLY_PHONE = "want_reply_phone";
 	private static final String COLUMN_CASE_SUBSCRIBERS = ENTITY_NAME + "_subscribers";
-	
+
 	private static final String COLUMN_REFERENCE = "reference";
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.idega.block.process.data.AbstractCaseBMPBean#getCaseCodeKey()
 	 */
 	@Override
@@ -77,7 +77,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.idega.block.process.data.AbstractCaseBMPBean#getCaseCodeDescription()
 	 */
 	@Override
@@ -111,15 +111,19 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
 		addManyToManyRelationShip(User.class, COLUMN_CASE_SUBSCRIBERS);
 		getEntityDefinition().setBeanCachingActiveByDefault(true, 1000);
-		
+
 		addAttribute(COLUMN_REFERENCE, "Reference", String.class);
+
+		super.initializeAttributes();
 	}
 
 	// Getters
+	@Override
 	public String getMessage() {
 		return getStringColumnValue(COLUMN_MESSAGE);
 	}
-	
+
+	@Override
 	public String getReply() {
 		String reply = getStringColumnValue(COLUMN_REPLY);
 
@@ -133,126 +137,154 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return reply;
 	}
 
+	@Override
 	public String getType() {
 		return getStringColumnValue(COLUMN_TYPE);
 	}
 
+	@Override
 	public CaseCategory getCaseCategory() {
 		return (CaseCategory) getColumnValue(COLUMN_CASE_CATEGORY);
 	}
 
+	@Override
 	public CaseType getCaseType() {
 		return (CaseType) getColumnValue(COLUMN_CASE_TYPE);
 	}
 
+	@Override
 	public ICFile getAttachment() {
 		return (ICFile) getColumnValue(COLUMN_FILE);
 	}
 
+	@Override
 	public User getHandledBy() {
 		return (User) getColumnValue(COLUMN_HANDLER);
 	}
 
+	@Override
 	public boolean isPrivate() {
 		return getBooleanColumnValue(COLUMN_IS_PRIVATE, false);
 	}
-	
+
+	@Override
 	public boolean isAnonymous() {
 		return getBooleanColumnValue(COLUMN_IS_ANONYMOUS, false);
 	}
 
+	@Override
 	public String getPriority() {
 		return getStringColumnValue(COLUMN_PRIORITY);
 	}
 
+	@Override
 	public String getTitle() {
 		return getStringColumnValue(COLUMN_TITLE);
 	}
 
+	@Override
 	public String getWantReply() {
 		return getStringColumnValue(COLUMN_WANT_REPLY);
 	}
 
+	@Override
 	public String getWantReplyEmail() {
 		return getStringColumnValue(COLUMN_WANT_REPLY_EMAIL);
 	}
 
+	@Override
 	public String getWantReplyPhone() {
 		return getStringColumnValue(COLUMN_WANT_REPLY_PHONE);
 	}
-	
+
+	@Override
 	public String getReference() {
 		return getStringColumnValue(COLUMN_REFERENCE);
 	}
 
 	// Setters
+	@Override
 	public void setMessage(String message) {
 		setColumn(COLUMN_MESSAGE, message);
 	}
-	
+
+	@Override
 	public void setReply(String reply) {
 		setColumn(COLUMN_REPLY, reply);
 	}
 
+	@Override
 	public void setType(String type) {
 		setColumn(COLUMN_TYPE, type);
 	}
 
+	@Override
 	public void setCaseCategory(CaseCategory category) {
 		setColumn(COLUMN_CASE_CATEGORY, category);
 	}
 
+	@Override
 	public void setCaseType(CaseType type) {
 		setColumn(COLUMN_CASE_TYPE, type);
 	}
 
+	@Override
 	public void setAttachment(ICFile attachment) {
 		setColumn(COLUMN_FILE, attachment);
 	}
 
+	@Override
 	public void setHandledBy(User handler) {
 		setColumn(COLUMN_HANDLER, handler);
 	}
 
+	@Override
 	public void setAsPrivate(boolean isPrivate) {
 		setColumn(COLUMN_IS_PRIVATE, isPrivate);
 	}
-	
+
+	@Override
 	public void setAsAnonymous(boolean isAnonymous) {
 		setColumn(COLUMN_IS_ANONYMOUS, isAnonymous);
 	}
 
+	@Override
 	public void setPriority(String priority) {
 		setColumn(COLUMN_PRIORITY, priority);
 	}
 
+	@Override
 	public void setTitle(String title) {
 		setColumn(COLUMN_TITLE, title);
 	}
 
+	@Override
 	public void setWantReply(String wantReply) {
 		setColumn(COLUMN_WANT_REPLY, wantReply);
 	}
 
+	@Override
 	public void setWantReplyEmail(String wantReplyEmail) {
 		setColumn(COLUMN_WANT_REPLY_EMAIL, wantReplyEmail);
 	}
 
+	@Override
 	public void setWantReplyPhone(String wantReplyPhone) {
 		setColumn(COLUMN_WANT_REPLY_PHONE, wantReplyPhone);
 	}
-	
+
+	@Override
 	public void setReference(String reference) {
 		setColumn(COLUMN_REFERENCE, reference);
 	}
-	
+
 	// Finders
 	public Collection ejbFindAllByGroup(Collection groups) throws FinderException {
 		return ejbFindAllByGroupAndStatuses(groups, null, null);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param groups
 	 * @param statuses
 	 * @param caseManagerType - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
@@ -278,15 +310,15 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		if (statuses != null) {
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}
-		
+
 		if (caseManagerType != null) {
-			
+
 			if(caseManagerType.length == 0) {
-				
+
 				query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName())));
-				
+
 			} else {
-			
+
 				query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName()), caseManagerType));
 			}
 		}
@@ -294,13 +326,13 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
-	
+
 	public Collection ejbFindAllByHandler(User handler) throws FinderException {
 		return ejbFindAllByHandlerAndStatuses(handler, null, null);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param handler
 	 * @param statuses
 	 * @param caseManagerType - if caseHandlers is null, then it is not added to criteria list, but if it's empty, then the criteria is considered to be IS NULL
@@ -324,22 +356,22 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		if (statuses != null) {
 			query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseStatusColumnName()), statuses));
 		}
-		
+
 		if (caseManagerType != null) {
-			
+
 			if(caseManagerType.length == 0) {
-				
+
 				query.addCriteria(new MatchCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName())));
-				
+
 			} else {
-			
+
 				query.addCriteria(new InCriteria(process.getColumn(getSQLGeneralCaseCaseManagerTypeColumnName()), caseManagerType));
 			}
 		}
 
 		return idoFindPKsByQuery(query);
 	}
-	
+
 	public Collection ejbFindAllByUsers(Collection users) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
@@ -357,7 +389,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		return idoFindPKsByQuery(query);
 	}
-	
+
 	public Collection ejbFindAllByMessage(String message) throws FinderException {
 		Table table = new Table(this);
 
@@ -367,11 +399,11 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		return idoFindPKsByQuery(query);
 	}
-	
+
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) throws FinderException {
 		return ejbFindByCriteria(parentCategory, category, type, status, anonymous, null);
 	}
-	
+
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws FinderException {
 		Table table = new Table(this);
 		Table process = new Table(Case.class);
@@ -423,7 +455,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
-	
+
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseManagerType) throws FinderException {
 
 		Table table = new Table(this);
@@ -497,10 +529,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		return idoGetNumberOfRecords(query);
 	}
-	
+
 	public Collection ejbFindByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) throws FinderException {
-		
+
 		Table generalCasesTable = new Table(this);
 		Table casesTable = new Table(Case.class);
 		String casesTableIdColumnName = null;
@@ -510,7 +542,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		SelectQuery query = new SelectQuery(generalCasesTable);
 		query.addColumn(generalCasesTable.getColumn(getIDColumnName()));
 		try {
@@ -520,7 +552,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			e.printStackTrace();
 			throw new FinderException(e.getMessage());
 		}
-		
+
 		if (owner != null) {
 			query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_USER), MatchCriteria.EQUALS, owner.getId()));
 		}
@@ -529,7 +561,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			for (Group group: groups) {
 				groupsIds.add(group.getId());
 			}
-			
+
 			query.addCriteria(new InCriteria(casesTable.getColumn(getSQLGeneralCaseHandlerColumnName()), groupsIds));
 		}
 		if (caseNumber != null) {
@@ -564,9 +596,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		if (simpleCases) {
 			query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CASE_MANAGER_TYPE), MatchCriteria.IS, MatchCriteria.NULL));
 		}
-		
+
 		query.addGroupByColumn(generalCasesTable.getColumn(getIDColumnName()));
-	
+
 		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
 		return idoFindPKsByQuery(query);
 	}
@@ -574,7 +606,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	public Collection ejbFindAllByIds(Collection<Integer> ids) throws FinderException {
 		Table generalCasesTable = new Table(this);
 		Table casesTable = new Table(Case.class);
-		
+
 		SelectQuery query = new SelectQuery(generalCasesTable);
 		String[] columnNames = getColumnNames();
 		for (String columnName: columnNames) {
@@ -592,10 +624,12 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
+	@Override
 	public void addSubscriber(User subscriber) throws IDOAddRelationshipException {
 		this.idoAddTo(subscriber);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Collection<User> getSubscribers() {
 		try {
@@ -606,9 +640,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return null;
 	}
 
+	@Override
 	public void removeSubscriber(User subscriber) throws IDORemoveRelationshipException {
 		super.idoRemoveFrom(subscriber);
 	}
-	
+
 
 }
