@@ -197,16 +197,15 @@ public class CasesSearcher extends CasesBlock {
 
 		if (this.processProperty == null) {
 			addFormItem(inputsContainer, "process", iwrb.getLocalizedString("cases_search_select_process", "Process"), processes);
-		}
-		else {
+		} else {
 			Layer layer = new Layer();
 			layer.setStyleClass("variablesSelectorDropdown");
 			inputsContainer.add(layer);
-			String action = "CasesListHelper.getProcessDefinitionVariablesByProcessID('"+iwrb.getLocalizedString("loading", "Loading")+"', '"+ this.processProperty +"');";
+			String action = "CasesListHelper.getProcessDefinitionVariablesByProcessID('"+iwrb.getLocalizedString("loading", "Loading")
+					+ "', '"+ this.processProperty +"');";
 
-			if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+			if (!CoreUtil.isSingleComponentRenderingProcess(iwc))
 				action = "jQuery(window).load(function() {" + action + "});";
-			}
 
 			PresentationUtil.addJavaScriptActionOnLoad(iwc, action);
 		}

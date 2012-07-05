@@ -420,7 +420,7 @@ function searchForCases(parameters) {
 	var dateRangeValue = dwr.util.getValue(dateRangeId);
 	var caseListType = dwr.util.getValue(parameters[9]);
 	var contact = dwr.util.getValue(parameters[10]);
-	var showStatistics = jQuery('#' + showStatisticsId).attr('checked');
+	var showStatistics = jQuery('#' + showStatisticsId).attr('checked') == 'checked';
 	if (!showStatistics) {
 		showStatistics = false;
 	}
