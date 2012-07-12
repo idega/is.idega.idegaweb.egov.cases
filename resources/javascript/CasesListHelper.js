@@ -823,23 +823,26 @@ CasesListHelper.addVariableInput = function() {
 					callback: function() {
 						closeAllLoadingMessages();
 						dwr.util.setValue(chooserId, '-1');
-						jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 + '\').hide(\'normal\', function() {jQuery(\'#' + id2 + '\').remove();});" src=\''+deleteImage+'\' />').show('fast');
+						jQuery('#' + id2).append('<img class=\'variableFieldDeleter\' onclick="jQuery(\'#' + id2 +
+							'\').hide(\'normal\', function() {jQuery(\'#' + id2 + '\').remove();});" src=\''+deleteImage+'\' />').show('fast');
 					},
 					append: true
 				};
-				var valueToSet = null;
-
 				
-
-				var beanName = 'bpmVariableValueResolver'+optionValue[0];
+				var valueToSet = null;
+				var beanName = 'bpmVariableValueResolver' + optionValue[0];
 				CasesEngine.isResolverExist(beanName, {
-					callback: function(resolverExist) {
-						if (resolverExist){
-							if (isMultipleObjectsField && advancedSearch && 'list_ticketViolationsNumbers'!=optionValue[0]) {
+					callback: function(resolverClass) {
+						if (resolverClass != null && resolverClass != '') {
+							var useProvidedClass = true;
+							if (isMultipleObjectsField && advancedSearch && 'list_ticketViolationsNumbers' != optionValue[0]) {
 								options.className = 'com.idega.presentation.ui.SelectionBox';
+								useProvidedClass = false;
 							} else {
 								options.className = 'com.idega.presentation.ui.DropdownMenu';
 							}
+							if (useProvidedClass && resolverClass != options.className)
+								options.className = resolverClass;
 
 							valueToSet = '#{' + beanName + '.getValues(\'' + procDefId + '\', \'' + optionValue[0] + '\')}';
 						}

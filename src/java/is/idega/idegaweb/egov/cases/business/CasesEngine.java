@@ -46,10 +46,9 @@ public interface CasesEngine {
 	 * if exist and registers answer to cache. Cache is found in
 	 * {@link DefaultSpringBean#getCache(String)} method.</p>
 	 * @param beanName {@link String} representation of bean name to check.
-	 * @return <code>true</code> if there is Spring bean with given name,
-	 * <code>false</code> otherwise.
+	 * @return UI class name if there is Spring bean with given name, null otherwise.
 	 */
-	public boolean isResolverExist(String beanName);
+	public String isResolverExist(String beanName);
 
 	public AdvancedProperty getExportedCases(String instanceId, String uri);
 
