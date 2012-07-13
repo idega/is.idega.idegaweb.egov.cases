@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -247,8 +248,9 @@ public class CasesSearcher extends CasesBlock {
 		}
 
 		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
-		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '").append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS)
-		.append("', '").append(showStatistics.getId()).append("', ").append(isShowAllStatuses()).append("]");
+		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '")
+			.append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS).append("', '").append(showStatistics.getId()).append("', ")
+			.append(isShowAllStatuses()).append("]");
 		addCasesFilterButtons(iwc, parameters.toString());
 	}
 
@@ -313,7 +315,8 @@ public class CasesSearcher extends CasesBlock {
 		return input;
 	}
 
-	protected void fillDropdown(Locale locale, DropdownMenu menu, List<AdvancedProperty> options, AdvancedProperty firstElement, String selectedElement) {
+	protected void fillDropdown(Locale locale, DropdownMenu menu, List<AdvancedProperty> options, AdvancedProperty firstElement,
+			String selectedElement) {
 		if (locale == null) {
 			locale = Locale.ENGLISH;
 		}
@@ -337,13 +340,14 @@ public class CasesSearcher extends CasesBlock {
 
 	private DropdownMenu getDropdownForSortingOptions(IWContext iwc) {
 		DropdownMenu sortingOptions = new DropdownMenu(PARAMETER_SORTING_OPTIONS);
-		sortingOptions.setTitle(getResourceBundle().getLocalizedString("cases_searcher_default_sorting_is_by_date", "By default sorting by case's creation date"));
+		sortingOptions.setTitle(getResourceBundle().getLocalizedString("cases_searcher_default_sorting_is_by_date",
+				"By default sorting by case's creation date"));
 		sortingOptions.setStyleClass("casesSearcherResultsSortingOptionsChooserStyle");
 
 		List<AdvancedProperty> defaultOptions = getCasesEngine().getDefaultSortingOptions(iwc);
 		if (ListUtil.isEmpty(defaultOptions)) {
-			sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_there_are_no_options", "There are no options"),
-					String.valueOf(-1)));
+			sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_there_are_no_options",
+					"There are no options"), String.valueOf(-1)));
 			sortingOptions.setDisabled(true);
 
 			return sortingOptions;
@@ -357,8 +361,8 @@ public class CasesSearcher extends CasesBlock {
 		sortingOptions.addFirstOption(new SelectOption(getResourceBundle().getLocalizedString("cases_searcher_select_sorting_option", "Select option"),
 				String.valueOf(-1)));
 
-		sortingOptions.setOnChange(new StringBuilder("CasesListHelper.addSelectedSearchResultsSortingOption('").append(sortingOptions.getId()).append("');")
-				.toString());
+		sortingOptions.setOnChange(new StringBuilder("CasesListHelper.addSelectedSearchResultsSortingOption('").append(sortingOptions.getId())
+				.append("');").toString());
 
 		return sortingOptions;
 	}
@@ -382,8 +386,8 @@ public class CasesSearcher extends CasesBlock {
 		fillDropdown(iwc.getCurrentLocale(), menu, allProcesses, new AdvancedProperty(String.valueOf(-1),
 				iwrb.getLocalizedString("cases_search_select_process", "Select process")), selectedProcess);
 
-		menu.setOnChange(new StringBuilder("CasesListHelper.getProcessDefinitionVariablesByIwID('").append(iwrb.getLocalizedString("loading", "Loading..."))
-							.append("', '").append(menu.getId()).append("');").toString());
+		menu.setOnChange(new StringBuilder("CasesListHelper.getProcessDefinitionVariablesByIwID('").append(iwrb
+				.getLocalizedString("loading", "Loading...")).append("', '").append(menu.getId()).append("');").toString());
 
 		return menu;
 	}
@@ -395,7 +399,7 @@ public class CasesSearcher extends CasesBlock {
 
 		CaseBusiness caseBusiness = getCasesBusiness(iwc);
 		if (caseBusiness == null) {
-			logWarning("CaseBusiness (" + CaseBusiness.class.getName() + ") is unavailable!");
+			getLogger().warning("CaseBusiness (" + CaseBusiness.class.getName() + ") is unavailable!");
 			menu.setDisabled(true);
 			return menu;
 		}
@@ -407,33 +411,30 @@ public class CasesSearcher extends CasesBlock {
 			e.printStackTrace();
 		}
 		if (ListUtil.isEmpty(allStatuses)) {
-			logWarning("There are no statuses available");
+			getLogger().warning("There are no statuses available");
 			menu.setDisabled(true);
 			return menu;
 		}
 
 		Locale l = iwc.getCurrentLocale();
-		if (l == null) {
+		if (l == null)
 			l = Locale.ENGLISH;
-		}
 
 		boolean addStatus = true;
 		String localizedStatus = null;
-		List<AdvancedProperty> statuses = new ArrayList<AdvancedProperty>();
+		Map<String, AdvancedProperty> statuses = new HashMap<String, AdvancedProperty>();
 		for (CaseStatus status: allStatuses) {
 			addStatus = true;
 
 			try {
 				localizedStatus = caseBusiness.getLocalizedCaseStatusDescription(null, status, l);
-				if (!showAllStatuses && localizedStatus.equals(status.getStatus())) {
+				if (!showAllStatuses && localizedStatus.equals(status.getStatus()))
 					addStatus = false;
-				}
 
 				if (this.getCaseStatusesToShow() != null) {
 					if (this.getCaseStatusesToShow().indexOf(status.getStatus()) != -1) {
 						addStatus = true;
-					}
-					else if (!showAllStatuses) {
+					} else if (!showAllStatuses) {
 						addStatus = false;
 					}
 				}
@@ -441,22 +442,27 @@ public class CasesSearcher extends CasesBlock {
 				if (this.getCaseStatusesToHide() != null) {
 					if (this.getCaseStatusesToHide().indexOf(status.getStatus()) != -1) {
 						addStatus = false;
-					}
-					else if (showAllStatuses) {
+					} else if (showAllStatuses) {
 						addStatus = true;
 					}
 				}
 
 				if (addStatus) {
-					statuses.add(new AdvancedProperty(status.getStatus(), localizedStatus));
+					String statusKey = status.getStatus();
+					if (statuses.containsKey(localizedStatus)) {
+						AdvancedProperty statusItem = statuses.get(localizedStatus);
+						statusItem.setId(statusItem.getId().concat(CoreConstants.COMMA).concat(statusKey));
+					} else {
+						statuses.put(localizedStatus, new AdvancedProperty(statusKey, localizedStatus));
+					}
 				}
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
 		}
 
-		fillDropdown(l, menu, statuses, new AdvancedProperty(String.valueOf(-1), getResourceBundle(iwc).getLocalizedString("select_status", "Select status")),
-				selectedStatus);
+		fillDropdown(l, menu, new ArrayList<AdvancedProperty>(statuses.values()), new AdvancedProperty(String.valueOf(-1),
+				getResourceBundle(iwc).getLocalizedString("select_status", "Select status")), selectedStatus);
 
 		return menu;
 	}
@@ -486,7 +492,8 @@ public class CasesSearcher extends CasesBlock {
 		return addFormItem(layer, null, localizedLabelText, input, additionalComponents);
 	}
 
-	protected Layer addFormItem(Layer layer, String styleClass, String localizedLabelText, InterfaceObject input, List<UIComponent> additionalComponents) {
+	protected Layer addFormItem(Layer layer, String styleClass, String localizedLabelText, InterfaceObject input,
+			List<UIComponent> additionalComponents) {
 		Layer element = new Layer(Layer.DIV);
 		layer.add(element);
 		element.setStyleClass("formItem shortFormItem");
