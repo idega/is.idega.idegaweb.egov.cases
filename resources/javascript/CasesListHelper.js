@@ -835,7 +835,7 @@ CasesListHelper.addVariableInput = function() {
 					callback: function(resolverClass) {
 						if (resolverClass != null && resolverClass != '') {
 							var useProvidedClass = true;
-							if (isMultipleObjectsField && advancedSearch && 'list_ticketViolationsNumbers' != optionValue[0]) {
+							if (isMultipleObjectsField && advancedSearch) {
 								options.className = 'com.idega.presentation.ui.SelectionBox';
 								useProvidedClass = false;
 							} else {
