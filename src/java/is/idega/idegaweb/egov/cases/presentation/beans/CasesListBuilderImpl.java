@@ -95,7 +95,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String caseIdParName = "caseid";
 	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
 	private String allowPDFSigningParName = "allowpdfsigning";
-	
+
 	public static final String VARIABLE_CASE_NR = "string_caseIdentifier";
 	public static final String VARIABLE_SENDER = "string_ownerFullName";
 	public static final String VARIABLE_DESCRIPTION = "string_caseDescription";
@@ -135,7 +135,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		return null;
 	}
-	
+
 	private Layer createHeader(IWContext iwc, Layer container, int totalCases, boolean searchResults, CaseListPropertiesBean properties) {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
 
@@ -175,7 +175,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 					iwrb.getLocalizedString("case_nr", "Case nr.")), headerItem, "CaseNumber");
 			layer.setStyleClass(VARIABLE_CASE_NR);
 		}
-			
+
 		List<String> customColumns = properties.getCustomColumns();
 		if (ListUtil.isEmpty(customColumns)) {
 			//	Sender
@@ -189,7 +189,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			Layer layer = addLayerToCasesList(headers, new Text(
 					iwrb.getLocalizedString("description", "Description")), headerItem, "Description");
 			layer.setStyleClass(VARIABLE_DESCRIPTION);
-			
+
 		} else {
 			CasesListCustomizer customizer = getCasesListCustomizer(properties);
 			Map<String, String> columns = null;
@@ -197,8 +197,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				columns = customizer.getHeadersAndVariables(customColumns);
 			if (!MapUtil.isEmpty(columns)) {
 				for (String column: columns.keySet()) {
-					Layer customLayer = addLayerToCasesList(headers, 
-							new Text(columns.get(column)), headerItem, "CustomHeader");
+					Layer customLayer = addLayerToCasesList(headers, new Text(columns.get(column)), headerItem, "CustomHeader");
 					customLayer.setStyleClass(column);
 				}
 			}
@@ -305,7 +304,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!StringUtil.isEmpty(theCase.getProcessName())) {
 			caseContainer.setStyleClass(theCase.getProcessName());
 		}
-		
+
 		User owner = theCase.getOwner();
 		IWTimestamp created = getCaseCreatedValue(theCase, properties);
 
