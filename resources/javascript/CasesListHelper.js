@@ -521,37 +521,46 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 	return caseList;
 }
 
+CasesListHelper.clearSearchResultsCallback = function() {}
+
 function clearSearchForCases(parameters) {
 	CasesEngine.clearSearchResults(window.location.pathname, {
 		callback: function(result) {
-			var cssClassName = null;
-			try {
-				if (parameters != null && parameters.length >= 13) {
-					cssClassName = parameters[0];
-					dwr.util.setValue(parameters[1], '');
-					dwr.util.setValue(parameters[8], '');
-					dwr.util.setValue(parameters[2], '');
-					dwr.util.setValue(parameters[3], '');
-					dwr.util.setValue(parameters[4], '-1');
-					dwr.util.setValue(parameters[5], '-1');
-					dwr.util.setValue(parameters[6], '');
-					dwr.util.setValue(parameters[10], '');
-					jQuery('#' + parameters[12]).attr('checked', false);
+			if (parameters != null) {
+				var cssClassName = null;
+				try {
+					if (parameters != null && parameters.length >= 13) {
+						cssClassName = parameters[0];
+						dwr.util.setValue(parameters[1], '');
+						dwr.util.setValue(parameters[8], '');
+						dwr.util.setValue(parameters[2], '');
+						dwr.util.setValue(parameters[3], '');
+						dwr.util.setValue(parameters[4], '-1');
+						dwr.util.setValue(parameters[5], '-1');
+						dwr.util.setValue(parameters[6], '');
+						dwr.util.setValue(parameters[10], '');
+						jQuery('#' + parameters[12]).attr('checked', false);
+					}
+				} catch (e) {}
+				cssClassName = cssClassName == null ? parameters.cssClassName : cssClassName;
+	
+				if (isNaN(parameters[4])) {
+					CasesListHelper.closeVariablesWindow();
+				} else {
+					jQuery('div', jQuery('#variableInputsContainer')).hide('normal', function() {
+						jQuery('div', jQuery('#variableInputsContainer')).empty();
+					});
 				}
-			} catch (e) {}
-			cssClassName = cssClassName == null ? parameters.cssClassName : cssClassName;
-
-			if (isNaN(parameters[4])) {
-				CasesListHelper.closeVariablesWindow();
-			} else {
-				jQuery('div', jQuery('#variableInputsContainer')).hide('normal', function() {jQuery('div', jQuery('#variableInputsContainer')).empty();});
+	
+				CasesListHelper.closeSortingOptionsWindow();
+	
+				setDisplayPropertyToAllCasesLists(cssClassName, true);
 			}
 
-			CasesListHelper.closeSortingOptionsWindow();
-
-			setDisplayPropertyToAllCasesLists(cssClassName, true);
-
 			CasesListHelper.searchCriterias = [];
+			
+			if (CasesListHelper.clearSearchResultsCallback != null)
+				CasesListHelper.clearSearchResultsCallback();
 		}
 	});
 }
@@ -592,6 +601,15 @@ function removePreviousSearchResults(className) {
 	}
 }
 
+CasesListHelper.getStatusesToShow = function() {
+	var selectedStatusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
+	return selectedStatusesToShow == null || selectedStatusesToShow == '' || selectedStatusesToShow == -1 ? null : new String(selectedStatusesToShow);
+}
+CasesListHelper.getStatusesToHide = function() {
+	var selectedStatusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
+	return selectedStatusesToHide == null || selectedStatusesToHide == '' || selectedStatusesToHide == -1 ? null : new String(selectedStatusesToHide);
+}
+
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
 										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
 										instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns) {
@@ -619,11 +637,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.sortingOptions = CasesListHelper.getSortedSortingOptions();
 	
-	var selectedStatusesToShow = jQuery('input.casesListStatusesToShow').attr('value');
-	this.statusesToShow = selectedStatusesToShow == null || selectedStatusesToShow == '' || selectedStatusesToShow == -1 ? null : selectedStatusesToShow;
-	
-	var selectedStatusesToHide = jQuery('input.casesListStatusesToHide').attr('value');
-	this.statusesToHide = selectedStatusesToHide == null || selectedStatusesToHide == '' || selectedStatusesToHide == -1 ? null : selectedStatusesToHide;
+	this.statusesToShow = CasesListHelper.getStatusesToShow();
+	this.statusesToHide = CasesListHelper.getStatusesToHide();
 	
 	this.caseCodes = jQuery('input.casesListCaseCodes').attr('value');
 	this.onlySubscribedCases = onlySubscribedCases;
