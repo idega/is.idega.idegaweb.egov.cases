@@ -22,11 +22,9 @@ import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.core.file.data.ICFile;
-import com.idega.data.IDOAddRelationshipException;
 import com.idega.data.IDOCompositePrimaryKeyException;
 import com.idega.data.IDOException;
 import com.idega.data.IDORelationshipException;
-import com.idega.data.IDORemoveRelationshipException;
 import com.idega.data.query.BetweenCriteria;
 import com.idega.data.query.Column;
 import com.idega.data.query.CountColumn;
@@ -623,27 +621,5 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		query.addOrder(casesTable, CaseBMPBean.COLUMN_CREATED, false);
 		return idoFindPKsByQuery(query);
 	}
-
-	@Override
-	public void addSubscriber(User subscriber) throws IDOAddRelationshipException {
-		this.idoAddTo(subscriber);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Collection<User> getSubscribers() {
-		try {
-			return super.idoGetRelatedEntities(User.class);
-		} catch (IDORelationshipException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public void removeSubscriber(User subscriber) throws IDORemoveRelationshipException {
-		super.idoRemoveFrom(subscriber);
-	}
-
 
 }

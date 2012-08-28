@@ -1,13 +1,10 @@
 package is.idega.idegaweb.egov.cases.data;
 
 
-import com.idega.core.file.data.ICFile;
-import com.idega.data.IDOAddRelationshipException;
-import java.util.Collection;
 import com.idega.block.process.data.Case;
-import com.idega.user.data.User;
-import com.idega.data.IDORemoveRelationshipException;
+import com.idega.core.file.data.ICFile;
 import com.idega.data.IDOEntity;
+import com.idega.user.data.User;
 
 public interface GeneralCase extends IDOEntity, Case {
 
@@ -171,18 +168,4 @@ public interface GeneralCase extends IDOEntity, Case {
 	 */
 	public void setReference(String reference);
 
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#addSubscriber
-	 */
-	public void addSubscriber(User subscriber) throws IDOAddRelationshipException;
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getSubscribers
-	 */
-	public Collection<User> getSubscribers();
-
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#removeSubscriber
-	 */
-	public void removeSubscriber(User subscriber) throws IDORemoveRelationshipException;
 }
