@@ -346,6 +346,9 @@ CasesListHelper.displayPager = function(instanceId, containerId, page, count, to
 					var parentContainerId = parentContainer.attr('id');
 					if (parentContainerId != null && parentContainerId != '')
 						parentContainer = parentContainerId;
+					jQuery('div.mainCasesListContainerStyleClass[searchresult=\'true\']').each(function() {
+						jQuery(this).hide();
+					});
 					IWCORE.renderComponent(instanceId, parentContainer, function() {
 						closeAllLoadingMessages(toPager);
 					}, properties, {append: true});
@@ -485,13 +488,17 @@ CasesListHelper.insertRenderedCasesList = function(component, className, callbac
 		return false;
 	}
 	
-	var container = lastCaseList.parent()[0];
-	insertNodesToContainerBefore(component, container, lastCaseList[0]);
+	jQuery('div.mainCasesListContainerStyleClass[searchresult=\'true\']').each(function() {
+		jQuery(this).hide();
+	});
+	
+	var container = lastCaseList.parent().parent().parent()[0];
+	var insertBefore = lastCaseList.parent().parent()[0];
+	insertNodesToContainerBefore(component, container, insertBefore);
 	continueInitializeCasesList(null);
 	
-	if (callback) {
+	if (callback)
 		callback();
-	}
 }
 
 function setDisplayPropertyToAllCasesLists(className, show) {
@@ -512,6 +519,7 @@ function setDisplayPropertyToAllCasesLists(className, show) {
 			if (show && !fullListVisible) {
 				fullListVisible = true;
 				caseList.show('fast');
+				caseList.parent().parent().show('fast');
 			} else {
 				caseList.hide('fast');
 			}
@@ -554,6 +562,9 @@ function clearSearchForCases(parameters) {
 	
 				CasesListHelper.closeSortingOptionsWindow();
 	
+				jQuery('div.mainCasesListContainerStyleClass[searchresult=\'true\']').each(function() {
+					jQuery(this).remove();
+				});
 				setDisplayPropertyToAllCasesLists(cssClassName, true);
 			}
 
