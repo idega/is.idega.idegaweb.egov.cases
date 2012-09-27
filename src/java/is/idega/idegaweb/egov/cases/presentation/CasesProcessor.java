@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Oct 31, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -50,9 +50,9 @@ import com.idega.util.PresentationUtil;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
-	
+
 	public static final String PARAMETER_ACTION = "cp_prm_action";
-	
+
 	public static final String PARAMETER_CASE_PK = UserCases.PARAMETER_CASE_PK;
 	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
@@ -68,115 +68,113 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS_FORM = 4;
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
-	
+
 	@Autowired
 	private CaseManagersProvider caseManagersProvider;
-	
+
 	private static final String caseManagerFacet = "caseManager";
-	
+
 	protected abstract String getBlockID();
-	
+
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 	}
-	
-	protected void display(IWContext iwc) throws Exception {
 
-		CaseManagerState caseHandlerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
-		
+	protected void display(IWContext iwc) throws Exception {
+		CaseManagerState caseHandlerState = WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
 		if(!caseHandlerState.getShowCaseHandler()) {
-			
+
 			switch (parseAction(iwc)) {
-			
+
 				case ACTION_VIEW:
 					showList(iwc);
 					break;
-	
+
 				case ACTION_PROCESS:
-					
+
 					showProcessor(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 					break;
-	
+
 				case ACTION_SAVE:
 					save(iwc);
 					showList(iwc);
 					break;
-	
+
 				case ACTION_MULTI_PROCESS_FORM:
 					showMultiProcessForm(iwc);
 					break;
-	
+
 				case ACTION_MULTI_PROCESS:
 					multiProcess(iwc);
 					showList(iwc);
 					break;
-	
+
 				case ACTION_ALLOCATION_FORM:
 					showAllocationForm(iwc, iwc.getParameter(PARAMETER_CASE_PK));
 					break;
-					
+
 				case UserCases.ACTION_CASE_MANAGER_VIEW:
 					showCaseManagerView(iwc);
 					break;
-				
+
 				default:
 					showList(iwc);
 			}
 		}
 	}
-	
+
 	private void showCaseManagerView(IWContext iwc) {
 
 		UIComponent view = null;
 
-		GeneralCaseManagerViewBuilder viewBuilder = (GeneralCaseManagerViewBuilder) WFUtil.getBeanInstance(GeneralCaseManagerViewBuilder.SPRING_BEAN_IDENTIFIER);
+		GeneralCaseManagerViewBuilder viewBuilder = WFUtil.getBeanInstance(GeneralCaseManagerViewBuilder.SPRING_BEAN_IDENTIFIER);
 		try {
 			view = viewBuilder.getCaseManagerView(iwc, getCasesProcessorType());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		
+
 		if (view == null) {
 			return;
 		}
-		
+
 		add(view);
 	}
-	
+
 	@Override
 	public void encodeBegin(FacesContext fc) throws IOException {
 		super.encodeBegin(fc);
-		
+
 		try {
 			display(IWContext.getIWContext(fc));
-		
+
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
 			Logger.getLogger(getClassName()).log(Level.SEVERE, "Exception while displaying CasesProcessor", e);
 		}
 	}
-	
+
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 		super.encodeChildren(context);
-		
-		CaseManagerState caseHandlerState = (CaseManagerState)WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
-		
+
+		CaseManagerState caseHandlerState = WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
+
 		if(caseHandlerState.getShowCaseHandler()) {
-			
+
 			UIComponent facet = getFacet(caseManagerFacet);
 			renderChild(context, facet);
 		}
 	}
-	
+
 	protected int parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(UserCases.PARAMETER_ACTION)) {
 			return Integer.parseInt(iwc.getParameter(UserCases.PARAMETER_ACTION));
 		}
 		return ACTION_VIEW;
 	}
-	
+
 	@Override
 	public boolean showCheckBoxes() {
 		try {
@@ -186,7 +184,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		}
 		return showCheckBox();
 	}
-	
+
 	protected void showList(IWContext iwc) throws RemoteException {
 		Layer topLayer = new Layer();
 		Form form = new Form();
@@ -194,15 +192,15 @@ public abstract class CasesProcessor extends CasesBlock {
 		topLayer.add(form);
 		boolean showCheckBoxes = showCheckBoxes();
 		add(topLayer);
-				
+
 		UICasesList list = getCasesList(iwc, topLayer.getId());
-		
+
 		form.add(list);
-		
+
 		if (list.isShowLegend()) {
 			form.add(getLegend(iwc));
 		}
-		
+
 		if (showCheckBoxes) {
 			Layer layer = new Layer();
 			layer.setStyleClass("buttonLayer");
@@ -281,7 +279,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		form.setStyleClass("adminForm");
 		form.maintainParameter(PARAMETER_CASE_PK);
 		form.addParameter(UserCases.PARAMETER_ACTION, "");
-		
+
 		boolean useSubCategories = getCasesBusiness(iwc).useSubCategories();
 
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, CoreConstants.DWR_ENGINE_SCRIPT);
@@ -348,9 +346,9 @@ public abstract class CasesProcessor extends CasesBlock {
 		types.keepStatusOnAction(true);
 		types.setSelectedElement(type.getPrimaryKey().toString());
 		types.setStyleClass("caseTypeDropdown");
-		
+
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
-		
+
 		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
 		users.setID(PARAMETER_USER);
@@ -361,7 +359,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		message.keepStatusOnAction(true);
-		
+
 		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -447,9 +445,9 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 
 	protected abstract void showProcessor(IWContext iwc, Object casePK) throws RemoteException;
-	
+
 	protected abstract void save(IWContext iwc) throws RemoteException;
-	
+
 	protected abstract void initializeTableSorter(IWContext iwc) throws RemoteException;
 
 	public CaseManagersProvider getCaseManagersProvider() {
@@ -459,7 +457,7 @@ public abstract class CasesProcessor extends CasesBlock {
 	public void setCaseManagersProvider(CaseManagersProvider caseManagersProvider) {
 		this.caseManagersProvider = caseManagersProvider;
 	}
-	
+
 	@Override
 	public Map<Object, Object> getUserCasesPageMap() {
 		return null;

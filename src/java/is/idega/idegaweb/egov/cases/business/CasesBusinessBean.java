@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Oct 30, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.business;
@@ -83,6 +83,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return CasesConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
+	@Override
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) {
 		try {
 			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
@@ -92,6 +93,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void sendReminder(GeneralCase theCase, User receiver, User sender, String message, IWContext iwc) {
 		IWResourceBundle iwrb = this.getIWResourceBundleForUser(receiver, iwc);
 
@@ -102,6 +104,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		sendMessage(theCase, receiver, sender, subject, body);
 	}
 
+	@Override
 	public Map<String, String> getAllSubCategories(String categoryPK, String country) {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 		Locale locale = new Locale(country, country.toUpperCase());
@@ -133,6 +136,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return map;
 	}
 
+	@Override
 	public Map<String, String> getUsers(String categoryPK) {
 		try {
 			Map<String, String> map = new LinkedHashMap<String, String>();
@@ -163,11 +167,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			throw new IBORuntimeException(re);
 		}
 	}
-	
+
+	@Override
 	public UserDWR getUser(String personalID) {
 		try {
 			User user = getUserBusiness().getUser(personalID);
-			
+
 			UserDWR dwr = new UserDWR();
 			dwr.setUserPersonalID(personalID);
 			dwr.setUserName(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName());
@@ -187,7 +192,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			catch (NoEmailFoundException e) {
 				// No email found...
 			}
-			
+
 			return dwr;
 		}
 		catch (RemoteException re) {
@@ -198,6 +203,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void reactivateCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException {
 		theCase.setHandledBy(performer);
 
@@ -232,6 +238,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public GeneralCaseHome getGeneralCaseHome() {
 		try {
 			return (GeneralCaseHome) IDOLookup.getHome(GeneralCase.class);
@@ -256,6 +263,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public ICFile getAttachment(Object attachmentPK) {
 		try {
 			return ((ICFileHome) IDOLookup.getHome(ICFile.class)).findByPrimaryKey(attachmentPK);
@@ -273,7 +281,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		try {
 			String code = theCase.getCode();
 			String typeOrCodeKey = null;
-			
+
 			Object[] arguments = null;
 			if (theCase instanceof GeneralCase) {
 				GeneralCase genCase = getGeneralCase(theCase.getPrimaryKey());
@@ -281,7 +289,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				arguments = new Object [] {type.getLocalizedCategoryName(locale)};
 				typeOrCodeKey = genCase.getType();
 			}
-			
+
 			IWResourceBundle iwrb = getBundle().getResourceBundle(locale);
 			String allKey = (StringUtil.isEmpty(typeOrCodeKey) ? CoreConstants.EMPTY : CoreConstants.DOT) + "case_code_key." + code;
 			String localizedDescription = iwrb.getLocalizedString(allKey, code);
@@ -298,6 +306,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public String getLocalizedCaseStatusDescription(CaseStatus status, Locale locale) {
 		return super.getLocalizedCaseStatusDescription(null, status, locale);
 	}
@@ -306,19 +315,19 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) {
 		return getLocalizedCaseStatusDescription(theCase, status, locale, getBundleIdentifier());
 	}
-	
+
 	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale, String bundleIdentifier) {
 		try {
 			String statusKey = status.getStatus();
 			String key = "case_status_key." + statusKey;
-			
+
 			String typeOrCodeKey = null;
 			if (theCase instanceof GeneralCase) {
 				GeneralCase genCase = (GeneralCase) theCase;
 				typeOrCodeKey = genCase.getType() == null ? CoreConstants.EMPTY : genCase.getType() + CoreConstants.DOT;
 			}
-			
+
 			IWResourceBundle iwrb = getIWMainApplication().getBundle(bundleIdentifier).getResourceBundle(locale);
 			if (theCase == null) {
 				return iwrb.getLocalizedString(key, statusKey);
@@ -327,19 +336,22 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return theCase.getStatus();
 	}
 
+	@Override
 	public GeneralCase getGeneralCase(Object casePK) throws FinderException {
 		return getGeneralCaseHome().findByPrimaryKey(new Integer(casePK.toString()));
 	}
 
+	@Override
 	public Collection getOpenCases(Collection groups) {
 
 		return getOpenCases(groups, new String[] {});
 	}
 
+	@Override
 	public Collection getOpenCases(Collection groups, String[] caseHandlers) {
 
 		try {
@@ -351,11 +363,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getMyCases(User handler) {
 
 		return getMyCases(handler, new String[] {});
 	}
 
+	@Override
 	public Collection getMyCases(User handler, String[] caseHandlers) {
 		try {
 			String[] statuses = getStatusesForMyCases();
@@ -366,11 +380,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getClosedCases(Collection groups) {
 
 		return getClosedCases(groups, new String[] {});
 	}
 
+	@Override
 	public Collection getClosedCases(Collection groups, String[] caseHandlers) {
 		try {
 			String[] statuses = getStatusesForClosedCases();
@@ -381,6 +397,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getCasesByUsers(Collection users) {
 		try {
 			return getGeneralCaseHome().findAllByUsers(users);
@@ -390,6 +407,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getCasesByMessage(String message) {
 		try {
 			return getGeneralCaseHome().findAllByMessage(message);
@@ -399,10 +417,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous) {
 		return getCasesByCriteria(parentCategory, category, type, status, anonymous, null);
 	}
 
+	@Override
 	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseHandler) {
 		try {
 			return getGeneralCaseHome().findByCriteria(parentCategory, category, type, status, anonymous, caseHandler);
@@ -412,10 +432,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public CaseCategory getCaseCategory(Object caseCategoryPK) throws FinderException {
 		return getCaseCategoryHome().findByPrimaryKey(new Integer(caseCategoryPK.toString()));
 	}
 
+	@Override
 	public Collection getAllCaseCategories() {
 		try {
 			return getCaseCategoryHome().findAll();
@@ -425,6 +447,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection<CaseCategory> getCaseCategoriesByName(String name) {
 		try {
 			return getCaseCategoryHome().findByName(name);
@@ -434,6 +457,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection<CaseType> getCaseTypesByName(String name) {
 		try {
 			return getCaseTypeHome().findByName(name);
@@ -443,6 +467,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getCaseCategories() {
 		try {
 			return getCaseCategoryHome().findAllTopLevelCategories();
@@ -452,6 +477,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getSubCategories(CaseCategory category) {
 		try {
 			return getCaseCategoryHome().findAllSubCategories(category);
@@ -461,6 +487,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public Collection getCaseLogs(GeneralCase theCase) {
 		try {
 			Collection logs = getCaseLogsByCase(theCase);
@@ -471,14 +498,17 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void removeCaseCategory(Object caseCategoryPK) throws FinderException, RemoveException {
 		getCaseCategory(caseCategoryPK).remove();
 	}
 
+	@Override
 	public CaseType getCaseType(Object caseTypePK) throws FinderException {
 		return getCaseTypeHome().findByPrimaryKey(new Integer(caseTypePK.toString()));
 	}
 
+	@Override
 	public Collection getCaseTypes() {
 		try {
 			return getCaseTypeHome().findAll();
@@ -488,6 +518,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public CaseType getFirstAvailableCaseType() {
 		try {
 			return getCaseTypeHome().findFirstType();
@@ -497,18 +528,22 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void removeCaseType(Object caseTypePK) throws FinderException, RemoveException {
 		getCaseType(caseTypePK).remove();
 	}
 
+	@Override
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb, boolean setType, Timestamp created) throws CreateException, RemoteException {
 		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, null, isPrivate, iwrb, setType, created);
 	}
 
+	@Override
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean setType, Timestamp created) throws CreateException, RemoteException {
 		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, true, null, setType, null, created);
 	}
 
+	@Override
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
 		GeneralCase theCase = getGeneralCaseHome().create();
 		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created);
@@ -517,14 +552,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	/**
 	 * The iwrb is the users preferred locale
 	 */
+	@Override
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, Timestamp created) throws CreateException, RemoteException {
 		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, CaseBMPBean.CASE_STATUS_OPEN_KEY, created);
 	}
 
+	@Override
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
 		Locale locale = iwrb.getLocale();
 		// TODO use users preferred language!!
-		
+
 		if (caseStatusKey == null) {
 			caseStatusKey = getCaseStatusOpenString();
 		}
@@ -616,6 +653,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return theCase;
 	}
 
+	@Override
 	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) {
 		boolean hasChanges = false;
 		try {
@@ -650,6 +688,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		sendMessage(theCase, user, performer, subject, body);
 	}
 
+	@Override
 	public void allocateCase(GeneralCase theCase, User user, String message, User performer, IWContext iwc) {
 		takeCase(theCase, user, iwc);
 
@@ -661,6 +700,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		sendMessage(theCase, user, performer, subject, body);
 	}
 
+	@Override
 	public void handleCase(Object casePK, Object caseCategoryPK, Object caseTypePK, String status, User performer, String reply, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		CaseCategory category = getCaseCategory(caseCategoryPK);
@@ -669,6 +709,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		handleCase(theCase, category, type, status, performer, reply, iwc);
 	}
 
+	@Override
 	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) {
 		theCase.setReply(reply);
 
@@ -748,11 +789,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	}
 
+	@Override
 	public void takeCase(Object casePK, User performer, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		takeCase(theCase, performer, iwc);
 	}
 
+	@Override
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) {
 		theCase.setHandledBy(performer);
 
@@ -772,17 +815,20 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges) {
 
 		takeCase(theCase, user, iwc, performer, hasChanges, true);
 	}
 
+	@Override
 	public void untakeCase(GeneralCase theCase) {
 
 		theCase.setHandledBy(null);
 		theCase.store();
 	}
 
+	@Override
 	public void takeCase(GeneralCase theCase, User user, IWContext iwc, User performer, boolean hasChanges, boolean sendMessages) {
 		String comment = getLocalizedString("case_handler_set", "Case handler set", iwc.getApplicationSettings().getDefaultLocale()) + ": " + new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getApplicationSettings().getDefaultLocale());
 
@@ -816,6 +862,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void reactivateCase(Object casePK, User performer, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		User owner = theCase.getOwner();
@@ -848,6 +895,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void reviewCase(GeneralCase theCase, User performer, IWContext iwc) throws FinderException {
 		CaseCategory category = theCase.getCaseCategory();
 		Group handlerGroup = category.getHandlerGroup();
@@ -883,11 +931,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 	}
 
+	@Override
 	public void reviewCase(Object casePK, User performer, IWContext iwc) throws FinderException {
 		GeneralCase theCase = getGeneralCase(casePK);
 		reviewCase(theCase, performer, iwc);
 	}
 
+	@Override
 	public CaseCategory storeCaseCategory(Object caseCategoryPK, Object parentCaseCategoryPK, String name, String description, Object groupPK, int localeId, int order) throws FinderException, CreateException {
 		CaseCategory category = null;
 		boolean isDefaultLocale = ICLocaleBusiness.getLocaleId(this.getDefaultLocale()) == localeId;
@@ -952,6 +1002,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	}
 
+	@Override
 	public CaseType storeCaseType(Object caseTypePK, String name, String description, int order) throws FinderException, CreateException {
 		CaseType type;
 		if (caseTypePK != null) {
@@ -983,26 +1034,32 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return false;
 	}
 
+	@Override
 	public boolean useSubCategories() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_USE_SUB_CATEGORIES, false);
 	}
 
+	@Override
 	public boolean useTypes() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_USE_TYPES, true);
 	}
 
+	@Override
 	public boolean allowPrivateCases() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_ALLOW_PRIVATE_CASES, false);
 	}
 
+	@Override
 	public boolean allowAnonymousCases() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_ALLOW_ANONYMOUS_CASES, false);
 	}
 
+	@Override
 	public boolean allowAttachments() {
 		return getIWApplicationContext().getApplicationSettings().getBoolean(CasesConstants.PROPERTY_ALLOW_ATTACHMENTS, false);
 	}
 
+	@Override
 	public Object[] createDefaultCaseTypesForDefaultGroupIfNotExist(String caseCategoryName, String caseCategoryDescription, String caseTypeName, String caseTypeDescription, String caseCategoryHandlersGroupName, String caseCategoryHandlersGroupDescription) throws FinderException, CreateException, RemoteException {
 
 		Collection<CaseCategory> caseCategories = getCaseCategoriesByName(caseCategoryName);
@@ -1064,21 +1121,21 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	// List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
 	// Collection<GeneralCase> cases = null;
 	// log(Level.INFO, "Case handlers: " + caseHandlers);
-	//		
+	//
 	// for (CaseManager handler : caseHandlers) {
-	//			
+	//
 	// @SuppressWarnings("unchecked")
 	// Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
-	//			
+	//
 	// if(cazes != null) {
-	//				
+	//
 	// if(cases == null)
 	// cases = cazes;
 	// else
 	// cases.addAll(cazes);
 	// }
 	// }
-	//		
+	//
 	// if (cases == null || cases.isEmpty()) {
 	// log(Level.INFO, "NO CASES - null!");
 	// }
@@ -1088,10 +1145,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	// return cases;
 	// }
 
+	@Override
 	public CaseManagersProvider getCaseHandlersProvider() {
-		return (CaseManagersProvider) WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
+		return WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
 	}
 
+	@Override
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
@@ -1106,7 +1165,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (ListUtil.isEmpty(caseOwners)) {
 				return null;
 			}
-			
+
 			owners = new ArrayList<User>(caseOwners);
 		}
 		if (name != null) {
@@ -1114,7 +1173,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (ListUtil.isEmpty(usersByName)) {
 				return null;
 			}
-		
+
 			if (ListUtil.isEmpty(owners)) {
 				owners = new ArrayList<User>(usersByName);
 			} else {
@@ -1125,7 +1184,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				}
 			}
 		}
-		
+
 		Collection<String> ownersIds = null;
 		if (personalId != null || name != null) {
 			if (ListUtil.isEmpty(owners)) {
@@ -1157,7 +1216,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		return null;
 	}
-	
+
+	@Override
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
@@ -1193,59 +1253,62 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				log(Level.SEVERE, errorMessage, e);
 			}
 		}
-		
+
 		return null;
 	}
-	
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public Collection<GeneralCase> getOpenCases(User user, IWMainApplication iwma, IWUserContext iwuc, String[] caseHandlers) {
-		
+
 		try {
 			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
-			
+
 			Collection<GeneralCase> openCases;
-			
+
 			if(caseHandlers == null) {
-			
+
 				openCases = getOpenCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null);
 			} else {
-				
+
 				openCases = getOpenCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null, caseHandlers);
 			}
 			return openCases;
-			
-		} catch (RemoteException e) {
-			throw new IBORuntimeException(e);
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, String[] caseHandlers) {
-		
-		try {
-			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
-			
-			Collection<GeneralCase> closedCases;
-			
-			if(caseHandlers == null) {
-			
-				closedCases = getClosedCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null);
-			} else {
-				
-				closedCases = getClosedCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null, caseHandlers);
-			}
-			return closedCases;
-			
+
 		} catch (RemoteException e) {
 			throw new IBORuntimeException(e);
 		}
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public Collection<GeneralCase> getClosedCases(User user, IWMainApplication iwma, IWUserContext iwuc, String[] caseHandlers) {
+
+		try {
+			boolean isCaseSuperAdmin = iwma.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwuc);
+
+			Collection<GeneralCase> closedCases;
+
+			if(caseHandlers == null) {
+
+				closedCases = getClosedCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null);
+			} else {
+
+				closedCases = getClosedCases(!isCaseSuperAdmin ? getUserBusiness().getUserGroupsDirectlyRelated(user) : null, caseHandlers);
+			}
+			return closedCases;
+
+		} catch (RemoteException e) {
+			throw new IBORuntimeException(e);
+		}
+	}
+
+	@Override
 	public Collection<Case> getFilteredProcesslessCases(Collection<Integer> ids, boolean notGeneralCases) {
 		if (ListUtil.isEmpty(ids)) {
 			return null;
 		}
-		
+
 		Collection<Case> cases = null;
 		if (notGeneralCases) {
 			try {
@@ -1264,29 +1327,30 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (ListUtil.isEmpty(generalCases)) {
 				return null;
 			}
-			
+
 			cases = new ArrayList<Case>(generalCases);
 		}
 		if (ListUtil.isEmpty(cases)) {
 			return null;
 		}
-		
+
 		List<Case> filteredCases = new ArrayList<Case>();
 		for (Case casse: cases) {
 			if (StringUtil.isEmpty(casse.getCaseManagerType())) {
 				filteredCases.add(casse);
 			}
 		}
-		
+
 		return filteredCases;
 	}
 
+	@Override
 	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases) {
 		Collection<Case> filteredCases = getFilteredProcesslessCases(ids, notGeneralCases);
 		if (ListUtil.isEmpty(filteredCases)) {
 			return null;
 		}
-		
+
 		Integer id = null;
 		List<Integer> filteredIds = new ArrayList<Integer>();
 		for (Case casse: filteredCases) {
@@ -1296,12 +1360,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			} catch(NumberFormatException e) {
 				e.printStackTrace();
 			}
-			
+
 			if (id != null && !filteredIds.contains(id)) {
 				filteredIds.add(id);
 			}
 		}
-		
+
 		return filteredIds;
 	}
 }
