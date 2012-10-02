@@ -205,9 +205,8 @@ function registerGridExpanderActionsForElement(event, element) {
 			return false;
 		}
 		
-		if (caseToExpand.attr('showLoadingMessage') == 'true') {
+		if (caseToExpand.attr('showLoadingMessage') == 'true')
 			showLoadingMessage(CASE_GRID_STRING_LOADING_PLEASE_WAIT);
-		}
 		var caseId = caseToExpand.attr(caseIdPar);
 		var usePDFDownloadColumn = caseToExpand.attr('usepdfdownloadcolumn') == 'true';
 		var allowPDFSigning = caseToExpand.attr('allowpdfsigning') == 'true';
@@ -424,9 +423,8 @@ function searchForCases(parameters) {
 	var caseListType = dwr.util.getValue(parameters[9]);
 	var contact = dwr.util.getValue(parameters[10]);
 	var showStatistics = jQuery('#' + showStatisticsId).attr('checked') == 'checked';
-	if (!showStatistics) {
+	if (!showStatistics)
 		showStatistics = false;
-	}
 	
 	var usePDFDownloadColumn = true;
 	var allowPDFSigning = true;
@@ -436,12 +434,14 @@ function searchForCases(parameters) {
 	var onlySubscribedCases = false;
 	var casesListCustomizer = null;
 	var customColumns = null;
+	var showLoadingMessageAttr = true;
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
 		
 		usePDFDownloadColumn = gridOpener.attr('usepdfdownloadcolumn') == 'true';
 		allowPDFSigning = gridOpener.attr('allowpdfsigning') == 'true';
 		hideEmptySection = gridOpener.attr('hideEmptySection') == 'true';
+		showLoadingMessageAttr = gridOpener.attr('showLoadingMessage') == 'true';
 		
 		instanceId = jQuery('input.casesListInstanceIdProperty').attr('value');
 		onlySubscribedCases = gridOpener.attr('onlysubscribedcases') == 'true';
@@ -460,10 +460,11 @@ function searchForCases(parameters) {
 	showLoadingMessage(parameters[7]);
 	
 	var criteriasId = 'id' + new Date().getTime() + '' + Math.floor(Math.random() * 10001);
-	var criterias = new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue, statusValue, dateRangeValue,
-		caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables, hideEmptySection, showCaseNumberColumn,
-		showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1, dwr.util.getValue(jQuery('select.listPagerSize').attr('id')),
-		jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'), criteriasId, showAllCases, casesListCustomizer, customColumns
+	var criterias = new CasesListSearchCriteriaBean(caseNumberValue, caseDescriptionValue, nameValue, personalIdValue, processValue, statusValue,
+		dateRangeValue, caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables,
+		hideEmptySection, showCaseNumberColumn,	showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1,
+		dwr.util.getValue(jQuery('select.listPagerSize').attr('id')), jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'),
+		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr
 	);
 	criterias.clearResults = true;
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
@@ -621,9 +622,11 @@ CasesListHelper.getStatusesToHide = function() {
 	return selectedStatusesToHide == null || selectedStatusesToHide == '' || selectedStatusesToHide == -1 ? null : new String(selectedStatusesToHide);
 }
 
-function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact, usePDFDownloadColumn,
-										allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
-										instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns) {
+function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact,
+	usePDFDownloadColumn, allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
+	instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns,
+	showLoadingMessageAttr) {
+	
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
@@ -664,6 +667,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.casesListCustomizer = casesListCustomizer;
 	this.customColumns = customColumns;
+	
+	this.showLoadingMessage = showLoadingMessageAttr;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
