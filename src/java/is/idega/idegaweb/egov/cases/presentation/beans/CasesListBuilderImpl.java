@@ -377,7 +377,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			Layer descriptionContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Description");
 			descriptionContainer.setStyleClass(VARIABLE_DESCRIPTION);
 			if (descriptionIsEditable) {
-				descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
+				if (properties.isDescriptionEditable())
+					descriptionContainer.setStyleClass("casesListBodyItemIsEditable");
 				descriptionContainer.setMarkupAttribute(caseIdParName, caseId);
 			}
 			String subject = theCase.getSubject();
