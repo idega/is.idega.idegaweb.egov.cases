@@ -73,9 +73,6 @@ import com.idega.webface.WFUtil;
 
 public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness, CasesBusiness {
 
-	/**
-	 * Comment for <code>serialVersionUID</code>
-	 */
 	private static final long serialVersionUID = -1807320113180412800L;
 
 	@Override
