@@ -86,7 +86,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),						//	6
 
 		new AdvancedProperty("string_ownerTotalCost", "Total cost"),								//	7
-		new AdvancedProperty("string_ownerGrantAmount", "Applied amount"),							//	8
+		new AdvancedProperty(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE, "Applied amount"),		//	8
 
 		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),						//	9
 
