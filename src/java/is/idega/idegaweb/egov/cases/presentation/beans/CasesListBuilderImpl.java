@@ -660,7 +660,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				navigationLayer.add(search);
 			}
 			navigationLayer.add(navigator);
-		}
+		} else
+			LOGGER.warning("Unable to add cases navigator");
 	}
 
 	private void addStatistics(IWContext iwc, Layer container, Collection<CasePresentation> cases) {
