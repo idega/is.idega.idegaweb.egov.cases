@@ -386,7 +386,16 @@ function changeCasesListPageSize(id, size, instanceId, containerId) {
 }
 
 function searchForCases(parameters) {
-	if (parameters == null || parameters.length < 14) {
+	if (parameters == null) {
+		alert('Search parameters are not provided!');
+		return false;
+	}
+	
+	if (parameters.action != null)
+		return parameters.action(parameters);
+	
+	if (parameters.length == null || parameters.length < 14) {
+		alert('Not enough parameters are provided!');
 		return false;
 	}
 	
