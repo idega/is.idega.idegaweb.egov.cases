@@ -661,7 +661,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 			navigationLayer.add(navigator);
 		} else
-			LOGGER.warning("Unable to add cases navigator");
+			LOGGER.warning("Unable to add cases navigator. Page size: " + pageSize + "; instance ID: " + instanceId + "; component ID: " +
+					componentId + "; total cases: " + totalCases);
 	}
 
 	private void addStatistics(IWContext iwc, Layer container, Collection<CasePresentation> cases) {
