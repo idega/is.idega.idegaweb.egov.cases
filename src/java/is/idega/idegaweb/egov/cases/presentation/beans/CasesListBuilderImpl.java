@@ -555,64 +555,70 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	@Override
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {
-		String type = properties.getType();
-		boolean showStatistics = properties.isShowStatistics();
-
-		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-
-		String emailAddress = getDefaultEmail();
-
-		boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
-
-		boolean searchResults = isSearchResultsList(type);
-		Layer container = getCasesListContainer(searchResults);
-
-		addProperties(container, properties);
-
-		int totalCases = getTotalCases(cases, searchResults, properties);
-
-		addNavigator(iwc, container, cases, properties, totalCases, searchResults);
-
-		IWResourceBundle iwrb = getResourceBundle(iwc);
-		CasesBusiness casesBusiness = getCasesBusiness(iwc);
-		if (casesBusiness == null) {
-			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list", "Sorry, error occurred - can not generate cases list.")));
-			return container;
-		}
-
-		Layer casesContainer = createHeader(iwc, container, totalCases, searchResults, properties);
-
-		if (totalCases < 1)
-			return container;
-
-		Layer casesBodyContainer = createBody(casesContainer);
-
-		int rowsCounter = 0;
-		Layer caseContainer = null;
-		Locale l = iwc.getCurrentLocale();
-		CaseStatus caseStatusReview = null;
+		long start = System.currentTimeMillis();
 		try {
-			caseStatusReview = casesBusiness.getCaseStatusReview();
-		} catch (RemoteException e) {
-			e.printStackTrace();
+			String type = properties.getType();
+			boolean showStatistics = properties.isShowStatistics();
+
+			Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
+
+			String emailAddress = getDefaultEmail();
+
+			boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
+
+			boolean searchResults = isSearchResultsList(type);
+			Layer container = getCasesListContainer(searchResults);
+
+			addProperties(container, properties);
+
+			int totalCases = getTotalCases(cases, searchResults, properties);
+
+			addNavigator(iwc, container, cases, properties, totalCases, searchResults);
+
+			IWResourceBundle iwrb = getResourceBundle(iwc);
+			CasesBusiness casesBusiness = getCasesBusiness(iwc);
+			if (casesBusiness == null) {
+				container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list",
+						"Sorry, error occurred - can not generate cases list.")));
+				return container;
+			}
+
+			Layer casesContainer = createHeader(iwc, container, totalCases, searchResults, properties);
+
+			if (totalCases < 1)
+				return container;
+
+			Layer casesBodyContainer = createBody(casesContainer);
+
+			int rowsCounter = 0;
+			Layer caseContainer = null;
+			Locale l = iwc.getCurrentLocale();
+			CaseStatus caseStatusReview = null;
+			try {
+				caseStatusReview = casesBusiness.getCaseStatusReview();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+
+			Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
+			for (CasePresentation theCase: casesInList) {
+				caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, rowsCounter, null, emailAddress,
+						descriptionIsEditable, properties, customLabels);
+				rowsCounter++;
+			}
+			if (caseContainer != null)
+				caseContainer.setStyleClass(lastRowStyle);
+
+			if (properties.isShowExportAllCasesButton())
+				container.add(getExportAllCasesButton(properties, iwrb));
+
+			if (showStatistics)
+				addStatistics(iwc, container, casesInList);
+
+			return container;
+		} finally {
+			LOGGER.info("Cases list were rendered in " + (System.currentTimeMillis() - start) + " ms. Cases in list: " + cases.getTotalCount());
 		}
-
-		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
-		for (CasePresentation theCase: casesInList) {
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, rowsCounter, null, emailAddress, descriptionIsEditable,
-					properties, customLabels);
-			rowsCounter++;
-		}
-		if (caseContainer != null)
-			caseContainer.setStyleClass(lastRowStyle);
-
-		if (properties.isShowExportAllCasesButton())
-			container.add(getExportAllCasesButton(properties, iwrb));
-
-		if (showStatistics)
-			addStatistics(iwc, container, casesInList);
-
-		return container;
 	}
 
 	private void addNavigator(IWContext iwc, Layer container, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, int totalCases,
