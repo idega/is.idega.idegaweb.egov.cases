@@ -110,14 +110,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			LOGGER.log(Level.WARNING, "Error getting cases managers", e);
 		}
 
-		if (ListUtil.isEmpty(managers)) {
+		if (ListUtil.isEmpty(managers))
 			return iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK);
-		}
 
 		String caseId = null;
-		for (Iterator<CasesRetrievalManager> managersIter = managers.iterator(); (managersIter.hasNext() && StringUtil.isEmpty(caseId));) {
+		for (Iterator<CasesRetrievalManager> managersIter = managers.iterator(); (managersIter.hasNext() && StringUtil.isEmpty(caseId));)
 			caseId = managersIter.next().resolveCaseId(iwc);
-		}
 
 		return caseId;
 	}
@@ -155,7 +153,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		addResources(resolveCaseId(iwc), iwc, getBundle(iwc), properties.getType());
 
 		if (searchResults) {
-			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results")).append(CoreConstants.SPACE);
+			StringBuilder message = new StringBuilder(iwrb.getLocalizedString("search_for_cases_results", "Your search results"))
+				.append(CoreConstants.SPACE);
 			message.append("(").append(totalCases).append("):");
 			container.add(new Heading3(message.toString()));
 
@@ -204,8 +203,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 
 		//	Creation date
-		Layer layer =  addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties.getDateCustomLabelLocalizationKey()) ?
-				"created_date" : properties.getDateCustomLabelLocalizationKey(), "Created date")), headerItem, "CreatedDate");
+		Layer layer =  addLayerToCasesList(headers, new Text(iwrb.getLocalizedString(StringUtil.isEmpty(properties
+				.getDateCustomLabelLocalizationKey()) ?
+						"created_date" : properties.getDateCustomLabelLocalizationKey(), "Created date")), headerItem, "CreatedDate");
 		layer.setStyleClass(VARIABLE_CREATION_DATE);
 
 		//	Status
@@ -298,12 +298,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, CasePresentation theCase, CaseStatus caseStatusReview, Locale l,
 			boolean isUserList, int rowsCounter, @SuppressWarnings("rawtypes") Map pages, String emailAddress, boolean descriptionIsEditable,
 			CaseListPropertiesBean properties, Map<String, Map<String, String>> labels) {
+
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
-		if (!StringUtil.isEmpty(theCase.getProcessName())) {
+		if (!StringUtil.isEmpty(theCase.getProcessName()))
 			caseContainer.setStyleClass(theCase.getProcessName());
-		}
 
 		User owner = theCase.getOwner();
 		IWTimestamp created = getCaseCreatedValue(theCase, properties);
@@ -383,10 +383,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 			String subject = theCase.getSubject();
 			if (subject != null && subject.length() > 100) {
-				subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT).append(CoreConstants.DOT).toString();
+				subject = new StringBuilder(subject.substring(0, 100)).append(CoreConstants.DOT).append(CoreConstants.DOT)
+						.append(CoreConstants.DOT).toString();
 			}
 			descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
 		} else if (!MapUtil.isEmpty(labels)) {
+			long start = System.currentTimeMillis();
+
 			Map<String, String> caseLabels = labels.get(caseId);
 			if (!MapUtil.isEmpty(caseLabels)) {
 				for (String column: customColumns) {
@@ -396,6 +399,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 						prepareCellToBeGridExpander(columnContainer, caseId, gridViewerId, properties);
 				}
 			}
+
+			LOGGER.info("Custom columns for case '" + theCase.getSubject() + "' added in " + (System.currentTimeMillis() - start) + " ms");
 		}
 
 		//	Creation date
@@ -425,7 +430,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!theCase.isBpm()) {
 			Image view = getBundle(iwc).getImage("edit.png", getResourceBundle(iwc).getLocalizedString("view_case", "View case"));
 			if (isUserList) {
-				childForContainer = getLinkToViewUserCase(iwc, theCase, view, pages, theCase.getCode(), status, properties.isAddCredentialsToExernalUrls());
+				childForContainer = getLinkToViewUserCase(iwc, theCase, view, pages, theCase.getCode(), status, properties
+						.isAddCredentialsToExernalUrls());
 			} else {
 				childForContainer = getProcessLink(iwc, view, theCase);
 			}
@@ -447,11 +453,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			multiHandleContainer.setStyleClass("lastColumn");
 		}
 
-		if (rowsCounter % 2 == 0) {
+		if (rowsCounter % 2 == 0)
 			caseContainer.setStyleClass("evenRow");
-		} else {
+		else
 			caseContainer.setStyleClass("oddRow");
-		}
 
 		caseContainer.add(new CSSSpacer());
 
@@ -556,6 +561,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	@Override
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {
 		long start = System.currentTimeMillis();
+		int casesToRender = 0;
 		try {
 			String type = properties.getType();
 			boolean showStatistics = properties.isShowStatistics();
@@ -601,6 +607,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 
 			Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
+			casesToRender = casesInList.size();
 			for (CasePresentation theCase: casesInList) {
 				caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, rowsCounter, null, emailAddress,
 						descriptionIsEditable, properties, customLabels);
@@ -617,12 +624,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			return container;
 		} finally {
-			LOGGER.info("Cases list were rendered in " + (System.currentTimeMillis() - start) + " ms. Cases in list: " + cases.getTotalCount());
+			LOGGER.info("Cases list were rendered in " + (System.currentTimeMillis() - start) + " ms. Rendered cases: " + casesToRender);
 		}
 	}
 
-	private void addNavigator(IWContext iwc, Layer container, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, int totalCases,
-			boolean searchResults) {
+	private void addNavigator(IWContext iwc, Layer container, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties,
+			int totalCases, boolean searchResults) {
 
 		int pageSize = properties.getPageSize();
 		int page = properties.getPage();
@@ -705,9 +712,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	private int getTotalCases(PagedDataCollection<CasePresentation> cases, boolean searchResults, CaseListPropertiesBean properties) {
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		int total = ListUtil.isEmpty(casesInList) ? 0 : searchResults ?
-													properties.getFoundResults() > 0 ?properties.getFoundResults() : casesInList == null ? 0 : cases.getTotalCount()
-				: casesInList == null ? 0 : casesInList.size();
+		int total = ListUtil.isEmpty(casesInList) ? 0 :
+			searchResults ?
+				properties.getFoundResults() > 0 ?
+					properties.getFoundResults() :
+					casesInList == null ? 0 : cases.getTotalCount()
+			: casesInList == null ? 0 : casesInList.size();
 		return searchResults ? total : cases == null ? 0 : cases.getTotalCount();
 	}
 
@@ -736,7 +746,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
 		if (casesBusiness == null) {
-			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list", "Sorry, error occurred - can not generate cases list.")));
+			container.add(new Heading3(iwrb.getLocalizedString("cases_list.can_not_get_cases_list",
+					"Sorry, error occurred - can not generate cases list.")));
 			return container;
 		}
 
@@ -759,8 +770,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
 		for (CasePresentation theCase: casesInList) {
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, true, rowsCounter, pages, emailAddress, descriptionIsEditable,
-					properties, customLabels);
+			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, true, rowsCounter, pages, emailAddress,
+					descriptionIsEditable, properties, customLabels);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
@@ -921,8 +932,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		//	Adding resources
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \"" + type.toString() +
-				"\";");
+		PresentationUtil.addJavaScriptActionToBody(iwc, "if(CASE_GRID_CASE_PROCESSOR_TYPE == null) var CASE_GRID_CASE_PROCESSOR_TYPE = \"" +
+				type.toString() + "\";");
 		PresentationUtil.addJavaScriptActionToBody(iwc, action.toString());
 	}
 
@@ -979,30 +990,24 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	@Override
 	public UIComponent getCaseManagerView(IWContext iwc, Integer caseId, String type) {
-
 		try {
-
 			Case theCase = getCasesBusiness(iwc).getCase(caseId);
 
 			CasesRetrievalManager caseManager;
-
-			if(theCase.getCaseManagerType() != null)
+			if (theCase.getCaseManagerType() != null)
 				caseManager = getCaseManagersProvider().getCaseManager();
 			else
 				caseManager = null;
 
-			if(caseManager != null) {
-
+			if (caseManager != null) {
 				UIComponent caseAssets = caseManager.getView(iwc, caseId, type, theCase.getCaseManagerType());
-
-				if(caseAssets != null)
+				if (caseAssets != null)
 					return caseAssets;
 				else
-					Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case assets component resolved from case manager: " + caseManager.getType() +
-							" by case pk: "+theCase.getPrimaryKey().toString());
+					Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case assets component resolved from case manager: " +
+							caseManager.getType() + " by case pk: "+theCase.getPrimaryKey().toString());
 			} else
 				Logger.getLogger(getClass().getName()).log(Level.WARNING, "No case manager resolved by type="+theCase.getCaseManagerType());
-
 		} catch (Exception e) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Exception while resolving case manager view", e);
 		}
@@ -1030,7 +1035,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	@Override
 	public String getSendEmailImage() {
-		return IWMainApplication.getDefaultIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("images/email.png");
+		return IWMainApplication.getDefaultIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER)
+				.getVirtualPathWithFileNameString("images/email.png");
 	}
 
 	private String getTitleSendEmail(IWResourceBundle iwrb) {
