@@ -388,8 +388,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 			descriptionContainer.add(new Text(subject == null ? CoreConstants.MINUS : subject));
 		} else if (!MapUtil.isEmpty(labels)) {
-			long start = System.currentTimeMillis();
-
 			Map<String, String> caseLabels = labels.get(caseId);
 			if (!MapUtil.isEmpty(caseLabels)) {
 				for (String column: customColumns) {
@@ -399,8 +397,6 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 						prepareCellToBeGridExpander(columnContainer, caseId, gridViewerId, properties);
 				}
 			}
-
-			LOGGER.info("Custom columns for case '" + theCase.getSubject() + "' added in " + (System.currentTimeMillis() - start) + " ms");
 		}
 
 		//	Creation date
