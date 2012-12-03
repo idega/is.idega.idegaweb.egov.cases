@@ -542,6 +542,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 
 	private Map<String, Map<String, String>> getCustomLabels(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {
+		long start = System.currentTimeMillis();
 		CasesListCustomizer customizer = getCasesListCustomizer(properties);
 		if (customizer == null)
 			return null;
@@ -551,11 +552,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return null;
 
 		List<String> casesIds = new ArrayList<String>();
-		for (CasePresentation theCase: theCases) {
+		for (CasePresentation theCase: theCases)
 			casesIds.add(theCase.getId());
-		}
 
-		return customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
+		Map<String, Map<String, String>> result = customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
+		LOGGER.info("Custom labels resolved in " + (System.currentTimeMillis() - start) + " ms");
+		return result;
 	}
 
 	@Override
