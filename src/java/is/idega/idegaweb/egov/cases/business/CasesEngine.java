@@ -11,6 +11,7 @@ import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.business.DefaultSpringBean;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.paging.PagedDataCollection;
+import com.idega.user.data.User;
 
 public interface CasesEngine {
 
@@ -53,5 +54,7 @@ public interface CasesEngine {
 	public AdvancedProperty getExportedCases(String instanceId, String uri);
 
 	public boolean showCaseAssets();
+
+	public void doLoadCases(User user);
 
 }
