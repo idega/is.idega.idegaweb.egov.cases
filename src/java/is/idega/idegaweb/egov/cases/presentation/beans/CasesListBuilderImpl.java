@@ -552,7 +552,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			casesIds.add(theCase.getId());
 
 		Map<String, Map<String, String>> result = customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
-		LOGGER.info("Custom labels resolved in " + (System.currentTimeMillis() - start) + " ms");
+		LOGGER.info("Custom labels (" + result + ") resolved in " + (System.currentTimeMillis() - start) + " ms");
 		return result;
 	}
 
