@@ -668,7 +668,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				navigationLayer.add(search);
 			}
 			navigationLayer.add(navigator);
-		} else
+		} else if (totalCases > 0)
 			LOGGER.warning("Unable to add cases navigator. Page size: " + pageSize + "; instance ID: " + instanceId + "; component ID: " +
 					componentId + "; total cases: " + totalCases);
 	}
