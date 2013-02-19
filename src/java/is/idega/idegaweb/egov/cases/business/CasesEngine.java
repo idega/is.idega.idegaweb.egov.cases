@@ -2,7 +2,7 @@ package is.idega.idegaweb.egov.cases.business;
 
 import java.util.List;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.presentation.beans.CasePresentation;
