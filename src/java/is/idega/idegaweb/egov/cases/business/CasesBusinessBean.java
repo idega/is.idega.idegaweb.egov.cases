@@ -38,6 +38,7 @@ import javax.faces.context.FacesContext;
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseBusinessBean;
 import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseStatus;
@@ -317,7 +318,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale, String bundleIdentifier) {
 		try {
 			String statusKey = status.getStatus();
-			String key = "case_status_key." + statusKey;
+			String key = ProcessConstants.CASE_STATUS_KEY + CoreConstants.DOT + statusKey;
 
 			String typeOrCodeKey = null;
 			if (theCase instanceof GeneralCase) {
