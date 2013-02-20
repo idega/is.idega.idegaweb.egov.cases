@@ -82,7 +82,7 @@ public abstract class CasesProcessor extends CasesBlock {
 
 	protected void display(IWContext iwc) throws Exception {
 		CaseManagerState caseHandlerState = WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
-		if(!caseHandlerState.getShowCaseHandler()) {
+		if (!caseHandlerState.getShowCaseHandler()) {
 
 			switch (parseAction(iwc)) {
 
@@ -124,7 +124,6 @@ public abstract class CasesProcessor extends CasesBlock {
 	}
 
 	private void showCaseManagerView(IWContext iwc) {
-
 		UIComponent view = null;
 
 		GeneralCaseManagerViewBuilder viewBuilder = WFUtil.getBeanInstance(GeneralCaseManagerViewBuilder.SPRING_BEAN_IDENTIFIER);
@@ -146,8 +145,8 @@ public abstract class CasesProcessor extends CasesBlock {
 		super.encodeBegin(fc);
 
 		try {
+			doResolveIds(IWContext.getIWContext(fc));
 			display(IWContext.getIWContext(fc));
-
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
@@ -160,9 +159,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		super.encodeChildren(context);
 
 		CaseManagerState caseHandlerState = WFUtil.getBeanInstance(CaseManagerState.beanIdentifier);
-
-		if(caseHandlerState.getShowCaseHandler()) {
-
+		if (caseHandlerState.getShowCaseHandler()) {
 			UIComponent facet = getFacet(caseManagerFacet);
 			renderChild(context, facet);
 		}
