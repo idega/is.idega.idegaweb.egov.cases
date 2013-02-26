@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.idegaweb.IWBundle;
@@ -28,6 +29,7 @@ public class CasesBoardViewCustomizer extends Block {
 	public static final String FINANCING_TABLE_COLUMN = "financing_table_column";
 
 	@Autowired
+	@Qualifier(BoardCasesManager.BEAN_NAME)
 	private BoardCasesManager boardCaseManager;
 
 	@Override
