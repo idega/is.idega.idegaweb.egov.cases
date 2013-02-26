@@ -164,7 +164,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					int financingTableCellIndex = key;
 
 					HSSFCell cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_STRING);
-					cell.setCellValue(iwrb.getLocalizedString("total", "Total"));
+					cell.setCellValue(getIWResourceBundle(iwc).getLocalizedString("total", "Total"));
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 					cell.setCellValue(String.valueOf(estimationTotal));
@@ -275,4 +275,22 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		streamIn.close();
 	}
 
+	protected IWResourceBundle getIWResourceBundle(IWContext iwc) {
+		if (iwc == null) {
+			return null;
+		}
+		
+		IWMainApplication iwma = iwc.getIWMainApplication();
+		if (iwma == null) {
+			return null;
+		}
+		
+		com.idega.idegaweb.IWBundle iwb = iwma.getBundle(
+				CasesConstants.IW_BUNDLE_IDENTIFIER);
+		if (iwb == null) {
+			return null;
+		}
+		
+		return iwb.getResourceBundle(iwc);
+	}
 }
