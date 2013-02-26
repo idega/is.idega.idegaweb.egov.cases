@@ -224,7 +224,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	protected String getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
-			info = boardCasesManager.getHandlerInfo(iwc, handler);
+			info = getBoardCasesManager().getHandlerInfo(iwc, handler);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
