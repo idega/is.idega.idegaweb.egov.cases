@@ -1,5 +1,5 @@
 /**
- * @(#)CasesProcessPropertyHandler.java    1.0.0 11:37:26
+ * @(#)HandlerCases.java    1.0.0 1:56:21 PM
  *
  * Idega Software hf. Source Code Licence Agreement x
  *
@@ -15,7 +15,7 @@
  *     (1) funds have been received for payment of the License for Software and 
  *     (2) the appropriate License has been purchased as stated in the 
  *     documentation for Software. As used in this License Agreement, 
- *      Licensee  shall also mean the individual using or installing 
+ *     Licensee shall also mean the individual using or installing 
  *     the source code together with any individual or entity, including 
  *     but not limited to your employer, on whose behalf you are acting 
  *     in using or installing the Source Code. By completing this agreement, 
@@ -80,97 +80,93 @@
  *     License that was purchased to become eligible to receive the Source 
  *     Code after Licensee receives the source code. 
  */
-package is.idega.idegaweb.egov.cases.presentation.handlers;
+package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.CasesEngine;
-import is.idega.idegaweb.egov.cases.presentation.CasesSearcher;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import java.util.List;
+import javax.faces.context.FacesContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.idega.builder.bean.AdvancedProperty;
-import com.idega.core.builder.presentation.ICPropertyHandler;
-import com.idega.idegaweb.IWResourceBundle;
+import com.idega.block.process.business.CasesRetrievalManager;
+import com.idega.block.process.presentation.CaseBlock;
+import com.idega.block.process.presentation.UICasesList;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.PresentationObject;
-import com.idega.presentation.ui.DropdownMenu;
-import com.idega.presentation.ui.SelectOption;
-import com.idega.util.expression.ELUtil;
+import com.idega.presentation.Layer;
+import com.idega.presentation.text.Text;
 
 /**
- * <p>Handler, that holds values for "Process" property defined in 
- * {@link CasesSearcher}.</p>
+ * <p>Cases viewer for current handler only, show cases that only
+ * current handler manages.</p>
  * <p>You can report about problems to: 
- * <a href="mailto:martynas@idega.com">Martynas Stakė</a></p>
- * <p>You can expect to find some test cases notice in the end of the file.</p>
+ * <a href="mailto:martynas@idega.is">Martynas Stakė</a></p>
  *
- * @version 1.0.0 2012.01.17
- * @author martynas
+ * @version 1.0.0 Jan 17, 2013
+ * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
  */
-public class CasesProcessPropertyHandler implements ICPropertyHandler {
+public class HandlerCases extends CaseBlock {
 	
-	@Autowired
-	private CasesEngine casesEngine;
+	@Override
+	public void encodeBegin(FacesContext fc) throws IOException {
+		super.encodeBegin(fc);
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.builder.presentation.ICPropertyHandler#getDefaultHandlerTypes()
-	 */
-	public List<?> getDefaultHandlerTypes() {
+		IWContext iwc = IWContext.getIWContext(fc);
+
+		if (!iwc.isLoggedOn()) {
+			add(new Text("No user logged on..."));
+			return;
+		}
+
+		try {
+			display(iwc);
+
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			Logger.getLogger(getClassName()).log(Level.SEVERE, "Exception while displaying CasesProcessor", e);
+		}
+	}
+	
+	protected void display(IWContext iwc) throws Exception {
+		showList(iwc);
+	}
+
+
+	private void showList(IWContext iwc) throws RemoteException {
+		Layer layer = new Layer(Layer.DIV);
+		layer.setStyleClass("caseElement");
+		layer.setID("handlerCases");
+
+		UICasesList list = getCasesList(iwc, layer.getId());
+		layer.add(list);
+
+		add(layer);
+	}
+	
+	@Override
+	protected void present(IWContext iwc) throws Exception {
+	}
+
+	@Override
+	public boolean showCheckBox() {
+		return false;
+	}
+
+	@Override
+	public boolean showCheckBoxes() {
+		return false;
+	}
+
+	@Override
+	public String getCasesProcessorType() {
+		return CasesRetrievalManager.CASE_LIST_TYPE_HANDLER;
+	}
+
+	@Override
+	public Map<Object, Object> getUserCasesPageMap() {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.builder.presentation.ICPropertyHandler#getHandlerObject(java.lang.String, java.lang.String, com.idega.presentation.IWContext, boolean, java.lang.String, java.lang.String)
-	 */
-	public PresentationObject getHandlerObject(String name, String stringValue,
-			IWContext iwc, boolean oldGenerationHandler, String instanceId,
-			String method) {
-
-		DropdownMenu processList = new DropdownMenu();
-
-		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-
-		processList.addOption(new SelectOption(iwrb.getLocalizedString("select_process", "Select process"), -1));
-
-		if (casesEngine == null) {
-			getCasesEngine();
-		}
-		
-		if (casesEngine == null) {
-			return processList;
-		}
-		
-		List<AdvancedProperty> processes = casesEngine.getAvailableProcesses(iwc);
-		
-		if (processes == null) {
-			return processList;
-		}
-		
-		for (AdvancedProperty process : processes) {
-			processList.addOption(new SelectOption(process.getValue(), process.getId()));
-		}
-
-		processList.setSelectedElement(stringValue);
-
-		return processList;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.idega.core.builder.presentation.ICPropertyHandler#onUpdate(java.lang.String[], com.idega.presentation.IWContext)
-	 */
-	public void onUpdate(String[] values, IWContext iwc) {}
-	
-	private CasesEngine getCasesEngine() {
-		if (casesEngine == null) {
-		
-			ELUtil.getInstance().autowire(this);
-		}
-		return casesEngine;
-	}
-
-	public void setCasesEngine(CasesEngine casesEngine) {
-		this.casesEngine = casesEngine;
-	}
 }

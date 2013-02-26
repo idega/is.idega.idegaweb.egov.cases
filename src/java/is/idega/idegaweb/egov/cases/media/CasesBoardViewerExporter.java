@@ -28,10 +28,12 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.file.util.MimeTypeUtil;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.DownloadWriter;
 import com.idega.io.MediaWritable;
@@ -44,15 +46,25 @@ import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
+import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 
 public class CasesBoardViewerExporter extends DownloadWriter implements MediaWritable {
 
-private MemoryFileBuffer memory;
+	private MemoryFileBuffer memory;
 
 	@Autowired
+	@Qualifier(BoardCasesManager.BEAN_NAME)
 	private BoardCasesManager boardCasesManager;
 
+	protected BoardCasesManager getBoardCasesManager() {
+		if (this.boardCasesManager == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		
+		return this.boardCasesManager;
+	}
+	
 	@Override
 	public String getMimeType() {
 		return MimeTypeUtil.MIME_TYPE_EXCEL_2;
@@ -124,18 +136,18 @@ private MemoryFileBuffer memory;
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String estimation = info.get(CasesBoardViewer.ESTIMATED_COST);
-						estimationTotal += boardCasesManager.getNumberValue(estimation);
+						estimationTotal += getBoardCasesManager().getNumberValue(estimation);
 						cell.setCellValue(estimation);
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
-						long sugg = boardCasesManager.getNumberValue(suggestion);
+						long sugg = getBoardCasesManager().getNumberValue(suggestion);
 						suggestionTotal += sugg;
 						cell.setCellValue(String.valueOf(sugg));
 
 						cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
 						String decision = info.get(CasesBoardViewer.BOARD_DECISION);
-						long dec = boardCasesManager.getNumberValue(decision);
+						long dec = getBoardCasesManager().getNumberValue(decision);
 						decisionTotal += dec;
 						cell.setCellValue(String.valueOf(dec));
 
@@ -152,7 +164,7 @@ private MemoryFileBuffer memory;
 					int financingTableCellIndex = key;
 
 					HSSFCell cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_STRING);
-					cell.setCellValue(iwrb.getLocalizedString("total", "Total"));
+					cell.setCellValue(getIWResourceBundle(iwc).getLocalizedString("total", "Total"));
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 					cell.setCellValue(String.valueOf(estimationTotal));
@@ -167,9 +179,9 @@ private MemoryFileBuffer memory;
 					HSSFCell bodyRowCell = row.createCell(cellIndex);
 
 					for (AdvancedProperty entry: entries) {
-						if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(5).getId())) {
+						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.CASE_IDENTIFIER)) {
 							bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-						} else if (boardCasesManager.isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
+						} else if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
 							bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 						} else {
 							bodyRowCell.setCellValue(entry.getValue());
@@ -209,10 +221,10 @@ private MemoryFileBuffer memory;
 				.toString(), memory.length());
 	}
 
-	private String getHandlerInfo(IWContext iwc, User handler) {
+	protected String getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
-			info = boardCasesManager.getHandlerInfo(iwc, handler);
+			info = getBoardCasesManager().getHandlerInfo(iwc, handler);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -224,7 +236,7 @@ private MemoryFileBuffer memory;
 		return info.getId();
 	}
 
-	private void createCellsWithValues(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
+	protected void createCellsWithValues(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
@@ -237,7 +249,7 @@ private MemoryFileBuffer memory;
 		}
 	}
 
-	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
+	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
@@ -263,4 +275,133 @@ private MemoryFileBuffer memory;
 		streamIn.close();
 	}
 
+	protected IWResourceBundle getIWResourceBundle(IWContext iwc) {
+		if (iwc == null) {
+			return null;
+		}
+		
+		IWMainApplication iwma = iwc.getIWMainApplication();
+		if (iwma == null) {
+			return null;
+		}
+		
+		com.idega.idegaweb.IWBundle iwb = iwma.getBundle(
+				CasesConstants.IW_BUNDLE_IDENTIFIER);
+		if (iwb == null) {
+			return null;
+		}
+		
+		return iwb.getResourceBundle(iwc);
+	}
+	
+	protected CaseBoardTableBean getTableData(IWContext iwc) {
+		if (iwc == null) {
+			return null;
+		}
+
+		return getBoardCasesManager().getTableData(
+				iwc, 
+				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER), 
+				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER), 
+				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID));
+	}
+	
+	protected OutputStream createOutputStream() {
+		memory = new MemoryFileBuffer();
+		return new MemoryOutputStream(memory);
+	}
+	
+	protected HSSFFont createBigFont(HSSFWorkbook workBook) {
+		if (workBook == null) {
+			return null;
+		}
+		
+		HSSFFont bigFont = workBook.createFont();
+		bigFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		bigFont.setFontHeightInPoints((short) 13);
+		return bigFont;
+	}
+	
+	protected HSSFCellStyle createBigStyle(HSSFWorkbook workBook, HSSFFont font) {
+		if (workBook == null) {
+			return null;
+		}
+		
+		HSSFCellStyle bigStyle = workBook.createCellStyle();
+		
+		if (font != null) {
+			bigStyle.setFont(font);
+		}
+		
+		return bigStyle;
+	}
+	
+	protected HSSFSheet createSheet(HSSFWorkbook workBook, 
+			Map<Integer, List<AdvancedProperty>> headers, IWContext iwc) {
+		if (workBook == null || iwc == null) {
+			return null;
+		}
+		
+		HSSFSheet sheet = workBook.createSheet(StringHandler.shortenToLength(
+				getIWResourceBundle(iwc).getLocalizedString(
+						"cases_board_viewer.cases_board", "Cases board"), 
+				30));
+		
+		if (!MapUtil.isEmpty(headers)) {
+			createHeaders(
+					sheet, 
+					createBigStyle(workBook, createBigFont(workBook)), 
+					headers, 
+					0);
+		}
+		
+		return sheet;
+	}
+	
+	protected boolean write(OutputStream streamOut, HSSFWorkbook workBook, IWContext iwc) {
+		try {
+			workBook.write(streamOut);
+		} catch (Exception e) {
+			Logger.getLogger(CasesBoardViewer.class.getName()).log(Level.SEVERE, "Error writing cases board to Excel!", e);
+			return false;
+		} finally {
+			IOUtil.closeOutputStream(streamOut);
+		}
+
+		memory.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
+		setAsDownload(iwc, 
+				new StringBuilder(getIWResourceBundle(iwc).getLocalizedString(
+						"cases_board_viewer.exported_data", "Exported cases board"
+						)).append(".xls").toString(), 
+				memory.length());
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * <p>Automatically fits content to each column in sheet.</p>
+	 * @param sheet to format;
+	 * @return <code>true</code> if formatted, false otherwise;
+	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
+	 */
+	protected boolean autosizeSheetColumns(HSSFSheet sheet) {
+		if (sheet == null) {
+			return false;
+		}
+		
+		for (int i = 0; i < sheet.getLastRowNum(); i++) {
+			HSSFRow row = sheet.getRow(i);
+			int cell = 0;
+			for (Iterator<Cell> cellsIter = row.cellIterator(); cellsIter.hasNext();) {
+				cellsIter.next();
+
+				if (row.getCell(cell) != null)
+					sheet.autoSizeColumn(cell);
+				cell++;
+			}
+		}
+		
+		return true;
+	}
 }
