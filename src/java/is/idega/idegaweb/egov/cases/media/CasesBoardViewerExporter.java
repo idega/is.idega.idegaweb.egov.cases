@@ -28,10 +28,12 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.file.util.MimeTypeUtil;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.DownloadWriter;
 import com.idega.io.MediaWritable;
@@ -44,15 +46,25 @@ import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
+import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 
 public class CasesBoardViewerExporter extends DownloadWriter implements MediaWritable {
 
-private MemoryFileBuffer memory;
+	private MemoryFileBuffer memory;
 
 	@Autowired
+	@Qualifier(BoardCasesManager.BEAN_NAME)
 	private BoardCasesManager boardCasesManager;
 
+	protected BoardCasesManager getBoardCasesManager() {
+		if (this.boardCasesManager == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		
+		return this.boardCasesManager;
+	}
+	
 	@Override
 	public String getMimeType() {
 		return MimeTypeUtil.MIME_TYPE_EXCEL_2;
@@ -124,18 +136,18 @@ private MemoryFileBuffer memory;
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String estimation = info.get(CasesBoardViewer.ESTIMATED_COST);
-						estimationTotal += boardCasesManager.getNumberValue(estimation);
+						estimationTotal += getBoardCasesManager().getNumberValue(estimation);
 						cell.setCellValue(estimation);
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
-						long sugg = boardCasesManager.getNumberValue(suggestion);
+						long sugg = getBoardCasesManager().getNumberValue(suggestion);
 						suggestionTotal += sugg;
 						cell.setCellValue(String.valueOf(sugg));
 
 						cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
 						String decision = info.get(CasesBoardViewer.BOARD_DECISION);
-						long dec = boardCasesManager.getNumberValue(decision);
+						long dec = getBoardCasesManager().getNumberValue(decision);
 						decisionTotal += dec;
 						cell.setCellValue(String.valueOf(dec));
 
@@ -167,9 +179,9 @@ private MemoryFileBuffer memory;
 					HSSFCell bodyRowCell = row.createCell(cellIndex);
 
 					for (AdvancedProperty entry: entries) {
-						if (boardCasesManager.isColumnOfDomain(entry.getId(), CasesBoardViewer.CASE_FIELDS.get(5).getId())) {
+						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.CASE_IDENTIFIER)) {
 							bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-						} else if (boardCasesManager.isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
+						} else if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
 							bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 						} else {
 							bodyRowCell.setCellValue(entry.getValue());
@@ -209,7 +221,7 @@ private MemoryFileBuffer memory;
 				.toString(), memory.length());
 	}
 
-	private String getHandlerInfo(IWContext iwc, User handler) {
+	protected String getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
 			info = boardCasesManager.getHandlerInfo(iwc, handler);
@@ -224,7 +236,7 @@ private MemoryFileBuffer memory;
 		return info.getId();
 	}
 
-	private void createCellsWithValues(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
+	protected void createCellsWithValues(HSSFSheet sheet, HSSFCellStyle cellStyle, List<String> labels, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
@@ -237,7 +249,7 @@ private MemoryFileBuffer memory;
 		}
 	}
 
-	private void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
+	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
