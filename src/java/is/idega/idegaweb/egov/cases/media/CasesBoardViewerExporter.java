@@ -293,4 +293,115 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		
 		return iwb.getResourceBundle(iwc);
 	}
+	
+	protected CaseBoardTableBean getTableData(IWContext iwc) {
+		if (iwc == null) {
+			return null;
+		}
+
+		return getBoardCasesManager().getTableData(
+				iwc, 
+				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER), 
+				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER), 
+				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID));
+	}
+	
+	protected OutputStream createOutputStream() {
+		memory = new MemoryFileBuffer();
+		return new MemoryOutputStream(memory);
+	}
+	
+	protected HSSFFont createBigFont(HSSFWorkbook workBook) {
+		if (workBook == null) {
+			return null;
+		}
+		
+		HSSFFont bigFont = workBook.createFont();
+		bigFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		bigFont.setFontHeightInPoints((short) 13);
+		return bigFont;
+	}
+	
+	protected HSSFCellStyle createBigStyle(HSSFWorkbook workBook, HSSFFont font) {
+		if (workBook == null) {
+			return null;
+		}
+		
+		HSSFCellStyle bigStyle = workBook.createCellStyle();
+		
+		if (font != null) {
+			bigStyle.setFont(font);
+		}
+		
+		return bigStyle;
+	}
+	
+	protected HSSFSheet createSheet(HSSFWorkbook workBook, 
+			Map<Integer, List<AdvancedProperty>> headers, IWContext iwc) {
+		if (workBook == null || iwc == null) {
+			return null;
+		}
+		
+		HSSFSheet sheet = workBook.createSheet(StringHandler.shortenToLength(
+				getIWResourceBundle(iwc).getLocalizedString(
+						"cases_board_viewer.cases_board", "Cases board"), 
+				30));
+		
+		if (!MapUtil.isEmpty(headers)) {
+			createHeaders(
+					sheet, 
+					createBigStyle(workBook, createBigFont(workBook)), 
+					headers, 
+					0);
+		}
+		
+		return sheet;
+	}
+	
+	protected boolean write(OutputStream streamOut, HSSFWorkbook workBook, IWContext iwc) {
+		try {
+			workBook.write(streamOut);
+		} catch (Exception e) {
+			Logger.getLogger(CasesBoardViewer.class.getName()).log(Level.SEVERE, "Error writing cases board to Excel!", e);
+			return false;
+		} finally {
+			IOUtil.closeOutputStream(streamOut);
+		}
+
+		memory.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
+		setAsDownload(iwc, 
+				new StringBuilder(getIWResourceBundle(iwc).getLocalizedString(
+						"cases_board_viewer.exported_data", "Exported cases board"
+						)).append(".xls").toString(), 
+				memory.length());
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * <p>Automatically fits content to each column in sheet.</p>
+	 * @param sheet to format;
+	 * @return <code>true</code> if formatted, false otherwise;
+	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
+	 */
+	protected boolean autosizeSheetColumns(HSSFSheet sheet) {
+		if (sheet == null) {
+			return false;
+		}
+		
+		for (int i = 0; i < sheet.getLastRowNum(); i++) {
+			HSSFRow row = sheet.getRow(i);
+			int cell = 0;
+			for (Iterator<Cell> cellsIter = row.cellIterator(); cellsIter.hasNext();) {
+				cellsIter.next();
+
+				if (row.getCell(cell) != null)
+					sheet.autoSizeColumn(cell);
+				cell++;
+			}
+		}
+		
+		return true;
+	}
 }
