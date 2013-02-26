@@ -15,7 +15,7 @@
  *     (1) funds have been received for payment of the License for Software and 
  *     (2) the appropriate License has been purchased as stated in the 
  *     documentation for Software. As used in this License Agreement, 
- *     �Licensee� shall also mean the individual using or installing 
+ *     Licensee shall also mean the individual using or installing 
  *     the source code together with any individual or entity, including 
  *     but not limited to your employer, on whose behalf you are acting 
  *     in using or installing the Source Code. By completing this agreement, 
