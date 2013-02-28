@@ -155,7 +155,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			return;
 		}
 
-		ELUtil.getInstance().autowire(this);
+//		ELUtil.getInstance().autowire(this);
 		uuid = getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this);
 		if (StringUtil.isEmpty(uuid))
 			uuid = CoreConstants.MINUS;
