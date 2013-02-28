@@ -155,7 +155,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 			return;
 		}
 
-//		ELUtil.getInstance().autowire(this);
 		uuid = getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this);
 		if (StringUtil.isEmpty(uuid))
 			uuid = CoreConstants.MINUS;
@@ -346,7 +345,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 				} else {
 					TableCell2 bodyRowCell = row.createCell();
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
-					int rowSpan = ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
+					int rowSpan = getRowSpan(financingInfo);
 					bodyRowCell.setRowSpan(rowSpan);
 
 					for (AdvancedProperty entry: entries) {
@@ -422,6 +421,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 
 		return true;
+	}
+
+	protected int getRowSpan(List<Map<String, String>> financingInfo) {
+		if (ListUtil.isEmpty(financingInfo)) {
+			return 1;
+		}
+		
+		return ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
 	}
 
 	private UIComponent getHandlerInfo(IWContext iwc, User handler) {
