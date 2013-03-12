@@ -69,7 +69,7 @@
             </value>
             <type>map</type>
           </key>
-                    <key>
+          <key>
             <name>:method:1025:implied:void:setDescriptionEditable:boolean:</name>
             <value>
               <map>
