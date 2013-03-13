@@ -22,12 +22,15 @@ import javax.faces.context.FacesContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.BuilderLogicWrapper;
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.core.idgenerator.business.UUIDGenerator;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
@@ -152,7 +155,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 			return;
 		}
 
-		ELUtil.getInstance().autowire(this);
 		uuid = getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this);
 		if (StringUtil.isEmpty(uuid))
 			uuid = CoreConstants.MINUS;
@@ -282,7 +284,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 						long sugg = getBoardCasesManager().getNumberValue(suggestion);
 						suggestionTotal += sugg;
 						suggestionCell.add(new Text(String.valueOf(sugg)));
-						makeCellEditable(suggestionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						
+						if (!getCaseBusiness().isCaseClosed(rowBean.getCaseIdentifier())) {
+							makeCellEditable(suggestionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						}
+						
 						suggestionCell.setStyleClass(BOARD_SUGGESTION);
 						suggestionCell.setMarkupAttribute("task_index", index);
 						suggestionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -293,7 +299,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 						long dec = getBoardCasesManager().getNumberValue(decision);
 						decisionTotal += dec;
 						decisionCell.add(new Text(String.valueOf(dec)));
-						makeCellEditable(decisionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						
+						if (!getCaseBusiness().isCaseClosed(rowBean.getCaseIdentifier())) {
+							makeCellEditable(decisionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
+						}
+						
 						decisionCell.setStyleClass(BOARD_DECISION);
 						decisionCell.setMarkupAttribute("task_index", index);
 						decisionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -335,7 +345,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 				} else {
 					TableCell2 bodyRowCell = row.createCell();
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
-					int rowSpan = ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
+					int rowSpan = getRowSpan(financingInfo);
 					bodyRowCell.setRowSpan(rowSpan);
 
 					for (AdvancedProperty entry: entries) {
@@ -349,6 +359,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 							//	E-mail link to handler
 							bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
 						} else if (!StringUtil.isEmpty(entry.getValue())) {
+							bodyRowCell.setStyleClass(entry.getId());
 							bodyRowCell.add(new Text(entry.getValue()));
 						} else {
 							bodyRowCell.add(new Text(CoreConstants.MINUS));
@@ -356,9 +367,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 						//	Editable fields
 						String editableType = EDITABLE_FIELDS.get(entry.getId());
-						if (!StringUtil.isEmpty(editableType))
+						if (!StringUtil.isEmpty(editableType) && !getCaseBusiness().isCaseClosed(rowBean.getCaseIdentifier()))
 							makeCellEditable(bodyRowCell, editableType);
-						}
+					}
 				}
 			}
 
@@ -412,6 +423,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 		return true;
 	}
 
+	protected int getRowSpan(List<Map<String, String>> financingInfo) {
+		if (ListUtil.isEmpty(financingInfo)) {
+			return 1;
+		}
+		
+		return ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
+	}
+
 	private UIComponent getHandlerInfo(IWContext iwc, User handler) {
 		AdvancedProperty info = null;
 		try {
@@ -444,7 +463,19 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 		return StringUtil.isEmpty(uri) ? iwc.getRequestURI() : uri;
 	}
-
+		
+	protected CaseBusiness getCaseBusiness() {
+		try {
+			return IBOLookup.getServiceInstance(CoreUtil.getIWContext(), CaseBusiness.class);
+		} catch (IBOLookupException e) {
+			LOGGER.log(Level.WARNING, "Unable to get " + CaseBusiness.class + 
+					" bean.", e);
+		}
+		
+		return null;
+		
+	}
+	
 	private void makeCellEditable(TableCell2 cell, String type) {
 		cell.setStyleClass(new StringBuilder("casesBoardViewerTableEditableCell").append(type).toString());
 	}

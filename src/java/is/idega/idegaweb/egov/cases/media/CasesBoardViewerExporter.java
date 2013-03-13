@@ -72,32 +72,15 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
-		ELUtil.getInstance().autowire(this);
-
-		String processName = iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER);
-		String caseStatus = iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER);
-		String uuid = iwc.getParameter(CasesBoardViewer.PARAMETER_UUID);
-
-		CaseBoardTableBean data = boardCasesManager.getTableData(iwc, caseStatus, processName, uuid);
+		
+		CaseBoardTableBean data = getTableData(iwc);
 		if (data == null || !data.isFilledWithData())
 			return;
-
-		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-
-		memory = new MemoryFileBuffer();
-		OutputStream streamOut = new MemoryOutputStream(memory);
+		
 		HSSFWorkbook workBook = new HSSFWorkbook();
-
-		HSSFFont bigFont = workBook.createFont();
-		bigFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		bigFont.setFontHeightInPoints((short) 13);
-		HSSFCellStyle bigStyle = workBook.createCellStyle();
-		bigStyle.setFont(bigFont);
-
-		HSSFSheet sheet = workBook.createSheet(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_board_viewer.cases_board",
-				"Cases board"), 30));
-		int rowNumber = 0;
-		createHeaders(sheet, bigStyle, data.getHeaderLabels(), rowNumber++);
+		HSSFSheet sheet = createSheet(workBook, data.getHeaderLabels(), iwc);
+		
+		int rowNumber = 1;
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			HSSFRow row = sheet.createRow(rowNumber++);
 
@@ -194,31 +177,8 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 
 		createCellsWithValues(sheet, null, data.getFooterValues(), rowNumber);
-
-		for (int i = 0; i < rowNumber; i++) {
-			HSSFRow row = sheet.getRow(i);
-			int cell = 0;
-			for (Iterator<Cell> cellsIter = row.cellIterator(); cellsIter.hasNext();) {
-				cellsIter.next();
-
-				if (row.getCell(cell) != null)
-					sheet.autoSizeColumn(cell);
-				cell++;
-			}
-		}
-
-		try {
-			workBook.write(streamOut);
-		} catch (Exception e) {
-			Logger.getLogger(CasesBoardViewer.class.getName()).log(Level.SEVERE, "Error writing cases board to Excel!", e);
-			return;
-		} finally {
-			IOUtil.closeOutputStream(streamOut);
-		}
-
-		memory.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
-		setAsDownload(iwc, new StringBuilder(iwrb.getLocalizedString("cases_board_viewer.exported_data", "Exported cases board")).append(".xls")
-				.toString(), memory.length());
+		autosizeSheetColumns(sheet);
+		write(createOutputStream(), workBook, iwc);
 	}
 
 	protected String getHandlerInfo(IWContext iwc, User handler) {

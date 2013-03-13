@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.business.CasesRetrievalManager;
+import com.idega.block.process.business.ExternalEntityInterface;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
@@ -251,6 +252,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			layer.setMarkupAttribute("commentsmanageridentifier", properties.getCommentsManagerIdentifier());
 		layer.setMarkupAttribute("showattachmentstatistics", properties.isShowAttachmentStatistics());
 		layer.setMarkupAttribute("showonlycreatorincontacts", properties.isShowOnlyCreatorInContacts());
+		layer.setMarkupAttribute("namefromexternalentity", properties.isNameFromExternalEntity());
 		layer.setMarkupAttribute("onlysubscribedcases", properties.isOnlySubscribedCases());
 		layer.setMarkupAttribute("showlogexportbutton", properties.isShowLogExportButton());
 		layer.setMarkupAttribute("showcomments", properties.isShowComments());
@@ -366,8 +368,28 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (properties.isShowCreatorColumn()) {
 				Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
 				senderContainer.setStyleClass(VARIABLE_SENDER);
-				senderContainer.add(owner == null ? new Text(CoreConstants.MINUS) : new Text(new Name(owner.getFirstName(), owner.getMiddleName(),
-						owner.getLastName()).getName(l)));
+				
+				StringBuilder senderName = new StringBuilder();
+				if (properties.isNameFromExternalEntity() && getExternalEntityInterface() != null) {
+					String ownerCompanyName = getExternalEntityInterface().getName(owner);
+					if (!StringUtil.isEmpty(ownerCompanyName)) {
+						senderName.append(ownerCompanyName).append(" (");
+					}
+				}
+				
+				if (owner != null) {
+					senderName.append(new Name(owner.getFirstName(), owner.getMiddleName(),
+							owner.getLastName()).getName(l));
+				} else {
+					senderName.append(CoreConstants.MINUS);
+				}
+				
+				if (senderName.indexOf(CoreConstants.BRACKET_LEFT) != -1) {
+					senderName.deleteCharAt(senderName.lastIndexOf(CoreConstants.SPACE));
+					senderName.append(CoreConstants.BRACKET_RIGHT);
+				}
+				
+				senderContainer.add(new Text(senderName.toString()));
 				if (theCase.isBpm()) {
 					prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
 				}
@@ -462,6 +484,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 
 		return caseContainer;
+	}
+	
+	@Autowired(required=false)
+	protected ExternalEntityInterface eei = null;
+	
+	protected ExternalEntityInterface getExternalEntityInterface() {
+		if (this.eei == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		
+		return this.eei; 
 	}
 
 	private String getEmailAddressMailtoFormattedWithSubject(String emailAddress, String subject) {
