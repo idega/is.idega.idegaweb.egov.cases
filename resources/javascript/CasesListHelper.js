@@ -219,12 +219,13 @@ function registerGridExpanderActionsForElement(event, element) {
 		var showContacts = caseToExpand.attr('showcontacts') == 'true';
 		var specialBackPage = caseToExpand.attr('specialbackpage');
 		var nameFromExternalEntity = caseToExpand.attr('nameFromExternalEntity') == 'true';
+		var showUserProfilePicture = caseToExpand.attr('showUserProfilePicture') == 'true';
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, 
 				CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, 
 				allowPDFSigning, hideEmptySection, commentsManagerIdentifier, 
 				showAttachmentStatistics, showOnlyCreatorInContacts, 
 				showLogExportButton, showComments, showContacts, specialBackPage,
-				nameFromExternalEntity), {
+				nameFromExternalEntity, showUserProfilePicture), {
 			callback: function(component) {
 				if (component == null) {
 					closeAllLoadingMessages();
@@ -246,8 +247,11 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 }
 
-function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, allowPDFSigning, hideEmptySection, commentsManagerIdentifier,
-								showAttachmentStatistics, showOnlyCreatorInContacts, showLogExportButton, showComments, showContacts, specialBackPage, nameFromExternalEntity) {
+function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, 
+		allowPDFSigning, hideEmptySection, commentsManagerIdentifier,
+		showAttachmentStatistics, showOnlyCreatorInContacts, 
+		showLogExportButton, showComments, showContacts, 
+		specialBackPage, nameFromExternalEntity, showUserProfilePicture) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -267,6 +271,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn, al
 	
 	this.specialBackPage = specialBackPage;
 	this.nameFromExternalEntity = nameFromExternalEntity;
+	this.showUserProfilePicture = showUserProfilePicture;
 }
 
 CasesListHelper.getPager = function(fromPager, page) {
