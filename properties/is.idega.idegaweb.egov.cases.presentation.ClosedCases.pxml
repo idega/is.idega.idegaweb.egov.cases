@@ -1644,7 +1644,7 @@
                 <key>
                   <name>iw_method_description</name>
                   <type>java.lang.String</type>
-                  <value>Show contacts</value>
+                  <value>Does user name as sender should be shown?</value>
                   <simple>false</simple>
                   <reload>false</reload>
                 </key>
@@ -1710,7 +1710,7 @@
                 <key>
                   <name>iw_method_description</name>
                   <type>java.lang.String</type>
-                  <value>Show contacts</value>
+                  <value>Show user profile picture?</value>
                   <simple>false</simple>
                   <reload>false</reload>
                 </key>
