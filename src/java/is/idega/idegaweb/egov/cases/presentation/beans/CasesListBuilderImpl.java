@@ -253,6 +253,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute("showattachmentstatistics", properties.isShowAttachmentStatistics());
 		layer.setMarkupAttribute("showonlycreatorincontacts", properties.isShowOnlyCreatorInContacts());
 		layer.setMarkupAttribute("namefromexternalentity", properties.isNameFromExternalEntity());
+		layer.setMarkupAttribute("showUserProfilePicture", properties.isShowUserProfilePicture());
 		layer.setMarkupAttribute("onlysubscribedcases", properties.isOnlySubscribedCases());
 		layer.setMarkupAttribute("showlogexportbutton", properties.isShowLogExportButton());
 		layer.setMarkupAttribute("showcomments", properties.isShowComments());
