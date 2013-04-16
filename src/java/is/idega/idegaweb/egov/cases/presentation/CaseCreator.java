@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Oct 31, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -78,7 +78,7 @@ public class CaseCreator extends ApplicationForm {
 	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
 	protected static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
 	protected static final String PARAMETER_PRIVATE = "prm_private";
-	
+
 	private static final String PARAMETER_NAME = "prm_name";
 	private static final String PARAMETER_PERSONAL_ID = "prm_personal_id";
 	private static final String PARAMETER_EMAIL = "prm_email";
@@ -97,7 +97,7 @@ public class CaseCreator extends ApplicationForm {
 	protected boolean iShowSenderInputs = false;
 	protected boolean iShowRegarding = true;
 
-	protected Collection iCategories;
+	protected Collection<String> iCategories;
 
 	@Override
 	public String getBundleIdentifier() {
@@ -186,7 +186,7 @@ public class CaseCreator extends ApplicationForm {
 		Layer contents = new Layer();
 		contents.setStyleClass("formContents");
 		form.add(contents);
-		
+
 		contents.add(getPersonInfo(iwc, user));
 
 		heading = new Heading1(this.iwrb.getLocalizedString(getPrefix() + "case_creator.enter_case", "New case"));
@@ -210,16 +210,17 @@ public class CaseCreator extends ApplicationForm {
 		}
 		else {
 			categories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_category", "Select category"));
-			Collection parentCategories = getCasesBusiness(iwc).getCaseCategories();
-			Iterator iter = parentCategories.iterator();
+			@SuppressWarnings("unchecked")
+			Collection<CaseCategory> parentCategories = getCasesBusiness(iwc).getCaseCategories();
+			Iterator<CaseCategory> iter = parentCategories.iterator();
 			while (iter.hasNext()) {
-				CaseCategory element = (CaseCategory) iter.next();
+				CaseCategory element = iter.next();
 
 				boolean addCategory = false;
 				if (iCategories != null) {
-					Iterator iterator = iCategories.iterator();
+					Iterator<String> iterator = iCategories.iterator();
 					while (iterator.hasNext()) {
-						String categoryPK = (String) iterator.next();
+						String categoryPK = iterator.next();
 						if (element.getPrimaryKey().toString().equals(categoryPK)) {
 							addCategory = true;
 						}
@@ -243,11 +244,12 @@ public class CaseCreator extends ApplicationForm {
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
 		boolean addEmptyElement = true;
 		if (category != null) {
-			Collection subCats = getCasesBusiness(iwc).getSubCategories(category);
+			@SuppressWarnings("unchecked")
+			Collection<CaseCategory> subCats = getCasesBusiness(iwc).getSubCategories(category);
 			if (!subCats.isEmpty()) {
-				Iterator iter = subCats.iterator();
+				Iterator<CaseCategory> iter = subCats.iterator();
 				while (iter.hasNext()) {
-					CaseCategory subCat = (CaseCategory) iter.next();
+					CaseCategory subCat = iter.next();
 					subCategories.addMenuElement(subCat.getPrimaryKey().toString(), subCat.getLocalizedCategoryName(locale));
 				}
 			}
@@ -270,10 +272,10 @@ public class CaseCreator extends ApplicationForm {
 
 		CaseType firstType = getCasesBusiness(iwc).getFirstAvailableCaseType();
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, firstType != null ? firstType.getPrimaryKey().toString() : "");
-		
+
 		TextInput regarding = new TextInput(PARAMETER_REGARDING);
 		regarding.keepStatusOnAction(true);
-		
+
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
 		// message.keepStatusOnAction(true);
@@ -369,7 +371,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(regarding);
 			section.add(formItem);
 		}
-		
+
 		if (this.iShowSenderInputs) {
 			TextInput reference = new TextInput(PARAMETER_REFERENCE);
 			reference.keepStatusOnAction(true);
@@ -381,7 +383,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(reference);
 			section.add(formItem);
 		}
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		if (!this.iShowSenderInputs) {
@@ -427,9 +429,9 @@ public class CaseCreator extends ApplicationForm {
 
 			section.add(clear);
 		}
-		
+
 		if (iShowSenderInputs) {
-			List scripts = new ArrayList();
+			List<String> scripts = new ArrayList<String>();
 			scripts.add("/dwr/interface/CasesBusiness.js");
 			scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 			scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
@@ -459,7 +461,7 @@ public class CaseCreator extends ApplicationForm {
 			personalID.keepStatusOnAction(true);
 			personalID.setOnKeyUp("readUser();");
 			personalID.setOnChange("readUser();");
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
@@ -470,7 +472,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(label);
 			formItem.add(personalID);
 			section.add(formItem);
-			
+
 
 			TextInput name = new TextInput(PARAMETER_NAME);
 			name.setID("userName");
@@ -485,7 +487,7 @@ public class CaseCreator extends ApplicationForm {
 			}
 			name.keepStatusOnAction(true);
 			name.setDisabled(true);
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
@@ -500,7 +502,7 @@ public class CaseCreator extends ApplicationForm {
 			TextInput email = new TextInput(PARAMETER_EMAIL);
 			email.setID("userEmail");
 			email.keepStatusOnAction(true);
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
@@ -515,7 +517,7 @@ public class CaseCreator extends ApplicationForm {
 			TextInput phone = new TextInput(PARAMETER_PHONE);
 			phone.setID("userPhone");
 			phone.keepStatusOnAction(true);
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("required");
@@ -629,7 +631,7 @@ public class CaseCreator extends ApplicationForm {
 		if (!this.iShowSenderInputs && !iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
 		}
-		
+
 		if (iShowSenderInputs) {
 			if (!iwc.isParameterSet(PARAMETER_PERSONAL_ID)) {
 				setError(PARAMETER_PERSONAL_ID, iwrb.getLocalizedString("case_creator.personal_id_empty", "You must enter personal ID"));
@@ -785,7 +787,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(new Span(new Text(iwc.getParameter(PARAMETER_REFERENCE))));
 			section.add(formItem);
 		}
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		formItem.setStyleClass("informationItem");
@@ -798,7 +800,7 @@ public class CaseCreator extends ApplicationForm {
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		section.add(clear);
-		
+
 		if (iShowSenderInputs) {
 			heading = new Heading1(this.iwrb.getLocalizedString("case_creator.sender_overview", "Sender overview"));
 			heading.setStyleClass("subHeader");
@@ -807,7 +809,7 @@ public class CaseCreator extends ApplicationForm {
 			section = new Layer(Layer.DIV);
 			section.setStyleClass("formSection");
 			form.add(section);
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("informationItem");
@@ -833,7 +835,7 @@ public class CaseCreator extends ApplicationForm {
 			catch (FinderException fe) {
 				log(fe);
 			}
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("informationItem");
@@ -842,7 +844,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem.add(label);
 			formItem.add(new Span(new Text(iwc.getParameter(PARAMETER_EMAIL))));
 			section.add(formItem);
-			
+
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			formItem.setStyleClass("informationItem");
@@ -882,7 +884,7 @@ public class CaseCreator extends ApplicationForm {
 		Object attachmentPK = iwc.getParameter(PARAMETER_ATTACHMENT_PK);
 		boolean isPrivate = iwc.isParameterSet(PARAMETER_PRIVATE);
 		Locale locale = iwc.getCurrentLocale();
-		
+
 		String personalID = iwc.getParameter(PARAMETER_PERSONAL_ID);
 		String email = iwc.getParameter(PARAMETER_EMAIL);
 		String phone = iwc.getParameter(PARAMETER_PHONE);
@@ -918,7 +920,7 @@ public class CaseCreator extends ApplicationForm {
 					getUserBusiness(iwc).updateUserHomePhone(user, phone);
 				}
 			}
-			
+
 			String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
 			if (category != null) {
 				headingText += " - " + category.getLocalizedCategoryName(locale);
@@ -1023,6 +1025,7 @@ public class CaseCreator extends ApplicationForm {
 		}
 	}
 
+	@Override
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) {
 		try {
 			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
@@ -1058,7 +1061,7 @@ public class CaseCreator extends ApplicationForm {
 
 	public void setAllowedCategory(String categoryPK) {
 		if (iCategories == null) {
-			iCategories = new ArrayList();
+			iCategories = new ArrayList<String>();
 		}
 		iCategories.add(categoryPK);
 	}
