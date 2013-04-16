@@ -392,7 +392,6 @@ public class CasesSearcher extends CasesBlock {
 		return menu;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected DropdownMenu getDropdownForStatus(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_CASE_STATUS);
 		String selectedStatus = iwc.isParameterSet(PARAMETER_CASE_STATUS) ? iwc.getParameter(PARAMETER_CASE_STATUS) : null;
