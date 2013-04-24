@@ -553,6 +553,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 	
 	public String getCaseStatus() {
+		if (this.caseStatus == null) {
+			return null;
+		}
+		
 		return caseStatus.replaceAll("\\s", CoreConstants.EMPTY);
 	}
 
