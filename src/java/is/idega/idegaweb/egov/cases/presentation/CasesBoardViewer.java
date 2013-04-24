@@ -206,7 +206,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
-		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, caseStatus, processName, uuid);
+		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, 
+				getCaseStatuses(), processName, uuid);
 
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
@@ -518,8 +519,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 		uri.setParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(CasesBoardViewerExporter.class));
 
-		if (!StringUtil.isEmpty(caseStatus))
-			uri.setParameter(CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER, caseStatus);
+		if (!StringUtil.isEmpty(getCaseStatus()))
+			uri.setParameter(CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER, getCaseStatus());
 		if (!StringUtil.isEmpty(processName))
 			uri.setParameter(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER, processName);
 		uri.setParameter(PARAMETER_UUID, uuid);
@@ -543,12 +544,20 @@ public class CasesBoardViewer extends IWBaseComponent {
 		return currentPageUri;
 	}
 
+	public List<String> getCaseStatuses() {
+		if (StringUtil.isEmpty(getCaseStatus())) {
+			return null;
+		}
+		
+		return Arrays.asList(getCaseStatus().split(CoreConstants.COMMA));
+	}
+	
 	public String getCaseStatus() {
-		return caseStatus;
+		return caseStatus.replaceAll("\\s", CoreConstants.EMPTY);
 	}
 
 	public void setCaseStatus(String caseStatus) {
-		this.caseStatus = caseStatus;
+		this.caseStatus = caseStatus.replaceAll("\\s", CoreConstants.EMPTY);
 	}
 
 	public String getRoleKey() {

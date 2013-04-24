@@ -20,6 +20,7 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 	jQuery(document).bind('keydown', function(event) {
 		CasesBoardHelper.pressedKeyboardButton = event.keyCode;
 	});
+	
 	jQuery(document).bind('keyup', function(event) {
 		CasesBoardHelper.pressedKeyboardButton = null;
 	});
