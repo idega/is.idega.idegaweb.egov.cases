@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -261,7 +262,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 		return getBoardCasesManager().getTableData(
 				iwc, 
-				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER), 
+				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)), 
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER), 
 				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID));
 	}

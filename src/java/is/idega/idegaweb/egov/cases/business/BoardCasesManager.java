@@ -4,6 +4,7 @@ import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,9 @@ public interface BoardCasesManager {
 	
 	public static final String BEAN_NAME = "boardCasesManager";
 
-	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, IWResourceBundle iwrb, String caseStatus, String processName, String uuid);
+	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, 
+			IWResourceBundle iwrb, Collection<String> caseStatus, 
+			String processName, String uuid);
 
 	/**
 	 * 
@@ -31,7 +34,8 @@ public interface BoardCasesManager {
 	 * @return data for table to represent or <code>null</code> on failure.
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
-	public CaseBoardTableBean getTableData(IWContext iwc, String caseStatus, String processName, String uuid);
+	public CaseBoardTableBean getTableData(IWContext iwc, 
+			Collection<String> caseStatus, String processName, String uuid);
 
 	public AdvancedProperty getHandlerInfo(IWContext iwc, User handler);
 
