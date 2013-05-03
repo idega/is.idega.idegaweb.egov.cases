@@ -206,7 +206,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
-		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, 
+		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc,
 				getCaseStatuses(), processName, uuid);
 
 		if (data == null || !data.isFilledWithData()) {
@@ -285,11 +285,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 						long sugg = getBoardCasesManager().getNumberValue(suggestion);
 						suggestionTotal += sugg;
 						suggestionCell.add(new Text(String.valueOf(sugg)));
-						
+
 						if (!getCaseBusiness().isCaseClosed(rowBean.getCaseIdentifier())) {
 							makeCellEditable(suggestionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
 						}
-						
+
 						suggestionCell.setStyleClass(BOARD_SUGGESTION);
 						suggestionCell.setMarkupAttribute("task_index", index);
 						suggestionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -300,11 +300,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 						long dec = getBoardCasesManager().getNumberValue(decision);
 						decisionTotal += dec;
 						decisionCell.add(new Text(String.valueOf(dec)));
-						
+
 						if (!getCaseBusiness().isCaseClosed(rowBean.getCaseIdentifier())) {
 							makeCellEditable(decisionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
 						}
-						
+
 						decisionCell.setStyleClass(BOARD_DECISION);
 						decisionCell.setMarkupAttribute("task_index", index);
 						decisionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -428,7 +428,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (ListUtil.isEmpty(financingInfo)) {
 			return 1;
 		}
-		
+
 		return ListUtil.isEmpty(financingInfo) ? 3 : (financingInfo.size() + 2);
 	}
 
@@ -464,19 +464,19 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 		return StringUtil.isEmpty(uri) ? iwc.getRequestURI() : uri;
 	}
-		
+
 	protected CaseBusiness getCaseBusiness() {
 		try {
 			return IBOLookup.getServiceInstance(CoreUtil.getIWContext(), CaseBusiness.class);
 		} catch (IBOLookupException e) {
-			LOGGER.log(Level.WARNING, "Unable to get " + CaseBusiness.class + 
+			LOGGER.log(Level.WARNING, "Unable to get " + CaseBusiness.class +
 					" bean.", e);
 		}
-		
+
 		return null;
-		
+
 	}
-	
+
 	private void makeCellEditable(TableCell2 cell, String type) {
 		cell.setStyleClass(new StringBuilder("casesBoardViewerTableEditableCell").append(type).toString());
 	}
@@ -548,11 +548,15 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (StringUtil.isEmpty(getCaseStatus())) {
 			return null;
 		}
-		
+
 		return Arrays.asList(getCaseStatus().split(CoreConstants.COMMA));
 	}
-	
+
 	public String getCaseStatus() {
+		if (this.caseStatus == null) {
+			return null;
+		}
+
 		return caseStatus.replaceAll("\\s", CoreConstants.EMPTY);
 	}
 
