@@ -56,7 +56,7 @@ public class CaseViewer extends CaseCreator {
 	public static final String PARAMETER_CASE_PK = "prm_case_pk";
 	private static final String PARAMETER_USER = "prm_user";
 
-	private static final int ACTION_VIEW = 1;
+	public static final int ACTION_VIEW = 1;
 	private static final int ACTION_SEND_REMINDER = 2;
 	private static final int ACTION_SEND = 3;
 	private static final int ACTION_ALLOCATION_FORM = 4;
