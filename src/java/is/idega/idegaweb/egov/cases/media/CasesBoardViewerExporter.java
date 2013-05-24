@@ -62,10 +62,10 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		if (this.boardCasesManager == null) {
 			ELUtil.getInstance().autowire(this);
 		}
-		
+
 		return this.boardCasesManager;
 	}
-	
+
 	@Override
 	public String getMimeType() {
 		return MimeTypeUtil.MIME_TYPE_EXCEL_2;
@@ -73,14 +73,13 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
-		
 		CaseBoardTableBean data = getTableData(iwc);
 		if (data == null || !data.isFilledWithData())
 			return;
-		
+
 		HSSFWorkbook workBook = new HSSFWorkbook();
 		HSSFSheet sheet = createSheet(workBook, data.getHeaderLabels(), iwc);
-		
+
 		int rowNumber = 1;
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			HSSFRow row = sheet.createRow(rowNumber++);
@@ -163,10 +162,23 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					HSSFCell bodyRowCell = row.createCell(cellIndex);
 
 					for (AdvancedProperty entry: entries) {
-						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.CASE_IDENTIFIER)) {
+						String varName = entry.getId();
+
+						if (getBoardCasesManager().isColumnOfDomain(varName, ProcessConstants.CASE_IDENTIFIER)) {
 							bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-						} else if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
+
+						} else if (getBoardCasesManager().isColumnOfDomain(varName, ProcessConstants.HANDLER_IDENTIFIER)) {
 							bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
+
+						} else if (getBoardCasesManager().isColumnOfDomain(varName, CasesBoardViewer.BOARD_SUGGESTION) ||
+								getBoardCasesManager().isColumnOfDomain(varName, CasesBoardViewer.BOARD_DECISION)) {
+
+							String boardValue = entry.getValue();
+							Logger.getLogger(getClass().getName()).info("Handling board value '" + boardValue + "' for variable '" + varName + "'");
+							bodyRowCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+							Long numberValue = getBoardCasesManager().getNumberValue(boardValue);
+							bodyRowCell.setCellValue(String.valueOf(numberValue));
+
 						} else {
 							bodyRowCell.setCellValue(entry.getValue());
 						}
@@ -240,85 +252,85 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		if (iwc == null) {
 			return null;
 		}
-		
+
 		IWMainApplication iwma = iwc.getIWMainApplication();
 		if (iwma == null) {
 			return null;
 		}
-		
+
 		com.idega.idegaweb.IWBundle iwb = iwma.getBundle(
 				CasesConstants.IW_BUNDLE_IDENTIFIER);
 		if (iwb == null) {
 			return null;
 		}
-		
+
 		return iwb.getResourceBundle(iwc);
 	}
-	
+
 	protected CaseBoardTableBean getTableData(IWContext iwc) {
 		if (iwc == null) {
 			return null;
 		}
 
 		return getBoardCasesManager().getTableData(
-				iwc, 
-				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)), 
-				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER), 
+				iwc,
+				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
+				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
 				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID));
 	}
-	
+
 	protected OutputStream createOutputStream() {
 		memory = new MemoryFileBuffer();
 		return new MemoryOutputStream(memory);
 	}
-	
+
 	protected HSSFFont createBigFont(HSSFWorkbook workBook) {
 		if (workBook == null) {
 			return null;
 		}
-		
+
 		HSSFFont bigFont = workBook.createFont();
 		bigFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		bigFont.setFontHeightInPoints((short) 13);
 		return bigFont;
 	}
-	
+
 	protected HSSFCellStyle createBigStyle(HSSFWorkbook workBook, HSSFFont font) {
 		if (workBook == null) {
 			return null;
 		}
-		
+
 		HSSFCellStyle bigStyle = workBook.createCellStyle();
-		
+
 		if (font != null) {
 			bigStyle.setFont(font);
 		}
-		
+
 		return bigStyle;
 	}
-	
-	protected HSSFSheet createSheet(HSSFWorkbook workBook, 
+
+	protected HSSFSheet createSheet(HSSFWorkbook workBook,
 			Map<Integer, List<AdvancedProperty>> headers, IWContext iwc) {
 		if (workBook == null || iwc == null) {
 			return null;
 		}
-		
+
 		HSSFSheet sheet = workBook.createSheet(StringHandler.shortenToLength(
 				getIWResourceBundle(iwc).getLocalizedString(
-						"cases_board_viewer.cases_board", "Cases board"), 
+						"cases_board_viewer.cases_board", "Cases board"),
 				30));
-		
+
 		if (!MapUtil.isEmpty(headers)) {
 			createHeaders(
-					sheet, 
-					createBigStyle(workBook, createBigFont(workBook)), 
-					headers, 
+					sheet,
+					createBigStyle(workBook, createBigFont(workBook)),
+					headers,
 					0);
 		}
-		
+
 		return sheet;
 	}
-	
+
 	protected boolean write(OutputStream streamOut, HSSFWorkbook workBook, IWContext iwc) {
 		try {
 			workBook.write(streamOut);
@@ -330,17 +342,17 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 
 		memory.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
-		setAsDownload(iwc, 
+		setAsDownload(iwc,
 				new StringBuilder(getIWResourceBundle(iwc).getLocalizedString(
 						"cases_board_viewer.exported_data", "Exported cases board"
-						)).append(".xls").toString(), 
+						)).append(".xls").toString(),
 				memory.length());
-		
+
 		return true;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * <p>Automatically fits content to each column in sheet.</p>
 	 * @param sheet to format;
 	 * @return <code>true</code> if formatted, false otherwise;
@@ -350,7 +362,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		if (sheet == null) {
 			return false;
 		}
-		
+
 		for (int i = 0; i < sheet.getLastRowNum(); i++) {
 			HSSFRow row = sheet.getRow(i);
 			int cell = 0;
@@ -362,7 +374,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				cell++;
 			}
 		}
-		
+
 		return true;
 	}
 }
