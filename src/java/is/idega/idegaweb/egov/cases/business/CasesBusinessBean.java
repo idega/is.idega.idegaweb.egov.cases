@@ -150,9 +150,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				if (category != null) {
 					Group handlerGroup = category.getHandlerGroup();
 
-					Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+					Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
 					if (!handlers.isEmpty()) {
-						Iterator iter = handlers.iterator();
+						Iterator<User> iter = handlers.iterator();
 						while (iter.hasNext()) {
 							User handler = (User) iter.next();
 							map.put(handler.getPrimaryKey().toString(), handler.getName());
