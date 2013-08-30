@@ -78,7 +78,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 	public static final String	WORK_ITEM = "work_item",
 								ESTIMATED_COST = "estimated_cost",
 								BOARD_SUGGESTION = ProcessConstants.BOARD_FINANCING_SUGGESTION,
-								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION;
+								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION,
+								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
 
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
 		new AdvancedProperty("string_ownerFullName", "Applicant"),									//	0
@@ -258,6 +259,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 						emptyValues.put(ESTIMATED_COST, CoreConstants.MINUS);
 						emptyValues.put(BOARD_SUGGESTION, CoreConstants.MINUS);
 						emptyValues.put(BOARD_DECISION, CoreConstants.MINUS);
+						emptyValues.put(BOARD_PROPOSAL_FOR_GRANT, CoreConstants.MINUS);
 						financingInfo.add(emptyValues);
 						rowBean.setFinancingInfo(financingInfo);
 					}
@@ -265,6 +267,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 					int index = 0;
 					long estimationTotal = 0;
 					long suggestionTotal = 0;
+					long proposalTotal = 0;
 					long decisionTotal = 0;
 					TableRow financingTableRow = row;
 					List<TableCell2> suggestionCells = new ArrayList<TableCell2>();
@@ -279,6 +282,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 						String estimation = info.get(ESTIMATED_COST);
 						estimationTotal += getBoardCasesManager().getNumberValue(estimation);
 						cell.add(new Text(estimation));
+						
+						cell = financingTableRow.createCell();
+						String proposal = info.get(BOARD_PROPOSAL_FOR_GRANT);
+						proposalTotal += getBoardCasesManager().getNumberValue(proposal);
+						cell.add(new Text(proposal));
 
 						TableCell2 suggestionCell = financingTableRow.createCell();
 						String suggestion = info.get(BOARD_SUGGESTION);
@@ -330,6 +338,12 @@ public class CasesBoardViewer extends IWBaseComponent {
 					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
 					financingTableRow.createCell().add(new Text(String.valueOf(estimationTotal)));
 
+					TableCell2 localProposalTotalCell = financingTableRow.createCell();
+					localProposalTotalCell.add(new Text(String.valueOf(proposalTotal)));
+					String proposalTotalCellId  = localProposalTotalCell.getId();
+					for (TableCell2 suggestionCell: suggestionCells)
+						suggestionCell.setMarkupAttribute("local_total", proposalTotalCellId);
+					
 					TableCell2 localSuggestionTotalCell = financingTableRow.createCell();
 					localSuggestionTotalCell.add(new Text(String.valueOf(suggestionTotal)));
 					String suggestionTotalCellId  = localSuggestionTotalCell.getId();
