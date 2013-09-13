@@ -297,6 +297,11 @@ view=Sko\u00F0a
 view_case=Sko\u00F0a erindi
 zip_city=Sta\u00F0ur
 zip_code=P\u00F3stn\u00FAmer
-string_ownerGradeComment=Stj\u00F3rnandinn upp\u00E1stungu
+
+estimated_cost=\u00C1\u00E6tla\u00F0ur kostna\u00F0ur
+proposal_for_grant=Tillaga a\u00F0 styrk
+string_ownergradecomment=Tillaga verkefnisstj\u00F3ra
+string_ownergrantamauntvalue=\u00C1kv\u00F6r\u00F0un stj\u00F3rnar
+work_item=Verk\u00FE\u00E1ttur
 
 
