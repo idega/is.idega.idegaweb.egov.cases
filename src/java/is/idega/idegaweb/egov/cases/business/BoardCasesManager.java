@@ -19,7 +19,7 @@ public interface BoardCasesManager {
 
 	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, 
 			IWResourceBundle iwrb, Collection<String> caseStatus, 
-			String processName, String uuid);
+			String processName, String uuid, boolean isSubscribedOnly);
 
 	/**
 	 * 
@@ -35,7 +35,8 @@ public interface BoardCasesManager {
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
 	public CaseBoardTableBean getTableData(IWContext iwc, 
-			Collection<String> caseStatus, String processName, String uuid);
+			Collection<String> caseStatus, String processName, String uuid,
+			boolean isSubscribedOnly);
 
 	public AdvancedProperty getHandlerInfo(IWContext iwc, User handler);
 

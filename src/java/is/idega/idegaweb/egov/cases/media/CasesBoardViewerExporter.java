@@ -47,6 +47,7 @@ import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
+import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 
@@ -266,6 +267,31 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 		return iwb.getResourceBundle(iwc);
 	}
+	
+	/**
+	 * 
+	 * @param uuid is id of UI component in page, not <code>null</code>;
+	 * @return <code>true</code> if only subscribed cases should be shown, 
+	 * <code>false</code> otherwise;
+	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
+	 */
+	protected boolean isSubscribedOnly(String uuid, IWContext iwc) {
+		if (StringUtil.isEmpty(uuid))
+			return Boolean.FALSE;
+
+		Object subscribed = iwc.getSessionAttribute(
+				CasesBoardViewer.PARAMETER_SHOW_ONLY_SUBSCRIBED + uuid);
+		Boolean value = null;
+		if (subscribed instanceof Boolean) {
+			value = (Boolean) subscribed;
+		}
+
+		if (value == null || value.equals(Boolean.FALSE)) {
+			return Boolean.FALSE;
+		} else {
+			return Boolean.TRUE;
+		}
+	}
 
 	protected CaseBoardTableBean getTableData(IWContext iwc) {
 		if (iwc == null) {
@@ -276,7 +302,8 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				iwc,
 				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
-				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID));
+				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID),
+				isSubscribedOnly(iwc.getParameter(CasesBoardViewer.PARAMETER_UUID), iwc));
 	}
 
 	protected OutputStream createOutputStream() {

@@ -622,4 +622,25 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCase#isSubscribed(com.idega.user.data.User)
+	 */
+	@Override
+	public boolean isSubscribed(User user) {
+		if (user == null) {
+			return Boolean.FALSE;
+		}
+
+		Collection<User> subscribers = getSubscribers();
+		if (!ListUtil.isEmpty(subscribers)) {
+			for (User subscriber : subscribers) {
+				if (subscriber.equals(user)) {
+					return Boolean.TRUE;
+				}
+			}
+		}
+		
+		return Boolean.FALSE;
+	}
 }

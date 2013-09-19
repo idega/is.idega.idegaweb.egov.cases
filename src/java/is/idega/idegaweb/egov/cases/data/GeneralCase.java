@@ -167,5 +167,14 @@ public interface GeneralCase extends IDOEntity, Case {
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setReference
 	 */
 	public void setReference(String reference);
+	
+	/**
+	 * 
+	 * <p>Checks if case is subscribed by user.</p>
+	 * @param user to check, not <code>null</code>;
+	 * @return <code>true</code> if subscribed, <code>false</code> otherwise;
+	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
+	 */
+	public boolean isSubscribed(User user);
 
 }

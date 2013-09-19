@@ -151,11 +151,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 
 	public void setOnlySubscribedCases(boolean onlySubscribedCases) {
-		CoreUtil.getIWContext().removeSessionAttribute(
-				CasesBoardViewer.PARAMETER_CUSTOM_COLUMNS + uuid);
-		CoreUtil.getIWContext().setSessionAttribute(
-				CasesBoardViewer.PARAMETER_CUSTOM_COLUMNS + uuid, 
-				onlySubscribedCases);
 		this.onlySubscribedCases = onlySubscribedCases;
 	}
 
@@ -196,6 +191,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			"/dwr/interface/BoardCasesManager.js",
 			bundle.getVirtualPathWithFileNameString("javascript/CasesBoardHelper.js")
 		));
+
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, web2.getBundleURIsToFancyBoxScriptFiles());
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
 			web2.getBundleUriToHumanizedMessagesStyleSheet(),
@@ -227,11 +223,17 @@ public class CasesBoardViewer extends IWBaseComponent {
 			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
+		
+		CoreUtil.getIWContext().removeSessionAttribute(
+				PARAMETER_SHOW_ONLY_SUBSCRIBED + uuid);
+		CoreUtil.getIWContext().setSessionAttribute(
+				PARAMETER_SHOW_ONLY_SUBSCRIBED + uuid, 
+				isOnlySubscribedCases());
 	}
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, 
-				getCaseStatuses(), processName, uuid);
+				getCaseStatuses(), processName, uuid, isOnlySubscribedCases());
 
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
