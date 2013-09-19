@@ -68,7 +68,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	public static final String	PARAMETER_PROCESS_NAME = "prmProcessName",
 								PARAMETER_UUID = "uuid",
-								PARAMETER_CUSTOM_COLUMNS = "customCasesBoardViewerColumns";
+								PARAMETER_CUSTOM_COLUMNS = "customCasesBoardViewerColumns",
+								PARAMETER_SHOW_ONLY_SUBSCRIBED = "showSubscribedOnly";
 
 	private static final String EDITABLE_FIELD_TYPE_TEXT_INPUT = "textinput",
 								EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea",
@@ -134,6 +135,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 	@Autowired
 	private BuilderLogicWrapper builderLogicWrapper;
 
+	private boolean onlySubscribedCases = Boolean.FALSE;
+	
 	protected String	caseStatus,
 					roleKey,
 					processName,
@@ -142,6 +145,19 @@ public class CasesBoardViewer extends IWBaseComponent {
 					uuid;
 
 	private boolean useCurrentPageAsBackPageFromTaskViewer = Boolean.TRUE;
+
+	public boolean isOnlySubscribedCases() {
+		return onlySubscribedCases;
+	}
+
+	public void setOnlySubscribedCases(boolean onlySubscribedCases) {
+		CoreUtil.getIWContext().removeSessionAttribute(
+				CasesBoardViewer.PARAMETER_CUSTOM_COLUMNS + uuid);
+		CoreUtil.getIWContext().setSessionAttribute(
+				CasesBoardViewer.PARAMETER_CUSTOM_COLUMNS + uuid, 
+				onlySubscribedCases);
+		this.onlySubscribedCases = onlySubscribedCases;
+	}
 
 	@Override
 	protected void initializeComponent(FacesContext context) {
