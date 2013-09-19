@@ -161,6 +161,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	@Override
 	protected void initializeComponent(FacesContext context) {
+		
+//		TODO: this is for testing with default theme
+//		Layer style = new Layer();
+//		add(style);
+//		style.add("<style>div{overflow:auto;}</style>");
+///////////////////////////////////////////////////////////
+		
 		IWContext iwc = IWContext.getIWContext(context);
 
 		if (!iwc.isLoggedOn()) {
@@ -238,15 +245,18 @@ public class CasesBoardViewer extends IWBaseComponent {
 		TableHeaderRowGroup headerGroup = table.createHeaderRowGroup();
 		TableRow headerRow = headerGroup.createRow();
 		Map<Integer, List<AdvancedProperty>> headers = data.getHeaderLabels();
+		ArrayList<String> ids = new ArrayList<String>(headers.size());
 		for (Integer key: headers.keySet()) {
 			List<AdvancedProperty> headerLabels = headers.get(key);
 			for (AdvancedProperty header: headerLabels) {
 				TableHeaderCell headerCell = headerRow.createHeaderCell();
 				headerCell.add(new Text(header.getValue()));
-
+				headerCell.setStyleClass(header.getId());
+				ids.add(header.getId());
 				if (getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(9).getId()) ||
 					getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(14).getId()))
 					headerCell.setStyleClass("casesBoardViewerTableWiderCell");
+				
 			}
 		}
 
@@ -417,6 +427,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		for (String footerLabel: data.getFooterValues()) {
 			TableCell2 footerCell = footerRow.createCell();
 			footerCell.add(new Text(footerLabel));
+			footerCell.setStyleClass(ids.get(index));
 
 			if (totalBoardDecisionCellIndex == index)
 				boardDecisionTotalCellId = footerCell.getId();
