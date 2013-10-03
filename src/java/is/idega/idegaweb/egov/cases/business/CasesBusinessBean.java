@@ -153,7 +153,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 					if (!handlers.isEmpty()) {
 						Iterator<User> iter = handlers.iterator();
 						while (iter.hasNext()) {
-							User handler = (User) iter.next();
+							User handler = iter.next();
 							map.put(handler.getPrimaryKey().toString(), handler.getName());
 						}
 					}
@@ -221,7 +221,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	private CommuneMessageBusiness getMessageBusiness() {
 		try {
-			return (CommuneMessageBusiness) this.getServiceInstance(CommuneMessageBusiness.class);
+			return this.getServiceInstance(CommuneMessageBusiness.class);
 		} catch (RemoteException e) {
 			throw new IBORuntimeException(e.getMessage());
 		}
@@ -229,7 +229,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	private UserBusiness getUserBusiness() {
 		try {
-			return (UserBusiness) this.getServiceInstance(UserBusiness.class);
+			return this.getServiceInstance(UserBusiness.class);
 		} catch (RemoteException e) {
 			throw new IBORuntimeException(e.getMessage());
 		}
@@ -1096,6 +1096,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return new Object[] { caseCategory, caseType };
 	}
 
+	@Override
 	protected GroupBusiness getGroupBusiness() {
 
 		try {
@@ -1107,40 +1108,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			else
 				iwac = IWMainApplication.getIWMainApplication(fctx).getIWApplicationContext();
 
-			return (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 		} catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
 	}
-
-	// public Collection<GeneralCase> getCases(User user, String casesProcessorType) throws RemoteException {
-	// log(Level.INFO, "User: " + user + ", cases type: " + casesProcessorType);
-	// List<CaseManager> caseHandlers = getCaseHandlersProvider().getCaseHandlers();
-	// Collection<GeneralCase> cases = null;
-	// log(Level.INFO, "Case handlers: " + caseHandlers);
-	//
-	// for (CaseManager handler : caseHandlers) {
-	//
-	// @SuppressWarnings("unchecked")
-	// Collection<GeneralCase> cazes = (Collection<GeneralCase>)handler.getCases(user, casesProcessorType);
-	//
-	// if(cazes != null) {
-	//
-	// if(cases == null)
-	// cases = cazes;
-	// else
-	// cases.addAll(cazes);
-	// }
-	// }
-	//
-	// if (cases == null || cases.isEmpty()) {
-	// log(Level.INFO, "NO CASES - null!");
-	// }
-	// else {
-	// log(Level.INFO, "Found cases: " + cases + ", totally: " + cases.size());
-	// }
-	// return cases;
-	// }
 
 	@Override
 	public CaseManagersProvider getCaseHandlersProvider() {
