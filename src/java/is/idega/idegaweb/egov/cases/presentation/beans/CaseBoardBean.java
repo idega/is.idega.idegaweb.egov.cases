@@ -12,6 +12,8 @@ import com.idega.util.CoreConstants;
 
 public class CaseBoardBean {
 
+	private String linkToCase;
+
 	private String caseId;
 	private Long processInstanceId;
 
@@ -272,4 +274,11 @@ public class CaseBoardBean {
 		this.financingOfTheTasks = financingOfTheTasks;
 	}
 
+	public String getLinkToCase() {
+		return linkToCase;
+	}
+
+	public void setLinkToCase(String linkToCase) {
+		this.linkToCase = linkToCase;
+	}
 }

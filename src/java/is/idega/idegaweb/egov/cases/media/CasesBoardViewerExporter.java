@@ -303,7 +303,9 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
 				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID),
-				isSubscribedOnly(iwc.getParameter(CasesBoardViewer.PARAMETER_UUID), iwc));
+				isSubscribedOnly(iwc.getParameter(CasesBoardViewer.PARAMETER_UUID), iwc),
+				Boolean.FALSE,
+				null);
 	}
 
 	protected OutputStream createOutputStream() {

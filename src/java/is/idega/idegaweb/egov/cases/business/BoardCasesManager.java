@@ -17,9 +17,19 @@ public interface BoardCasesManager {
 	
 	public static final String BEAN_NAME = "boardCasesManager";
 
-	public List<CaseBoardBean> getAllSortedCases(IWContext iwc, 
-			IWResourceBundle iwrb, Collection<String> caseStatus, 
-			String processName, String uuid, boolean isSubscribedOnly);
+	/**
+	 * 
+	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
+	 */
+	public List<CaseBoardBean> getAllSortedCases(
+			IWContext iwc, 
+			IWResourceBundle iwrb, 
+			Collection<String> caseStatus, 
+			String processName, 
+			String uuid, 
+			boolean isSubscribedOnly,
+			boolean backPage,
+			String taskName);
 
 	/**
 	 * 
@@ -36,7 +46,7 @@ public interface BoardCasesManager {
 	 */
 	public CaseBoardTableBean getTableData(IWContext iwc, 
 			Collection<String> caseStatus, String processName, String uuid,
-			boolean isSubscribedOnly);
+			boolean isSubscribedOnly, boolean useBasePage, String taskName);
 
 	public AdvancedProperty getHandlerInfo(IWContext iwc, User handler);
 

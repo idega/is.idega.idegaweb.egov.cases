@@ -11,7 +11,7 @@ public class CaseBoardTableBodyRowBean {
 	private String id;
 	private String caseId;
 	private String caseIdentifier;
-
+	private String linkToCase;
 	private Long processInstanceId;
 
 	private User handler;
@@ -70,4 +70,11 @@ public class CaseBoardTableBodyRowBean {
 		this.financingInfo = financingInfo;
 	}
 
+	public String getLinkToCase() {
+		return linkToCase;
+	}
+
+	public void setLinkToCase(String linkToCase) {
+		this.linkToCase = linkToCase;
+	}
 }

@@ -233,7 +233,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc, 
-				getCaseStatuses(), processName, uuid, isOnlySubscribedCases());
+				getCaseStatuses(), processName, uuid, isOnlySubscribedCases(), 
+				useCurrentPageAsBackPageFromTaskViewer, getTaskName());
 
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
@@ -394,7 +395,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 					for (AdvancedProperty entry: entries) {
 						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), CASE_FIELDS.get(5).getId())) {
 							//	Link to grading task
-							linkToTask = new Link(rowBean.getCaseIdentifier(), getLinkToTheTask(iwc, rowBean));
+							linkToTask = new Link(rowBean.getCaseIdentifier(), rowBean.getLinkToCase());
 							linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 							linkToTask.getId();
 							bodyRowCell.add(linkToTask);
@@ -494,18 +495,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 		Link mailTo = new Link(info.getId(), info.getValue());
 		mailTo.setSessionId(false);
 		return mailTo;
-	}
-
-	private String getLinkToTheTask(IWContext iwc, CaseBoardTableBodyRowBean rowBean) {
-		String uri = null;
-		try {
-			String basePage = getCurrentPageUri(iwc);
-			uri = getBoardCasesManager().getLinkToTheTaskRedirector(iwc, basePage, rowBean.getCaseId(), rowBean.getProcessInstanceId(),
-					useCurrentPageAsBackPageFromTaskViewer ? basePage : null, getTaskName());
-		} catch(Exception e) {
-			LOGGER.log(Level.WARNING, "Error getting uri to the task for process: " + rowBean.getProcessInstanceId());
-		}
-		return StringUtil.isEmpty(uri) ? iwc.getRequestURI() : uri;
 	}
 		
 	protected CaseBusiness getCaseBusiness() {
