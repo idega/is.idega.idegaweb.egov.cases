@@ -31,3 +31,4 @@ cases_searcher_default_sorting_is_by_date=By default sorting by case's creation 
 cases_searcher_there_are_no_options=There are no options
 cases_searcher_select_sorting_option=Select option
 string_ownerGradeComment=Handler suggestion
+handler_category_id=Handler category id

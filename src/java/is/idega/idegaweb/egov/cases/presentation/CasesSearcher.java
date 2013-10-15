@@ -2,6 +2,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.application.IWBundleStarter;
 import is.idega.idegaweb.egov.cases.business.CasesEngine;
+import is.idega.idegaweb.egov.cases.business.HandlerCategoryBusiness;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
@@ -43,6 +44,8 @@ import com.idega.presentation.ui.InterfaceObject;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SelectOption;
 import com.idega.presentation.ui.TextInput;
+import com.idega.user.data.Group;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
@@ -64,10 +67,10 @@ public class CasesSearcher extends CasesBlock {
 	private static final String PARAMETER_CASE_LIST_TYPE = "cf_prm_case_list_type";
 	private static final String PARAMETER_CASE_CONTACT = "cf_prm_case_contact";
 	private static final String PARAMETER_SORTING_OPTIONS = "cf_prm_sorting_options";
+	public static final String PARAMETER_HANDLER_CATEGORY = "cf_prm_handler_category";
 
 	private String textInputStyleClass = "textinput";
 	private String buttonStyleClass = "button";
-
 
 	private String listType;
 
@@ -76,10 +79,14 @@ public class CasesSearcher extends CasesBlock {
 
 	private String processProperty = null;
 
+	private String providedGroups; 
+
 	@Autowired
 	private CasesEngine casesEngine;
+
 	@Autowired
 	private Web2Business web2;
+
 	@Autowired
 	private JQuery jQuery;
 
@@ -88,8 +95,35 @@ public class CasesSearcher extends CasesBlock {
 
 	protected Layer container, inputsContainer;
 
+	@Autowired(required=false)
+	private HandlerCategoryBusiness handlerCategoryBusiness;
+
+	protected HandlerCategoryBusiness getHandlerCategoryBusiness() {
+		if (this.handlerCategoryBusiness == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+
+		return this.handlerCategoryBusiness;
+	}
+	
 	public CasesSearcher() {
 		super();
+	}
+
+	public String getProvidedGroups() {
+		return providedGroups;
+	}
+	
+	public String[] getProvidedGroupsList() {
+		if (StringUtil.isEmpty(getProvidedGroups())) {
+			return null;
+		}
+		
+		return getProvidedGroups().split(CoreConstants.COMMA);
+	}
+
+	public void setProvidedGroups(String providedGroups) {
+		this.providedGroups = providedGroups;
 	}
 
 	private Web2Business getWeb2Business() {
@@ -219,6 +253,13 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu statuses = getDropdownForStatus(iwc);
 		addFormItem(inputsContainer, "status", iwrb.getLocalizedString("status", "Status"), statuses);
 
+		// Handler categories
+		DropdownMenu handlerCategories = null;
+		if (!ArrayUtil.isEmpty(getProvidedGroupsList()) && getHandlerCategoryBusiness() != null) {
+			handlerCategories = getDropdownForHandlerCategories(iwc, getProvidedGroupsList());
+			addFormItem(inputsContainer, "handlerCategories", iwrb.getLocalizedString("handler_categories", "Handler categories"), handlerCategories);
+		}
+
 		//	Date range
 		Date from = null;
 		Date to = null;
@@ -238,19 +279,35 @@ public class CasesSearcher extends CasesBlock {
 		element.add(showStatistics);
 		element.add(label);
 
-		StringBuilder parameters  = new StringBuilder("['").append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '");
-		parameters.append(caseNumber.getId()).append("', '").append(name.getId()).append("', '").append(personalID.getId()).append("', '");
+		StringBuilder parameters  = new StringBuilder("['");
+
+		parameters.append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '")
+		.append(caseNumber.getId()).append("', '")
+		.append(name.getId()).append("', '")
+		.append(personalID.getId()).append("', '");
 
 		if (this.processProperty == null) {
-			parameters.append(processes.getId()).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
+			parameters.append(processes.getId()).append("', '");
 		} else {
-			parameters.append(this.processProperty).append("', '").append(statuses.getId()).append("', '").append(dateRange.getId()).append("', '");
+			parameters.append(this.processProperty).append("', '");
 		}
 
-		parameters.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '").append(caseDescription.getId()).append("', '");
-		parameters.append(listTypeInput.getId()).append("', '").append(contact.getId()).append("', '")
-			.append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS).append("', '").append(showStatistics.getId()).append("', ")
-			.append(isShowAllStatuses()).append("]");
+		parameters.append(statuses.getId()).append("', '")
+		.append(dateRange.getId()).append("', '")
+		.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '")
+		.append(caseDescription.getId()).append("', '")
+		.append(listTypeInput.getId()).append("', '")
+		.append(contact.getId()).append("', '")
+		.append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS).append("', '")
+		.append(showStatistics.getId()).append("', ")
+		.append(isShowAllStatuses());
+
+		if (handlerCategories != null) {
+			parameters.append(" ,'").append(handlerCategories.getId()).append("'");
+		}
+
+		parameters.append("]");
+
 		addCasesFilterButtons(iwc, parameters.toString());
 	}
 
@@ -392,6 +449,32 @@ public class CasesSearcher extends CasesBlock {
 		return menu;
 	}
 
+	protected DropdownMenu getDropdownForHandlerCategories(
+			IWContext iwc,
+			String[] providedGroupsList) {
+		if (providedGroupsList == null || iwc == null) {
+			return null;
+		}
+
+		List<Group> groups = getHandlerCategoryBusiness().findAllGroups(
+				Arrays.asList(providedGroupsList), null);
+		if (ListUtil.isEmpty(groups)) {
+			return null;
+		}
+
+		DropdownMenu dm = new DropdownMenu(PARAMETER_HANDLER_CATEGORY);
+		dm.addFirstOption(new SelectOption(getLocalizedString(
+				"select_handler_category", "Select handler category", iwc), "-1"));
+
+		for (Group group : groups) {
+			dm.addMenuElement(
+					group.getPrimaryKey().toString(), 
+					group.getName());
+		}
+
+		return dm;
+	}
+	
 	protected DropdownMenu getDropdownForStatus(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_CASE_STATUS);
 		String selectedStatus = iwc.isParameterSet(PARAMETER_CASE_STATUS) ? iwc.getParameter(PARAMETER_CASE_STATUS) : null;

@@ -306,3 +306,5 @@ view_case=Visa \u00E4rende
 zip_city=City
 zip_code=Postnummer
 tender_case.last_date=Sista datum
+
+handler_category_id=Handler kategori id
