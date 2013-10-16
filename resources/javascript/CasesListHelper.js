@@ -565,7 +565,7 @@ function clearSearchForCases(parameters) {
 			if (parameters != null) {
 				var cssClassName = null;
 				try {
-					if (parameters != null && parameters.length >= 13) {
+					if (parameters != null && parameters.length >= 14) {
 						cssClassName = parameters[0];
 						dwr.util.setValue(parameters[1], '');
 						dwr.util.setValue(parameters[8], '');
@@ -575,6 +575,7 @@ function clearSearchForCases(parameters) {
 						dwr.util.setValue(parameters[5], '-1');
 						dwr.util.setValue(parameters[6], '');
 						dwr.util.setValue(parameters[10], '');
+						dwr.util.setValue(parameters[14], '-1');
 						jQuery('#' + parameters[12]).attr('checked', false);
 					}
 				} catch (e) {}
