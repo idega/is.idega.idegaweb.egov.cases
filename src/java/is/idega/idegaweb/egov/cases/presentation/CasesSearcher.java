@@ -257,7 +257,9 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu handlerCategories = null;
 		if (!ArrayUtil.isEmpty(getProvidedGroupsList()) && getHandlerCategoryBusiness() != null) {
 			handlerCategories = getDropdownForHandlerCategories(iwc, getProvidedGroupsList());
-			addFormItem(inputsContainer, "handlerCategories", iwrb.getLocalizedString("handler_categories", "Handler categories"), handlerCategories);
+			addFormItem(inputsContainer, "handlerCategories", 
+					iwrb.getLocalizedString("handler_categories", "Handler categories"), 
+					handlerCategories);
 		}
 
 		//	Date range
@@ -456,15 +458,14 @@ public class CasesSearcher extends CasesBlock {
 			return null;
 		}
 
-		List<Group> groups = getHandlerCategoryBusiness().findAllGroups(
-				Arrays.asList(providedGroupsList), null);
-		if (ListUtil.isEmpty(groups)) {
-			return null;
-		}
-
 		DropdownMenu dm = new DropdownMenu(PARAMETER_HANDLER_CATEGORY);
 		dm.addFirstOption(new SelectOption(getLocalizedString(
 				"select_handler_category", "Select handler category", iwc), "-1"));
+		List<Group> groups = getHandlerCategoryBusiness().findAllGroups(
+				Arrays.asList(providedGroupsList), null);
+		if (ListUtil.isEmpty(groups)) {
+			return dm;
+		}
 
 		for (Group group : groups) {
 			dm.addMenuElement(
