@@ -117,7 +117,8 @@ public interface HandlerCategoryBusiness {
 	 * @param requiredGroups is {@link Set} of {@link Group#getName()}, which
 	 * should be returned, if <code>null</code> then all {@link Group}s
 	 * will be returned;
-	 * @param unnecessaryGroup TODO
+	 * @param unnecessaryGroup {@link Group#getName()} which should be not
+	 * included;
 	 * @return all {@link Group}s in data source or selected only or 
 	 * {@link Collections#emptySet()} on failure; 
 	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
