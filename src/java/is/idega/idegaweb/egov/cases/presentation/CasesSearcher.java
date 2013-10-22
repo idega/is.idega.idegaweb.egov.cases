@@ -79,7 +79,7 @@ public class CasesSearcher extends CasesBlock {
 
 	private String processProperty = null;
 
-	private String providedGroups; 
+	private String providedGroups;
 
 	@Autowired
 	private CasesEngine casesEngine;
@@ -105,7 +105,7 @@ public class CasesSearcher extends CasesBlock {
 
 		return this.handlerCategoryBusiness;
 	}
-	
+
 	public CasesSearcher() {
 		super();
 	}
@@ -113,12 +113,12 @@ public class CasesSearcher extends CasesBlock {
 	public String getProvidedGroups() {
 		return providedGroups;
 	}
-	
+
 	public String[] getProvidedGroupsList() {
 		if (StringUtil.isEmpty(getProvidedGroups())) {
 			return null;
 		}
-		
+
 		return getProvidedGroups().split(CoreConstants.COMMA);
 	}
 
@@ -245,10 +245,6 @@ public class CasesSearcher extends CasesBlock {
 			PresentationUtil.addJavaScriptActionOnLoad(iwc, action);
 		}
 
-		//	Sorting options
-		DropdownMenu sortingOptions = getDropdownForSortingOptions(iwc);
-		addFormItem(inputsContainer, "sorting", iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions);
-
 		//	Status
 		DropdownMenu statuses = getDropdownForStatus(iwc);
 		addFormItem(inputsContainer, "status", iwrb.getLocalizedString("status", "Status"), statuses);
@@ -257,8 +253,8 @@ public class CasesSearcher extends CasesBlock {
 		DropdownMenu handlerCategories = null;
 		if (!ArrayUtil.isEmpty(getProvidedGroupsList()) && getHandlerCategoryBusiness() != null) {
 			handlerCategories = getDropdownForHandlerCategories(iwc, getProvidedGroupsList());
-			addFormItem(inputsContainer, "handlerCategories", 
-					iwrb.getLocalizedString("handler_categories", "Handler categories"), 
+			addFormItem(inputsContainer, "handlerCategories",
+					iwrb.getLocalizedString("handler_categories", "Handler categories"),
 					handlerCategories);
 		}
 
@@ -271,6 +267,10 @@ public class CasesSearcher extends CasesBlock {
 		}
 		IWDatePicker dateRange = getDateRange(iwc, "dateRange", from, to);
 		addFormItem(inputsContainer, "dateRange", iwrb.getLocalizedString("date_range", "Date range"), dateRange);
+
+		//		Sorting options
+		DropdownMenu sortingOptions = getDropdownForSortingOptions(iwc);
+		addFormItem(inputsContainer, "sorting", iwrb.getLocalizedString("cases_search_sorting_optins", "Sorting options"), sortingOptions);
 
 		//	Show statistics
 		Layer element = getContainer("formItem shortFormItem checkboxFormItem showStatistics");
@@ -469,13 +469,13 @@ public class CasesSearcher extends CasesBlock {
 
 		for (Group group : groups) {
 			dm.addMenuElement(
-					group.getPrimaryKey().toString(), 
+					group.getPrimaryKey().toString(),
 					group.getName());
 		}
 
 		return dm;
 	}
-	
+
 	protected DropdownMenu getDropdownForStatus(IWContext iwc) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_CASE_STATUS);
 		String selectedStatus = iwc.isParameterSet(PARAMETER_CASE_STATUS) ? iwc.getParameter(PARAMETER_CASE_STATUS) : null;
