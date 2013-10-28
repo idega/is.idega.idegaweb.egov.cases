@@ -620,7 +620,7 @@ div.caseViewBackButtonStyle {
 	float: right;
 }
 
-td.string_ownerGradeComment{
+td.string_ownerGradeComment, th.string_ownerGradeComment{
 	display:none;
 }
 	

@@ -267,6 +267,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		Link linkToTask = null;
 		TableBodyRowGroup body = table.createBodyRowGroup();
 		body.setStyleClass("casesBoardViewerBodyRows");
+		int finalEstimate = 0;
+		int finalProposed = 0;
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			TableRow row = body.createRow();
 			row.setId(rowBean.getId());
@@ -336,6 +338,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 						decisionCell.add(new Text(String.valueOf(dec)));
 						makeCellEditable(decisionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
 
+						
 						decisionCell.setStyleClass(BOARD_DECISION);
 						decisionCell.setMarkupAttribute("task_index", index);
 						decisionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -350,30 +353,42 @@ public class CasesBoardViewer extends IWBaseComponent {
 					}
 
 					//	Totals
-					financingTableRow = body.createRow();
-					financingTableRow.setStyleClass("childRow");
-					for (int i = 0; i < 4; i++)
-						financingTableRow.createCell().add(new Text(CoreConstants.SPACE));
+					TableRow emptyRow = body.createRow();
+					emptyRow.setStyleClass("childRow");
 
 					financingTableRow = body.createRow();
 					financingTableRow.setStyleClass("childRow");
 
 					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
-					financingTableRow.createCell().add(new Text(String.valueOf(estimationTotal)));
+					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
+					
+					
+					TableCell2 estimateCell = financingTableRow.createCell();
+					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
+					estimateCell.add(new Text(String.valueOf(estimationTotal)));
+					finalEstimate += estimationTotal;
+					
 
 					TableCell2 localProposalTotalCell = financingTableRow.createCell();
+					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
 					localProposalTotalCell.add(new Text(String.valueOf(proposalTotal)));
+					finalProposed += proposalTotal;
 					String proposalTotalCellId  = localProposalTotalCell.getId();
 					for (TableCell2 suggestionCell: suggestionCells)
 						suggestionCell.setMarkupAttribute("local_total", proposalTotalCellId);
 
 					TableCell2 localSuggestionTotalCell = financingTableRow.createCell();
+					TableCell2 emptyCell = emptyRow.createCell();
+					emptyCell.add(new Text(CoreConstants.SPACE));
+					emptyCell.setStyleClass(BOARD_SUGGESTION);
+					localSuggestionTotalCell.setStyleClass(BOARD_SUGGESTION);
 					localSuggestionTotalCell.add(new Text(String.valueOf(suggestionTotal)));
 					String suggestionTotalCellId  = localSuggestionTotalCell.getId();
 					for (TableCell2 suggestionCell: suggestionCells)
 						suggestionCell.setMarkupAttribute("local_total", suggestionTotalCellId);
 
 					TableCell2 localDecisionTotalCell = financingTableRow.createCell();
+					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
 					localDecisionTotalCell.add(new Text(String.valueOf(decisionTotal)));
 					String decisionTotalCellId = localDecisionTotalCell.getId();
 					for (TableCell2 decisionCell: decisionCells)
@@ -419,8 +434,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 		String boardDecisionTotalCellId = null;
 		TableFooterRowGroup footer = table.createFooterRowGroup();
 		TableRow footerRow = footer.createRow();
-		int totalBoardSuggestionCellIndex = getBoardCasesManager().getIndexOfColumn(ProcessConstants.BOARD_FINANCING_SUGGESTION, uuid) - 1;
-		int totalBoardDecisionCellIndex = getBoardCasesManager().getIndexOfColumn(ProcessConstants.BOARD_FINANCING_DECISION, uuid) - 1;
+		int totalBoardSuggestionCellIndex = ids.indexOf(ProcessConstants.BOARD_FINANCING_SUGGESTION);
+		int totalBoardDecisionCellIndex = ids.indexOf(ProcessConstants.BOARD_FINANCING_DECISION);
+		int finalEstimateIndex = ids.indexOf(CasesBoardViewer.ESTIMATED_COST);
+		int finalProposedIndex = ids.indexOf(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT);
 		for (String footerLabel: data.getFooterValues()) {
 			TableCell2 footerCell = footerRow.createCell();
 			footerCell.add(new Text(footerLabel));
@@ -430,6 +447,12 @@ public class CasesBoardViewer extends IWBaseComponent {
 				boardDecisionTotalCellId = footerCell.getId();
 			else if (totalBoardSuggestionCellIndex == index)
 				boardSuggestionTotalCellId = footerCell.getId();
+			else if(finalEstimateIndex == index){
+				footerCell.add(new Text(String.valueOf(finalEstimate)));
+			}
+			else if(finalProposedIndex == index){
+				footerCell.add(new Text(String.valueOf(finalProposed)));
+			}
 
 			index++;
 		}
