@@ -44,7 +44,7 @@ case_board_viewer.string_ownerTotalCost=Heildarkostn.
 case_board_viewer.sum_all_grades=Eink.
 case_board_viewer.total_sum=Samtals
 case_board_viewer.string_ownerAddress=Heimilisfang
-case_board_viewer.handlerUserId=d\u00FDra\u00FEj\u00E1lfari
+case_board_viewer.handlerUserId=D\u00FDra\u00FEj\u00E1lfari
 
 case_category=M\u00E1laflokkur
 case_category.group_not_empty=Vinsamlegast velji\u00F0 h\u00F3p sem \u00E1 a\u00F0 sj\u00E1 um \u00FEessa tegund erinda
@@ -111,6 +111,7 @@ case_status_key.UBEH=M\u00F3tteki\u00F0
 case_status_key.WAIT=\u00CD bi\u00F0
 case_status_key.CREA=Stofna\u00F0
 case_status_key.FINI=Loki\u00F0
+case_status_key.REPO=Greinarger\u00F0
 case_taken_body=M\u00E1laflokkur\: {0}\r\nTegund erindis\:  {1} \r\nUmsj\u00F3narma\u00F0ur a\u00F0 nafni\: {2}, hefur teki\u00F0 erindi \u00FEitt til me\u00F0h\u00F6ndlunar. \u00DEegar afgrei\u00F0slu erindisins er loki\u00F0, ver\u00F0a skilabo\u00F0 send \u00ED t\u00F6lvup\u00F3sti \u00E1 uppgefi\u00F0 netfang og \u00ED \u00FEj\u00F3nustug\u00E1ttina. \u00DEar getur \u00FE\u00FA fylgst me\u00F0 st\u00F6\u00F0u erindisins undir flipanum M\u00E1lin m\u00EDn.
 case_taken_subject=Erindi \u00FEitt teki\u00F0 til me\u00F0h\u00F6ndlunar
 case_type=Tegund
