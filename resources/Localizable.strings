@@ -108,6 +108,7 @@ case_status_key.CREA=Created
 case_status_key.FINI=Finished
 case_status_key.UPPS=UPPS
 case_status_key.WAIT=Under hold
+case_status_key.REPO=Report
 case_taken_body=Your case with category {0} and type {1} has been put into process by {2}
 case_taken_subject=Your case has been taken
 case_type=Case type

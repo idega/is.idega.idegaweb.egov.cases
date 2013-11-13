@@ -306,6 +306,9 @@ div.shortFormItem label {
 	width: 75px;
 }
 
+.casesSearcherInputsBoxStyleClass div.shortFormItem input, div.shortFormItem select{
+	width: 108px!important;
+}
 div.shortFormItem input, div.shortFormItem select {
 	width: 108px;
 	margin: 0;
@@ -619,3 +622,8 @@ div.casesBoardViewCustomizerButtons {
 div.caseViewBackButtonStyle {
 	float: right;
 }
+
+td.string_ownerGradeComment, th.string_ownerGradeComment{
+	display:none;
+}
+	

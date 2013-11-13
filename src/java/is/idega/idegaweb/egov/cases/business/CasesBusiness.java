@@ -77,6 +77,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseDescription
 	 */
+	@Override
 	public String getLocalizedCaseDescription(Case theCase, Locale locale) throws RemoteException;
 
 	/**
@@ -87,6 +88,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getLocalizedCaseStatusDescription
 	 */
+	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) throws RemoteException;
 
 	/**
@@ -302,6 +304,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#canDeleteCase
 	 */
+	@Override
 	public boolean canDeleteCase(Case theCase) throws RemoteException;
 
 	/**
@@ -350,6 +353,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByIds
 	 */
+	@Override
 	public Collection<Case> getCasesByIds(Collection<Integer> ids);
 
 	/**
@@ -371,4 +375,5 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getFilteredProcesslessCasesIds
 	 */
 	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases) throws RemoteException;
+	
 }

@@ -136,9 +136,9 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 	settings.uuid = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableUniqueIdKey\']', container);
 	settings.container = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableContainerKey\']', container);
 	
-	settings.totalBoardSuggestionCellId = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableTotalBoardSuggestionCellIdKey\']',
+	settings.totalBoardSuggestionCellId = CasesBoardHelper.getValueFromHiddenInput('[name="casesBoardViewerTableTotalBoardSuggestionCellIdKey"]',
 		container);
-	settings.totalBoardAmountCellId = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableTotalBoardAmountCellIdKey\']',
+	settings.totalBoardAmountCellId = CasesBoardHelper.getValueFromHiddenInput('[name="casesBoardViewerTableTotalBoardAmountCellIdKey"]',
 		container);
 		
 	settings.backPage = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableSpecialBackPageFromTaskViewer\']',

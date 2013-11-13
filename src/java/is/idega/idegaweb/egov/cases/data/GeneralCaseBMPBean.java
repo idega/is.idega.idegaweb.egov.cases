@@ -22,7 +22,6 @@ import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.core.file.data.ICFile;
-import com.idega.data.IDOCompositePrimaryKeyException;
 import com.idega.data.IDOException;
 import com.idega.data.IDORelationshipException;
 import com.idega.data.query.BetweenCriteria;
@@ -36,6 +35,7 @@ import com.idega.data.query.Table;
 import com.idega.data.query.range.DateRange;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 
@@ -450,8 +450,16 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		query.addOrder(new Order(process.getColumn(getSQLGeneralCaseCreatedColumnName()), true));
 
-		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
-		return idoFindPKsByQuery(query);
+		boolean measureSQL = CoreUtil.isSQLMeasurementOn();
+		long start = measureSQL ? System.currentTimeMillis() : 0;
+		try {
+			return idoFindPKsByQuery(query);
+		} finally {
+			if (measureSQL) {
+				java.util.logging.Logger.getLogger(getClass().getName()).info("Query '" + query.toString() + "' was executed in " +
+						(System.currentTimeMillis() - start) + " ms");
+			}
+		}
 	}
 
 	public Collection ejbFindByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Boolean anonymous, String caseManagerType) throws FinderException {
@@ -528,18 +536,20 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoGetNumberOfRecords(query);
 	}
 
-	public Collection ejbFindByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses, IWTimestamp dateFrom,
-			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) throws FinderException {
+	public Collection<Integer> ejbFindByCriteria(
+			String caseNumber,
+			String description,
+			Collection<String> owners,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases
+	) throws FinderException {
 
 		Table generalCasesTable = new Table(this);
 		Table casesTable = new Table(Case.class);
-		String casesTableIdColumnName = null;
-		try {
-			casesTableIdColumnName = casesTable.getPrimaryKeyColumnName();
-		} catch (IDOCompositePrimaryKeyException e) {
-			e.printStackTrace();
-			return null;
-		}
 
 		SelectQuery query = new SelectQuery(generalCasesTable);
 		query.addColumn(generalCasesTable.getColumn(getIDColumnName()));
@@ -563,7 +573,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			query.addCriteria(new InCriteria(casesTable.getColumn(getSQLGeneralCaseHandlerColumnName()), groupsIds));
 		}
 		if (caseNumber != null) {
-			Column column = new Column(casesTable, casesTableIdColumnName);
+			Column column = new Column(casesTable, casesTable.getColumn(CaseBMPBean.COLUMN_CASE_IDENTIFIER).getName());
 			column.setPrefix("lower(");
 			column.setPostfix(")");
 			query.addCriteria(new MatchCriteria(column, MatchCriteria.LIKE, true, caseNumber));
@@ -582,8 +592,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		}
 		if (dateFrom != null && dateTo != null) {
 			query.addCriteria(new BetweenCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CREATED), new DateRange(dateFrom.getDate(), dateTo.getDate())));
-		}
-		else {
+		} else {
 			if (dateFrom != null) {
 				query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CREATED), MatchCriteria.GREATEREQUAL, dateFrom.getDate()));
 			}
@@ -597,8 +606,16 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		query.addGroupByColumn(generalCasesTable.getColumn(getIDColumnName()));
 
-		java.util.logging.Logger.getLogger(getClass().getName()).log(Level.INFO, query.toString());
-		return idoFindPKsByQuery(query);
+		boolean measureSQL = CoreUtil.isSQLMeasurementOn();
+		long start = measureSQL ? System.currentTimeMillis() : 0;
+		try {
+			return idoFindPKsByQuery(query);
+		} finally {
+			if (measureSQL) {
+				java.util.logging.Logger.getLogger(getClass().getName()).info("Query '" + query.toString() + "' was executed in " +
+						(System.currentTimeMillis() - start) + " ms");
+			}
+		}
 	}
 
 	public Collection ejbFindAllByIds(Collection<Integer> ids) throws FinderException {
@@ -622,4 +639,25 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see is.idega.idegaweb.egov.cases.data.GeneralCase#isSubscribed(com.idega.user.data.User)
+	 */
+	@Override
+	public boolean isSubscribed(User user) {
+		if (user == null) {
+			return Boolean.FALSE;
+		}
+
+		Collection<User> subscribers = getSubscribers();
+		if (!ListUtil.isEmpty(subscribers)) {
+			for (User subscriber : subscribers) {
+				if (subscriber.equals(user)) {
+					return Boolean.TRUE;
+				}
+			}
+		}
+
+		return Boolean.FALSE;
+	}
 }

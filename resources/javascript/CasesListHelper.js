@@ -408,7 +408,8 @@ function searchForCases(parameters) {
 		alert('Not enough parameters are provided!');
 		return false;
 	}
-	
+
+	// Component id's
 	var caseNumberId = parameters[1];
 	var caseDescriptionId = parameters[8];
 	var nameId = parameters[2];
@@ -418,7 +419,8 @@ function searchForCases(parameters) {
 	var dateRangeId = parameters[6];
 	var showStatisticsId = parameters[12];
 	var showAllCases = parameters[13];
-	
+
+	// Component values
 	var caseNumberValue = dwr.util.getValue(caseNumberId);
 	var caseDescriptionValue = dwr.util.getValue(caseDescriptionId);
 	var nameValue = dwr.util.getValue(nameId);
@@ -445,6 +447,12 @@ function searchForCases(parameters) {
 	if (!showStatistics)
 		showStatistics = false;
 	
+	var groupId = dwr.util.getValue(parameters[14]);
+	if (groupId == '' || groupId == -1) {
+		groupId = null;
+	}
+	
+	// Additional properties
 	var usePDFDownloadColumn = true;
 	var allowPDFSigning = true;
 	var hideEmptySection = false;
@@ -483,7 +491,7 @@ function searchForCases(parameters) {
 		dateRangeValue, caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables,
 		hideEmptySection, showCaseNumberColumn,	showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1,
 		dwr.util.getValue(jQuery('select.listPagerSize').attr('id')), jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'),
-		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr
+		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId
 	);
 	criterias.clearResults = true;
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
@@ -557,7 +565,7 @@ function clearSearchForCases(parameters) {
 			if (parameters != null) {
 				var cssClassName = null;
 				try {
-					if (parameters != null && parameters.length >= 13) {
+					if (parameters != null && parameters.length >= 14) {
 						cssClassName = parameters[0];
 						dwr.util.setValue(parameters[1], '');
 						dwr.util.setValue(parameters[8], '');
@@ -567,6 +575,7 @@ function clearSearchForCases(parameters) {
 						dwr.util.setValue(parameters[5], '-1');
 						dwr.util.setValue(parameters[6], '');
 						dwr.util.setValue(parameters[10], '');
+						dwr.util.setValue(parameters[14], '-1');
 						jQuery('#' + parameters[12]).attr('checked', false);
 					}
 				} catch (e) {}
@@ -644,8 +653,9 @@ CasesListHelper.getStatusesToHide = function() {
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact,
 	usePDFDownloadColumn, allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
 	instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns,
-	showLoadingMessageAttr) {
+	showLoadingMessageAttr, groupId) {
 	
+	this.subscribersGroupId = groupId;
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
 	this.description = description == '' ? null : description;
 	this.name = name == '' ? null : name;
