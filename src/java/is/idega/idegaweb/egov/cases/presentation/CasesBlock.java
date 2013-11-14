@@ -63,6 +63,9 @@ public abstract class CasesBlock extends CaseBlock {
 
 	@Override
 	public void main(IWContext iwc) throws Exception {
+		IWBundle iwb =  iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.bpm");
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, iwb.getVirtualPathWithFileNameString("javascript/CasesBPMAssets.js"));
+		
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
 				iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"),
 				iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/case.css")
@@ -333,7 +336,7 @@ public abstract class CasesBlock extends CaseBlock {
 
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
-			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
@@ -347,7 +350,7 @@ public abstract class CasesBlock extends CaseBlock {
 
 	private UserBusiness getUserBusiness(IWApplicationContext iwac) {
 		try {
-			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, UserBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);

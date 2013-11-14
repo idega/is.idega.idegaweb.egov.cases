@@ -259,6 +259,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute("showcomments", properties.isShowComments());
 		layer.setMarkupAttribute("showcontacts", properties.isShowContacts());
 		layer.setMarkupAttribute("addExportContacts", properties.isAddExportContacts());
+		layer.setMarkupAttribute("showUserCompany", properties.isShowUserCompany());
 		if (!StringUtil.isEmpty(properties.getSpecialBackPage()))
 			layer.setMarkupAttribute("specialbackpage", properties.getSpecialBackPage());
 		if (!StringUtil.isEmpty(properties.getCasesListCustomizer()))

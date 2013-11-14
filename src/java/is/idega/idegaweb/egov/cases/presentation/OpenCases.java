@@ -47,6 +47,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		return OpenCases.pageType;
 	}
 
+	@Override
 	public boolean actionPerformed(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
 			Object casePK = iwc.getParameter(PARAMETER_CASE_PK);
