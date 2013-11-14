@@ -258,6 +258,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute("showlogexportbutton", properties.isShowLogExportButton());
 		layer.setMarkupAttribute("showcomments", properties.isShowComments());
 		layer.setMarkupAttribute("showcontacts", properties.isShowContacts());
+		layer.setMarkupAttribute("addExportContacts", properties.isAddExportContacts());
 		if (!StringUtil.isEmpty(properties.getSpecialBackPage()))
 			layer.setMarkupAttribute("specialbackpage", properties.getSpecialBackPage());
 		if (!StringUtil.isEmpty(properties.getCasesListCustomizer()))
@@ -838,7 +839,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			String caseCode, CaseStatus caseStatus, boolean addCredentialsToExernalUrls) {
 		CaseBusiness caseBusiness = null;
 		try {
-			caseBusiness = (CaseBusiness) IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
+			caseBusiness = IBOLookup.getServiceInstance(iwc, CaseBusiness.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
@@ -968,7 +969,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	private CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
-			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
@@ -979,7 +980,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private CredentialBusiness getCredentialBusiness(IWApplicationContext iwac) {
 
 		try {
-			return (CredentialBusiness) IBOLookup.getServiceInstance(iwac, CredentialBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CredentialBusiness.class);
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();

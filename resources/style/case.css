@@ -626,4 +626,9 @@ div.caseViewBackButtonStyle {
 td.string_ownerGradeComment, th.string_ownerGradeComment{
 	display:none;
 }
+
+.case-header-actions{
+	display:inline;
+	padding-left:2em;
+}
 	
