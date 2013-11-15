@@ -370,7 +370,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (properties.isShowCreatorColumn()) {
 				Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
 				senderContainer.setStyleClass(VARIABLE_SENDER);
-				
+
 				StringBuilder senderName = new StringBuilder();
 				if (properties.isNameFromExternalEntity() && getExternalEntityInterface() != null) {
 					String ownerCompanyName = getExternalEntityInterface().getName(owner);
@@ -378,19 +378,19 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 						senderName.append(ownerCompanyName).append(" (");
 					}
 				}
-				
+
 				if (owner != null) {
 					senderName.append(new Name(owner.getFirstName(), owner.getMiddleName(),
 							owner.getLastName()).getName(l));
 				} else {
 					senderName.append(CoreConstants.MINUS);
 				}
-				
+
 				if (senderName.indexOf(CoreConstants.BRACKET_LEFT) != -1) {
 					senderName.deleteCharAt(senderName.lastIndexOf(CoreConstants.SPACE));
 					senderName.append(CoreConstants.BRACKET_RIGHT);
 				}
-				
+
 				senderContainer.add(new Text(senderName.toString()));
 				if (theCase.isBpm()) {
 					prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
@@ -487,16 +487,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		return caseContainer;
 	}
-	
+
 	@Autowired(required=false)
 	protected ExternalEntityInterface eei = null;
-	
+
 	protected ExternalEntityInterface getExternalEntityInterface() {
 		if (this.eei == null) {
 			ELUtil.getInstance().autowire(this);
 		}
-		
-		return this.eei; 
+
+		return this.eei;
 	}
 
 	private String getEmailAddressMailtoFormattedWithSubject(String emailAddress, String subject) {
@@ -654,7 +654,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			return container;
 		} finally {
-			LOGGER.info("Cases list were rendered in " + (System.currentTimeMillis() - start) + " ms. Rendered cases: " + casesToRender);
+			long duration = System.currentTimeMillis() - start;
+			if (duration > 1000) {
+				LOGGER.info("Cases list were rendered in " + duration + " ms. Rendered cases: " + casesToRender);
+			}
 		}
 	}
 
