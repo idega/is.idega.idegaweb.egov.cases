@@ -76,33 +76,33 @@ import com.idega.util.expression.ELUtil;
 
 
 public class CasesStatistics extends CasesBlock {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(CasesStatistics.class.getName());
 
 	private static final String PARAMETER_FROM_DATE = "prm_from_date";
 	private static final String PARAMETER_TO_DATE = "prm_to_date";
-	
+
 	public static final String UNKOWN_CATEGORY_ID = "case.unkown_category";
-	
+
 	private String visibleStatuses = null;
-	
+
 	private Boolean useStatisticsByCaseType,
 					showDateRange = Boolean.TRUE;
-	
+
 	private Collection<CasePresentation> cases;
-	
+
 	private List<Integer> customCategories;
 	private List<String> namesOfCustomCategories = Collections.unmodifiableList(Arrays.asList("BPM"));	//	TODO: use constant
-	
+
 	private List<String> availableStatuses;
-	
+
 	private String casesCriteria;
 	private String categoriesCriteria;
 	private String statusesCriteria;
-	
+
 	@Autowired(required = false)
 	private CaseManagersProvider caseManagersProvider;
-	
+
 	@Override
 	public void main(IWContext iwc) throws Exception {
 		try {
@@ -110,16 +110,15 @@ public class CasesStatistics extends CasesBlock {
 		} catch(Exception e) {
 			LOGGER.log(Level.WARNING, "Unable to autowire Spring bean: " + CaseManagersProvider.class.getName() + ". Will skip BPM cases in statistics");
 		}
-		
+
 		super.main(iwc);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		boolean useSubCats = super.getCasesBusiness(iwc).useSubCategories();
 		boolean useTypes = super.getCasesBusiness(iwc).useTypes();
-		
+
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		Collection<CaseStatus> statuses = null;
 		if (visibleStatuses == null) {
@@ -149,14 +148,14 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
-		
+
 		String localizedStatus = null;
 		Collection<CaseStatus> statusesToUse = new ArrayList<CaseStatus>();
 		if (!ListUtil.isEmpty(statuses)) {
 			for (CaseStatus status: statuses) {
 				if (!statusesToUse.contains(status)) {
 					localizedStatus = getCasesBusiness().getLocalizedCaseStatusDescription(null, status, iwc.getCurrentLocale());
-					
+
 					if (!StringUtil.isEmpty(localizedStatus) && !localizedStatus.equals(status.getStatus())) {
 						statusesToUse.add(status);
 					}
@@ -186,7 +185,7 @@ public class CasesStatistics extends CasesBlock {
 		Layer section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		form.add(section);
-		
+
 		IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
 		from.setUseCurrentDateIfNotSet(false);
 		from.setShowMonthChange(true);
@@ -206,14 +205,14 @@ public class CasesStatistics extends CasesBlock {
 			element.add(label);
 			element.add(from);
 			section.add(element);
-	
+
 			element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
 			label = new Label(getResourceBundle().getLocalizedString("cases_fetcher.to_date", "To date"), to);
 			element.add(label);
 			element.add(to);
 			section.add(element);
-	
+
 			SubmitButton fetch = new SubmitButton(getResourceBundle().getLocalizedString("cases_fetcher.fetch", "Fetch"));
 			fetch.setStyleClass("indentedButton");
 			fetch.setStyleClass("button");
@@ -222,12 +221,12 @@ public class CasesStatistics extends CasesBlock {
 			element.add(fetch);
 			section.add(element);
 		}
-		
+
 		section = new Layer(Layer.DIV);
 		section.setStyleClass("formSection");
 		section.setStyleClass("statisticsLayer");
 		form.add(section);
-		
+
 		Heading1 heading = new Heading1(iwrb.getLocalizedString("case.statistics", "Case statistics"));
 		section.add(heading);
 
@@ -250,7 +249,7 @@ public class CasesStatistics extends CasesBlock {
 		addResults(null, null, null, iwc, iwrb, section, resultsByUsers, statusesToUse, iwrb.getLocalizedString("case.cases_by_handler", "Cases by handler"),
 				false, false, 0, fromDate, toDate);
 		section.add(new CSSSpacer());
-		
+
 		if (useStatisticsByCaseType != null) {
 			useTypes = useStatisticsByCaseType;
 		}
@@ -272,11 +271,11 @@ public class CasesStatistics extends CasesBlock {
 				totals.put(status, 0);
 			}
 		}
-		
+
 		if (table == null) {
 			Heading2 heading2 = new Heading2(header);
 			section.add(heading2);
-			
+
 			table = new Table2();
 			table.setWidth("100%");
 			table.setCellpadding(0);
@@ -284,7 +283,7 @@ public class CasesStatistics extends CasesBlock {
 			table.setStyleClass("adminTable");
 			table.setStyleClass("ruler");
 			section.add(table);
-			
+
 			TableColumnGroup columnGroup = table.createColumnGroup();
 			TableColumn column = columnGroup.createColumn();
 			column.setSpan(3);
@@ -298,7 +297,7 @@ public class CasesStatistics extends CasesBlock {
 			cell.setStyleClass("firstColumn");
 			cell.setStyleClass("name");
 			cell.add(new Text(getResourceBundle().getLocalizedString("name", "Name")));
-			
+
 			CaseStatus status;
 			for (Iterator<CaseStatus> statIter = statuses.iterator(); statIter.hasNext();) {
 				status = statIter.next();
@@ -312,14 +311,14 @@ public class CasesStatistics extends CasesBlock {
 				}
 				cell.add(new Text(StringUtil.isEmpty(statusLabel) ? status.getStatus() : statusLabel));
 			}
-			
+
 			cell = row.createHeaderCell();
 			cell.setStyleClass("total lastColumn");
 			cell.add(new Text(getResourceBundle().getLocalizedString("total", "Total")));
 
 			group = table.createBodyRowGroup();
 		}
-		
+
 		if (!ListUtil.isEmpty(results)) {
 			for (Iterator<Result> iter = results.iterator(); iter.hasNext();) {
 				++iRow;
@@ -336,7 +335,7 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
-		
+
 		if (!isSubCategory) {
 			group = table.createFooterRowGroup();
 			TableRow row = group.createRow();
@@ -388,7 +387,7 @@ public class CasesStatistics extends CasesBlock {
 				val = value.intValue();
 			}
 			totalValue += val;
-			
+
 			cell = row.createCell();
 			cell.setStyleClass(status.getStatus());
 			if (showNumbers) {
@@ -397,11 +396,11 @@ public class CasesStatistics extends CasesBlock {
 				cell.add(Text.getNonBrakingSpace());
 			}
 			cell.setHorizontalAlignment(Table2.HORIZONTAL_ALIGNMENT_CENTER);
-			
+
 			Integer total = totals.get(status);
 			totals.put(status, (total.intValue() + val));
 		}
-		
+
 		cell = row.createCell();
 		cell.setStyleClass("total");
 		cell.setStyleClass("lastColumn");
@@ -422,7 +421,7 @@ public class CasesStatistics extends CasesBlock {
 			row.setStyleClass("subCategory");
 		}
 	}
-	
+
 	private Collection<Result> getResults(IWContext iwc, boolean useSubCats, int parentID, boolean useHandlerIfNotFoundCustom, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		if (useHandlerIfNotFoundCustom) {
 			Handler handler = new CategoryHandler(useSubCats, parentID);
@@ -430,28 +429,28 @@ public class CasesStatistics extends CasesBlock {
 			handler.setDateTo(dateTo);
 			return getResults(iwc, handler);
 		}
-		
+
 		return null;
 	}
-	
+
 	private Collection<Result> getResultsUsers(IWContext iwc, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		Handler handler = new UserHandler(false, -1);
 		handler.setDateFrom(dateFrom);
 		handler.setDateTo(dateTo);
 		return getResults(iwc, handler);
 	}
-	
+
 	private Collection<Result> getResultsCode(IWContext iwc, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		Handler handler = new CaseTypeHandler(false, -1);
 		handler.setDateFrom(dateFrom);
 		handler.setDateTo(dateTo);
 		return getResults(iwc, handler);
 	}
-	
+
 	public void setVisibleStatuses(String statuses) {
 		this.visibleStatuses = statuses;
 	}
-	
+
 	protected CaseStatusHome getCaseStatusHome() {
 		try {
 			return (CaseStatusHome) IDOLookup.getHome(CaseStatus.class);
@@ -460,13 +459,13 @@ public class CasesStatistics extends CasesBlock {
 			throw new IBORuntimeException(ile);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId) {
 		if (getCaseManagersProvider() == null) {
 			return null;
 		}
-		
+
 		CaseCategory category = null;
 		try {
 			category = getCaseCategory(categoryId);
@@ -476,20 +475,20 @@ public class CasesStatistics extends CasesBlock {
 		if (category == null) {
 			return null;
 		}
-		
+
 		Collection<Case> cases = null;
 		try {
 			cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		Map<String, List<Case>> casesByProcesses = getCasesByProcesses(cases);
 		if (casesByProcesses == null || ListUtil.isEmpty(casesByProcesses.keySet())) {
 			LOGGER.info("Didn't find any custom category ('"+category+"') cases");
 			return null;
 		}
-		
+
 		String localizedProcessName = null;
 		Locale locale = iwc.getCurrentLocale();
 		List<Result> results = new ArrayList<Result>();
@@ -504,20 +503,20 @@ public class CasesStatistics extends CasesBlock {
 			if (StringUtil.isEmpty(localizedProcessName)) {
 				localizedProcessName = unkownProcess;
 			}
-			
+
 			results.add(new Result(-1, localizedProcessName, getStatusesForCases(casesByProcesses.get(processName)), false));
 		}
-		
+
 		return results;
 	}
-	
+
 	private Map<String, Integer> getStatusesForCases(List<Case> cases) {
 		if (ListUtil.isEmpty(cases)) {
 			return new HashMap<String, Integer>();
 		}
-		
+
 		Map<String, Integer> statuses = new HashMap<String, Integer>();
-		
+
 		String statusId = null;
 		for (Case theCase: cases) {
 			statusId = theCase.getStatus();
@@ -535,15 +534,15 @@ public class CasesStatistics extends CasesBlock {
 				statuses.put(statusId, count);
 			}
 		}
-		
+
 		return statuses;
 	}
-	
+
 	private boolean canCaseBeUsedInStatistics(Case theCase) {
 		if (ListUtil.isEmpty(cases)) {
 			return true;	//	No data set is set
 		}
-		
+
 		for (CasePresentation preCase: cases) {
 			if (theCase.getPrimaryKey().toString().equals(preCase.getId())) {
 				return true;
@@ -552,14 +551,14 @@ public class CasesStatistics extends CasesBlock {
 
 		return false;
 	}
-	
+
 	private Map<String, List<Case>> getCasesByProcesses(Collection<Case> cases) {
 		if (ListUtil.isEmpty(cases) || getCaseManagersProvider() == null || getCaseManagersProvider().getCaseManager() == null) {
 			return null;
 		}
-		
+
 		Map<String, List<Case>> casesByProcesses = new HashMap<String, List<Case>>();
-		
+
 		String processDefinitionName = null;
 		for (Case theCase: cases) {
 			if (canCaseBeUsedInStatistics(theCase)) {
@@ -569,7 +568,7 @@ public class CasesStatistics extends CasesBlock {
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
-				
+
 				if (StringUtil.isEmpty(processDefinitionName)) {
 					LOGGER.warning("Unable to get process identifier for case: " + theCase);
 				}
@@ -583,10 +582,10 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
-		
+
 		return casesByProcesses;
 	}
-	
+
 	private Collection<Result> getResults(IWContext iwc, Handler handler) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -598,7 +597,7 @@ public class CasesStatistics extends CasesBlock {
 			stmt = conn.createStatement();
 
 			rs = stmt.executeQuery(handler.getSQL());
-			
+
 			results.addAll(handler.getResults(iwc, rs));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -621,36 +620,36 @@ public class CasesStatistics extends CasesBlock {
 				ConnectionBroker.freeConnection(conn);
 			}
 		}
-		
+
 		return results;
 	}
-	
+
 	protected class Result {
-	
+
 		private int id;
 		private boolean useDefaultHandlerIfNotFoundResultsProvider = true;
 		private String name = null;
 		private Map<String, Integer> statusMap;
-		
+
 		protected Result(int id, String name, Map<String, Integer> statusMap) {
 			this(id, name, statusMap, true);
 		}
-		
+
 		protected Result(int id, String name, Map<String, Integer> statusMap, boolean useDefaultHandlerIfNotFoundResultsProvider) {
 			this.id = id;
 			this.name = name;
 			this.statusMap = statusMap;
 			this.useDefaultHandlerIfNotFoundResultsProvider = useDefaultHandlerIfNotFoundResultsProvider;
 		}
-		
+
 		protected String getName() {
 			return name;
 		}
-		
+
 		protected Map<String, Integer> getStatusMap() {
 			return statusMap;
 		}
-		
+
 		protected int getID(){
 			return id;
 		}
@@ -659,18 +658,18 @@ public class CasesStatistics extends CasesBlock {
 			return useDefaultHandlerIfNotFoundResultsProvider;
 		}
 	}
-	
+
 	protected abstract class Handler {
 		public abstract String getSQL();
 		public abstract Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException;
 		public abstract boolean addResult(IWContext iwc, Collection<Result> results, int prevID, Map<String, Integer> statuses)
 										throws RemoteException, FinderException;
-		
+
 		private boolean useSubCats = false;
 		private int parentID = -1;
 		private IWTimestamp dateFrom;
 		private IWTimestamp dateTo;
-		
+
 		protected boolean isUseSubCats() {
 			return useSubCats;
 		}
@@ -696,16 +695,16 @@ public class CasesStatistics extends CasesBlock {
 			this.dateTo = dateTo;
 		}
 	}
-	
+
 	//	Cases by categories
 	protected class CategoryHandler extends Handler {
 		private List<Integer> addedCategories = new ArrayList<Integer>();
-		
+
 		public CategoryHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
 		}
-		
+
 		@Override
 		public String getSQL() {
 			StringBuilder query = new StringBuilder("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
@@ -718,19 +717,19 @@ public class CasesStatistics extends CasesBlock {
 			if (getDateTo() != null) {
 				query.append(getDateToCriteria(getDateTo()));
 			}
-				
+
 			query.append(" where cc.parent_category ");
-			
+
 			if (isUseSubCats() && getParentID() > -1) {
 				query.append("= ").append(getParentID());			//	We seek for special category
 			} else {
 				query.append("is null");							//	We weed ONLY top level categories
-				
+
 				query.append(getCategoriesIdsCriteria());			//	We need the very categories used by PROVIDED cases set
 			}
-			
+
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
-			
+
 			if (getParentID() == -1) {
 				System.out.println("CategoryHandler: " + query.toString());
 			}
@@ -746,17 +745,17 @@ public class CasesStatistics extends CasesBlock {
 				int categoryId = rs.getInt("comm_case_category_id");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("CASE_STATUS");
-				
+
 				if (previousCaseCategoryId != categoryId) {
 					if (statuses != null) {
 						//	Adding results for previous category
 						addResult(iwc, results, previousCaseCategoryId, statuses);
 					}
-					
+
 					//	New category
 					statuses = new HashMap<String, Integer>();
 				}
-				
+
 				statuses.put(caseStatus, isValidStatus(caseStatus) ? count : 0);
 				previousCaseCategoryId = categoryId;
 			}
@@ -764,7 +763,7 @@ public class CasesStatistics extends CasesBlock {
 				//	Adding results for LAST category
 				addResult(iwc, results, previousCaseCategoryId, statuses);
 			}
-			
+
 			return results;
 		}
 
@@ -774,7 +773,7 @@ public class CasesStatistics extends CasesBlock {
 			if (caseCategoryId < 0) {
 				return false;
 			}
-			
+
 			if (!addedCategories.contains(caseCategoryId) && isCustomCategory(caseCategoryId)) {
 				addedCategories.add(caseCategoryId);
 				Collection<Result> customCategoryResults = getCustomCategoryResults(iwc, caseCategoryId);
@@ -783,53 +782,53 @@ public class CasesStatistics extends CasesBlock {
 				}
 				return true;
 			}
-			
+
 			return addResultToList(getCategoryName(iwc, getCaseCategory(caseCategoryId)), results, caseCategoryId, statuses);
 		}
 	}
-	
+
 	boolean isValidStatus(String caseStatus) {
 		if (ListUtil.isEmpty(getAvailableStatuses())) {
 			return true;
 		}
-		
+
 		return availableStatuses.contains(caseStatus);
 	}
-	
+
 	private CaseCategory getTopCategory(CaseCategory category) {
 		CaseCategory parentCategory = category.getParent();
 		return parentCategory == null ? category : getTopCategory(parentCategory);
 	}
-	
+
 	String getCategoryName(IWContext iwc, CaseCategory caseCategory) {
 		return caseCategory == null ?	getResourceBundle(iwc).getLocalizedString(UNKOWN_CATEGORY_ID, "Unkown category") :
 										caseCategory.getLocalizedCategoryName(iwc.getCurrentLocale());
 	}
-	
+
 	CaseCategory getCaseCategory(Object primaryKey) throws RemoteException, FinderException {
 		return getCasesBusiness(IWMainApplication.getDefaultIWApplicationContext()).getCaseCategory(primaryKey);
 	}
-	
+
 	boolean isCustomCategory(int categoryId) {
 		if (!ListUtil.isEmpty(customCategories) && customCategories.contains(Integer.valueOf(categoryId))) {
 			return true;
 		}
-		
+
 		if (categoryId < 0) {
 			return false;
 		}
-		
+
 		CaseCategory category = null;
 		try {
 			category = getCaseCategory(categoryId);
 		} catch (Exception e) {
 			LOGGER.warning("Unable to get category by: " + categoryId);
 		}
-		
+
 		if (category == null) {
 			return false;
 		}
-		
+
 		if (namesOfCustomCategories.contains(category.getName())) {
 			if (ListUtil.isEmpty(customCategories)) {
 				customCategories = new ArrayList<Integer>();
@@ -837,7 +836,7 @@ public class CasesStatistics extends CasesBlock {
 			customCategories.add(Integer.valueOf(categoryId));
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -847,7 +846,7 @@ public class CasesStatistics extends CasesBlock {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
 		}
-		
+
 		@Override
 		public String getSQL() {
 			StringBuilder query = new StringBuilder("select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
@@ -861,9 +860,9 @@ public class CasesStatistics extends CasesBlock {
 			if (getDateTo() != null) {
 				query.append(getDateToCriteria(getDateTo()));
 			}
-			
+
 			query.append(" group by c.handler, p.case_status, u.display_name order by u.display_name, p.case_status");
-			
+
 			System.out.println("UserHandler: " + query.toString());
 			return query.toString();
 		}
@@ -877,7 +876,7 @@ public class CasesStatistics extends CasesBlock {
 				int handlerId = rs.getInt("handler");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("case_status");
-				
+
 				if (previousUserId != handlerId) {
 					if (statuses != null) {
 						//	Adding results for previous user
@@ -887,7 +886,7 @@ public class CasesStatistics extends CasesBlock {
 					//	New user
 					statuses = new HashMap<String, Integer>();
 				}
-				
+
 				statuses.put(caseStatus, count);
 				previousUserId = handlerId;
 			}
@@ -895,7 +894,7 @@ public class CasesStatistics extends CasesBlock {
 				//	Adding results for LAST user
 				addResult(iwc, results, previousUserId, statuses);
 			}
-			
+
 			return results;
 		}
 
@@ -910,29 +909,29 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 	}
-	
+
 	//	Cases by type
 	protected class CaseTypeHandler extends Handler {
 		public CaseTypeHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
 		}
-		
+
 		@Override
 		public String getSQL() {
 			StringBuilder query =  new StringBuilder("select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.case_type = c.case_type ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria());
-			
+
 			if (getDateFrom() != null) {
 				query.append(getDateFromCriteria(getDateFrom()));
 			}
 			if (getDateTo() != null) {
 				query.append(getDateToCriteria(getDateTo()));
 			}
-			
+
 			query.append(" group by c.case_type, p.case_status order by case_type");
-			
+
 			System.out.println("CaseTypeHandler: " + query.toString());
 			return query.toString();
 		}
@@ -946,17 +945,17 @@ public class CasesStatistics extends CasesBlock {
 				int caseTypeId = rs.getInt("case_type");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("case_status");
-				
+
 				if (prevCaseTypeId != caseTypeId) {
 					if (statuses != null) {
 						//	Adding results for previous case type
 						addResult(iwc, results, prevCaseTypeId, statuses);
 					}
-					
+
 					//	New case type
 					statuses = new HashMap<String, Integer>();
 				}
-				
+
 				statuses.put(caseStatus, count);
 				prevCaseTypeId = caseTypeId;
 			}
@@ -964,13 +963,13 @@ public class CasesStatistics extends CasesBlock {
 				//	Adding results for LAST case type
 				addResult(iwc, results, prevCaseTypeId, statuses);
 			}
-			
+
 			return results;
 		}
 
 		@Override
 		public boolean addResult(IWContext iwc, Collection<Result> results, int caseTypeId, Map<String, Integer> statuses)
-			throws FinderException, RemoteException {			
+			throws FinderException, RemoteException {
 			String resultName = null;
 			if (caseTypeId > -1) {
 				CaseType type = getCasesBusiness().getCaseType(caseTypeId);
@@ -978,68 +977,68 @@ public class CasesStatistics extends CasesBlock {
 			}
 			return addResultToList(resultName, results, caseTypeId, statuses);
 		}
-	
+
 	}
-	
+
 	boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses) {
 		if (identifier < 0 || StringUtil.isEmpty(resultName)) {
 			return false;
 		}
-		
+
 		results.add(new Result(identifier, resultName, statuses));
 
 		return true;
 	}
-	
+
 	String getDateFromCriteria(IWTimestamp date) {
 		StringBuilder builder = new StringBuilder(" and p.created >= '").append(date.toSQLDateString()).append("'");
 		return builder.toString();
 	}
-	
+
 	String getDateToCriteria(IWTimestamp date) {
 		StringBuilder builder = new StringBuilder(" and p.created <= '").append(date.toSQLDateString()).append("'");
 		return builder.toString();
 	}
-	
+
 	String getCasesIdsCriteria() {
 		if (ListUtil.isEmpty(cases)) {
 			return CoreConstants.EMPTY;
 		}
-		
+
 		if (casesCriteria != null) {
 			return casesCriteria;
 		}
-		
+
 		StringBuilder casesIds = new StringBuilder();
 		for (Iterator<CasePresentation> casesIter = cases.iterator(); casesIter.hasNext();) {
 			casesIds.append(casesIter.next().getId());
-			
+
 			if (casesIter.hasNext()) {
 				casesIds.append(CoreConstants.COMMA).append(CoreConstants.SPACE);
 			}
 		}
-		
+
 		casesCriteria = new StringBuilder(" and c.comm_case_id in (").append(casesIds.toString()).append(") ").toString();
 		return casesCriteria;
 	}
-	
+
 	String getCategoriesIdsCriteria() {
 		if (ListUtil.isEmpty(cases)) {
 			return CoreConstants.EMPTY;
 		}
-		
+
 		if (categoriesCriteria != null) {
 			return categoriesCriteria;
 		}
-		
-		StringBuilder query = new StringBuilder(" and cc.comm_case_category_id ");	
-		
+
+		StringBuilder query = new StringBuilder(" and cc.comm_case_category_id ");
+
 		CaseCategory category = null;
 		CaseCategory topCategory = null;
 		List<String> categoriesToUse = new ArrayList<String>();
 		for (CasePresentation theCase: cases) {
 			category = null;
-			
+
 			if (!StringUtil.isEmpty(theCase.getCategoryId())) {
 				try {
 					category = getCaseCategory(theCase.getCategoryId());
@@ -1047,7 +1046,7 @@ public class CasesStatistics extends CasesBlock {
 					e.printStackTrace();
 				}
 			}
-			
+
 			if (category != null) {
 				topCategory = getTopCategory(category);
 				if (!categoriesToUse.contains(topCategory.getPrimaryKey().toString())) {
@@ -1055,7 +1054,7 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		}
-		
+
 		if (ListUtil.isEmpty(categoriesToUse)) {
 			query.append("= -1");					//	No categories needed!!!
 		}
@@ -1063,52 +1062,52 @@ public class CasesStatistics extends CasesBlock {
 			query.append("in (");
 			for (Iterator<String> catIter = categoriesToUse.iterator(); catIter.hasNext();) {
 				query.append(catIter.next());
-				
+
 				if (catIter.hasNext()) {
 					query.append(CoreConstants.COMMA).append(CoreConstants.SPACE);
 				}
 			}
 			query.append(")");
 		}
-		
+
 		categoriesCriteria = query.toString();
 		return categoriesCriteria;
 	}
-	
+
 	private List<String> getAvailableStatuses() {
 		if (ListUtil.isEmpty(cases)) {
 			return null;
 		}
-		
+
 		if (!ListUtil.isEmpty(availableStatuses)) {
 			return availableStatuses;
 		}
-		
+
 		String status = null;
 		availableStatuses = new ArrayList<String>();
 		for (Iterator<CasePresentation> casesIter = cases.iterator(); casesIter.hasNext();) {
 			CaseStatus caseStatus = casesIter.next().getCaseStatus();
 			status = caseStatus == null ? null : caseStatus.getStatus();
-			
+
 			if (!StringUtil.isEmpty(status) && !availableStatuses.contains(status)) {
 				availableStatuses.add(status);
 			}
 		}
-		
+
 		return availableStatuses;
 	}
-	
+
 	String getStatusesIdsCriteria() {
 		if (ListUtil.isEmpty(cases)) {
 			return CoreConstants.EMPTY;
 		}
-		
+
 		if (statusesCriteria != null) {
 			return statusesCriteria;
 		}
-		
+
 		StringBuilder criteria = new StringBuilder(" and p.case_status ");
-		
+
 		List<String> statusesToUse = getAvailableStatuses();
 		if (ListUtil.isEmpty(statusesToUse)) {
 			criteria.append("= '-1'");
@@ -1117,14 +1116,14 @@ public class CasesStatistics extends CasesBlock {
 			criteria.append("in (");
 			for (Iterator<String> statusesIter = statusesToUse.iterator(); statusesIter.hasNext();) {
 				criteria.append(CoreConstants.QOUTE_SINGLE_MARK).append(statusesIter.next()).append(CoreConstants.QOUTE_SINGLE_MARK);
-				
+
 				if (statusesIter.hasNext()) {
 					criteria.append(CoreConstants.COMMA).append(CoreConstants.SPACE);
 				}
 			}
 			criteria.append(") ");
 		}
-		
+
 		statusesCriteria = criteria.toString();
 		return statusesCriteria;
 	}
@@ -1136,7 +1135,7 @@ public class CasesStatistics extends CasesBlock {
 	public void setCases(Collection<CasePresentation> cases) {
 		this.cases = cases;
 	}
-	
+
 	public CaseManagersProvider getCaseManagersProvider() {
 		return caseManagersProvider;
 	}
@@ -1157,7 +1156,7 @@ public class CasesStatistics extends CasesBlock {
 	public void setUseStatisticsByCaseType(Boolean useStatisticsByCaseType) {
 		this.useStatisticsByCaseType = useStatisticsByCaseType;
 	}
-	
+
 	@Override
 	public String getCasesProcessorType() {
 		return null;
@@ -1185,5 +1184,5 @@ public class CasesStatistics extends CasesBlock {
 	public void setShowDateRange(Boolean showDateRange) {
 		this.showDateRange = showDateRange;
 	}
-	
+
 }
