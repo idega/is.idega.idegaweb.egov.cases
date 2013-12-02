@@ -976,7 +976,9 @@ CasesListHelper.resetVariablesAndAddNewOne = function() {
 
 CasesListHelper.exportSearchResults = function(message) {
 	showLoadingMessage(message);
-	CasesEngine.getExportedSearchResults(window.location.pathname, {
+	var addexportcontacts = jQuery('[addexportcontacts="true"]').length > 0;
+	var showusercompany = jQuery('[showusercompany="true"]').length > 0;
+	CasesEngine.getExportedSearchResults(window.location.pathname,addexportcontacts,showusercompany, {
 		callback: function(result) {
 			if (result == null || result.id != 'true') {
 				closeAllLoadingMessages();
@@ -993,9 +995,9 @@ CasesListHelper.exportSearchResults = function(message) {
 	});
 }
 
-CasesListHelper.exportAllCases = function(message, containerId, instanceId) {
+CasesListHelper.exportAllCases = function(message, containerId, instanceId,isExportContacts,isShowCompany) {
 	showLoadingMessage(message);
-	CasesEngine.getExportedCases(instanceId, window.location.pathname, {
+	CasesEngine.getExportedCases(instanceId,window.location.pathname,isExportContacts,isShowCompany, {
 		callback: function(result) {
 			if (result == null || result.id != 'true') {
 				closeAllLoadingMessages();

@@ -51,7 +51,7 @@ public interface CasesEngine {
 	 */
 	public String isResolverExist(String beanName);
 
-	public AdvancedProperty getExportedCases(String instanceId, String uri);
+	public AdvancedProperty getExportedCases(String instanceId, String uri,Boolean isExportContacts, Boolean isShowCompany);
 
 	public boolean showCaseAssets();
 

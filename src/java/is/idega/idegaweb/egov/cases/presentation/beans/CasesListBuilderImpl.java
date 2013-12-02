@@ -822,7 +822,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		buttonsLayer.setStyleClass("exportAllCasesButtonStyle");
 		GenericButton exportButton = new GenericButton(iwrb.getLocalizedString("export_cases_data", "Export data to Excel"));
 		exportButton.setOnClick("CasesListHelper.exportAllCases('" + iwrb.getLocalizedString("exporting", "Exporting...") + "', '" +
-				buttonsLayer.getId() + "', '" + properties.getInstanceId() +  "');");
+				buttonsLayer.getId() + "', '" + properties.getInstanceId() + "', '" + properties.isAddExportContacts()  
+				+ "', '" + properties.isShowUserCompany() + "');");
 		buttonsLayer.add(exportButton);
 		return buttonsLayer;
 	}
