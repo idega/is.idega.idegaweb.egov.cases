@@ -299,10 +299,21 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return null;
 	}
 
-	private Layer addRowToCasesList(IWContext iwc, Layer casesBodyContainer, CasePresentation theCase, CaseStatus caseStatusReview, Locale l,
-			boolean isUserList, int rowsCounter, @SuppressWarnings("rawtypes") Map pages, String emailAddress, boolean descriptionIsEditable,
-			CaseListPropertiesBean properties, Map<String, Map<String, String>> labels) {
-
+	private Layer addRowToCasesList(
+			IWContext iwc,
+			Layer casesBodyContainer,
+			CasePresentation theCase,
+			CaseStatus caseStatusReview,
+			Locale l,
+			boolean isUserList,
+			int rowsCounter,
+			Map<?, ?> pages,
+			String emailAddress,
+			boolean descriptionIsEditable,
+			CaseListPropertiesBean properties,
+			Map<String, Map<String, String>> labels,
+			Map<String, String> statuses
+	) {
 		Layer caseContainer = new Layer();
 		casesBodyContainer.add(caseContainer);
 		caseContainer.setStyleClass(caseContainerStyle);
@@ -435,9 +446,18 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		if (properties.isShowCaseStatus()) {
 			//	Status
-			String localizedStatus = theCase.getLocalizedStatus();
-			Layer statusContainer = addLayerToCasesList(caseContainer, new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
-					bodyItem, "Status");
+			String localizedStatus = null;
+			if (MapUtil.isEmpty(statuses) || !statuses.containsKey(theCase.getId())) {
+				localizedStatus = theCase.getLocalizedStatus();
+			} else {
+				localizedStatus = statuses.get(theCase.getId());
+			}
+			Layer statusContainer = addLayerToCasesList(
+					caseContainer,
+					new Text(StringUtil.isEmpty(localizedStatus) ? CoreConstants.MINUS : localizedStatus),
+					bodyItem,
+					"Status"
+			);
 			statusContainer.setStyleClass(VARIABLE_STATUS);
 			if (theCase.isBpm())
 				prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
@@ -588,6 +608,22 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
 	}
 
+	private Map<String, String> getLocalizedStatuses(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, Locale locale) {
+		CasesListCustomizer customizer = getCasesListCustomizer(properties);
+		if (customizer == null)
+			return null;
+
+		Collection<CasePresentation> theCases = cases.getCollection();
+		if (ListUtil.isEmpty(theCases))
+			return null;
+
+		List<String> casesIds = new ArrayList<String>();
+		for (CasePresentation theCase: theCases)
+			casesIds.add(theCase.getId());
+
+		return customizer.getLocalizedStatuses(casesIds, locale);
+	}
+
 	@Override
 	public UIComponent getCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {
 		long start = System.currentTimeMillis();
@@ -637,10 +673,24 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 
 			Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
+			Map<String, String> statuses = getLocalizedStatuses(cases, properties, l);
 			casesToRender = casesInList.size();
 			for (CasePresentation theCase: casesInList) {
-				caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, false, rowsCounter, null, emailAddress,
-						descriptionIsEditable, properties, customLabels);
+				caseContainer = addRowToCasesList(
+						iwc,
+						casesBodyContainer,
+						theCase,
+						caseStatusReview,
+						l,
+						false,
+						rowsCounter,
+						null,
+						emailAddress,
+						descriptionIsEditable,
+						properties,
+						customLabels,
+						statuses
+				);
 				rowsCounter++;
 			}
 			if (caseContainer != null)
@@ -802,9 +852,23 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 
 		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
+		Map<String, String> statuses = getLocalizedStatuses(cases, properties, l);
 		for (CasePresentation theCase: casesInList) {
-			caseContainer = addRowToCasesList(iwc, casesBodyContainer, theCase, caseStatusReview, l, true, rowsCounter, pages, emailAddress,
-					descriptionIsEditable, properties, customLabels);
+			caseContainer = addRowToCasesList(
+					iwc,
+					casesBodyContainer,
+					theCase,
+					caseStatusReview,
+					l,
+					true,
+					rowsCounter,
+					pages,
+					emailAddress,
+					descriptionIsEditable,
+					properties,
+					customLabels,
+					statuses
+			);
 			rowsCounter++;
 		}
 		caseContainer.setStyleClass(lastRowStyle);
