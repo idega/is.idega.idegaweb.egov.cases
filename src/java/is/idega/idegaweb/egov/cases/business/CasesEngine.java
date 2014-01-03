@@ -51,10 +51,13 @@ public interface CasesEngine {
 	 */
 	public String isResolverExist(String beanName);
 
-	public AdvancedProperty getExportedCases(String instanceId, String uri,Boolean isExportContacts, Boolean isShowCompany);
+	public AdvancedProperty getExportedCases(String instanceId, String uri, Boolean isExportContacts, Boolean isShowCompany);
 
 	public boolean showCaseAssets();
 
 	public void doLoadCases(User user);
+
+	public AdvancedProperty getExportedCasesToPDF(Long processDefinitionId, String id);
+	public AdvancedProperty getStatusOfExport(String id);
 
 }
