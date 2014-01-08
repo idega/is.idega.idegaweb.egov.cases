@@ -59,5 +59,6 @@ public interface CasesEngine {
 
 	public AdvancedProperty getExportedCasesToPDF(Long processDefinitionId, String id);
 	public AdvancedProperty getStatusOfExport(String id);
+	public AdvancedProperty getLinkForZippedCases(String id, List<String> casesIdentifiers);
 
 }
