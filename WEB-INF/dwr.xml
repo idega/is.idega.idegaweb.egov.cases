@@ -12,5 +12,6 @@
 		</create>
 		
 		<convert converter="bean" match="is.idega.idegaweb.egov.cases.business.UserDWR"/>
+		<convert converter="bean" match="is.idega.idegaweb.egov.cases.bean.CasesExportParams"/>
 	</allow>
 </dwr>
