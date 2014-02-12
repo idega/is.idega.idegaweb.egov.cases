@@ -1,5 +1,7 @@
 package is.idega.idegaweb.egov.cases.business;
 
+import is.idega.idegaweb.egov.cases.bean.CasesExportParams;
+
 import java.util.List;
 
 import org.jdom2.Document;
@@ -51,10 +53,16 @@ public interface CasesEngine {
 	 */
 	public String isResolverExist(String beanName);
 
-	public AdvancedProperty getExportedCases(String instanceId, String uri);
+	public AdvancedProperty getExportedCases(String instanceId, String uri, Boolean isExportContacts, Boolean isShowCompany);
 
 	public boolean showCaseAssets();
 
 	public void doLoadCases(User user);
+
+	public AdvancedProperty getExportedCasesToPDF(CasesExportParams params);
+	public AdvancedProperty doActualExport(String id);
+	public Boolean doRemoveFromMemory(String id);
+	public AdvancedProperty getStatusOfExport(String id);
+	public AdvancedProperty getLinkForZippedCases(String id, List<String> casesIdentifiers);
 
 }

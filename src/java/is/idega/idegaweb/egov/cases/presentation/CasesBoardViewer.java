@@ -446,7 +446,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 		for (String footerLabel: data.getFooterValues()) {
 			TableCell2 footerCell = footerRow.createCell();
 			footerCell.add(new Text(footerLabel));
-			footerCell.setStyleClass(ids.get(index));
+			try {
+				footerCell.setStyleClass(ids.get(index));
+			} catch (IndexOutOfBoundsException e) {
+				continue;
+			}
 
 			if (totalBoardDecisionCellIndex == index)
 				boardDecisionTotalCellId = footerCell.getId();

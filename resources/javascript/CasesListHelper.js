@@ -221,12 +221,15 @@ function registerGridExpanderActionsForElement(event, element) {
 		var nameFromExternalEntity = caseToExpand.attr('nameFromExternalEntity') == 'true';
 		var showUserProfilePicture = caseToExpand.attr('showUserProfilePicture') == 'true';
 		var addExportContacts = caseToExpand.attr('addExportContacts') == 'true';
+		var showUserCompany = caseToExpand.attr('showUserCompany') == 'true';
+		var showLastLoginDate = caseToExpand.attr('showLastLoginDate') == 'true';
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, 
 				CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, 
 				allowPDFSigning, hideEmptySection, commentsManagerIdentifier, 
 				showAttachmentStatistics, showOnlyCreatorInContacts, 
 				showLogExportButton, showComments, showContacts, specialBackPage,
-				nameFromExternalEntity, showUserProfilePicture,addExportContacts), {
+				nameFromExternalEntity, showUserProfilePicture,addExportContacts,
+				showUserCompany,showLastLoginDate), {
 			callback: function(component) {
 				if (component == null) {
 					closeAllLoadingMessages();
@@ -252,7 +255,8 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 		allowPDFSigning, hideEmptySection, commentsManagerIdentifier,
 		showAttachmentStatistics, showOnlyCreatorInContacts, 
 		showLogExportButton, showComments, showContacts, 
-		specialBackPage, nameFromExternalEntity, showUserProfilePicture,addExportContacts) {
+		specialBackPage, nameFromExternalEntity, showUserProfilePicture,addExportContacts,
+		showUserCompany,showLastLoginDate) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -274,6 +278,8 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 	this.nameFromExternalEntity = nameFromExternalEntity;
 	this.showUserProfilePicture = showUserProfilePicture;
 	this.addExportContacts = addExportContacts;
+	this.showUserCompany = showUserCompany;
+	this.showLastLoginDate = showLastLoginDate;
 }
 
 CasesListHelper.getPager = function(fromPager, page) {
@@ -464,6 +470,10 @@ function searchForCases(parameters) {
 	var casesListCustomizer = null;
 	var customColumns = null;
 	var showLoadingMessageAttr = true;
+	var showAttachmentStatistics = false;
+	var showUserProfilePicture = true;
+	var addExportContacts = false;
+	var showUserCompany = false;
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
 		
@@ -476,7 +486,14 @@ function searchForCases(parameters) {
 		onlySubscribedCases = gridOpener.attr('onlysubscribedcases') == 'true';
 		
 		casesListCustomizer = gridOpener.attr('caseslistcustomizer');
+		
 		customColumns = gridOpener.attr('customcolumns');
+		
+		showAttachmentStatistics = gridOpener.attr('showAttachmentStatistics');
+		showUserProfilePicture = gridOpener.attr('showUserProfilePicture');
+		addExportContacts = gridOpener.attr('addExportContacts');
+		showUserCompany = gridOpener.attr('showUserCompany');
+		
 		if (customColumns != null)
 			customColumns = customColumns.split(',');
 	}
@@ -493,7 +510,8 @@ function searchForCases(parameters) {
 		dateRangeValue, caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables,
 		hideEmptySection, showCaseNumberColumn,	showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1,
 		dwr.util.getValue(jQuery('select.listPagerSize').attr('id')), jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'),
-		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId
+		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId,showAttachmentStatistics,
+		showUserProfilePicture,addExportContacts,showUserCompany
 	);
 	criterias.clearResults = true;
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
@@ -655,7 +673,7 @@ CasesListHelper.getStatusesToHide = function() {
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact,
 	usePDFDownloadColumn, allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
 	instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns,
-	showLoadingMessageAttr, groupId) {
+	showLoadingMessageAttr, groupId,showAttachmentStatistics,showUserProfilePicture,addExportContacts,showUserCompany) {
 	
 	this.subscribersGroupId = groupId;
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
@@ -700,6 +718,10 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.customColumns = customColumns;
 	
 	this.showLoadingMessage = showLoadingMessageAttr;
+	this.showAttachmentStatistics = showAttachmentStatistics;
+	this.showUserProfilePicture = showUserProfilePicture;
+	this.addExportContacts = addExportContacts;
+	this.showUserCompany = showUserCompany;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
@@ -970,7 +992,9 @@ CasesListHelper.resetVariablesAndAddNewOne = function() {
 
 CasesListHelper.exportSearchResults = function(message) {
 	showLoadingMessage(message);
-	CasesEngine.getExportedSearchResults(window.location.pathname, {
+	var addexportcontacts = jQuery('[addexportcontacts="true"]').length > 0;
+	var showusercompany = jQuery('[showusercompany="true"]').length > 0;
+	CasesEngine.getExportedSearchResults(window.location.pathname,addexportcontacts,showusercompany, {
 		callback: function(result) {
 			if (result == null || result.id != 'true') {
 				closeAllLoadingMessages();
@@ -987,9 +1011,9 @@ CasesListHelper.exportSearchResults = function(message) {
 	});
 }
 
-CasesListHelper.exportAllCases = function(message, containerId, instanceId) {
+CasesListHelper.exportAllCases = function(message, containerId, instanceId,isExportContacts,isShowCompany) {
 	showLoadingMessage(message);
-	CasesEngine.getExportedCases(instanceId, window.location.pathname, {
+	CasesEngine.getExportedCases(instanceId,window.location.pathname,isExportContacts,isShowCompany, {
 		callback: function(result) {
 			if (result == null || result.id != 'true') {
 				closeAllLoadingMessages();

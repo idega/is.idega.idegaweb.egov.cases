@@ -259,6 +259,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute("showcomments", properties.isShowComments());
 		layer.setMarkupAttribute("showcontacts", properties.isShowContacts());
 		layer.setMarkupAttribute("addExportContacts", properties.isAddExportContacts());
+		layer.setMarkupAttribute("showUserCompany", properties.isShowUserCompany());
+		layer.setMarkupAttribute("showLastLoginDate", properties.isShowLastLoginDate());
 		if (!StringUtil.isEmpty(properties.getSpecialBackPage()))
 			layer.setMarkupAttribute("specialbackpage", properties.getSpecialBackPage());
 		if (!StringUtil.isEmpty(properties.getCasesListCustomizer()))
@@ -887,7 +889,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		buttonsLayer.setStyleClass("exportAllCasesButtonStyle");
 		GenericButton exportButton = new GenericButton(iwrb.getLocalizedString("export_cases_data", "Export data to Excel"));
 		exportButton.setOnClick("CasesListHelper.exportAllCases('" + iwrb.getLocalizedString("exporting", "Exporting...") + "', '" +
-				buttonsLayer.getId() + "', '" + properties.getInstanceId() +  "');");
+				buttonsLayer.getId() + "', '" + properties.getInstanceId() + "', '" + properties.isAddExportContacts()  
+				+ "', '" + properties.isShowUserCompany() + "');");
 		buttonsLayer.add(exportButton);
 		return buttonsLayer;
 	}
