@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Nov 7, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -34,17 +34,17 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 public class ClosedCases extends CasesProcessor {
-	
+
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
 	private boolean showStatistics;
 	private boolean hideEmptySection;
-	
+
 	@Override
 	public boolean isUsePDFDownloadColumn() {
 		return usePDFDownloadColumn;
 	}
-	
+
 	@Override
 	public void setUsePDFDownloadColumn(boolean usePDFDownloadColumn) {
 		this.usePDFDownloadColumn = usePDFDownloadColumn;
@@ -84,17 +84,6 @@ public class ClosedCases extends CasesProcessor {
 	protected String getBlockID() {
 		return "closedCases";
 	}
-
-//	protected Collection<GeneralCase> getCases(User user) {
-//		
-//		Collection<GeneralCase> cases = super.getCases(user);
-//		Collection<GeneralCase> closedCases = getClosedCases(user, getIWApplicationContext().getIWMainApplication(), getIWUserContext(), getUserBusiness(), getCasesBusiness(), null);
-//		
-//		if(cases != null)
-//			closedCases.addAll(cases);
-//		
-//		return closedCases;
-//	}
 
 	@Override
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
@@ -164,7 +153,7 @@ public class ClosedCases extends CasesProcessor {
 		formItem.add(label);
 		formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
 		layer.add(formItem);
-		
+
 		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -277,7 +266,7 @@ public class ClosedCases extends CasesProcessor {
 				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
 			}
 		}
-		
+
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
@@ -287,7 +276,7 @@ public class ClosedCases extends CasesProcessor {
 		back.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
-		
+
 		Link pdf = getDownloadButtonLink(getResourceBundle().getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
 		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		bottom.add(pdf);
@@ -316,7 +305,7 @@ public class ClosedCases extends CasesProcessor {
 	public boolean showCheckBox() {
 		return false;
 	}
-	
+
 	@Override
 	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
 		StringBuffer buffer = new StringBuffer();
@@ -326,7 +315,7 @@ public class ClosedCases extends CasesProcessor {
 			super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());
 		}
 	}
-	
+
 	@Override
 	public String getCasesProcessorType() {
 		return CasesRetrievalManager.CASE_LIST_TYPE_CLOSED;
