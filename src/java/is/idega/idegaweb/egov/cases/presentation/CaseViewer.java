@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Oct 31, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -11,7 +11,6 @@ import is.idega.idegaweb.egov.cases.business.CaseWriter;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import com.idega.block.process.business.CaseConstants;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -19,6 +18,7 @@ import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.business.CaseConstants;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
@@ -27,6 +27,7 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -49,7 +50,7 @@ import com.idega.util.text.Name;
 
 public class CaseViewer extends CaseCreator {
 
-	public static final String PARAMETER_ACTION = "cp_prm_action";
+	public static final String PARAMETER_ACTION = CasesProcessor.PARAMETER_ACTION;
 
 	public static final String PARAMETER_ACTION_REACTIVATE = "prm_action_reactivate";
 	public static final String PARAMETER_ACTION_REVIEW = "prm_action_review";
@@ -68,7 +69,7 @@ public class CaseViewer extends CaseCreator {
 	@Override
 	protected void present(IWContext iwc) {
 		PresentationUtil.addStyleSheetToHeader(iwc, getBundle(iwc).getVirtualPathWithFileNameString("style/case.css"));
-		
+
 		try {
 			if (iwc.isParameterSet(PARAMETER_CASE_PK)) {
 				if (iwc.isParameterSet(PARAMETER_ACTION_REACTIVATE)) {
@@ -113,13 +114,13 @@ public class CaseViewer extends CaseCreator {
 				fe.printStackTrace();
 				throw new IBORuntimeException(fe);
 			}
-			
+
 			if(theCase.getCaseManagerType() != null) {
-				
+
 //				TODO: show bpm view (where is this used)
 				return;
 			}
-			
+
 			CaseCategory category = theCase.getCaseCategory();
 			CaseCategory parentCategory = category.getParent();
 			CaseStatus status = theCase.getCaseStatus();
@@ -160,7 +161,7 @@ public class CaseViewer extends CaseCreator {
 			if (theCase.isPrivate()) {
 				section.add(getAttentionLayer(iwrb.getLocalizedString(getPrefix() + "case.is_private", "The sender wishes that this case be handled as confidential.")));
 			}
-			
+
 			Layer formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
 			Label label = new Label();
@@ -233,7 +234,7 @@ public class CaseViewer extends CaseCreator {
 				formItem.add(attachmentSpan);
 				section.add(formItem);
 			}
-			
+
 			if (theCase.getSubject() != null) {
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
@@ -259,7 +260,7 @@ public class CaseViewer extends CaseCreator {
 
 			@SuppressWarnings("unchecked")
 			Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
-			
+
 			if (!logs.isEmpty()) {
 				for (CaseLog log : logs)
 					form.add(getHandlerLayer(iwc, iwrb, theCase, log));
@@ -329,7 +330,7 @@ public class CaseViewer extends CaseCreator {
 				home.setPage(getHomePage());
 				bottom.add(home);
 			}
-			
+
 			if (!iwc.getCurrentUser().equals(owner)) {
 				Link pdf = getDownloadButtonLink(iwrb.getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
 				pdf.addParameter(getCasesBusiness(iwc).getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
@@ -425,7 +426,7 @@ public class CaseViewer extends CaseCreator {
 
 		return layer;
 	}
-	
+
 	protected void showReminderForm(IWContext iwc, GeneralCase theCase) throws RemoteException {
 		Form form = new Form();
 		form.setStyleClass("adminForm");
@@ -507,7 +508,7 @@ public class CaseViewer extends CaseCreator {
 		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
 		Group handlerGroup = category.getHandlerGroup();
-		Collection handlers = getUserBusiness(iwc).getUsersInGroup(handlerGroup);
+		Collection<User> handlers = getUserBusiness(iwc).getUsersInGroup(handlerGroup);
 
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness(iwc).getCaseCategories(), "getName");
@@ -525,15 +526,14 @@ public class CaseViewer extends CaseCreator {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		subCategories.setOnChange("changeUsers('" + PARAMETER_SUB_CASE_CATEGORY_PK + "')");
 
-		Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
+		Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
 		if (collection.isEmpty()) {
 			subCategories.addMenuElement(category.getPrimaryKey().toString(), iwrb.getLocalizedString("case_creator.no_sub_category", "no sub category"));
 		}
 		else {
 			subCategories.addMenuElement(category.getPrimaryKey().toString(), iwrb.getLocalizedString("case_creator.select_sub_category", "Select sub category"));
-			Iterator iter = collection.iterator();
-			while (iter.hasNext()) {
-				CaseCategory subCategory = (CaseCategory) iter.next();
+			for (Iterator<CaseCategory> iter = collection.iterator(); iter.hasNext();) {
+				CaseCategory subCategory = iter.next();
 				subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 			}
 		}
@@ -548,9 +548,8 @@ public class CaseViewer extends CaseCreator {
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
 		users.setID(PARAMETER_USER);
 
-		Iterator iter = handlers.iterator();
-		while (iter.hasNext()) {
-			User handler = (User) iter.next();
+		for (Iterator<User> iter = handlers.iterator(); iter.hasNext();) {
+			User handler = iter.next();
 			users.addMenuElement(handler.getPrimaryKey().toString(), handler.getName());
 		}
 
@@ -678,7 +677,7 @@ public class CaseViewer extends CaseCreator {
 		bottom.add(link);
 	}
 
-	protected Link getDownloadButtonLink(String text, Class mediaWriterClass) {
+	protected <M extends MediaWritable> Link getDownloadButtonLink(String text, Class<M> mediaWriterClass) {
 		Layer all = new Layer(Layer.SPAN);
 		all.setStyleClass("buttonSpan");
 

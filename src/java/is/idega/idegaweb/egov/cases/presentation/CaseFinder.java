@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Nov 7, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.core.builder.data.ICPage;
@@ -103,7 +104,7 @@ public class CaseFinder extends CasesBlock {
 		TextInput personalID = new TextInput(PARAMETER_PERSONAL_ID);
 		personalID.setStyleClass("textinput");
 		personalID.keepStatusOnAction(true);
-		
+
 		TextInput text = new TextInput(PARAMETER_TEXT);
 		text.setStyleClass("textinput");
 		text.keepStatusOnAction(true);
@@ -135,14 +136,14 @@ public class CaseFinder extends CasesBlock {
 		element.add(label);
 		element.add(personalID);
 		layer.add(element);
-		
+
 		element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
 		label = new Label(getResourceBundle().getLocalizedString("text", "Text"), text);
 		element.add(label);
 		element.add(text);
 		layer.add(element);
-		
+
 
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");
@@ -160,7 +161,7 @@ public class CaseFinder extends CasesBlock {
 	}
 
 	private void showResults(IWContext iwc) throws RemoteException {
-		Collection cases = new ArrayList();
+		Collection<Case> cases = new ArrayList<Case>();
 		if (iwc.isParameterSet(PARAMETER_CASE_NUMBER)) {
 			try {
 				GeneralCase theCase = getCasesBusiness().getGeneralCase(iwc.getParameter(PARAMETER_CASE_NUMBER));
@@ -172,7 +173,7 @@ public class CaseFinder extends CasesBlock {
 		}
 		else if (iwc.isParameterSet(PARAMETER_NAME)) {
 			try {
-				Collection users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_NAME), false);
+				Collection<User> users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_NAME), false);
 				cases.addAll(getCasesBusiness().getCasesByUsers(users));
 			}
 			catch (FinderException fe) {
@@ -181,7 +182,7 @@ public class CaseFinder extends CasesBlock {
 		}
 		else if (iwc.isParameterSet(PARAMETER_PERSONAL_ID)) {
 			try {
-				Collection users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_PERSONAL_ID), false);
+				Collection<User> users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_PERSONAL_ID), false);
 				cases.addAll(getCasesBusiness().getCasesByUsers(users));
 			}
 			catch (FinderException fe) {
@@ -190,7 +191,7 @@ public class CaseFinder extends CasesBlock {
 		}
 		else if (iwc.isParameterSet(PARAMETER_TEXT)) {
 			cases.addAll(getCasesBusiness().getCasesByMessage(iwc.getParameter(PARAMETER_PERSONAL_ID)));
-		} 
+		}
 
 		if (cases.isEmpty()) {
 			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));
@@ -233,8 +234,7 @@ public class CaseFinder extends CasesBlock {
 			group = table.createBodyRowGroup();
 			int iRow = 1;
 
-			Iterator iter = cases.iterator();
-			while (iter.hasNext()) {
+			for (Iterator<Case> iter = cases.iterator(); iter.hasNext();) {
 				GeneralCase theCase = (GeneralCase) iter.next();
 				CaseStatus status = theCase.getCaseStatus();
 				CaseType type = theCase.getCaseType();
@@ -339,7 +339,7 @@ public class CaseFinder extends CasesBlock {
 	public void setViewCasesPage(ICPage viewCasesPage) {
 		this.viewCasesPage = viewCasesPage;
 	}
-	
+
 	@Override
 	public String getCasesProcessorType() {
 		return null;

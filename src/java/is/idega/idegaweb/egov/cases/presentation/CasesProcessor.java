@@ -51,7 +51,7 @@ import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
 
-	public static final String PARAMETER_ACTION = "cp_prm_action";
+	public static final String PARAMETER_ACTION = UserCases.PARAMETER_ACTION;
 
 	public static final String PARAMETER_CASE_PK = UserCases.PARAMETER_CASE_PK;
 	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
