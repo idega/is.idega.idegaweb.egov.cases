@@ -143,7 +143,6 @@ public class HandlerCases extends CasesProcessor {
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		ELUtil.getInstance().autowire(this);
-		super.display(iwc);
 	}
 
 	@Override
