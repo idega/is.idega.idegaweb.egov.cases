@@ -21,6 +21,7 @@ import javax.ejb.RemoveException;
 import com.idega.block.process.business.CaseBusiness;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.data.Case;
+import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOService;
 import com.idega.core.file.data.ICFile;
@@ -37,7 +38,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByCriteria
 	 */
-	public Collection getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws RemoteException;
+	public Collection<Case> getCasesByCriteria(CaseCategory parentCategory, CaseCategory category, CaseType type, CaseStatus status, Date fromDate, Date toDate, Boolean anonymous) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#sendReminder
@@ -169,17 +170,17 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategories
 	 */
-	public Collection getCaseCategories() throws RemoteException;
+	public Collection<CaseCategory> getCaseCategories() throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
 	 */
-	public Collection getSubCategories(CaseCategory category) throws RemoteException;
+	public Collection<CaseCategory> getSubCategories(CaseCategory category) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseLogs
 	 */
-	public Collection getCaseLogs(GeneralCase theCase) throws RemoteException;
+	public Collection<CaseLog> getCaseLogs(GeneralCase theCase) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#removeCaseCategory
@@ -194,7 +195,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseTypes
 	 */
-	public Collection getCaseTypes() throws RemoteException;
+	public Collection<CaseType> getCaseTypes() throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getFirstAvailableCaseType
@@ -349,7 +350,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases);
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCasesByIds
 	 */
@@ -375,5 +376,5 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getFilteredProcesslessCasesIds
 	 */
 	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases) throws RemoteException;
-	
+
 }
