@@ -292,7 +292,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			}
 
 			cell = row.createCell(cellColumn++);
-			cell.setCellValue(category.getLocalizedCategoryName(locale));
+			cell.setCellValue(category == null ? CoreConstants.EMPTY : category.getLocalizedCategoryName(locale));
 			cell.setCellStyle(style2);
 
 			if (type != null && getBusiness(iwc).useTypes()) {
