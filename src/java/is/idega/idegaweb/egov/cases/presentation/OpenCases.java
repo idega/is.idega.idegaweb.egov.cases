@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Nov 7, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -37,11 +37,11 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
-	
+
 	public static final String pageType = "openCases";
 
 	protected ICPage iMyCasesPage;
-		
+
 	@Override
 	protected String getBlockID() {
 		return OpenCases.pageType;
@@ -68,7 +68,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	@Override
 	protected void showProcessor(IWContext iwc, Object casePK) throws RemoteException {
-		
+
 		Form form = new Form();
 		form.setStyleClass("adminForm");
 		form.setStyleClass("overview");
@@ -128,7 +128,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		formItem.add(label);
 		formItem.add(new Span(new Text(theCase.getPrimaryKey().toString())));
 		section.add(formItem);
-		
+
 		if (getCasesBusiness().useTypes()) {
 			Layer element = new Layer(Layer.DIV);
 			element.setStyleClass("formItem");
@@ -193,7 +193,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			element.add(attachmentSpan);
 			section.add(element);
 		}
-		
+
 		if (theCase.getSubject() != null) {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
@@ -223,7 +223,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
 			}
 		}
-		
+
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
@@ -232,7 +232,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		back.setStyleClass("homeButton");
 		back.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		bottom.add(back);
-		
+
 		Link pdf = getDownloadButtonLink(getResourceBundle().getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
 		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		bottom.add(pdf);
@@ -254,7 +254,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 	@Override
 	protected void save(IWContext iwc) throws RemoteException {
-		
+
 		String casePK = iwc.getParameter(PARAMETER_CASE_PK);
 //		Object caseCategoryPK = iwc.isParameterSet(PARAMETER_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_CASE_CATEGORY_PK) : null;
 //		Object subCaseCategoryPK = iwc.isParameterSet(PARAMETER_SUB_CASE_CATEGORY_PK) ? iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK) : null;
@@ -286,11 +286,11 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 	public void setMyCasesPage(ICPage myCasesPage) {
 		this.iMyCasesPage = myCasesPage;
 	}
-	
+
 	@Override
 	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("$(document).ready(function() { $('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
+		buffer.append("jQuery(document).ready(function() { jQuery('#" + getBlockID() + "').tablesorter( { headers: { " + (getCasesBusiness().useTypes() ? 3 : 2) + ": { sorter: false }, " + (getCasesBusiness().useTypes() ? 6 : 5) + ": { sorter: false}" + (showCheckBox() ? ", " + (getCasesBusiness().useTypes() ? 7 : 6) + ": { sorter: false}" : "") + "}, sortList: [[0,0]] } ); } );");
 
 		if (getParentPage() != null) {
 			super.getParentPage().getAssociatedScript().addFunction("tableSorter", buffer.toString());

@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Dec 19, 2006
- * 
+ *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.business;
@@ -30,6 +30,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
@@ -46,6 +47,7 @@ import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.StringHandler;
@@ -123,7 +125,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			if (iwc.isParameterSet(PARAMETER_TO_DATE)) {
 				toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
 			}
-			
+
 			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, fromDate, toDate, anonymous);
 
 			this.buffer = writeXLS(iwc, cases);
@@ -157,7 +159,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		}
 	}
 
-	public MemoryFileBuffer writeXLS(IWContext iwc, Collection cases) throws Exception {
+	public MemoryFileBuffer writeXLS(IWContext iwc, Collection<Case> cases) throws Exception {
 		MemoryFileBuffer buffer = new MemoryFileBuffer();
 		MemoryOutputStream mos = new MemoryOutputStream(buffer);
 
@@ -239,17 +241,23 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 		User currentUser = iwc.getCurrentUser();
 
-		Iterator iter = cases.iterator();
-		while (iter.hasNext()) {
-			GeneralCase element = (GeneralCase) iter.next();
-			CaseCategory category = element.getCaseCategory();
-			Group handlerGroup = category.getHandlerGroup();
-			if (!currentUser.hasRelationTo(handlerGroup)) {
+		for (Iterator<Case> iter = cases.iterator(); iter.hasNext();) {
+			Case theCase = iter.next();
+			if (!(theCase instanceof GeneralCase)) {
 				continue;
+			}
+
+			GeneralCase element = (GeneralCase) theCase;
+			CaseCategory category = element.getCaseCategory();
+			if (category != null) {
+				Group handlerGroup = category.getHandlerGroup();
+				if (handlerGroup != null && !currentUser.hasRelationTo(handlerGroup)) {
+					continue;
+				}
 			}
 			CaseType type = element.getCaseType();
 			CaseStatus status = element.getCaseStatus();
-			if (status.equals(getBusiness(iwc).getCaseStatusDeleted())) {
+			if (status != null && status.equals(getBusiness(iwc).getCaseStatusDeleted())) {
 				continue;
 			}
 			User user = element.getOwner();
@@ -284,21 +292,21 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			}
 
 			cell = row.createCell(cellColumn++);
-			cell.setCellValue(category.getLocalizedCategoryName(locale));
+			cell.setCellValue(category == null ? CoreConstants.EMPTY : category.getLocalizedCategoryName(locale));
 			cell.setCellStyle(style2);
 
-			if (getBusiness(iwc).useTypes()) {
+			if (type != null && getBusiness(iwc).useTypes()) {
 				cell = row.createCell(cellColumn++);
 				cell.setCellValue(type.getName());
 				cell.setCellStyle(style2);
 			}
-			
+
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getReference() != null ? element.getReference() : "");
 			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
-			cell.setCellValue(getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));
+			cell.setCellValue(status == null ? CoreConstants.MINUS : getBusiness(iwc).getLocalizedCaseStatusDescription(element, status, locale));
 			cell.setCellStyle(style2);
 
 			cell = row.createCell(cellColumn++);
@@ -308,7 +316,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 			cell = row.createCell(cellColumn++);
 			cell.setCellValue(element.getMessage());
 			cell.setCellStyle(style2);
-			
+
 			Collection<CaseLog> logs = getBusiness(iwc).getCaseLogs(element);
 			if (!logs.isEmpty()) {
 				for (CaseLog log : logs) {
@@ -332,7 +340,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 	protected CasesBusiness getBusiness(IWApplicationContext iwac) {
 		try {
-			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);

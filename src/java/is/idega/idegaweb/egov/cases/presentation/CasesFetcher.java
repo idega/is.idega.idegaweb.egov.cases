@@ -4,7 +4,6 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.CasesWriter;
-import is.idega.idegaweb.egov.cases.business.CasesWriterExtended;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import javax.ejb.FinderException;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBORuntimeException;
@@ -42,6 +42,7 @@ import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
@@ -69,7 +70,7 @@ public class CasesFetcher extends CasesBlock {
 	private Date fromDate;
 	private Date toDate;
 
-	private Collection cases;
+	private Collection<Case> cases;
 
 	private ICPage iPage;
 
@@ -108,7 +109,7 @@ public class CasesFetcher extends CasesBlock {
 		if (iwc.isParameterSet(PARAMETER_ANONYMOUS)) {
 			anonymous = new Boolean(iwc.getParameter(PARAMETER_ANONYMOUS));
 		}
-		
+
 		if (iwc.isParameterSet(PARAMETER_FROM_DATE)) {
 			fromDate = new IWTimestamp(IWDatePickerHandler.getParsedDate(iwc.getParameter(PARAMETER_FROM_DATE), iwc.getCurrentLocale())).getDate();
 		}
@@ -141,7 +142,7 @@ public class CasesFetcher extends CasesBlock {
 			form.setID("casesFetcher");
 			form.setStyleClass("adminForm");
 			form.addParameter(PARAMETER_SHOW_RESULTS, Boolean.TRUE.toString());
-			
+
 			HiddenInput localeInput = new HiddenInput("current_locale", iwc.getCurrentLocale().getCountry().toLowerCase());
 			localeInput.setID("casesLocale");
 			form.add(localeInput);
@@ -168,14 +169,13 @@ public class CasesFetcher extends CasesBlock {
 			subCategories.setStyleClass("subCaseCategoryDropdown");
 
 			if (parentCategory != null) {
-				Collection collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
-				if (collection.isEmpty()) {
+				Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
+				if (ListUtil.isEmpty(collection)) {
 					subCategories.addMenuElement(parentCategory.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
 				}
 				else {
-					Iterator iter = collection.iterator();
-					while (iter.hasNext()) {
-						CaseCategory subCategory = (CaseCategory) iter.next();
+					for (Iterator<CaseCategory> iter = collection.iterator(); iter.hasNext();) {
+						CaseCategory subCategory = iter.next();
 						subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
 					}
 					subCategories.setMenuElementFirst("", getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
@@ -202,7 +202,7 @@ public class CasesFetcher extends CasesBlock {
 			anonymous.addMenuElement(Boolean.FALSE.toString(), getResourceBundle().getLocalizedString("cases_fetcher.no", "No"));
 			anonymous.keepStatusOnAction(true);
 			anonymous.setStyleClass("anonymousDropdown");
-			
+
 			IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
 			from.setUseCurrentDateIfNotSet(false);
 			from.keepStatusOnAction(true);
@@ -295,7 +295,7 @@ public class CasesFetcher extends CasesBlock {
 		table.setCellspacing(0);
 		table.setStyleClass("ruler");
 		table.setStyleClass("adminTable");
-		table.setID("casesFetcher");
+//		table.setID("casesFetcher");
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -342,12 +342,20 @@ public class CasesFetcher extends CasesBlock {
 
 		group = table.createBodyRowGroup();
 		int iRow = 1;
-		
+
 		User currentUser = iwc.getCurrentUser();
 
-		Iterator iter = cases.iterator();
-		while (iter.hasNext()) {
-			GeneralCase theCase = (GeneralCase) iter.next();
+		if (ListUtil.isEmpty(cases)) {
+			return table;
+		}
+
+		for (Iterator<Case> iter = cases.iterator(); iter.hasNext();) {
+			Case object = iter.next();
+			if (!(object instanceof GeneralCase)) {
+				continue;
+			}
+
+			GeneralCase theCase = (GeneralCase) object;
 			CaseCategory category = theCase.getCaseCategory();
 			if (category != null) {
 				Group handlerGroup = category.getHandlerGroup();
@@ -455,34 +463,6 @@ public class CasesFetcher extends CasesBlock {
 		link.setStyleClass("xls");
 		link.setTarget(Link.TARGET_NEW_WINDOW);
 		link.setMediaWriterClass(CasesWriter.class);
-		if (parentCategory != null) {
-			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, parentCategory.getPrimaryKey().toString());
-		}
-		if (category != null) {
-			link.addParameter(CasesWriter.PARAMETER_SUB_CASE_CATEGORY, category.getPrimaryKey().toString());
-		}
-		if (type != null) {
-			link.addParameter(CasesWriter.PARAMETER_CASE_TYPE, type.getPrimaryKey().toString());
-		}
-		if (status != null) {
-			link.addParameter(CasesWriter.PARAMETER_CASE_STATUS, status.getPrimaryKey().toString());
-		}
-		if (fromDate != null) {
-			link.addParameter(CasesWriter.PARAMETER_FROM_DATE, fromDate.toString());
-		}
-		if (toDate != null) {
-			link.addParameter(CasesWriter.PARAMETER_TO_DATE, toDate.toString());
-		}
-		if (anonymous != null) {
-			link.addParameter(CasesWriter.PARAMETER_ANONYMOUS, anonymous.toString());
-		}
-
-		layer.add(link);
-
-		link = new DownloadLink(getBundle().getImage("xls.gif"));
-		link.setStyleClass("xls");
-		link.setTarget(Link.TARGET_NEW_WINDOW);
-		link.setMediaWriterClass(CasesWriterExtended.class);
 		if (parentCategory != null) {
 			link.addParameter(CasesWriter.PARAMETER_CASE_CATEGORY, parentCategory.getPrimaryKey().toString());
 		}
