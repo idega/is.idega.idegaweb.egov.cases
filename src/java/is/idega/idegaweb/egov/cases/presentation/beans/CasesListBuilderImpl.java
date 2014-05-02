@@ -97,7 +97,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
 	private String allowPDFSigningParName = "allowpdfsigning";
 
-	public static final String VARIABLE_CASE_NR = "string_caseIdentifier";
+	public static final String VARIABLE_CASE_NR = ProcessConstants.CASE_IDENTIFIER;
 	public static final String VARIABLE_SENDER = "string_ownerFullName";
 	public static final String VARIABLE_DESCRIPTION = "string_caseDescription";
 	public static final String VARIABLE_CREATION_DATE = "string_caseCreatedDateString";
@@ -372,7 +372,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			if (properties.isShowCreatorColumn()) {
 				Layer senderContainer = addLayerToCasesList(caseContainer, null, bodyItem, "Sender");
 				senderContainer.setStyleClass(VARIABLE_SENDER);
-				
+
 				StringBuilder senderName = new StringBuilder();
 				if (properties.isNameFromExternalEntity() && getExternalEntityInterface() != null) {
 					String ownerCompanyName = getExternalEntityInterface().getName(owner);
@@ -380,19 +380,19 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 						senderName.append(ownerCompanyName).append(" (");
 					}
 				}
-				
+
 				if (owner != null) {
 					senderName.append(new Name(owner.getFirstName(), owner.getMiddleName(),
 							owner.getLastName()).getName(l));
 				} else {
 					senderName.append(CoreConstants.MINUS);
 				}
-				
+
 				if (senderName.indexOf(CoreConstants.BRACKET_LEFT) != -1) {
 					senderName.deleteCharAt(senderName.lastIndexOf(CoreConstants.SPACE));
 					senderName.append(CoreConstants.BRACKET_RIGHT);
 				}
-				
+
 				senderContainer.add(new Text(senderName.toString()));
 				if (theCase.isBpm()) {
 					prepareCellToBeGridExpander(senderContainer, caseId, gridViewerId, properties);
@@ -489,16 +489,16 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		return caseContainer;
 	}
-	
+
 	@Autowired(required=false)
 	protected ExternalEntityInterface eei = null;
-	
+
 	protected ExternalEntityInterface getExternalEntityInterface() {
 		if (this.eei == null) {
 			ELUtil.getInstance().autowire(this);
 		}
-		
-		return this.eei; 
+
+		return this.eei;
 	}
 
 	private String getEmailAddressMailtoFormattedWithSubject(String emailAddress, String subject) {
@@ -822,7 +822,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		buttonsLayer.setStyleClass("exportAllCasesButtonStyle");
 		GenericButton exportButton = new GenericButton(iwrb.getLocalizedString("export_cases_data", "Export data to Excel"));
 		exportButton.setOnClick("CasesListHelper.exportAllCases('" + iwrb.getLocalizedString("exporting", "Exporting...") + "', '" +
-				buttonsLayer.getId() + "', '" + properties.getInstanceId() + "', '" + properties.isAddExportContacts()  
+				buttonsLayer.getId() + "', '" + properties.getInstanceId() + "', '" + properties.isAddExportContacts()
 				+ "', '" + properties.isShowUserCompany() + "');");
 		buttonsLayer.add(exportButton);
 		return buttonsLayer;
