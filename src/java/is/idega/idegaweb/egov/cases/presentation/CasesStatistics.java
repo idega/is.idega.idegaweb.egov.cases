@@ -114,7 +114,6 @@ public class CasesStatistics extends CasesBlock {
 		super.main(iwc);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		boolean useSubCats = super.getCasesBusiness(iwc).useSubCategories();
