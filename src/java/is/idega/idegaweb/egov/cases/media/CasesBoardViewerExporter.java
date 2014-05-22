@@ -293,13 +293,84 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 	}
 
+	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
+		IWDatePicker datePicker = new IWDatePicker(name);
+		datePicker.setId(name);
+		datePicker.setVersion("1.8.17");
+		datePicker.keepStatusOnAction(true);
+
+		if (from != null)
+			datePicker.setDate(from);
+		if (to != null)
+			datePicker.setDateTo(to);
+		datePicker.setDateRange(true);
+		datePicker.setUseCurrentDateIfNotSet(false);
+
+		return datePicker;
+	}
+
+	protected IWTimestamp getTimestampFrom(IWContext iwc) {
+		if (iwc.isParameterSet(CasesBoardViewer.PARAMETER_DATE_RANGE)) {
+			String dateRangeValue = iwc.getParameter(CasesBoardViewer.PARAMETER_DATE_RANGE);
+			String[] dates = dateRangeValue.split(CoreConstants.MINUS);
+			if (!ArrayUtil.isEmpty(dates) && dates.length == 2) {
+				Locale locale = iwc.getCurrentLocale();
+				java.util.Date tmp = IWDatePickerHandler.getParsedDate(dates[0].trim(), locale);
+				if (tmp != null) {
+					IWTimestamp iwFrom = new IWTimestamp(tmp);
+					iwFrom.setTime(0, 0, 0, 0);
+					return iwFrom;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	protected IWTimestamp getTimestampTo(IWContext iwc) {
+		if (iwc.isParameterSet(CasesBoardViewer.PARAMETER_DATE_RANGE)) {
+			String dateRangeValue = iwc.getParameter(CasesBoardViewer.PARAMETER_DATE_RANGE);
+			String[] dates = dateRangeValue.split(CoreConstants.MINUS);
+			if (!ArrayUtil.isEmpty(dates) && dates.length == 2) {
+				Locale locale = iwc.getCurrentLocale();
+				java.util.Date tmp = IWDatePickerHandler.getParsedDate(dates[1].trim(), locale);
+				if (tmp != null) {
+					IWTimestamp iwTo = new IWTimestamp(tmp);
+					iwTo.setTime(23, 59, 59, 999);
+					return iwTo;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	protected java.util.Date getDateFrom(IWContext iwc) {
+		IWTimestamp timestamp = getTimestampFrom(iwc);
+		if (timestamp != null) {
+			return timestamp.getTimestamp();
+		}
+
+		return null;
+	}
+
+	protected java.util.Date getDateTo(IWContext iwc) {
+		IWTimestamp timestamp = getTimestampTo(iwc);
+		if (timestamp != null) {
+			return timestamp.getTimestamp();
+		}
+
+		return null;
+	}
+
 	protected CaseBoardTableBean getTableData(IWContext iwc) {
 		if (iwc == null) {
 			return null;
 		}
 
 		return getBoardCasesManager().getTableData(
-				iwc,
+				getDateFrom(iwc),
+				getDateTo(iwc),
 				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
 				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID),

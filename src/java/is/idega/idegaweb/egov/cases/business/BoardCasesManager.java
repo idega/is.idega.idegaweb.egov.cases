@@ -20,16 +20,18 @@ public interface BoardCasesManager {
 	/**
 	 * 
 	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
+	 * @param dateFrom is floor of {@link Case#getCreated()}, 
+	 * skipped if <code>null</code>;
+	 * @param dateTo is ceiling of {@link Case#getCreated()},
+	 * skipped if <code>null</code>;
 	 */
 	public List<CaseBoardBean> getAllSortedCases(
-			IWContext iwc, 
-			IWResourceBundle iwrb, 
 			Collection<String> caseStatus, 
 			String processName, 
 			String uuid, 
 			boolean isSubscribedOnly,
 			boolean backPage,
-			String taskName);
+			String taskName, Date dateFrom, Date dateTo);
 
 	/**
 	 * 

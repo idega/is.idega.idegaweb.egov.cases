@@ -6,12 +6,15 @@ import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,16 +53,24 @@ import com.idega.presentation.TableRow;
 import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.IWDatePicker;
+import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.PrintButton;
+import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.user.data.User;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.URIUtil;
+import com.idega.util.WebUtil;
 import com.idega.util.expression.ELUtil;
 
 public class CasesBoardViewer extends IWBaseComponent {
@@ -81,7 +92,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 								BOARD_SUGGESTION = ProcessConstants.BOARD_FINANCING_SUGGESTION,
 								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION,
 								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
-
+	
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
 		new AdvancedProperty("string_ownerFullName", "Applicant"),									//	0
 		new AdvancedProperty("string_ownerKennitala", "Personal ID"),								//	1
@@ -154,6 +165,120 @@ public class CasesBoardViewer extends IWBaseComponent {
 		this.onlySubscribedCases = onlySubscribedCases;
 	}
 
+	public static final String PARAMETER_DATE_RANGE = "dateRange";
+
+	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
+		IWDatePicker datePicker = new IWDatePicker(name);
+		datePicker.setId(name);
+		datePicker.setVersion("1.8.17");
+		datePicker.keepStatusOnAction(true);
+
+		if (from != null)
+			datePicker.setDate(from);
+		if (to != null)
+			datePicker.setDateTo(to);
+		datePicker.setDateRange(true);
+		datePicker.setUseCurrentDateIfNotSet(false);
+
+		return datePicker;
+	}
+
+	protected IWTimestamp getTimestampFrom(IWContext iwc) {
+		if (iwc.isParameterSet(PARAMETER_DATE_RANGE)) {
+			String dateRangeValue = iwc.getParameter(PARAMETER_DATE_RANGE);
+			String[] dates = dateRangeValue.split(CoreConstants.MINUS);
+			if (!ArrayUtil.isEmpty(dates) && dates.length == 2) {
+				Locale locale = iwc.getCurrentLocale();
+				java.util.Date tmp = IWDatePickerHandler.getParsedDate(dates[0].trim(), locale);
+				if (tmp != null) {
+					IWTimestamp iwFrom = new IWTimestamp(tmp);
+					iwFrom.setTime(0, 0, 0, 0);
+					return iwFrom;
+				}
+			}
+		}
+
+		IWTimestamp now = IWTimestamp.RightNow();
+		now.setDay(1);
+		now.setTime(0, 0, 0, 0);
+
+		return now;
+	}
+
+	protected IWTimestamp getTimestampTo(IWContext iwc) {
+		if (iwc.isParameterSet(PARAMETER_DATE_RANGE)) {
+			String dateRangeValue = iwc.getParameter(PARAMETER_DATE_RANGE);
+			String[] dates = dateRangeValue.split(CoreConstants.MINUS);
+			if (!ArrayUtil.isEmpty(dates) && dates.length == 2) {
+				Locale locale = iwc.getCurrentLocale();
+				java.util.Date tmp = IWDatePickerHandler.getParsedDate(dates[1].trim(), locale);
+				if (tmp != null) {
+					IWTimestamp iwTo = new IWTimestamp(tmp);
+					iwTo.setTime(23, 59, 59, 999);
+					return iwTo;
+				}
+			}
+		}
+
+		IWTimestamp now = IWTimestamp.RightNow();
+		now.setMonth(now.getMonth() + 1);
+		now.setDay(1);
+		now.setDay(now.getDay() - 1);
+		now.setTime(23, 59, 59, 999);
+
+		return now;
+	}
+
+	protected java.util.Date getDateFrom(IWContext iwc) {
+		IWTimestamp timestamp = getTimestampFrom(iwc);
+		if (timestamp != null) {
+			return timestamp.getTimestamp();
+		}
+
+		return null;
+	}
+
+	protected java.util.Date getDateTo(IWContext iwc) {
+		IWTimestamp timestamp = getTimestampTo(iwc);
+		if (timestamp != null) {
+			return timestamp.getTimestamp();
+		}
+
+		return null;
+	}
+
+	/**
+	 * <p>Add date filter</p>
+	 * @param iwc
+	 */
+	protected void addDatePicker(IWContext iwc) {
+		IWDatePicker dateRange = getDateRange(iwc, PARAMETER_DATE_RANGE, 
+				getTimestampFrom(iwc).getDate(), 
+				getTimestampTo(iwc).getDate());
+		Label label = new Label(localize("date_range", "Date range") + CoreConstants.COLON, dateRange);
+
+		Form form = new Form();
+		form.add(label);
+		form.add(dateRange);
+		form.add(new SubmitButton(localize("show", "Show")));
+
+		Layer element = new Layer();
+		element.setStyleClass("formItem shortFormItem");
+		element.add(form);
+
+		Layer container = new Layer();
+		container.setStyleClass("savedFormsViewer");
+		container.add(element);
+		container.add(new CSSSpacer());
+
+		add(container);
+	}
+
+	protected String localize(String key, String value) {
+		return getWebUtil().getLocalizedString(
+				CasesConstants.IW_BUNDLE_IDENTIFIER, key, value);
+	}
+
 	@Override
 	protected void initializeComponent(FacesContext context) {
 
@@ -199,6 +324,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			web2.getBundleURIToFancyBoxStyleFile()
 		));
 
+		addDatePicker(iwc);
+
 		Layer container = new Layer();
 		getChildren().add(container);
 		container.setStyleClass("casesBoardViewerContainer");
@@ -222,6 +349,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(document).ready(function() {").append(initAction).append("});").toString();
 		}
+
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 
 		CoreUtil.getIWContext().removeSessionAttribute(
@@ -232,9 +360,15 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
-		CaseBoardTableBean data = getBoardCasesManager().getTableData(iwc,
-				getCaseStatuses(), processName, uuid, isOnlySubscribedCases(),
-				useCurrentPageAsBackPageFromTaskViewer, getTaskName());
+		CaseBoardTableBean data = getBoardCasesManager().getTableData(
+				getDateFrom(iwc),
+				getDateTo(iwc),
+				getCaseStatuses(), 
+				processName, 
+				uuid, 
+				isOnlySubscribedCases(),
+				useCurrentPageAsBackPageFromTaskViewer, 
+				getTaskName());
 
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
@@ -256,8 +390,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 				headerCell.add(new Text(header.getValue()));
 				headerCell.setStyleClass(header.getId());
 				ids.add(header.getId());
-				if (getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(9).getId()) ||
-					getBoardCasesManager().isColumnOfDomain(header.getId(), CASE_FIELDS.get(14).getId()))
+				if (getBoardCasesManager().isEqual(header.getId(), CASE_FIELDS.get(9).getId()) ||
+					getBoardCasesManager().isEqual(header.getId(), CASE_FIELDS.get(14).getId()))
 					headerCell.setStyleClass("casesBoardViewerTableWiderCell");
 
 			}
@@ -267,8 +401,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		Link linkToTask = null;
 		TableBodyRowGroup body = table.createBodyRowGroup();
 		body.setStyleClass("casesBoardViewerBodyRows");
-		int finalEstimate = 0;
-		int finalProposed = 0;
+		long finalEstimate = 0;
+		long finalProposed = 0;
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			TableRow row = body.createRow();
 			row.setId(rowBean.getId());
@@ -402,13 +536,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 					bodyRowCell.setRowSpan(rowSpan);
 
 					for (AdvancedProperty entry: entries) {
-						if (getBoardCasesManager().isColumnOfDomain(entry.getId(), CASE_FIELDS.get(5).getId())) {
+						if (getBoardCasesManager().isEqual(entry.getId(), CASE_FIELDS.get(5).getId())) {
 							//	Link to grading task
 							linkToTask = new Link(rowBean.getCaseIdentifier(), rowBean.getLinkToCase());
 							linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
 							linkToTask.getId();
 							bodyRowCell.add(linkToTask);
-						} else if (getBoardCasesManager().isColumnOfDomain(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
+						} else if (getBoardCasesManager().isEqual(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
 							//	E-mail link to handler
 							bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
 						} else if (!StringUtil.isEmpty(entry.getValue())) {
@@ -577,6 +711,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (!StringUtil.isEmpty(processName))
 			uri.setParameter(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER, processName);
 		uri.setParameter(PARAMETER_UUID, uuid);
+		
+		if (iwc.isParameterSet(PARAMETER_DATE_RANGE)) {
+			uri.setParameter(PARAMETER_DATE_RANGE, iwc.getParameter(PARAMETER_DATE_RANGE));
+		}
 
 		return uri.getUri();
 	}
@@ -670,4 +808,14 @@ public class CasesBoardViewer extends IWBaseComponent {
 		this.taskName = taskName;
 	}
 
+	@Autowired
+	private WebUtil webUtil = null;
+
+	protected WebUtil getWebUtil() {
+		if (this.webUtil == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+
+		return this.webUtil;
+	}
 }
