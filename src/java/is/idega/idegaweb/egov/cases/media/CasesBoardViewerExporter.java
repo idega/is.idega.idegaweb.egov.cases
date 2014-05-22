@@ -10,11 +10,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,10 +43,14 @@ import com.idega.io.MediaWritable;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.ui.IWDatePicker;
+import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.user.data.User;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
+import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
@@ -120,20 +126,21 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String estimation = info.get(CasesBoardViewer.ESTIMATED_COST);
-						estimationTotal += getBoardCasesManager().getNumberValue(estimation);
-						cell.setCellValue(estimation);
-
+						Long estimationNumber = getBoardCasesManager().getNumberValue(estimation);
+						estimationTotal += estimationNumber;
+						cell.setCellValue(estimationNumber);
+						
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
 						long sugg = getBoardCasesManager().getNumberValue(suggestion);
 						suggestionTotal += sugg;
-						cell.setCellValue(String.valueOf(sugg));
+						cell.setCellValue(sugg);
 
 						cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
 						String decision = info.get(CasesBoardViewer.BOARD_DECISION);
 						long dec = getBoardCasesManager().getNumberValue(decision);
 						decisionTotal += dec;
-						cell.setCellValue(String.valueOf(dec));
+						cell.setCellValue(dec);
 
 						if (infoIter.hasNext())
 							financingTableRow = sheet.createRow(rowNumber++);
@@ -151,13 +158,13 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					cell.setCellValue(getIWResourceBundle(iwc).getLocalizedString("total", "Total"));
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
-					cell.setCellValue(String.valueOf(estimationTotal));
+					cell.setCellValue(estimationTotal);
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
-					cell.setCellValue(String.valueOf(suggestionTotal));
+					cell.setCellValue(suggestionTotal);
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
-					cell.setCellValue((String.valueOf(decisionTotal)));
+					cell.setCellValue(decisionTotal);
 				} else {
 					//	Simple values
 					HSSFCell bodyRowCell = row.createCell(cellIndex);
@@ -165,20 +172,20 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					for (AdvancedProperty entry: entries) {
 						String varName = entry.getId();
 
-						if (getBoardCasesManager().isColumnOfDomain(varName, ProcessConstants.CASE_IDENTIFIER)) {
+						if (getBoardCasesManager().isEqual(varName, ProcessConstants.CASE_IDENTIFIER)) {
 							bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
 
-						} else if (getBoardCasesManager().isColumnOfDomain(varName, ProcessConstants.HANDLER_IDENTIFIER)) {
+						} else if (getBoardCasesManager().isEqual(varName, ProcessConstants.HANDLER_IDENTIFIER)) {
 							bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
 
-						} else if (getBoardCasesManager().isColumnOfDomain(varName, CasesBoardViewer.BOARD_SUGGESTION) ||
-								getBoardCasesManager().isColumnOfDomain(varName, CasesBoardViewer.BOARD_DECISION)) {
+						} else if (getBoardCasesManager().isEqual(varName, CasesBoardViewer.BOARD_SUGGESTION) ||
+								getBoardCasesManager().isEqual(varName, CasesBoardViewer.BOARD_DECISION)) {
 
 							String boardValue = entry.getValue();
 							Logger.getLogger(getClass().getName()).info("Handling board value '" + boardValue + "' for variable '" + varName + "'");
 							bodyRowCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 							Long numberValue = getBoardCasesManager().getNumberValue(boardValue);
-							bodyRowCell.setCellValue(String.valueOf(numberValue));
+							bodyRowCell.setCellValue(numberValue);
 
 						} else {
 							bodyRowCell.setCellValue(entry.getValue());
@@ -218,12 +225,14 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 			HSSFCell cell = row.createCell(cellIndex++);
 			cell.setCellValue(label);
 
-			if (cellStyle != null)
+			if (cellStyle != null) {
 				cell.setCellStyle(cellStyle);
+			}
 		}
 	}
 
-	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
+	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, 
+			Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
