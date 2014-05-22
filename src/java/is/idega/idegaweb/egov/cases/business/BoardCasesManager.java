@@ -5,9 +5,11 @@ import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.idega.block.process.data.Case;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
@@ -39,16 +41,36 @@ public interface BoardCasesManager {
 	 * @param iwc - application context;
 	 * @param caseStatus of cases to add to table, for example: 
 	 * "BVJD, INPR, FINI, ...";
-	 * @param processName - name ProcessDefinition object;
+	 * @param processName is name of ProcessDefinition object;
 	 * @param customColumns - variable names, which should be shown as columns,
 	 * for example: "string_caseIdentifier,string_caseDescription,..."
 	 * @param uuid of {@link CasesBoardViewer} component;
 	 * @return data for table to represent or <code>null</code> on failure.
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
-	public CaseBoardTableBean getTableData(IWContext iwc, 
-			Collection<String> caseStatus, String processName, String uuid,
-			boolean isSubscribedOnly, boolean useBasePage, String taskName);
+	public CaseBoardTableBean getTableData(
+			Collection<String> caseStatus, 
+			String processName, 
+			String uuid,
+			boolean isSubscribedOnly,
+			boolean useBasePage, 
+			String taskName);
+
+	/**
+	 * @param dateFrom is floor of {@link Case#getCreated()}, 
+	 * skipped if <code>null</code>;
+	 * @param dateTo is ceiling of {@link Case#getCreated()},
+	 * skipped if <code>null</code>;
+	 */
+	public CaseBoardTableBean getTableData(
+			Date dateFrom, 
+			Date dateTo,
+			Collection<String> caseStatus,
+			String processName, 
+			String uuid, 
+			boolean isSubscribedOnly,
+			boolean useBasePage,
+			String taskName);
 
 	public AdvancedProperty getHandlerInfo(IWContext iwc, User handler);
 
@@ -56,11 +78,11 @@ public interface BoardCasesManager {
 
 	public List<AdvancedProperty> getAvailableVariables(String processName);
 
-	public Map<Integer, List<AdvancedProperty>> getColumns(IWResourceBundle iwrb, String uuid);
+	public Map<Integer, List<AdvancedProperty>> getColumns(String uuid);
 
 	public List<String> getCustomColumns(String uuid);
 
-	public boolean isColumnOfDomain(String currentColumn, String columnOfDomain);
+	public boolean isEqual(String currentColumn, String columnOfDomain);
 
 	public int getIndexOfColumn(String column, String uuid);
 

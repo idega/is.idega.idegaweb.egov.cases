@@ -56,7 +56,7 @@ public class CasesBoardViewCustomizer extends Block {
 
 		SelectionBox selectedColumns = box.getRightBox();
 		List<String> keys = new ArrayList<String>();
-		Map<Integer, List<AdvancedProperty>> currentColumns = boardCaseManager.getColumns(iwrb, uuid);
+		Map<Integer, List<AdvancedProperty>> currentColumns = boardCaseManager.getColumns(uuid);
 		for (Integer key: currentColumns.keySet()) {
 			List<AdvancedProperty> columns = currentColumns.get(key);
 			for (AdvancedProperty column: columns) {
@@ -74,7 +74,7 @@ public class CasesBoardViewCustomizer extends Block {
 		}
 
 		SelectionBox options = box.getLeftBox();
-		Map<Integer, List<AdvancedProperty>> defaultColumns = boardCaseManager.getColumns(iwrb, null);
+		Map<Integer, List<AdvancedProperty>> defaultColumns = boardCaseManager.getColumns(null);
 		for (Integer key: defaultColumns.keySet()) {
 			List<AdvancedProperty> columns = defaultColumns.get(key);
 			for (AdvancedProperty defaultColumn: columns) {
