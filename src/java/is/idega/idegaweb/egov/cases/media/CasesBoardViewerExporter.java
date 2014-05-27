@@ -378,8 +378,8 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 
 		return getBoardCasesManager().getTableData(
-				getDateFrom(iwc),
-				getDateTo(iwc),
+				null,
+				null,
 				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
 				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID),

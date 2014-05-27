@@ -255,6 +255,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 		IWDatePicker dateRange = getDateRange(iwc, PARAMETER_DATE_RANGE, 
 				getTimestampFrom(iwc).getDate(), 
 				getTimestampTo(iwc).getDate());
+		dateRange.setShowYearChange(Boolean.TRUE);
+		dateRange.setShowMonthChange(Boolean.TRUE);
 		Label label = new Label(localize("date_range", "Date range") + CoreConstants.COLON, dateRange);
 
 		Form form = new Form();
@@ -324,7 +326,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			web2.getBundleURIToFancyBoxStyleFile()
 		));
 
-		addDatePicker(iwc);
+//		addDatePicker(iwc);
 
 		Layer container = new Layer();
 		getChildren().add(container);
@@ -361,8 +363,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(
-				getDateFrom(iwc),
-				getDateTo(iwc),
+				null,
+				null,
 				getCaseStatuses(), 
 				processName, 
 				uuid, 
