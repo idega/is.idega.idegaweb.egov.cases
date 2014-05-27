@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,6 +78,24 @@ public class CaseBoardTableBodyRowBean {
 
 	public void setFinancingInfo(List<Map<String, String>> financingInfo) {
 		this.financingInfo = financingInfo;
+	}
+
+	public void setFinancingInfo(String variable, String value) {
+		if (this.financingInfo == null) {
+			this.financingInfo = new ArrayList<Map<String,String>>();
+		}
+
+		Map<String, String> map = null;
+		if (!ListUtil.isEmpty(financingInfo)) {
+			map = this.financingInfo.iterator().next();
+		}
+
+		if (map == null) {
+			map = new HashMap<String, String>();
+			this.financingInfo.add(map);
+		}
+
+		map.put(variable, value);
 	}
 
 	public String getLinkToCase() {
