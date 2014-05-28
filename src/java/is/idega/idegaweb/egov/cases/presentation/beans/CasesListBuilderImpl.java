@@ -97,7 +97,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String usePDFDownloadColumnParName = "usepdfdownloadcolumn";
 	private String allowPDFSigningParName = "allowpdfsigning";
 
-	public static final String VARIABLE_CASE_NR = "string_caseIdentifier";
+	public static final String VARIABLE_CASE_NR = ProcessConstants.CASE_IDENTIFIER;
 	public static final String VARIABLE_SENDER = "string_ownerFullName";
 	public static final String VARIABLE_DESCRIPTION = "string_caseDescription";
 	public static final String VARIABLE_CREATION_DATE = "string_caseCreatedDateString";
@@ -889,7 +889,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		buttonsLayer.setStyleClass("exportAllCasesButtonStyle");
 		GenericButton exportButton = new GenericButton(iwrb.getLocalizedString("export_cases_data", "Export data to Excel"));
 		exportButton.setOnClick("CasesListHelper.exportAllCases('" + iwrb.getLocalizedString("exporting", "Exporting...") + "', '" +
-				buttonsLayer.getId() + "', '" + properties.getInstanceId() + "', '" + properties.isAddExportContacts()  
+				buttonsLayer.getId() + "', '" + properties.getInstanceId() + "', '" + properties.isAddExportContacts()
 				+ "', '" + properties.isShowUserCompany() + "');");
 		buttonsLayer.add(exportButton);
 		return buttonsLayer;
