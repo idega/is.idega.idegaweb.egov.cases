@@ -7,7 +7,6 @@ import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,6 +59,7 @@ import com.idega.presentation.ui.IWDatePicker;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.PrintButton;
 import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.user.data.User;
 import com.idega.util.ArrayUtil;
@@ -77,10 +77,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	private static final Logger LOGGER = Logger.getLogger(CasesBoardViewer.class.getName());
 
+	public static final String	PROPERTY_SHOW_DATE_FILTER = "show_cases_board_date_filter";
+	
 	public static final String	PARAMETER_PROCESS_NAME = "prmProcessName",
 								PARAMETER_UUID = "uuid",
 								PARAMETER_CUSTOM_COLUMNS = "customCasesBoardViewerColumns",
-								PARAMETER_SHOW_ONLY_SUBSCRIBED = "showSubscribedOnly";
+								PARAMETER_SHOW_ONLY_SUBSCRIBED = "showSubscribedOnly",
+								PARAMETER_CASE_IDENTIFIER = "prm_case_identifier";
 
 	private static final String EDITABLE_FIELD_TYPE_TEXT_INPUT = "textinput",
 								EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea",
@@ -265,7 +268,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		form.add(new SubmitButton(localize("show", "Show")));
 
 		Layer element = new Layer();
-		element.setStyleClass("formItem shortFormItem");
+		element.setStyleClass("formItem");
 		element.add(form);
 
 		Layer container = new Layer();
@@ -274,6 +277,23 @@ public class CasesBoardViewer extends IWBaseComponent {
 		container.add(new CSSSpacer());
 
 		add(container);
+	}
+
+	protected String getCaseIdentifier(IWContext iwc) {
+		if (iwc != null) {
+			return iwc.getParameter(PARAMETER_CASE_IDENTIFIER);
+		}
+
+		return null;
+	}
+
+	protected TextInput getCaseNumberFilter(IWContext iwc) {
+		String caseIdentifier = getCaseIdentifier(iwc);
+		if (!StringUtil.isEmpty(caseIdentifier)) {
+			return new TextInput(PARAMETER_CASE_IDENTIFIER, caseIdentifier);
+		}
+
+		return new TextInput(PARAMETER_CASE_IDENTIFIER);
 	}
 
 	protected String localize(String key, String value) {
@@ -312,7 +332,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			jQuery.getBundleURIToJQueryLib(),
 			web2.getBundleUriToHumanizedMessagesScript(),
 			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
-			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
+
+			web2.getBundleURIToTableSorterLibRootFolder("2.0") + "jquery.tablesorter.min.js",
 			CoreConstants.DWR_ENGINE_SCRIPT,
 			CoreConstants.DWR_UTIL_SCRIPT,
 			"/dwr/interface/BoardCasesManager.js",
@@ -326,7 +347,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 			web2.getBundleURIToFancyBoxStyleFile()
 		));
 
-//		addDatePicker(iwc);
+		if (doFilterByDate(iwc)) {
+			addDatePicker(iwc);
+		}
 
 		Layer container = new Layer();
 		getChildren().add(container);
@@ -361,15 +384,21 @@ public class CasesBoardViewer extends IWBaseComponent {
 				isOnlySubscribedCases());
 	}
 
+	protected boolean doFilterByDate(IWContext iwc) {
+		return iwc.getApplicationSettings().getBoolean(
+				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER, 
+				Boolean.FALSE);
+	}
+	
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(
-				null,
-				null,
-				getCaseStatuses(), 
-				processName, 
-				uuid, 
+				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
+				doFilterByDate(iwc) ? getDateTo(iwc) : null,
+				getCaseStatuses(),
+				processName,
+				uuid,
 				isOnlySubscribedCases(),
-				useCurrentPageAsBackPageFromTaskViewer, 
+				useCurrentPageAsBackPageFromTaskViewer,
 				getTaskName());
 
 		if (data == null || !data.isFilledWithData()) {

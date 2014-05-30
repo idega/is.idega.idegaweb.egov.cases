@@ -372,14 +372,20 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		return null;
 	}
 
+	protected boolean doFilterByDate(IWContext iwc) {
+		return iwc.getApplicationSettings().getBoolean(
+				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER, 
+				Boolean.FALSE);
+	}
+	
 	protected CaseBoardTableBean getTableData(IWContext iwc) {
 		if (iwc == null) {
 			return null;
 		}
 
 		return getBoardCasesManager().getTableData(
-				null,
-				null,
+				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
+				doFilterByDate(iwc) ? getDateTo(iwc) : null,
 				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
 				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID),
