@@ -30,7 +30,8 @@ public class CaseBoardBean {
 			CASE_OWNER_TOTAL_COST = "string_ownerTotalCost",
 			CASE_OWNER_BUSINESS_CONCEPT = "string_ownerBusinessConcept",
 			CASE_OWNER_GRADE = "string_ownerGrade",
-			CASE_OWNER_ANSWER = "string_ownerAnswer";
+			CASE_OWNER_ANSWER = "string_ownerAnswer",
+			CASE_OWNER_GENDER = "string_ownerGender";
 
 	private String linkToCase;
 
