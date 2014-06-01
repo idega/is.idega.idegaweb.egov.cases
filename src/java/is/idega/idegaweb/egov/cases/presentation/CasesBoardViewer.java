@@ -336,7 +336,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 			web2.getBundleUriToHumanizedMessagesScript(),
 			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
 
-			web2.getBundleURIToTableSorterLibRootFolder("2.0") + "jquery.tablesorter.min.js",
+			//web2.getBundleURIToTableSorterLibRootFolder("2.0") + "jquery.tablesorter.min.js",
 			CoreConstants.DWR_ENGINE_SCRIPT,
 			CoreConstants.DWR_UTIL_SCRIPT,
 			"/dwr/interface/BoardCasesManager.js",
