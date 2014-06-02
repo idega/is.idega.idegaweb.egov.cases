@@ -16,7 +16,7 @@ CasesBoardHelper.pressedMouseRightClickButton = false;
 CasesBoardHelper.initializeBoardCases = function(localizations) {
 	CasesBoardHelper.linkInAction = null;
 	CasesBoardHelper.localizations = localizations;
-	
+
 	jQuery(document).bind('keydown', function(event) {
 		CasesBoardHelper.pressedKeyboardButton = event.keyCode;
 	});
@@ -24,10 +24,10 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 	jQuery(document).bind('keyup', function(event) {
 		CasesBoardHelper.pressedKeyboardButton = null;
 	});
-	
+
 	jQuery.each(jQuery('a.casesBoardViewerTableLinkToTaskStyle'), function() {
 		var link = jQuery(this);
-		
+
 		link.click(function(event) {
 			if (event && event.button && event.button == 2) {
 				CasesBoardHelper.pressedMouseRightClickButton = true;
@@ -36,7 +36,7 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 			if (CasesBoardHelper.linkInAction == this.id) {
 				return false;
 			}
-			
+
 			showLoadingMessage(CasesBoardHelper.localizations.loading);
 			CasesBoardHelper.linkInAction = this.id;
 			if (CasesBoardHelper.isLinkToBeOpenedInNewTab()) {
@@ -50,27 +50,33 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 			return false;
 		});
 	});
-	
+
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect'), function() {
-		CasesBoardHelper.initializeEditableCell(jQuery(this), {
-			data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
-			type:		'select',
-			rerender:	false
-		}, 'select');
+		jQuery(this).mouseover(function() {
+			CasesBoardHelper.initializeEditableCell(jQuery(this), {
+				data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
+				type:		'select',
+				rerender:	false
+			}, 'select');
+		});
 	});
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput'), function() {
-		CasesBoardHelper.initializeEditableCell(jQuery(this), {
-			rerender:	false,
-			recount:	true
-		}, 'textinput');
+		jQuery(this).mouseover(function() {
+			CasesBoardHelper.initializeEditableCell(jQuery(this), {
+				rerender:	false,
+				recount:	true
+			}, 'textinput');
+		});
 	});
 	
 	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextarea'), function() {
-		CasesBoardHelper.initializeEditableCell(jQuery(this), {
-			type:		'textarea',
-			rerender:	false
-		}, 'textarea');
+		jQuery(this).mouseover(function() {
+			CasesBoardHelper.initializeEditableCell(jQuery(this), {
+				type:		'textarea',
+				rerender:	false
+			}, 'textarea');
+		});
 	});
 	
 	jQuery('a.casesBoardViewCustomizer').each(function() {
@@ -106,13 +112,13 @@ CasesBoardHelper.initializeEditableCell = function(cell, settings, type) {
 	var caseId = rowId.replace('uniqueCaseId', '');
 	caseId = caseId.split('_')[0];
 	settings.caseId = caseId;
-	
+
 	var customName = cell.hasClass('string_ownerGradeComment') ?
 		'string_ownerGradeComment' :
 		cell.hasClass('string_ownerGrantAmauntValue') ?
 			'string_ownerGrantAmauntValue' :
 			null;
-	
+
 	if (customName == null)
 		settings.variable = CasesBoardHelper.getValueFromHiddenInput('input[type=\'hidden\'][name=\'casesBoardViewerTableEditableCell'+type+
 			'VariableName\']', container);

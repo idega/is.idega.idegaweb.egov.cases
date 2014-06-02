@@ -2,6 +2,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
 import is.idega.idegaweb.egov.cases.media.CasesBoardViewerExporter;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
@@ -59,6 +60,7 @@ import com.idega.presentation.ui.IWDatePicker;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.PrintButton;
 import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.handlers.IWDatePickerHandler;
 import com.idega.user.data.User;
 import com.idega.util.ArrayUtil;
@@ -76,10 +78,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	private static final Logger LOGGER = Logger.getLogger(CasesBoardViewer.class.getName());
 
+	public static final String	PROPERTY_SHOW_DATE_FILTER = "show_cases_board_date_filter";
+	
 	public static final String	PARAMETER_PROCESS_NAME = "prmProcessName",
 								PARAMETER_UUID = "uuid",
 								PARAMETER_CUSTOM_COLUMNS = "customCasesBoardViewerColumns",
-								PARAMETER_SHOW_ONLY_SUBSCRIBED = "showSubscribedOnly";
+								PARAMETER_SHOW_ONLY_SUBSCRIBED = "showSubscribedOnly",
+								PARAMETER_CASE_IDENTIFIER = "prm_case_identifier";
 
 	private static final String EDITABLE_FIELD_TYPE_TEXT_INPUT = "textinput",
 								EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea",
@@ -93,7 +98,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
 	
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
-		new AdvancedProperty("string_ownerFullName", "Applicant"),									//	0
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_FULL_NAME, "Applicant"),									//	0
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GENDER, "Gender"),
 		new AdvancedProperty("string_ownerKennitala", "Personal ID"),								//	1
 		new AdvancedProperty("string_ownerAddress", "Address"),										//	2
 		new AdvancedProperty("string_ownerPostCode", "Zip"),										//	3
@@ -109,23 +115,24 @@ public class CasesBoardViewer extends IWBaseComponent {
 		new AdvancedProperty("sum_all_negative_grades", "Negative grade"),							//	10
 		new AdvancedProperty("sum_all_grades", "Grade"),											//	11
 
-		new AdvancedProperty("string_ownerProjectLead", "Category"),								//	12,	EDITABLE, select
+		new AdvancedProperty(CaseBoardBean.CASE_CATEGORY, "Category"),								//	12,	EDITABLE, select
 
 		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	13, table of 4 columns
 
-		new AdvancedProperty("string_ownerGrade", "Comment"),										//	14
-		new AdvancedProperty("string_ownerAnswer", "Restrictions")									//	15, EDITABLE, text area
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GRADE, "Comment"),										//	14
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_ANSWER, "Restrictions")									//	15, EDITABLE, text area
 	));
 
 	private static Map<String, String> EDITABLE_FIELDS;
 	static {
+//		CaseBoardBean.CASE_OWNER_GRADE;
 		EDITABLE_FIELDS = new HashMap<String, String>();
-		EDITABLE_FIELDS.put(CASE_FIELDS.get(12).getId(), EDITABLE_FIELD_TYPE_DROPDOWN);
+		EDITABLE_FIELDS.put(CaseBoardBean.CASE_CATEGORY, EDITABLE_FIELD_TYPE_DROPDOWN);
 
 		EDITABLE_FIELDS.put(ProcessConstants.BOARD_FINANCING_SUGGESTION, EDITABLE_FIELD_TYPE_TEXT_INPUT);
 		EDITABLE_FIELDS.put(ProcessConstants.BOARD_FINANCING_DECISION, EDITABLE_FIELD_TYPE_TEXT_INPUT);
 
-		EDITABLE_FIELDS.put(CASE_FIELDS.get(15).getId(), EDITABLE_FIELD_TYPE_TEXT_AREA);
+		EDITABLE_FIELDS.put(CaseBoardBean.CASE_OWNER_ANSWER, EDITABLE_FIELD_TYPE_TEXT_AREA);
 	}
 
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
@@ -264,7 +271,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		form.add(new SubmitButton(localize("show", "Show")));
 
 		Layer element = new Layer();
-		element.setStyleClass("formItem shortFormItem");
+		element.setStyleClass("formItem");
 		element.add(form);
 
 		Layer container = new Layer();
@@ -273,6 +280,23 @@ public class CasesBoardViewer extends IWBaseComponent {
 		container.add(new CSSSpacer());
 
 		add(container);
+	}
+
+	protected String getCaseIdentifier(IWContext iwc) {
+		if (iwc != null) {
+			return iwc.getParameter(PARAMETER_CASE_IDENTIFIER);
+		}
+
+		return null;
+	}
+
+	protected TextInput getCaseNumberFilter(IWContext iwc) {
+		String caseIdentifier = getCaseIdentifier(iwc);
+		if (!StringUtil.isEmpty(caseIdentifier)) {
+			return new TextInput(PARAMETER_CASE_IDENTIFIER, caseIdentifier);
+		}
+
+		return new TextInput(PARAMETER_CASE_IDENTIFIER);
 	}
 
 	protected String localize(String key, String value) {
@@ -311,7 +335,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			jQuery.getBundleURIToJQueryLib(),
 			web2.getBundleUriToHumanizedMessagesScript(),
 			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
-			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
+
+			//web2.getBundleURIToTableSorterLibRootFolder("2.0") + "jquery.tablesorter.min.js",
 			CoreConstants.DWR_ENGINE_SCRIPT,
 			CoreConstants.DWR_UTIL_SCRIPT,
 			"/dwr/interface/BoardCasesManager.js",
@@ -325,7 +350,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 			web2.getBundleURIToFancyBoxStyleFile()
 		));
 
-//		addDatePicker(iwc);
+		if (doFilterByDate(iwc)) {
+			addDatePicker(iwc);
+		}
 
 		Layer container = new Layer();
 		getChildren().add(container);
@@ -360,15 +387,21 @@ public class CasesBoardViewer extends IWBaseComponent {
 				isOnlySubscribedCases());
 	}
 
+	protected boolean doFilterByDate(IWContext iwc) {
+		return iwc.getApplicationSettings().getBoolean(
+				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER, 
+				Boolean.FALSE);
+	}
+	
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(
-				null,
-				null,
-				getCaseStatuses(), 
-				processName, 
-				uuid, 
+				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
+				doFilterByDate(iwc) ? getDateTo(iwc) : null,
+				getCaseStatuses(),
+				processName,
+				uuid,
 				isOnlySubscribedCases(),
-				useCurrentPageAsBackPageFromTaskViewer, 
+				useCurrentPageAsBackPageFromTaskViewer,
 				getTaskName());
 
 		if (data == null || !data.isFilledWithData()) {
@@ -391,10 +424,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 				headerCell.add(new Text(header.getValue()));
 				headerCell.setStyleClass(header.getId());
 				ids.add(header.getId());
-				if (getBoardCasesManager().isEqual(header.getId(), CASE_FIELDS.get(9).getId()) ||
-					getBoardCasesManager().isEqual(header.getId(), CASE_FIELDS.get(14).getId()))
-					headerCell.setStyleClass("casesBoardViewerTableWiderCell");
 
+				if (getBoardCasesManager().isEqual(header.getId(), CaseBoardBean.CASE_OWNER_BUSINESS_CONCEPT) ||
+					getBoardCasesManager().isEqual(header.getId(), CaseBoardBean.CASE_OWNER_GRADE)) {
+					headerCell.setStyleClass("casesBoardViewerTableWiderCell");
+				}
 			}
 		}
 
@@ -534,9 +568,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					int rowSpan = getRowSpan(financingInfo);
 					bodyRowCell.setRowSpan(rowSpan);
-
 					for (AdvancedProperty entry: entries) {
-						if (getBoardCasesManager().isEqual(entry.getId(), CASE_FIELDS.get(5).getId())) {
+						if (getBoardCasesManager().isEqual(entry.getId(), ProcessConstants.CASE_IDENTIFIER)) {
 							//	Link to grading task
 							linkToTask = new Link(rowBean.getCaseIdentifier(), rowBean.getLinkToCase());
 							linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
@@ -596,7 +629,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN)
-				.append("VariableName").toString(), CASE_FIELDS.get(12).getId()));
+				.append("VariableName").toString(), CaseBoardBean.CASE_CATEGORY));
 
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT)
 				.append(ProcessConstants.BOARD_FINANCING_SUGGESTION).toString(), ProcessConstants.BOARD_FINANCING_SUGGESTION));
@@ -604,7 +637,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 				.append(ProcessConstants.BOARD_FINANCING_DECISION).toString(),	ProcessConstants.BOARD_FINANCING_DECISION));
 
 		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA)
-				.append("VariableName").toString(), CASE_FIELDS.get(15).getId()));
+				.append("VariableName").toString(), CaseBoardBean.CASE_OWNER_ANSWER));
 
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
 

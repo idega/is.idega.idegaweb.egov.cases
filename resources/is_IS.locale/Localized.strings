@@ -45,6 +45,7 @@ case_board_viewer.sum_all_grades=Eink.
 case_board_viewer.total_sum=Samtals
 case_board_viewer.string_ownerAddress=Heimilisfang
 case_board_viewer.handlerUserId=D\u00FDra\u00FEj\u00E1lfari
+case_board_viewer.string_ownerGender=Kyn
 
 case_category=M\u00E1laflokkur
 case_category.group_not_empty=Vinsamlegast velji\u00F0 h\u00F3p sem \u00E1 a\u00F0 sj\u00E1 um \u00FEessa tegund erinda
@@ -308,3 +309,6 @@ string_ownergrantamauntvalue=\u00C1kv\u00F6r\u00F0un stj\u00F3rnar
 work_item=Verk\u00FE\u00E1ttur
 
 handler_category_id=Stj\u00F3rnandinn flokkur id
+doesnotapply=-
+male=Karl
+female=Kona
