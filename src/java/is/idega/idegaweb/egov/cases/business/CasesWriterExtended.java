@@ -34,6 +34,7 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.StringHandler;
 import com.idega.util.text.Name;
+import com.idega.util.text.TextSoap;
 
 public class CasesWriterExtended extends CasesWriter {
 
@@ -44,7 +45,7 @@ public class CasesWriterExtended extends CasesWriter {
 
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		HSSFSheet sheet = workbook.createSheet(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_fetcher.statistics", "Statistics"), 30));
+		HSSFSheet sheet = workbook.createSheet(TextSoap.encodeToValidExcelSheetName(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_fetcher.statistics", "Statistics"), 30)));
 		sheet.setColumnWidth((short) 0, (short) (38 * 256));
 		sheet.setColumnWidth((short) 1, (short) (85 * 256));
 
@@ -139,7 +140,7 @@ public class CasesWriterExtended extends CasesWriter {
 				cell = row.createCell((short) 1);
 				cell.setCellValue(type.getName());
 			}
-			
+
 			if (element.getReference() != null) {
 				row = sheet.createRow(cellRow++);
 
@@ -182,11 +183,11 @@ public class CasesWriterExtended extends CasesWriter {
 
 			if (element.getReply() != null) {
 				row = sheet.createRow(cellRow++);
-	
+
 				cell = row.createCell((short) 0);
 				cell.setCellValue(this.iwrb.getLocalizedString("reply", "Reply"));
 				cell.setCellStyle(style3);
-	
+
 				cell = row.createCell((short) 1);
 				cell.setCellValue(element.getReply());
 				cell.setCellStyle(style2);

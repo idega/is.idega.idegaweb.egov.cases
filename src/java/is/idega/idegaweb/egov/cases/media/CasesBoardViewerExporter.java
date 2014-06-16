@@ -56,6 +56,7 @@ import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
+import com.idega.util.text.TextSoap;
 
 public class CasesBoardViewerExporter extends DownloadWriter implements MediaWritable {
 
@@ -129,7 +130,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						Long estimationNumber = getBoardCasesManager().getNumberValue(estimation);
 						estimationTotal += estimationNumber;
 						cell.setCellValue(estimationNumber);
-						
+
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
 						long sugg = getBoardCasesManager().getNumberValue(suggestion);
@@ -231,7 +232,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 	}
 
-	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, 
+	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle,
 			Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
@@ -276,11 +277,11 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 		return iwb.getResourceBundle(iwc);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param uuid is id of UI component in page, not <code>null</code>;
-	 * @return <code>true</code> if only subscribed cases should be shown, 
+	 * @return <code>true</code> if only subscribed cases should be shown,
 	 * <code>false</code> otherwise;
 	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
 	 */
@@ -374,10 +375,10 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 	protected boolean doFilterByDate(IWContext iwc) {
 		return iwc.getApplicationSettings().getBoolean(
-				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER, 
+				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER,
 				Boolean.FALSE);
 	}
-	
+
 	protected CaseBoardTableBean getTableData(IWContext iwc) {
 		if (iwc == null) {
 			return null;
@@ -430,10 +431,10 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 			return null;
 		}
 
-		HSSFSheet sheet = workBook.createSheet(StringHandler.shortenToLength(
+		HSSFSheet sheet = workBook.createSheet(TextSoap.encodeToValidExcelSheetName(StringHandler.shortenToLength(
 				getIWResourceBundle(iwc).getLocalizedString(
 						"cases_board_viewer.cases_board", "Cases board"),
-				30));
+				30)));
 
 		if (!MapUtil.isEmpty(headers)) {
 			createHeaders(

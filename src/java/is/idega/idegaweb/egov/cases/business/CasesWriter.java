@@ -52,6 +52,7 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.StringHandler;
 import com.idega.util.text.Name;
+import com.idega.util.text.TextSoap;
 
 public class CasesWriter extends DownloadWriter implements MediaWritable {
 
@@ -166,7 +167,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
 		short cellColumn = 0;
-		HSSFSheet sheet = workbook.createSheet(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_fetcher.statistics", "Statistics"), 30));
+		HSSFSheet sheet = workbook.createSheet(TextSoap.encodeToValidExcelSheetName(StringHandler.shortenToLength(iwrb.getLocalizedString("cases_fetcher.statistics", "Statistics"), 30)));
 		sheet.setColumnWidth(cellColumn++, (short) (8 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (14 * 256));
 		sheet.setColumnWidth(cellColumn++, (short) (30 * 256));
