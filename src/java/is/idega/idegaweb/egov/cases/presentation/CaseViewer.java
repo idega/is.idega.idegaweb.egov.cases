@@ -258,7 +258,6 @@ public class CaseViewer extends CaseCreator {
 			clear.setStyleClass("Clear");
 			section.add(clear);
 
-			@SuppressWarnings("unchecked")
 			Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
 
 			if (!logs.isEmpty()) {

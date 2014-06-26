@@ -1070,7 +1070,6 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 			GroupBusiness groupBusiness = getGroupBusiness();
 
-			@SuppressWarnings("unchecked")
 			Collection<Group> caseHandlersGroups = groupBusiness.getGroupsByGroupName(caseCategoryHandlersGroupName);
 			Group caseHandlersGroup;
 

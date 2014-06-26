@@ -1,8 +1,8 @@
 /*
  * $Id$ Created on Nov 7, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
@@ -49,20 +49,20 @@ public class MyCases extends CasesProcessor {
 	private static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	private static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	private static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-	
+
 	private boolean usePDFDownloadColumn = true;
 	private boolean allowPDFSigning = true;
 	private boolean showStatistics;
 	private boolean hideEmptySection = true;
-	
+
 	@Autowired
 	private JQuery jQuery;
-	
+
 	@Override
 	public boolean isUsePDFDownloadColumn() {
 		return usePDFDownloadColumn;
 	}
-	
+
 	@Override
 	public void setUsePDFDownloadColumn(boolean usePDFDownloadColumn) {
 		this.usePDFDownloadColumn = usePDFDownloadColumn;
@@ -102,7 +102,7 @@ public class MyCases extends CasesProcessor {
 	protected String getBlockID() {
 		return "myCases";
 	}
-	
+
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		ELUtil.getInstance().autowire(this);
@@ -175,9 +175,8 @@ public class MyCases extends CasesProcessor {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 
 		if (parentCategory != null) {
-			@SuppressWarnings("unchecked")
 			Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
-			
+
 			if (collection.isEmpty())
 				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
 			else
@@ -213,7 +212,7 @@ public class MyCases extends CasesProcessor {
 		TextArea reply = new TextArea(PARAMETER_REPLY);
 		reply.setStyleClass("textarea");
 		reply.keepStatusOnAction(true);
-		
+
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
@@ -274,7 +273,7 @@ public class MyCases extends CasesProcessor {
 			element.add(attachmentSpan);
 			section.add(element);
 		}
-		
+
 		if (theCase.getSubject() != null) {
 			formItem = new Layer(Layer.DIV);
 			formItem.setStyleClass("formItem");
@@ -320,14 +319,13 @@ public class MyCases extends CasesProcessor {
 
 		section.add(clear);
 
-		@SuppressWarnings("unchecked")
 		Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
 		if (!logs.isEmpty()) {
 			for (CaseLog log : logs) {
 				form.add(getHandlerLayer(iwc, this.getResourceBundle(), theCase, log));
 			}
 		}
-		
+
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
@@ -337,7 +335,7 @@ public class MyCases extends CasesProcessor {
 		back.setValueOnClick(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
-		
+
 		Link pdf = getDownloadButtonLink(getResourceBundle().getLocalizedString("fetch_pdf", "Fetch PDF"), CaseWriter.class);
 		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		bottom.add(pdf);
@@ -371,7 +369,7 @@ public class MyCases extends CasesProcessor {
 	public boolean showCheckBox() {
 		return false;
 	}
-	
+
 	@Override
 	protected void initializeTableSorter(IWContext iwc) throws RemoteException {
 		StringBuilder buffer = new StringBuilder();
@@ -381,7 +379,7 @@ public class MyCases extends CasesProcessor {
 			.append("}, sortList: [[0,0]] } ); } );");
 		PresentationUtil.addJavaScriptActionToBody(iwc, buffer.toString());
 	}
-	
+
 	@Override
 	public String getCasesProcessorType() {
 		return CasesRetrievalManager.CASE_LIST_TYPE_MY;

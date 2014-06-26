@@ -232,7 +232,6 @@ public class HandlerCases extends CasesProcessor {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 
 		if (parentCategory != null) {
-			@SuppressWarnings("unchecked")
 			Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
 
 			if (collection.isEmpty())
@@ -377,7 +376,6 @@ public class HandlerCases extends CasesProcessor {
 
 		section.add(clear);
 
-		@SuppressWarnings("unchecked")
 		Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
 		if (!logs.isEmpty()) {
 			for (CaseLog log : logs) {

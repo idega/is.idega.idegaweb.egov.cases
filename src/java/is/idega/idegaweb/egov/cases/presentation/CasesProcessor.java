@@ -325,7 +325,6 @@ public abstract class CasesProcessor extends CasesBlock {
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		subCategories.setOnChange("changeUsers('" + PARAMETER_SUB_CASE_CATEGORY_PK + "')");
 
-		@SuppressWarnings("unchecked")
 		Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
 		if (collection.isEmpty()) {
 			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));

@@ -259,7 +259,6 @@ public class ClosedCases extends CasesProcessor {
 
 		layer.add(clear);
 
-		@SuppressWarnings("unchecked")
 		Collection<CaseLog> logs = getCasesBusiness(iwc).getCaseLogs(theCase);
 		if (!logs.isEmpty()) {
 			for (CaseLog log : logs) {

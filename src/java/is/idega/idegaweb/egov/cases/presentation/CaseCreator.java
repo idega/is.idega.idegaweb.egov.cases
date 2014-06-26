@@ -210,7 +210,6 @@ public class CaseCreator extends ApplicationForm {
 		}
 		else {
 			categories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_category", "Select category"));
-			@SuppressWarnings("unchecked")
 			Collection<CaseCategory> parentCategories = getCasesBusiness(iwc).getCaseCategories();
 			Iterator<CaseCategory> iter = parentCategories.iterator();
 			while (iter.hasNext()) {
@@ -244,7 +243,6 @@ public class CaseCreator extends ApplicationForm {
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
 		boolean addEmptyElement = true;
 		if (category != null) {
-			@SuppressWarnings("unchecked")
 			Collection<CaseCategory> subCats = getCasesBusiness(iwc).getSubCategories(category);
 			if (!subCats.isEmpty()) {
 				Iterator<CaseCategory> iter = subCats.iterator();
@@ -1009,7 +1007,7 @@ public class CaseCreator extends ApplicationForm {
 
 	private UserSession getUserSession(IWUserContext iwuc) {
 		try {
-			return (UserSession) IBOLookup.getSessionInstance(iwuc, UserSession.class);
+			return IBOLookup.getSessionInstance(iwuc, UserSession.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
@@ -1018,7 +1016,7 @@ public class CaseCreator extends ApplicationForm {
 
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
-			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
@@ -1028,7 +1026,7 @@ public class CaseCreator extends ApplicationForm {
 	@Override
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) {
 		try {
-			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, UserBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
