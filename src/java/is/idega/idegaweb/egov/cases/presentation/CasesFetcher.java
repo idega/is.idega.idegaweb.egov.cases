@@ -204,10 +204,12 @@ public class CasesFetcher extends CasesBlock {
 			anonymous.setStyleClass("anonymousDropdown");
 
 			IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
+			from.setVersion(IWDatePicker.VERSION_1_8_17);
 			from.setUseCurrentDateIfNotSet(false);
 			from.keepStatusOnAction(true);
 
 			IWDatePicker to = new IWDatePicker(PARAMETER_TO_DATE);
+			to.setVersion(IWDatePicker.VERSION_1_8_17);
 			to.setUseCurrentDateIfNotSet(false);
 			to.keepStatusOnAction(true);
 

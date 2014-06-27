@@ -187,12 +187,14 @@ public class CasesStatistics extends CasesBlock {
 		form.add(section);
 
 		IWDatePicker from = new IWDatePicker(PARAMETER_FROM_DATE);
+		from.setVersion(IWDatePicker.VERSION_1_8_17);
 		from.setUseCurrentDateIfNotSet(false);
 		from.setShowMonthChange(true);
 		from.setShowYearChange(true);
 		from.keepStatusOnAction(true);
 
 		IWDatePicker to = new IWDatePicker(PARAMETER_TO_DATE);
+		to.setVersion(IWDatePicker.VERSION_1_8_17);
 		to.setUseCurrentDateIfNotSet(false);
 		to.setShowMonthChange(true);
 		to.setShowYearChange(true);

@@ -306,7 +306,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
 		IWDatePicker datePicker = new IWDatePicker(name);
 		datePicker.setId(name);
-		datePicker.setVersion("1.8.17");
+		datePicker.setVersion(IWDatePicker.VERSION_1_8_17);
 		datePicker.keepStatusOnAction(true);
 
 		if (from != null)

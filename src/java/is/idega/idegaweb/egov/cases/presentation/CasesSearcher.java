@@ -552,7 +552,7 @@ public class CasesSearcher extends CasesBlock {
 
 	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
 		IWDatePicker datePicker = new IWDatePicker(name);
-		datePicker.setVersion("1.8.17");
+		datePicker.setVersion(IWDatePicker.VERSION_1_8_17);
 
 		if (from != null)
 			datePicker.setDate(from);

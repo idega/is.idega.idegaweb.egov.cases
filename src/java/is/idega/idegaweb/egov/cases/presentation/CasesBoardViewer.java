@@ -79,7 +79,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private static final Logger LOGGER = Logger.getLogger(CasesBoardViewer.class.getName());
 
 	public static final String	PROPERTY_SHOW_DATE_FILTER = "show_cases_board_date_filter";
-	
+
 	public static final String	PARAMETER_PROCESS_NAME = "prmProcessName",
 								PARAMETER_UUID = "uuid",
 								PARAMETER_CUSTOM_COLUMNS = "customCasesBoardViewerColumns",
@@ -96,7 +96,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 								BOARD_SUGGESTION = ProcessConstants.BOARD_FINANCING_SUGGESTION,
 								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION,
 								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
-	
+
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
 		new AdvancedProperty(CaseBoardBean.CASE_OWNER_FULL_NAME, "Applicant"),									//	0
 		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GENDER, "Gender"),
@@ -176,7 +176,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	protected IWDatePicker getDateRange(IWContext iwc, String name, Date from, Date to) {
 		IWDatePicker datePicker = new IWDatePicker(name);
 		datePicker.setId(name);
-		datePicker.setVersion("1.8.17");
+		datePicker.setVersion(IWDatePicker.VERSION_1_8_17);
 		datePicker.keepStatusOnAction(true);
 
 		if (from != null)
@@ -258,8 +258,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 	 * @param iwc
 	 */
 	protected void addDatePicker(IWContext iwc) {
-		IWDatePicker dateRange = getDateRange(iwc, PARAMETER_DATE_RANGE, 
-				getTimestampFrom(iwc).getDate(), 
+		IWDatePicker dateRange = getDateRange(iwc, PARAMETER_DATE_RANGE,
+				getTimestampFrom(iwc).getDate(),
 				getTimestampTo(iwc).getDate());
 		dateRange.setShowYearChange(Boolean.TRUE);
 		dateRange.setShowMonthChange(Boolean.TRUE);
@@ -389,10 +389,10 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	protected boolean doFilterByDate(IWContext iwc) {
 		return iwc.getApplicationSettings().getBoolean(
-				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER, 
+				CasesBoardViewer.PROPERTY_SHOW_DATE_FILTER,
 				Boolean.FALSE);
 	}
-	
+
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(
 				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
@@ -756,7 +756,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		if (!StringUtil.isEmpty(processName))
 			uri.setParameter(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER, processName);
 		uri.setParameter(PARAMETER_UUID, uuid);
-		
+
 		if (iwc.isParameterSet(PARAMETER_DATE_RANGE)) {
 			uri.setParameter(PARAMETER_DATE_RANGE, iwc.getParameter(PARAMETER_DATE_RANGE));
 		}
