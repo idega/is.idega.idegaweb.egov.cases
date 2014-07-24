@@ -6,6 +6,7 @@ import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -269,7 +270,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			layer.setMarkupAttribute("customcolumns", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCustomColumns()));
 	}
 
-	private IWTimestamp getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
+	private Serializable getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
 		if (StringUtil.isEmpty(properties.getDateCustomValueVariable())) {
 			return new IWTimestamp(theCase.getCreated());
 		}
@@ -281,7 +282,12 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		Timestamp value = null;
 		try {
-			value = artifactsProvider.getVariableValue(theCase.getId(), properties.getDateCustomValueVariable());
+			Serializable dateValue = artifactsProvider.getVariableValue(theCase.getId(), properties.getDateCustomValueVariable());
+			if (dateValue instanceof Timestamp) {
+				value = (Timestamp) dateValue;
+			} else {
+				return dateValue;
+			}
 		} catch (ClassCastException e) {
 			LOGGER.log(Level.WARNING, "Error while resolving date!", e);
 		}
@@ -323,7 +329,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			caseContainer.setStyleClass(theCase.getProcessName());
 
 		User owner = theCase.getOwner();
-		IWTimestamp created = getCaseCreatedValue(theCase, properties);
+		Serializable created = getCaseCreatedValue(theCase, properties);
 
 		if (rowsCounter == 0)
 			caseContainer.setStyleClass("firstRow");
@@ -430,8 +436,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				for (String column: customColumns) {
 					Layer columnContainer = addLayerToCasesList(caseContainer, new Text(caseLabels.get(column)), bodyItem, "CustomLabel");
 					columnContainer.setStyleClass(column);
-					if (theCase.isBpm())
+					if (theCase.isBpm()) {
 						prepareCellToBeGridExpander(columnContainer, caseId, gridViewerId, properties);
+					}
 				}
 			}
 		}
@@ -439,12 +446,23 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		//	Creation date
 		Layer creationDateContainer = addLayerToCasesList(caseContainer, null, bodyItem, "CreationDate");
 		creationDateContainer.setStyleClass(VARIABLE_CREATION_DATE);
-		if (properties.isShowCreationTimeInDateColumn())
+		if (properties.isShowCreationTimeInDateColumn()) {
 			creationDateContainer.setStyleClass("showOnlyDateValueForCaseInCasesListRow");
-		creationDateContainer.add(new Text(properties.isShowCreationTimeInDateColumn() ? created.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT) :
-			created.getLocaleDate(l, IWTimestamp.SHORT)));
-		if (theCase.isBpm())
+		}
+		Text dateText = null;
+		if (created instanceof IWTimestamp) {
+			IWTimestamp createdTimestamp = (IWTimestamp) created;
+			dateText = new Text(properties.isShowCreationTimeInDateColumn() ?
+					createdTimestamp.getLocaleDateAndTime(l, IWTimestamp.SHORT, IWTimestamp.SHORT) :
+					createdTimestamp.getLocaleDate(l, IWTimestamp.SHORT)
+			);
+		} else {
+			dateText = new Text(created instanceof String ? (String) created : CoreConstants.MINUS);
+		}
+		creationDateContainer.add(dateText);
+		if (theCase.isBpm()) {
 			prepareCellToBeGridExpander(creationDateContainer, caseId, gridViewerId, properties);
+		}
 
 		if (properties.isShowCaseStatus()) {
 			//	Status
