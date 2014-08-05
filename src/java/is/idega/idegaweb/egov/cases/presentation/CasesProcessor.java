@@ -30,6 +30,7 @@ import com.idega.block.process.presentation.UICasesList;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.block.process.presentation.beans.GeneralCaseManagerViewBuilder;
+import com.idega.block.process.variables.VisibleVariablesBean;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
@@ -47,6 +48,7 @@ import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 public abstract class CasesProcessor extends CasesBlock {
@@ -69,8 +71,37 @@ public abstract class CasesProcessor extends CasesBlock {
 	protected static final int ACTION_MULTI_PROCESS = 5;
 	protected static final int ACTION_ALLOCATION_FORM = 6;
 
+	private String commaSeparatedVariablesForExport;
+
+	public String getCommaSeparatedVariablesForExport() {
+		return commaSeparatedVariablesForExport;
+	}
+
+	public void setCommaSeparatedVariablesForExport(
+			String commaSeparatedVariablesForExport) {
+		this.commaSeparatedVariablesForExport = commaSeparatedVariablesForExport;
+		try {
+			getVisibleVariablesBean().setVariables(
+					String.valueOf(getICObjectInstance().getUniqueId()), 
+					commaSeparatedVariablesForExport);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Autowired
 	private CaseManagersProvider caseManagersProvider;
+
+	@Autowired
+	private VisibleVariablesBean visibleVariablesBean = null;
+
+	protected VisibleVariablesBean getVisibleVariablesBean() {
+		if (this.visibleVariablesBean == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+
+		return this.visibleVariablesBean;
+	}
 
 	private static final String caseManagerFacet = "caseManager";
 

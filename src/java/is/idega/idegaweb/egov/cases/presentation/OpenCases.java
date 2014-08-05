@@ -18,9 +18,12 @@ import java.util.Collection;
 
 import javax.ejb.FinderException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
+import com.idega.block.process.variables.VisibleVariablesBean;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
@@ -35,6 +38,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.util.expression.ELUtil;
 
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
