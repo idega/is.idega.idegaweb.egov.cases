@@ -68,6 +68,7 @@ public class CasesSearcher extends CasesBlock {
 	private static final String PARAMETER_CASE_CONTACT = "cf_prm_case_contact";
 	private static final String PARAMETER_SORTING_OPTIONS = "cf_prm_sorting_options";
 	public static final String PARAMETER_HANDLER_CATEGORY = "cf_prm_handler_category";
+	protected static final String PARAMETER_ADDRESS = "cf_prm_address";
 
 	private String textInputStyleClass = "textinput";
 	private String buttonStyleClass = "button";
@@ -203,6 +204,8 @@ public class CasesSearcher extends CasesBlock {
 		TextInput contact = getTextInput(PARAMETER_CASE_CONTACT, iwrb.getLocalizedString("cases_search_enter_name_email_or_phone",
 				"Contact's name, e-mail or phone number"), searchSettings == null ? null : searchSettings.getContact());
 
+		TextInput address = getTextInput(CaseFinder.PARAMETER_ADDRESS, null, searchSettings == null ? null : searchSettings.getAddress());
+
 		String showStatisticsLabel = iwrb.getLocalizedString("show_cases_statistics", "Show statistics");
 		CheckBox showStatistics = new CheckBox(CaseFinder.PARAMETER_SHOW_STATISTICS);
 		showStatistics.setChecked(searchSettings != null && searchSettings.isShowStatistics());
@@ -214,6 +217,9 @@ public class CasesSearcher extends CasesBlock {
 
 		//	Case number
 		addFormItem(inputsContainer, "caseIdentifier", iwrb.getLocalizedString("case_nr", "Case nr."), caseNumber);
+
+		//	Case address
+		addFormItem(inputsContainer, "address", iwrb.getLocalizedString("address", "Address"), address);
 
 		// Case description
 		addFormItem(inputsContainer, "caseDescription", iwrb.getLocalizedString("description", "Description"), caseDescription);
@@ -302,7 +308,8 @@ public class CasesSearcher extends CasesBlock {
 		.append(contact.getId()).append("', '")
 		.append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS).append("', '")
 		.append(showStatistics.getId()).append("', ")
-		.append(isShowAllStatuses());
+		.append(isShowAllStatuses()).append(", '")
+		.append(address.getId()).append("'");
 
 		if (handlerCategories != null) {
 			parameters.append(" ,'").append(handlerCategories.getId()).append("'");

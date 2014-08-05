@@ -51,6 +51,7 @@ public class CaseFinder extends CasesBlock {
 	public static final String PARAMETER_PERSONAL_ID = "cf_prm_personal_id";
 	protected static final String PARAMETER_TEXT = "cf_prm_text";
 	protected static final String PARAMETER_SHOW_STATISTICS = "cf_prm_show_statistics";
+	protected static final String PARAMETER_ADDRESS = "cf_prm_address";
 
 	private static final int ACTION_SEARCH = 1;
 	private static final int ACTION_RESULTS = 2;
@@ -109,12 +110,18 @@ public class CaseFinder extends CasesBlock {
 		text.setStyleClass("textinput");
 		text.keepStatusOnAction(true);
 
+		TextInput address = new TextInput(PARAMETER_ADDRESS);
+		address.setStyleClass("textinput");
+		address.keepStatusOnAction(true);
+
 		caseNumber.setToDisableOnWhenNotEmpty(name);
 		caseNumber.setToDisableOnWhenNotEmpty(personalID);
 		name.setToDisableOnWhenNotEmpty(caseNumber);
 		name.setToDisableOnWhenNotEmpty(personalID);
 		personalID.setToDisableOnWhenNotEmpty(caseNumber);
 		personalID.setToDisableOnWhenNotEmpty(name);
+		address.setToDisableOnWhenNotEmpty(caseNumber);
+		address.setToDisableOnWhenNotEmpty(personalID);
 
 		Layer element = new Layer(Layer.DIV);
 		element.setStyleClass("formItem");
@@ -144,6 +151,12 @@ public class CaseFinder extends CasesBlock {
 		element.add(text);
 		layer.add(element);
 
+		element = new Layer(Layer.DIV);
+		element.setStyleClass("formItem");
+		label = new Label(getResourceBundle().getLocalizedString("address", "Address"), address);
+		element.add(label);
+		element.add(address);
+		layer.add(element);
 
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");
@@ -192,6 +205,16 @@ public class CaseFinder extends CasesBlock {
 		else if (iwc.isParameterSet(PARAMETER_TEXT)) {
 			cases.addAll(getCasesBusiness().getCasesByMessage(iwc.getParameter(PARAMETER_PERSONAL_ID)));
 		}
+		else if (iwc.isParameterSet(PARAMETER_ADDRESS)) {
+			try {
+				Collection<User> users = getUserBusiness().getUserHome().findUsersBySearchCondition(iwc.getParameter(PARAMETER_ADDRESS), false);
+				cases.addAll(getCasesBusiness().getCasesByUsers(users));
+			}
+			catch (FinderException fe) {
+				fe.printStackTrace();
+			}
+		}
+
 
 		if (cases.isEmpty()) {
 			Heading1 heading = new Heading1(getResourceBundle().getLocalizedString("search_results.nothing_found", "Nothing found"));
