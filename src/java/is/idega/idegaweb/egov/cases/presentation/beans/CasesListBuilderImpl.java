@@ -195,7 +195,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			CasesListCustomizer customizer = getCasesListCustomizer(properties);
 			Map<String, String> columns = null;
 			if (customizer != null)
-				columns = customizer.getHeadersAndVariables(customColumns);
+				columns = customizer.getHeadersAndVariables(properties, customColumns);
 			if (!MapUtil.isEmpty(columns)) {
 				for (String column: columns.keySet()) {
 					Layer customLayer = addLayerToCasesList(headers, new Text(columns.get(column)), headerItem, "CustomHeader");
@@ -612,20 +612,43 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return container;
 	}
 
-	private Map<String, Map<String, String>> getCustomLabels(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties) {
+	private Map<String, Map<String, String>> getCustomLabels(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, Locale locale) {
 		CasesListCustomizer customizer = getCasesListCustomizer(properties);
-		if (customizer == null)
+		if (customizer == null) {
 			return null;
+		}
 
 		Collection<CasePresentation> theCases = cases.getCollection();
-		if (ListUtil.isEmpty(theCases))
+		if (ListUtil.isEmpty(theCases)) {
 			return null;
+		}
 
 		List<String> casesIds = new ArrayList<String>();
-		for (CasePresentation theCase: theCases)
+		for (CasePresentation theCase: theCases) {
 			casesIds.add(theCase.getId());
+		}
 
-		return customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
+		Map<String, Map<String, String>> customLabels = customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
+		if (customLabels == null) {
+			return null;
+		}
+
+		if (isSearchResultsList(properties.getType())) {
+			Map<String, Map<String, String>> customColumnsForSearch = customizer.getCustomColumnsForSearchResult(casesIds, locale);
+			if (customColumnsForSearch != null) {
+				for (String caseId: customColumnsForSearch.keySet()) {
+					Map<String, String> valuesForSearch = customColumnsForSearch.get(caseId);
+					Map<String, String> values = customLabels.get(caseId);
+					if (values == null) {
+						customLabels.put(caseId, valuesForSearch);
+					} else {
+						values.putAll(valuesForSearch);
+					}
+				}
+			}
+		}
+
+		return customLabels;
 	}
 
 	private Map<String, String> getLocalizedStatuses(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, Locale locale) {
@@ -692,7 +715,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				e.printStackTrace();
 			}
 
-			Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
+			Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties, l);
 			Map<String, String> statuses = getLocalizedStatuses(cases, properties, l);
 			casesToRender = casesInList.size();
 			for (CasePresentation theCase: casesInList) {
@@ -871,7 +894,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			e.printStackTrace();
 		}
 
-		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties);
+		Map<String, Map<String, String>> customLabels = getCustomLabels(cases, properties, l);
 		Map<String, String> statuses = getLocalizedStatuses(cases, properties, l);
 		for (CasePresentation theCase: casesInList) {
 			caseContainer = addRowToCasesList(
