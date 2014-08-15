@@ -268,6 +268,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			layer.setMarkupAttribute("caseslistcustomizer", properties.getCasesListCustomizer());
 		if (!ListUtil.isEmpty(properties.getCustomColumns()))
 			layer.setMarkupAttribute("customcolumns", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCustomColumns()));
+		layer.setMarkupAttribute("casecodes", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCaseCodes()));
 	}
 
 	private Serializable getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
@@ -560,8 +561,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		return descriptionIsEditable;
 	}
 
-	private boolean isSearchResultsList(String caseProcessorType) {
-		return ProcessConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(caseProcessorType);
+	private boolean isSearchResultsList(CaseListPropertiesBean properties) {
+		return properties.isSearch() || ProcessConstants.CASE_LIST_TYPE_SEARCH_RESULTS.equals(properties.getType());
 	}
 
 	private Layer getCasesListContainer(boolean searchResults) {
@@ -633,7 +634,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return null;
 		}
 
-		if (isSearchResultsList(properties.getType())) {
+		if (isSearchResultsList(properties)) {
 			Map<String, Map<String, String>> customColumnsForSearch = customizer.getCustomColumnsForSearchResult(casesIds, locale);
 			if (customColumnsForSearch != null) {
 				for (String caseId: customColumnsForSearch.keySet()) {
@@ -681,7 +682,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
 
-			boolean searchResults = isSearchResultsList(type);
+			boolean searchResults = isSearchResultsList(properties);
 			Layer container = getCasesListContainer(searchResults);
 
 			addProperties(container, properties);
@@ -848,9 +849,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 
 	@Override
-	public UIComponent getUserCasesList(IWContext iwc, PagedDataCollection<CasePresentation> cases, @SuppressWarnings("rawtypes") Map pages,
-			CaseListPropertiesBean properties) {
-
+	public UIComponent getUserCasesList(
+			IWContext iwc,
+			PagedDataCollection<CasePresentation> cases,
+			@SuppressWarnings("rawtypes")
+			Map pages,
+			CaseListPropertiesBean properties
+	) {
 		String type = properties.getType();
 
 		boolean showStatistics = properties.isShowStatistics();
@@ -859,7 +864,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
 
-		boolean searchResults = isSearchResultsList(type);
+		boolean searchResults = isSearchResultsList(properties);
 		Layer container = getCasesListContainer(searchResults);
 
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();

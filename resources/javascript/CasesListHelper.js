@@ -474,6 +474,7 @@ function searchForCases(parameters) {
 	var showUserProfilePicture = true;
 	var addExportContacts = false;
 	var showUserCompany = false;
+	var caseCodes = null;
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
 		
@@ -496,6 +497,8 @@ function searchForCases(parameters) {
 		
 		if (customColumns != null)
 			customColumns = customColumns.split(',');
+			
+		caseCodes = gridOpener.attr('casecodes');
 	}
 	var showCaseNumberColumn = jQuery('div.casesListHeadersContainerItemCaseNumber').length == 0 ? false : true;
 	var showCreationTimeInDateColumn = jQuery('div.showOnlyDateValueForCaseInCasesListRow').length == 0 ? false : true;
@@ -511,7 +514,7 @@ function searchForCases(parameters) {
 		hideEmptySection, showCaseNumberColumn,	showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1,
 		dwr.util.getValue(jQuery('select.listPagerSize').attr('id')), jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'),
 		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId,showAttachmentStatistics,
-		showUserProfilePicture,addExportContacts,showUserCompany
+		showUserProfilePicture,addExportContacts,showUserCompany,caseCodes
 	);
 	criterias.clearResults = true;
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
@@ -673,7 +676,7 @@ CasesListHelper.getStatusesToHide = function() {
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact,
 	usePDFDownloadColumn, allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
 	instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns,
-	showLoadingMessageAttr, groupId,showAttachmentStatistics,showUserProfilePicture,addExportContacts,showUserCompany) {
+	showLoadingMessageAttr, groupId,showAttachmentStatistics,showUserProfilePicture,addExportContacts,showUserCompany,caseCodes) {
 	
 	this.subscribersGroupId = groupId;
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
@@ -722,6 +725,8 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.showUserProfilePicture = showUserProfilePicture;
 	this.addExportContacts = addExportContacts;
 	this.showUserCompany = showUserCompany;
+	
+	this.caseCodes = caseCodes;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
