@@ -408,10 +408,10 @@ function searchForCases(parameters) {
 		alert('Search parameters are not provided!');
 		return false;
 	}
-	
+	 
 	if (parameters.action != null)
 		return parameters.action(parameters);
-	
+	 
 	if (parameters.length == null || parameters.length < 14) {
 		alert('Not enough parameters are provided!');
 		return false;
@@ -427,6 +427,7 @@ function searchForCases(parameters) {
 	var dateRangeId = parameters[6];
 	var showStatisticsId = parameters[12];
 	var showAllCases = parameters[13];
+	var addressId = parameters[14];
 
 	// Component values
 	var caseNumberValue = dwr.util.getValue(caseNumberId);
@@ -440,7 +441,7 @@ function searchForCases(parameters) {
 	} else {
 		processValue = processId;
 	}
-	
+	 
 	if (processValue == '' || processValue == -1) {
 		processValue = null;
 	}
@@ -455,7 +456,9 @@ function searchForCases(parameters) {
 	if (!showStatistics)
 		showStatistics = false;
 	
-	var groupId = dwr.util.getValue(parameters[14]);
+	var addressValue = dwr.util.getValue(addressId);
+	
+	var groupId = dwr.util.getValue(parameters[15]);
 	if (groupId == '' || groupId == -1) {
 		groupId = null;
 	}
@@ -517,6 +520,8 @@ function searchForCases(parameters) {
 		showUserProfilePicture,addExportContacts,showUserCompany,caseCodes
 	);
 	criterias.clearResults = true;
+	criterias.address = addressValue;
+	
 	CasesListHelper.searchCriterias.push({id: criteriasId, criteria: criterias});
 	CasesListHelper.getRenderedCasesListByCriterias(criterias, parameters[0], null);
 }
@@ -598,7 +603,8 @@ function clearSearchForCases(parameters) {
 						dwr.util.setValue(parameters[5], '-1');
 						dwr.util.setValue(parameters[6], '');
 						dwr.util.setValue(parameters[10], '');
-						dwr.util.setValue(parameters[14], '-1');
+						dwr.util.setValue(parameters[14], '');
+						dwr.util.setValue(parameters[15], '-1');
 						jQuery('#' + parameters[12]).attr('checked', false);
 					}
 				} catch (e) {}
