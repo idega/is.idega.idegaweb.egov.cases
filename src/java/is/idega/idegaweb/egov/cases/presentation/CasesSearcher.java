@@ -289,29 +289,29 @@ public class CasesSearcher extends CasesBlock {
 
 		StringBuilder parameters  = new StringBuilder("['");
 
-		parameters.append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '")
-		.append(caseNumber.getId()).append("', '")
-		.append(name.getId()).append("', '")
-		.append(personalID.getId()).append("', '");
+		parameters.append(GeneralCasesListBuilder.MAIN_CASES_LIST_CONTAINER_STYLE).append("', '")	//	0
+		.append(caseNumber.getId()).append("', '")													//	1
+		.append(name.getId()).append("', '")														//	2
+		.append(personalID.getId()).append("', '");													//	3
 
-		if (this.processProperty == null) {
+		if (this.processProperty == null) {															//	4
 			parameters.append(processes.getId()).append("', '");
 		} else {
 			parameters.append(this.processProperty).append("', '");
 		}
 
-		parameters.append(statuses.getId()).append("', '")
-		.append(dateRange.getId()).append("', '")
-		.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '")
-		.append(caseDescription.getId()).append("', '")
-		.append(listTypeInput.getId()).append("', '")
-		.append(contact.getId()).append("', '")
-		.append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS).append("', '")
-		.append(showStatistics.getId()).append("', ")
-		.append(isShowAllStatuses()).append(", '")
-		.append(address.getId()).append("'");
+		parameters.append(statuses.getId()).append("', '")											//	5
+		.append(dateRange.getId()).append("', '")													//	6
+		.append(iwrb.getLocalizedString("searching", "Searching...")).append("', '")				//	7
+		.append(caseDescription.getId()).append("', '")												//	8
+		.append(listTypeInput.getId()).append("', '")												//	9
+		.append(contact.getId()).append("', '")														//	10
+		.append(CasesConstants.CASES_LIST_GRID_EXPANDER_STYLE_CLASS).append("', '")					//	11
+		.append(showStatistics.getId()).append("', ")												//	12
+		.append(isShowAllStatuses()).append(", '")													//	13
+		.append(address.getId()).append("'");														//	14
 
-		if (handlerCategories != null) {
+		if (handlerCategories != null) {															//	15
 			parameters.append(" ,'").append(handlerCategories.getId()).append("'");
 		}
 

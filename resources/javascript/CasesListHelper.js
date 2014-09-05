@@ -596,16 +596,18 @@ function clearSearchForCases(parameters) {
 					if (parameters != null && parameters.length >= 14) {
 						cssClassName = parameters[0];
 						dwr.util.setValue(parameters[1], '');
-						dwr.util.setValue(parameters[8], '');
 						dwr.util.setValue(parameters[2], '');
 						dwr.util.setValue(parameters[3], '');
 						dwr.util.setValue(parameters[4], '-1');
 						dwr.util.setValue(parameters[5], '-1');
 						dwr.util.setValue(parameters[6], '');
+						dwr.util.setValue(parameters[8], '');
 						dwr.util.setValue(parameters[10], '');
-						dwr.util.setValue(parameters[14], '');
-						dwr.util.setValue(parameters[15], '-1');
 						jQuery('#' + parameters[12]).attr('checked', false);
+						dwr.util.setValue(parameters[14], '');
+						if (parameters.length >= 16) {
+							dwr.util.setValue(parameters[15], '-1');
+						}
 					}
 				} catch (e) {}
 				cssClassName = cssClassName == null ? parameters.cssClassName : cssClassName;
