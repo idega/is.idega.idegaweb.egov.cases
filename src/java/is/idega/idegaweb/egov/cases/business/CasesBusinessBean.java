@@ -498,7 +498,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public void removeCaseCategory(Object caseCategoryPK) throws FinderException, RemoveException {
-		getCaseCategory(caseCategoryPK).remove();
+		CaseCategory caseCategory = getCaseCategory(caseCategoryPK);
+		caseCategory.setDeleted(Boolean.TRUE);
+		caseCategory.store();
 	}
 
 	@Override

@@ -88,4 +88,8 @@ public interface CaseCategory extends IDOEntity {
 	 * @see is.idega.idegaweb.egov.cases.data.CaseCategoryBMPBean#getLocalizedText
 	 */
 	public LocalizedText getLocalizedText(Locale locale);
+
+	public boolean isDeleted();
+
+	public void setDeleted(boolean deleted);
 }
