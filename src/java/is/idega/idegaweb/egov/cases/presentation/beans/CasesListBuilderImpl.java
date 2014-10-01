@@ -839,13 +839,19 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	private int getTotalCases(PagedDataCollection<CasePresentation> cases, boolean searchResults, CaseListPropertiesBean properties) {
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
-		int total = ListUtil.isEmpty(casesInList) ? 0 :
-			searchResults ?
+		int total = 0;
+		if (!ListUtil.isEmpty(casesInList)) {
+			total = searchResults ?
 				properties.getFoundResults() > 0 ?
 					properties.getFoundResults() :
-					casesInList == null ? 0 : cases.getTotalCount()
+					casesInList == null ? 0 : cases.getTotalCount().intValue()
 			: casesInList == null ? 0 : casesInList.size();
-		return searchResults ? total : cases == null ? 0 : cases.getTotalCount();
+		}
+		total = searchResults ? total : cases == null ? 0 : cases.getTotalCount().intValue();
+		if (!searchResults && cases != null && total != cases.getTotalCount().intValue()) {
+			total = cases.getTotalCount().intValue();
+		}
+		return total;
 	}
 
 	@Override

@@ -82,7 +82,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		this.commaSeparatedVariablesForExport = commaSeparatedVariablesForExport;
 		try {
 			getVisibleVariablesBean().setVariables(
-					String.valueOf(getICObjectInstance().getUniqueId()), 
+					String.valueOf(getICObjectInstance().getUniqueId()),
 					commaSeparatedVariablesForExport);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -176,8 +176,11 @@ public abstract class CasesProcessor extends CasesBlock {
 		super.encodeBegin(fc);
 
 		try {
-			doResolveIds(IWContext.getIWContext(fc));
-			display(IWContext.getIWContext(fc));
+			IWContext iwc = IWContext.getIWContext(fc);
+			int page = getPage();
+			setTotalNumberOfCases(getTotalCountOfCases(iwc, page));
+			doResolveIds(iwc, getPageSize(), page);
+			display(iwc);
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
