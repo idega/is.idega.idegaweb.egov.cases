@@ -32,6 +32,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 
 public class ClosedCases extends CasesProcessor {
 
@@ -104,7 +105,7 @@ public class ClosedCases extends CasesProcessor {
 		CaseCategory category = theCase.getCaseCategory();
 		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
-		ICFile attachment = theCase.getAttachment();
+		Collection<ICFile> attachments = theCase.getAttachments();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 
@@ -202,21 +203,23 @@ public class ClosedCases extends CasesProcessor {
 		element.add(createdDate);
 		layer.add(element);
 
-		if (attachment != null) {
-			Link link = new Link(new Text(attachment.getName()));
-			link.setFile(attachment);
-			link.setTarget(Link.TARGET_BLANK_WINDOW);
-
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(link);
-
-			element = new Layer(Layer.DIV);
-			element.setStyleClass("formItem");
-			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
-			element.add(label);
-			element.add(attachmentSpan);
-			layer.add(element);
+		if (!ListUtil.isEmpty(attachments)) {
+			for(ICFile attachment : attachments){
+				Link link = new Link(new Text(attachment.getName()));
+				link.setFile(attachment);
+				link.setTarget(Link.TARGET_BLANK_WINDOW);
+	
+				Layer attachmentSpan = new Layer(Layer.SPAN);
+				attachmentSpan.add(link);
+	
+				element = new Layer(Layer.DIV);
+				element.setStyleClass("formItem");
+				label = new Label();
+				label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+				element.add(label);
+				element.add(attachmentSpan);
+				layer.add(element);
+			}
 		}
 
 		element = new Layer(Layer.DIV);

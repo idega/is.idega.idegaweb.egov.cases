@@ -14,30 +14,38 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.google.gson.Gson;
+import com.idega.block.web2.business.JQuery;
+import com.idega.block.web2.business.Web2Business;
+import com.idega.block.web2.business.Web2BusinessBean;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
+import com.idega.content.upload.servlet.ICFileUploadServlet;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
+import com.idega.facelets.ui.FaceletComponent;
 import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.io.UploadFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Script;
@@ -48,7 +56,6 @@ import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DropdownMenu;
-import com.idega.presentation.ui.FileInput;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Label;
@@ -60,23 +67,25 @@ import com.idega.user.business.UserSession;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.EmailValidator;
-import com.idega.util.FileUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
 import com.idega.util.text.SocialSecurityNumber;
+import com.idega.webface.WFUtil;
 
 public class CaseCreator extends ApplicationForm {
 
 	protected static final String PARAMETER_ACTION = "cc_prm_action";
-
+	public static final String PARAMETER_FILE = "file-id";
+	
 	protected static final String PARAMETER_REGARDING = "prm_regarding";
 	protected static final String PARAMETER_MESSAGE = "prm_message";
 	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
 	protected static final String PARAMETER_HIDE_OTHERS = "hide_others";
 	protected static final String PARAMETER_SUB_CASE_CATEGORY_PK = "prm_sub_case_category_pk";
 	protected static final String PARAMETER_CASE_TYPE_PK = "prm_case_type_pk";
-	protected static final String PARAMETER_ATTACHMENT_PK = "prm_file_pk";
 	protected static final String PARAMETER_PRIVATE = "prm_private";
 
 	private static final String PARAMETER_NAME = "prm_name";
@@ -209,7 +218,7 @@ public class CaseCreator extends ApplicationForm {
 			categories.setSelectedElement(category.getPrimaryKey().toString());
 		}
 		else {
-			categories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_category", "Select category"));
+			categories.addMenuElementFirst("", this.iwrb.getLocalizedString(getPrefix() + "case_creator.select_category1", "Select category"));
 			Collection<CaseCategory> parentCategories = getCasesBusiness(iwc).getCaseCategories();
 			Iterator<CaseCategory> iter = parentCategories.iterator();
 			while (iter.hasNext()) {
@@ -281,6 +290,7 @@ public class CaseCreator extends ApplicationForm {
 		if (messageText != null) {
 			message.setContent(messageText);
 		}
+		message.setMarkupAttribute("maxlength", "4000");
 
 		Layer helpLayer = new Layer(Layer.DIV);
 		helpLayer.setStyleClass("helperText");
@@ -345,16 +355,18 @@ public class CaseCreator extends ApplicationForm {
 		}
 
 		if (getCasesBusiness(iwc).allowAttachments()) {
-			FileInput file = new FileInput();
-			file.keepStatusOnAction(true);
-
-			formItem = new Layer(Layer.DIV);
-			formItem.setStyleClass("formItem");
-			formItem.setID("attachment");
-			label = new Label(this.iwrb.getLocalizedString("attachment", "Attachment"), file);
-			formItem.add(label);
-			formItem.add(file);
-			section.add(formItem);
+			section.add(getAttachmentsLayer(iwc));
+			
+//			FileInput file = new FileInput();
+//			file.keepStatusOnAction(true);
+//
+//			formItem = new Layer(Layer.DIV);
+//			formItem.setStyleClass("formItem");
+//			formItem.setID("attachment");
+//			label = new Label(this.iwrb.getLocalizedString("attachment", "Attachment"), file);
+//			formItem.add(label);
+//			formItem.add(file);
+//			section.add(formItem);
 		}
 
 		if (this.iShowRegarding) {
@@ -391,6 +403,7 @@ public class CaseCreator extends ApplicationForm {
 			formItem.setStyleClass("hasError");
 		}
 		label = new Label(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "message", "Message"))), message);
+		label.add(new Span(new Text(this.iwrb.getLocalizedString(getPrefix() + "4000_max_symbols", "(4000 symbols max)"))));
 		formItem.add(label);
 		formItem.add(message);
 		section.add(formItem);
@@ -539,6 +552,78 @@ public class CaseCreator extends ApplicationForm {
 
 		add(form);
 	}
+	private Layer getAttachmentsLayer(IWContext iwc) throws RemoteException{
+		Layer formItem = new Layer(Layer.DIV);
+		
+		List<String> scripts = new ArrayList<String>();
+		
+		Web2Business web2 = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
+		try{
+				JQuery  jQuery = web2.getJQuery();
+				scripts.add(jQuery.getBundleURIToJQueryLib());
+				scripts.add(jQuery.getBundleURIToJQueryUILib(Web2BusinessBean.JQUERY_UI_LATEST_VERSION,"jquery-ui.custom.min.js"));
+				scripts.addAll(web2.getBundleUrisToBlueimpFileUploadBasicScriptFiles());
+		}
+		catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed adding scripts no jQuery and it's plugins files were added");
+		}
+		IWBundle iwb = getBundle(iwc);
+		scripts.add(iwb.getVirtualPathWithFileNameString("javascript/multiple_ic_files_uploader.js"));
+		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
+		
+		FaceletComponent facelet = (FaceletComponent)iwc.getApplication().createComponent(FaceletComponent.COMPONENT_TYPE);
+		formItem.add(facelet);
+		facelet.setFaceletURI(iwb.getFaceletURI("multiple_ic_files_uploader.xhtml"));
+		formItem.add(getAttachmentsScript(iwc));
+		
+		return formItem;
+	}
+	private Collection<ICFile> getAttachments(IWContext iwc) throws IDOLookupException{
+		ICFileHome icFileHome = (ICFileHome) IDOLookup.getHome(ICFile.class);
+		try{
+			return icFileHome.getEntityCollectionForPrimaryKeys(getAttachmenstPks(iwc));
+		}catch (FinderException e) {
+		}
+		return Collections.emptyList();
+	}
+	private List<String> getAttachmenstPks(IWContext iwc){
+		String[] fileIds = 
+//			{"66","67"};
+			iwc.getParameterValues(PARAMETER_FILE);
+		if((fileIds == null) || (fileIds.length < 1)){
+			return Collections.emptyList();
+		}
+		ArrayList<String> pks = new ArrayList<String>(fileIds.length);
+		for(String pk : fileIds){
+			if(CoreConstants.EMPTY.equals(pk)){
+				continue;
+			}
+			pks.add(pk);
+		}
+		return pks;
+	}
+	private String getAttachmentsJson(IWContext iwc) throws IDOLookupException{
+		Collection<ICFile> icFiles = getAttachments(iwc);
+		if(ListUtil.isEmpty(icFiles)){
+			return "[]";
+		}
+		Collection<Map<String, Object>> files = new ArrayList<Map<String,Object>>(icFiles.size());
+		for(ICFile icFile : icFiles){
+			Map<String, Object> file = ICFileUploadServlet.getFileResponce(icFile);
+			files.add(file);
+		}
+		return new Gson().toJson(files);
+	}
+	private Layer getAttachmentsScript(IWContext iwc) throws RemoteException{
+		StringBuilder creationScript = new StringBuilder("jQuery(document).ready(function(){")
+				.append("\n\tjQuery('.ic-files-uploader').multipleICFilesUploader({")
+				.append("\n\t\ticFiles:").append(getAttachmentsJson(iwc))
+				.append("\n\t});")
+				.append("});");
+		Layer script = new Layer("script");
+		script.add(creationScript.toString());
+		return script;
+	}
 
 	protected void showOverview(IWContext iwc) throws RemoteException {
 		Locale locale = iwc.getCurrentLocale();
@@ -549,38 +634,39 @@ public class CaseCreator extends ApplicationForm {
 		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 
-		ICFile attachment = null;
-		UploadFile uploadFile = iwc.getUploadedFile();
-		if (uploadFile != null && uploadFile.getName() != null && uploadFile.getName().length() > 0) {
-			try {
-				FileInputStream input = new FileInputStream(uploadFile.getRealPath());
-
-				attachment = ((ICFileHome) IDOLookup.getHome(ICFile.class)).create();
-				attachment.setName(uploadFile.getName());
-				attachment.setMimeType(uploadFile.getMimeType());
-				attachment.setFileValue(input);
-				attachment.setFileSize((int) uploadFile.getSize());
-				attachment.store();
-
-				uploadFile.setId(((Integer) attachment.getPrimaryKey()).intValue());
-				try {
-					FileUtil.delete(uploadFile);
-				}
-				catch (Exception ex) {
-					System.err.println("MediaBusiness: deleting the temporary file at " + uploadFile.getRealPath() + " failed.");
-				}
-			}
-			catch (RemoteException e) {
-				e.printStackTrace(System.err);
-				uploadFile.setId(-1);
-			}
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			catch (CreateException ce) {
-				ce.printStackTrace();
-			}
-		}
+		Collection<ICFile> attachments = getAttachments(iwc);
+//		ICFile attachment = null;
+//		UploadFile uploadFile = iwc.getUploadedFile();
+//		if (uploadFile != null && uploadFile.getName() != null && uploadFile.getName().length() > 0) {
+//			try {
+//				FileInputStream input = new FileInputStream(uploadFile.getRealPath());
+//
+//				attachment = ((ICFileHome) IDOLookup.getHome(ICFile.class)).create();
+//				attachment.setName(uploadFile.getName());
+//				attachment.setMimeType(uploadFile.getMimeType());
+//				attachment.setFileValue(input);
+//				attachment.setFileSize((int) uploadFile.getSize());
+//				attachment.store();
+//
+//				uploadFile.setId(((Integer) attachment.getPrimaryKey()).intValue());
+//				try {
+//					FileUtil.delete(uploadFile);
+//				}
+//				catch (Exception ex) {
+//					System.err.println("MediaBusiness: deleting the temporary file at " + uploadFile.getRealPath() + " failed.");
+//				}
+//			}
+//			catch (RemoteException e) {
+//				e.printStackTrace(System.err);
+//				uploadFile.setId(-1);
+//			}
+//			catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//			catch (CreateException ce) {
+//				ce.printStackTrace();
+//			}
+//		}
 
 		CaseCategory category = null;
 		if (caseCategoryPK != null && !"".equals(caseCategoryPK)) {
@@ -628,6 +714,9 @@ public class CaseCreator extends ApplicationForm {
 		}
 		if (!this.iShowSenderInputs && !iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
+		}
+		if(!StringUtil.isEmpty(message) && (message.length() > 400)){
+			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_too_long", "Message can not be longer than 4000 symbols"));
 		}
 
 		if (iShowSenderInputs) {
@@ -681,9 +770,6 @@ public class CaseCreator extends ApplicationForm {
 		form.maintainParameter(PARAMETER_EMAIL);
 		form.maintainParameter(PARAMETER_PHONE);
 		form.maintainParameter(PARAMETER_REFERENCE);
-		if (attachment != null) {
-			form.add(new HiddenInput(PARAMETER_ATTACHMENT_PK, attachment.getPrimaryKey().toString()));
-		}
 
 		String headingText = this.iwrb.getLocalizedString(getPrefix() + (this.iUseAnonymous ? "anonymous_application.case_creator" : "application.case_creator"), "Case creator");
 		if (category != null) {
@@ -748,21 +834,24 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 		}
 
-		if (attachment != null) {
-			Link link = new Link(new Text(attachment.getName()));
-			link.setFile(attachment);
-			link.setTarget(Link.TARGET_BLANK_WINDOW);
-
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(link);
-
-			formItem = new Layer(Layer.DIV);
-			formItem.setStyleClass("formItem");
-			label = new Label();
-			label.setLabel(this.iwrb.getLocalizedString("attachment", "Attachment"));
-			formItem.add(label);
-			formItem.add(attachmentSpan);
-			section.add(formItem);
+		if(!ListUtil.isEmpty(attachments)){
+			for(ICFile attachment : attachments){
+				Link link = new Link(new Text(attachment.getName()));
+				link.setFile(attachment);
+				link.setTarget(Link.TARGET_BLANK_WINDOW);
+	
+				Layer attachmentSpan = new Layer(Layer.SPAN);
+				attachmentSpan.add(link);
+	
+				formItem = new Layer(Layer.DIV);
+				formItem.setStyleClass("formItem");
+				label = new Label();
+				label.setLabel(this.iwrb.getLocalizedString("attachment", "Attachment"));
+				formItem.add(label);
+				formItem.add(attachmentSpan);
+				section.add(formItem);
+				form.add(new HiddenInput(PARAMETER_FILE, attachment.getPrimaryKey().toString()));
+			}
 		}
 
 		if (this.iShowRegarding) {
@@ -879,7 +968,8 @@ public class CaseCreator extends ApplicationForm {
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
 		Object caseTypePK = iwc.getParameter(PARAMETER_CASE_TYPE_PK);
-		Object attachmentPK = iwc.getParameter(PARAMETER_ATTACHMENT_PK);
+		@SuppressWarnings("unchecked")
+		List<Object> attachmentsPks = (List<Object>)(List<?>)getAttachmenstPks(iwc);
 		boolean isPrivate = iwc.isParameterSet(PARAMETER_PRIVATE);
 		Locale locale = iwc.getCurrentLocale();
 
@@ -908,7 +998,7 @@ public class CaseCreator extends ApplicationForm {
 					log(fe);
 				}
 			}
-			GeneralCase theCase = getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentPK, regarding, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)), !iShowSenderInputs, null);
+			GeneralCase theCase = getCasesBusiness(iwc).storeGeneralCase(user, getCasesBusiness(iwc).useSubCategories() ? subCaseCategoryPK : caseCategoryPK, caseTypePK, attachmentsPks, regarding, message, getType(), isPrivate, getCasesBusiness(iwc).getIWResourceBundleForUser(user, iwc, this.getBundle(iwc)), !iShowSenderInputs, null);
 			if (iShowSenderInputs) {
 				theCase.setReference(reference);
 				theCase.store();

@@ -1,6 +1,8 @@
 package is.idega.idegaweb.egov.cases.data;
 
 
+import java.util.Collection;
+
 import com.idega.block.process.data.Case;
 import com.idega.core.file.data.ICFile;
 import com.idega.data.IDOEntity;
@@ -43,10 +45,11 @@ public interface GeneralCase extends IDOEntity, Case {
 	 */
 	public CaseType getCaseType();
 
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getAttachment
-	 */
-	public ICFile getAttachment();
+	public void addAttachment(ICFile file);
+	
+	public Collection<ICFile> getAttachments();
+	public void removeAllAttachments();
+	public void removeAttachment(ICFile file);
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#getHandledBy
@@ -118,10 +121,6 @@ public interface GeneralCase extends IDOEntity, Case {
 	 */
 	public void setCaseType(CaseType type);
 
-	/**
-	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setAttachment
-	 */
-	public void setAttachment(ICFile attachment);
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean#setHandledBy

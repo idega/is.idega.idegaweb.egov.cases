@@ -10,12 +10,14 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseCategoryHome;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -24,6 +26,7 @@ import javax.ejb.RemoveException;
 import com.idega.block.text.business.TextFinder;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.localisation.presentation.ICLocalePresentation;
+import com.idega.data.IDOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -64,6 +67,7 @@ public class CaseCategoryEditor extends CasesBlock {
 	private static final int ACTION_NEW = 3;
 	private static final int ACTION_SAVE = 4;
 	private static final int ACTION_DELETE = 5;
+	private static final int ACTION_HIDE = 6;
 
 	@Override
 	protected void present(IWContext iwc) throws Exception {
@@ -92,6 +96,11 @@ public class CaseCategoryEditor extends CasesBlock {
 			case ACTION_DELETE:
 				iwc.removeSessionAttribute(PARAMETER_CASE_CATEGORY_PK);
 				removeCategory(iwc);
+				showList(iwc);
+				break;
+			case ACTION_HIDE:
+				iwc.removeSessionAttribute(PARAMETER_CASE_CATEGORY_PK);
+				changeHiddenStatus(iwc);
 				showList(iwc);
 				break;
 		}
@@ -158,7 +167,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		column.setSpan(2);
 		column.setWidth("12");
 
-		Collection categories = getCasesBusiness().getCaseCategories();
+		Collection categories = getCasesBusiness().getCaseCategoriesForAdmins();
 
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
@@ -184,9 +193,13 @@ public class CaseCategoryEditor extends CasesBlock {
 		cell.add(new Text(getResourceBundle().getLocalizedString("edit", "Edit")));
 
 		cell = row.createHeaderCell();
-		cell.setStyleClass("lastColumn");
 		cell.setStyleClass("delete");
 		cell.add(new Text(getResourceBundle().getLocalizedString("delete", "Delete")));
+		
+		cell = row.createHeaderCell();
+		cell.setStyleClass("lastColumn");
+		cell.setStyleClass("hide");
+		cell.add(new Text(getResourceBundle().getLocalizedString("hide", "Hide")));
 		
 		group = table.createBodyRowGroup();
 		
@@ -243,7 +256,7 @@ public class CaseCategoryEditor extends CasesBlock {
 		delete.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
 		delete.setClickConfirmation(getResourceBundle().getLocalizedString("delete_confirmation", "Are you sure you want to delete this case category?"));
 		delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
-
+		
 		TableCell2 cell = row.createCell();
 		cell.setStyleClass("firstColumn");
 		cell.setStyleClass("name");
@@ -262,11 +275,21 @@ public class CaseCategoryEditor extends CasesBlock {
 		cell.setStyleClass("order");
 		cell.add(new Text(category.getOrder() != -1 ? String.valueOf(category.getOrder()) : "-"));
 
-		row.createCell().add(edit);
+		cell = row.createCell();
+		cell.setStyleClass("edit");
+		cell.add(edit);
+		
+		cell = row.createCell();
+		cell.setStyleClass("delete");
+		cell.add(delete);
+		
 		cell = row.createCell();
 		cell.setStyleClass("lastColumn");
-		cell.setStyleClass("edit");
-		cell.add(delete);
+		cell.setStyleClass("hide");
+		Link hide = new Link(category.isHidden() ? getResourceBundle().getLocalizedString("show", "Show") : getResourceBundle().getLocalizedString("hide", "Hide") );
+		hide.addParameter(PARAMETER_CASE_CATEGORY_PK, category.getPrimaryKey().toString());
+		hide.addParameter(PARAMETER_ACTION, ACTION_HIDE);
+		cell.add(hide);
 		
 		if (iRow % 2 == 0) {
 			row.setStyleClass("evenRow");
@@ -468,6 +491,17 @@ public class CaseCategoryEditor extends CasesBlock {
 		}
 		catch (FinderException fe) {
 			fe.printStackTrace();
+		}
+	}
+	private void changeHiddenStatus(IWContext iwc){
+		String caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
+		try {
+			CaseCategoryHome caseCategoryHome =  (CaseCategoryHome) IDOLookup.getHome(CaseCategory.class);
+			CaseCategory caseCategory = caseCategoryHome.findByPrimaryKey(caseCategoryPK);
+			caseCategory.setHidden(!caseCategory.isHidden());
+			caseCategory.store();
+		}catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed changing CaseCategory " + caseCategoryPK + " hidden status", e);
 		}
 	}
 	

@@ -115,6 +115,7 @@ import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.TextSoap;
@@ -196,7 +197,7 @@ public class HandlerCases extends CasesProcessor {
 		CaseCategory category = theCase.getCaseCategory();
 		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
-		ICFile attachment = theCase.getAttachment();
+		Collection<ICFile> attachments = theCase.getAttachments();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 
@@ -314,21 +315,23 @@ public class HandlerCases extends CasesProcessor {
 		element.add(createdDate);
 		section.add(element);
 
-		if (attachment != null) {
-			Link link = new Link(new Text(attachment.getName()));
-			link.setFile(attachment);
-			link.setTarget(Link.TARGET_BLANK_WINDOW);
-
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(link);
-
-			element = new Layer(Layer.DIV);
-			element.setStyleClass("formItem");
-			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
-			element.add(label);
-			element.add(attachmentSpan);
-			section.add(element);
+		if (!ListUtil.isEmpty(attachments)) {
+			for(ICFile attachment : attachments){
+				Link link = new Link(new Text(attachment.getName()));
+				link.setFile(attachment);
+				link.setTarget(Link.TARGET_BLANK_WINDOW);
+	
+				Layer attachmentSpan = new Layer(Layer.SPAN);
+				attachmentSpan.add(link);
+	
+				element = new Layer(Layer.DIV);
+				element.setStyleClass("formItem");
+				label = new Label();
+				label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+				element.add(label);
+				element.add(attachmentSpan);
+				section.add(element);
+			}
 		}
 
 		if (theCase.getSubject() != null) {

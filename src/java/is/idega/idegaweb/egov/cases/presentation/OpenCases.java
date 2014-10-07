@@ -18,12 +18,9 @@ import java.util.Collection;
 
 import javax.ejb.FinderException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.data.CaseLog;
 import com.idega.block.process.presentation.UserCases;
-import com.idega.block.process.variables.VisibleVariablesBean;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.file.data.ICFile;
@@ -38,7 +35,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
-import com.idega.util.expression.ELUtil;
+import com.idega.util.ListUtil;
 
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
@@ -94,7 +91,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		CaseCategory category = theCase.getCaseCategory();
 		CaseCategory parentCategory = category.getParent();
 		CaseType type = theCase.getCaseType();
-		ICFile attachment = theCase.getAttachment();
+		Collection<ICFile> files = theCase.getAttachments();
 		User owner = theCase.getOwner();
 		IWTimestamp created = new IWTimestamp(theCase.getCreated());
 
@@ -181,21 +178,23 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		element.add(createdDate);
 		section.add(element);
 
-		if (attachment != null) {
-			Link link = new Link(new Text(attachment.getName()));
-			link.setFile(attachment);
-			link.setTarget(Link.TARGET_BLANK_WINDOW);
-
-			Layer attachmentSpan = new Layer(Layer.SPAN);
-			attachmentSpan.add(link);
-
-			element = new Layer(Layer.DIV);
-			element.setStyleClass("formItem");
-			label = new Label();
-			label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
-			element.add(label);
-			element.add(attachmentSpan);
-			section.add(element);
+		if (!ListUtil.isEmpty(files)) {
+			for(ICFile attachment : files){
+				Link link = new Link(new Text(attachment.getName()));
+				link.setFile(attachment);
+				link.setTarget(Link.TARGET_BLANK_WINDOW);
+	
+				Layer attachmentSpan = new Layer(Layer.SPAN);
+				attachmentSpan.add(link);
+	
+				element = new Layer(Layer.DIV);
+				element.setStyleClass("formItem");
+				label = new Label();
+				label.setLabel(getResourceBundle().getLocalizedString("attachment", "Attachment"));
+				element.add(label);
+				element.add(attachmentSpan);
+				section.add(element);
+			}
 		}
 
 		if (theCase.getSubject() != null) {

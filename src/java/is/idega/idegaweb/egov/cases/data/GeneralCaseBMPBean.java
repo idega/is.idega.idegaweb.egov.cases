@@ -12,6 +12,7 @@ import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -50,6 +51,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_CASE_CATEGORY = "case_category";
 	private static final String COLUMN_CASE_TYPE = "case_type";
 	private static final String COLUMN_FILE = "ic_file_id";
+	private static final String RELATION_FILES = ENTITY_NAME + "_ic_file";
 	private static final String COLUMN_TYPE = "type";
 	private static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
@@ -108,11 +110,47 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		addManyToOneRelationship(COLUMN_FILE, ICFile.class);
 		addManyToOneRelationship(COLUMN_HANDLER, User.class);
 		addManyToManyRelationShip(User.class, COLUMN_CASE_SUBSCRIBERS);
+		addManyToManyRelationShip(ICFile.class, RELATION_FILES);
 		getEntityDefinition().setBeanCachingActiveByDefault(true, 1000);
 
 		addAttribute(COLUMN_REFERENCE, "Reference", String.class);
 
 		super.initializeAttributes();
+	}
+	
+	@Override
+	public void removeAllAttachments(){
+		try{
+			idoRemoveFrom(ICFile.class);
+		}catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed removing files from case " + getPrimaryKey(), e);
+		}
+	}
+	@Override
+	public void removeAttachment(ICFile file){
+		try{
+			idoRemoveFrom(file);
+		}catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed removing file " + file + " from case " + getPrimaryKey(), e);
+		}
+	}
+	@Override
+	public void addAttachment(ICFile file){
+		try{
+			idoAddTo(file);
+		}catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed adding file " + file + " to case " + getPrimaryKey(), e);
+		}
+	}
+	
+	@Override
+	public Collection<ICFile> getAttachments(){
+		try {
+			return idoGetRelatedEntities(ICFile.class);
+		} catch (IDORelationshipException e) {
+			getLogger().log(Level.WARNING, "Failed getting files of case " + getPrimaryKey(), e);
+		}
+		return Collections.emptyList();
 	}
 
 	// Getters
@@ -150,7 +188,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return (CaseType) getColumnValue(COLUMN_CASE_TYPE);
 	}
 
-	@Override
 	public ICFile getAttachment() {
 		return (ICFile) getColumnValue(COLUMN_FILE);
 	}
@@ -226,7 +263,6 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		setColumn(COLUMN_CASE_TYPE, type);
 	}
 
-	@Override
 	public void setAttachment(ICFile attachment) {
 		setColumn(COLUMN_FILE, attachment);
 	}
@@ -639,6 +675,14 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 		return idoFindPKsByQuery(query);
 	}
 
+	public Collection<Integer> getCasesWithONeToOneAttachments(int start,int max) throws FinderException{
+		Table generalCasesTable = new Table(this);
+
+		SelectQuery query = new SelectQuery(generalCasesTable);
+		query.addColumn(generalCasesTable, getIDColumnName());
+		query.addCriteria(new MatchCriteria(generalCasesTable, COLUMN_FILE, MatchCriteria.ISNOT, MatchCriteria.NULL));
+		return idoFindPKsByQuery(query, max, start);
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see is.idega.idegaweb.egov.cases.data.GeneralCase#isSubscribed(com.idega.user.data.User)

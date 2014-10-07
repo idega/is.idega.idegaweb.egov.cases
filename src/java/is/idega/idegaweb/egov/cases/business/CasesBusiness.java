@@ -171,6 +171,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategories
 	 */
 	public Collection<CaseCategory> getCaseCategories() throws RemoteException;
+	
+	public Collection<CaseCategory> getCaseCategoriesForAdmins();
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getSubCategories
@@ -211,6 +213,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb, boolean setType, Timestamp created) throws CreateException, RemoteException, RemoteException;
+
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Collection<Object> attachmentPKs, String regarding, String message, String type, boolean isPrivate, IWResourceBundle iwrb, boolean setType, Timestamp created) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase

@@ -631,4 +631,43 @@ td.string_ownerGradeComment, th.string_ownerGradeComment{
 	display:inline;
 	padding-left:2em;
 }
-	
+
+/* multiple files uploader*/
+.ic-files-uploader .div-row input{
+	display:inline;
+	display:inline-block;
+	width:160px;
+}
+.ic-files-uploader .div-row label{
+	display:inline;
+	display:inline-block;
+	width:130px;
+}
+.ic-files-uploader .trigger input{
+	display:inline;
+}
+.ic-files-uploader .trigger{
+	display:block;
+	text-align:right;
+}
+.ic-files-uploader table td .trigger{
+	position:static;
+}
+.ic-files-uploader .repeat-item td{
+	border: 1px dashed #000000;
+}
+.ic-files-uploader{
+	font-size: 12px;
+	line-height: 14px;
+	font-weight: bold;
+	font-family: "Lucida Grande", "Lucida Sans Unicode", Geneva, Arial, Verdana, sans-serif;
+}
+.ic-files-uploader{
+	width:350px;
+	padding:1em 0 1em 0;
+}
+.ic-files-uploader .uploads-table{
+	margin:0px;
+	width:340px;
+}
+/*------------------------*/

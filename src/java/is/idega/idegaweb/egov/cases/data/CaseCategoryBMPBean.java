@@ -39,6 +39,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	private static final String COLUMN_ORDER = "category_order";
 	private static final String COLUMN_PARENT_CATEGORY = "parent_category";
 	private static final String COLUMN_DELETED = "deleted";
+	public static final String COLUMN_HIDDEN = "hidden";
 
 	@Override
 	public String getEntityName() {
@@ -53,6 +54,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		addAttribute(COLUMN_DESCRIPTION, "Description", String.class, 4000);
 		addAttribute(COLUMN_ORDER, "Order", Integer.class);
 		addAttribute(COLUMN_DELETED, "Deleted", Boolean.class);
+		addAttribute(COLUMN_HIDDEN, "hidden", Boolean.class);
 
 		addManyToOneRelationship(COLUMN_HANDLER_GROUP, Group.class);
 		setNullable(COLUMN_HANDLER_GROUP, false);
@@ -143,6 +145,19 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 
 		return idoFindPKsByQuery(query);
 	}
+	public Collection ejbFindAllTopLevelCategoriesForAdmins() throws FinderException {
+		Table table = new Table(this);
+
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_PARENT_CATEGORY)));
+		query.addOrder(table, COLUMN_ORDER, true);
+		Criteria isNull = new MatchCriteria(new Column(table, COLUMN_DELETED), MatchCriteria.IS, MatchCriteria.NULL);
+		Criteria notEquals = new MatchCriteria(new Column(table, COLUMN_DELETED), MatchCriteria.NOTEQUALS, true);
+		query.addCriteria(new OR(isNull, notEquals));
+
+		return idoFindPKsByQuery(query);
+	}
 
 	public Collection ejbFindAllByName(String categoryName) throws FinderException {
 		Table table = new Table(this);
@@ -167,8 +182,13 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	}
 
 	private void addNotDeletedCriteria(Table table, SelectQuery query) {
+//		Deleted
 		Criteria isNull = new MatchCriteria(new Column(table, COLUMN_DELETED), MatchCriteria.IS, MatchCriteria.NULL);
 		Criteria notEquals = new MatchCriteria(new Column(table, COLUMN_DELETED), MatchCriteria.NOTEQUALS, true);
+		query.addCriteria(new OR(isNull, notEquals));
+//		Hidden
+		isNull = new MatchCriteria(new Column(table, COLUMN_HIDDEN), MatchCriteria.IS, MatchCriteria.NULL);
+		notEquals = new MatchCriteria(new Column(table, COLUMN_HIDDEN), MatchCriteria.NOTEQUALS, true);
 		query.addCriteria(new OR(isNull, notEquals));
 	}
 
@@ -269,6 +289,16 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	@Override
 	public void setDeleted(boolean deleted) {
 		setValue(COLUMN_DELETED, deleted);
+	}
+	
+	@Override
+	public boolean isHidden(){
+		return getBooleanColumnValue(COLUMN_HIDDEN);
+	}
+
+	@Override
+	public void setHidden(boolean hidden){
+		setValue(COLUMN_HIDDEN, hidden);
 	}
 
 }

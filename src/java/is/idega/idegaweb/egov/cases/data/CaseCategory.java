@@ -92,4 +92,9 @@ public interface CaseCategory extends IDOEntity {
 	public boolean isDeleted();
 
 	public void setDeleted(boolean deleted);
+	
+	public boolean isHidden();
+
+	public void setHidden(boolean hidden);
+	
 }

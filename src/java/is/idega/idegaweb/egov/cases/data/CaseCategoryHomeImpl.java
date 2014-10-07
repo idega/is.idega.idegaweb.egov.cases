@@ -2,6 +2,9 @@ package is.idega.idegaweb.egov.cases.data;
 
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -39,6 +42,24 @@ public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome
 		Collection ids = ((CaseCategoryBMPBean) entity).ejbFindAllTopLevelCategories();
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+	@Override
+	public Collection findAllTopLevelCategoriesForAdmins(){
+		try{
+			IDOEntity entity = this.idoCheckOutPooledEntity();
+			Collection ids = ((CaseCategoryBMPBean) entity).ejbFindAllTopLevelCategoriesForAdmins();
+			this.idoCheckInPooledEntity(entity);
+			return this.getEntityCollectionForPrimaryKeys(ids);
+		}catch (FinderException e) {
+			// TODO: handle exception
+		}catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed getting top level categories for admins", e);
+		}
+		return Collections.EMPTY_LIST;
+	}
+	
+	private Logger getLogger(){
+		return Logger.getLogger(CaseCategoryHomeImpl.class.getName());
 	}
 
 	@Override

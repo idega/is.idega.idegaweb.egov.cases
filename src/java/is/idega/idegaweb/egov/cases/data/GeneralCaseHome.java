@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.data;
 
 import java.sql.Date;
 import java.util.Collection;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
@@ -67,4 +68,13 @@ public interface GeneralCaseHome extends IDOHome {
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) throws FinderException;
 	
 	public Collection<Case> getCasesByIds(Collection<Integer> ids) throws FinderException;
+	
+	/**
+	 * @deprecated used only for refactoring to new structure with many to many relations
+	 * @param start
+	 * @param max
+	 * @return
+	 */
+	@Deprecated
+	public Collection<Case> getCasesWithONeToOneAttachments(int start,int max);
 }

@@ -1,0 +1,45 @@
+<div class="ic-files-uploader" id="file-id"
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:f="http://java.sun.com/jsf/core"
+		xmlns:ui="http://java.sun.com/jsf/facelets"
+		xmlns:content="http://xmlns.idega.com/com.idega.content" >
+	<div class="label">
+		#{localizedStrings['is.idega.idegaweb.egov.cases']['attachment']}
+	</div>
+   	<table class="uploads-table">
+   		<tbody>
+   		</tbody>
+   	</table>
+   	<div class="trigger" >
+    	<input type="button" value="#{localizedStrings['is.idega.idegaweb.egov.cases']['add_attachments']}" class="value add-attachments"/>
+    </div>
+<ui:fragment>
+	<div class="components-div" style="display:none;">
+		<table class="td-div">
+			<tbody>
+				<tr class="repeat-item">
+					<td>
+						<div class="div-row">
+							<label>
+								#{localizedStrings['is.idega.idegaweb.egov.cases']['uploaded_file_name']}
+							</label>
+							<span class="name-label" ></span>
+							<input type="hidden" name="file-id"/>
+							<input type="file"/>
+						</div>
+						<!-- TODO: add javascript for changing file name and then make this visible -->
+						<div class="div-row" style="display:none;">
+							<label class="label">#{localizedStrings['is.idega.idegaweb.egov.cases']['descriptive_name']}</label>
+							<input type="text" value="" class="value file-name" />
+						</div>
+						<div class="trigger">
+							<input type="button" class="value remove" 
+							value="#{localizedStrings['is.idega.idegaweb.egov.cases']['remove']}"/>
+		                </div>
+	 				</td>
+	 			</tr>
+			</tbody>
+		</table>
+	</div>
+</ui:fragment>
+</div>

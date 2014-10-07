@@ -2,6 +2,9 @@ package is.idega.idegaweb.egov.cases.data;
 
 import java.sql.Date;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -172,5 +175,21 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+	
+	private Logger getLogger(){
+		return Logger.getLogger(GeneralCaseHomeImpl.class.getName());
+	}
+	@Override
+	public Collection<Case> getCasesWithONeToOneAttachments(int start,int max){
+		try {
+			IDOEntity entity = this.idoCheckOutPooledEntity();
+			Collection<Integer> ids = ((GeneralCaseBMPBean) entity).getCasesWithONeToOneAttachments(start, max);
+			this.idoCheckInPooledEntity(entity);
+			return this.getEntityCollectionForPrimaryKeys(ids);
+		} catch (FinderException e) {
+			getLogger().log(Level.WARNING, "Failed getting attachments", e);
+		}
+		return Collections.emptyList();
 	}
 }
