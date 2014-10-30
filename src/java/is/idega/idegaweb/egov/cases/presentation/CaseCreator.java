@@ -79,7 +79,7 @@ public class CaseCreator extends ApplicationForm {
 
 	protected static final String PARAMETER_ACTION = "cc_prm_action";
 	public static final String PARAMETER_FILE = "file-id";
-	
+
 	protected static final String PARAMETER_REGARDING = "prm_regarding";
 	protected static final String PARAMETER_MESSAGE = "prm_message";
 	protected static final String PARAMETER_CASE_CATEGORY_PK = "prm_case_category_pk";
@@ -356,7 +356,7 @@ public class CaseCreator extends ApplicationForm {
 
 		if (getCasesBusiness(iwc).allowAttachments()) {
 			section.add(getAttachmentsLayer(iwc));
-			
+
 //			FileInput file = new FileInput();
 //			file.keepStatusOnAction(true);
 //
@@ -554,9 +554,9 @@ public class CaseCreator extends ApplicationForm {
 	}
 	private Layer getAttachmentsLayer(IWContext iwc) throws RemoteException{
 		Layer formItem = new Layer(Layer.DIV);
-		
+
 		List<String> scripts = new ArrayList<String>();
-		
+
 		Web2Business web2 = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		try{
 				JQuery  jQuery = web2.getJQuery();
@@ -570,12 +570,12 @@ public class CaseCreator extends ApplicationForm {
 		IWBundle iwb = getBundle(iwc);
 		scripts.add(iwb.getVirtualPathWithFileNameString("javascript/multiple_ic_files_uploader.js"));
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
-		
+
 		FaceletComponent facelet = (FaceletComponent)iwc.getApplication().createComponent(FaceletComponent.COMPONENT_TYPE);
 		formItem.add(facelet);
 		facelet.setFaceletURI(iwb.getFaceletURI("multiple_ic_files_uploader.xhtml"));
 		formItem.add(getAttachmentsScript(iwc));
-		
+
 		return formItem;
 	}
 	private Collection<ICFile> getAttachments(IWContext iwc) throws IDOLookupException{
@@ -587,7 +587,7 @@ public class CaseCreator extends ApplicationForm {
 		return Collections.emptyList();
 	}
 	private List<String> getAttachmenstPks(IWContext iwc){
-		String[] fileIds = 
+		String[] fileIds =
 //			{"66","67"};
 			iwc.getParameterValues(PARAMETER_FILE);
 		if((fileIds == null) || (fileIds.length < 1)){
@@ -610,7 +610,9 @@ public class CaseCreator extends ApplicationForm {
 		Collection<Map<String, Object>> files = new ArrayList<Map<String,Object>>(icFiles.size());
 		for(ICFile icFile : icFiles){
 			Map<String, Object> file = ICFileUploadServlet.getFileResponce(icFile);
-			files.add(file);
+			if (file != null) {
+				files.add(file);
+			}
 		}
 		return new Gson().toJson(files);
 	}
@@ -839,10 +841,10 @@ public class CaseCreator extends ApplicationForm {
 				Link link = new Link(new Text(attachment.getName()));
 				link.setFile(attachment);
 				link.setTarget(Link.TARGET_BLANK_WINDOW);
-	
+
 				Layer attachmentSpan = new Layer(Layer.SPAN);
 				attachmentSpan.add(link);
-	
+
 				formItem = new Layer(Layer.DIV);
 				formItem.setStyleClass("formItem");
 				label = new Label();
