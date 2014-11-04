@@ -335,8 +335,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 			jQuery.getBundleURIToJQueryLib(),
 			web2.getBundleUriToHumanizedMessagesScript(),
 			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE),
+			jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.TABLE_SORTER),
 
-			//web2.getBundleURIToTableSorterLibRootFolder("2.0") + "jquery.tablesorter.min.js",
 			CoreConstants.DWR_ENGINE_SCRIPT,
 			CoreConstants.DWR_UTIL_SCRIPT,
 			"/dwr/interface/BoardCasesManager.js",
@@ -856,6 +856,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	@Autowired
 	private WebUtil webUtil = null;
 
+	@Override
 	protected WebUtil getWebUtil() {
 		if (this.webUtil == null) {
 			ELUtil.getInstance().autowire(this);
