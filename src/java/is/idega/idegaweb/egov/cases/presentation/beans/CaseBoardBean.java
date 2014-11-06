@@ -1,24 +1,25 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
-import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
 import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
 
 public class CaseBoardBean {
-	
-	public static final String 
+
+	public static final String
 			CASE_CATEGORY = "string_ownerProjectLead",
 			CASE_SUM_OF_NEGATIVE_GRADES = "sum_all_negative_grades",
 			CASE_SUM_ALL_GRADES = "sum_all_grades",
@@ -35,14 +36,12 @@ public class CaseBoardBean {
 
 	private String linkToCase;
 
-	private String caseId;
+	private String caseId, grade, negativeGrade;
 	private Long processInstanceId;
 
 	private List<Map<String, String>> financingOfTheTasks;
 
-	private List<String> allValues;
-
-	private Map<String, String> values = null;
+	private Map<String, String> values = new HashMap<String, String>();
 
 	private User handler;
 
@@ -163,10 +162,6 @@ public class CaseBoardBean {
 		addValue(ProcessConstants.BOARD_FINANCING_DECISION, boardAmount);
 	}
 
-	public void setAllValues(List<String> allValues) {
-		this.allValues = allValues;
-	}
-
 	public String getCaseId() {
 		return caseId;
 	}
@@ -175,25 +170,20 @@ public class CaseBoardBean {
 		this.caseId = caseId;
 	}
 
-	public List<String> getAllValues() {
-		if (allValues == null) {
-			allValues = new ArrayList<String>(CasesBoardViewer.CASE_FIELDS.size());
-			allValues.addAll(getValues().values());
-			allValues.add(CoreConstants.EMPTY);							//	13	should be a table here...
-		}
-		return allValues;
-	}
-
 	public String getGradingSum() {
-		return getValues().get(CASE_SUM_ALL_GRADES);
+		String value = values.get(CASE_SUM_ALL_GRADES);
+		if (StringUtil.isEmpty(value)) {
+			return getGrade();
+		}
+		return value;
 	}
 
 	public void setGradingSum(String gradingSum) {
-		getValues().put(CASE_SUM_ALL_GRADES, gradingSum);
+		values.put(CASE_SUM_ALL_GRADES, gradingSum);
 	}
 
 	public void setNegativeGradingSum(String value){
-		getValues().put(CASE_SUM_OF_NEGATIVE_GRADES, value);
+		values.put(CASE_SUM_OF_NEGATIVE_GRADES, value);
 	}
 
 	public Long getProcessInstanceId() {
@@ -222,47 +212,52 @@ public class CaseBoardBean {
 
 	public void addValue(String name, String value) {
 		if (name != null && value != null) {
-			getValues().put(name, value);
+			values.put(name, value);
+		} else {
+			Logger.getLogger(getClass().getName()).warning("Name ('" + name + "') or value ('" + value + "') are not provided for " + getCaseIdentifier() + "!");
 		}
 	}
 
-	public void addValue(String name, BigDecimal value) {
+	public void addValue(String name, BigDecimal value, NumberFormat formatter) {
 		if (name != null && value != null) {
-			getValues().put(name, value.toPlainString());
+			String numberValue = formatter.format(value.doubleValue());
+			addValue(name, numberValue);
+
+			if (CASE_SUM_ALL_GRADES.equals(name)) {
+				setGrade(numberValue);
+			} else if (CASE_SUM_OF_NEGATIVE_GRADES.equals(name)) {
+				setNegativeGrade(numberValue);
+			}
+		} else {
+			Logger.getLogger(getClass().getName()).warning("Name ('" + name + "') or value ('" + value + "') are not provided for " + getCaseIdentifier() + "!");
 		}
 	}
 
-	private void addValue(
-			String variableName,
-			Long value) {
+	private void addValue(String variableName, Long value) {
 		if (value != null) {
 			addValue(variableName, value.toString());
 		}
 	}
 
-	public void addValues(Map<String, BigDecimal> values) {
+	public void addValues(Map<String, BigDecimal> values, Locale locale) {
 		if (!MapUtil.isEmpty(values)) {
-			for (Map.Entry<String,BigDecimal> entry : values.entrySet()) {
-				addValue(entry.getKey(), entry.getValue());
+			NumberFormat formatter = DecimalFormat.getNumberInstance(locale);
+			for (Map.Entry<String, BigDecimal> entry: values.entrySet()) {
+				addValue(entry.getKey(), entry.getValue(), formatter);
 			}
+		} else {
+			Logger.getLogger(getClass().getName()).warning("Values are not provided for " + getCaseIdentifier() + "!");
 		}
 	}
 
-	public Map<String, String> getValues() {
-		if (this.values == null) {
-			this.values = new HashMap<String, String>();
-		}
-
-		return values;
-	}
-	
 	public String getValue(String name) {
-		if (name == null)
+		if (name == null) {
 			return null;
+		}
 
-		return getValues().get(name);
+		return values.get(name);
 	}
-	
+
 	public BigDecimal getNumberValue(String name) {
 		String value = getValue(name);
 		if (!StringUtil.isEmpty(value)) {
@@ -275,26 +270,34 @@ public class CaseBoardBean {
 	@Override
 	public String toString() {
 		String string = "\n".concat(this.getClass().getSimpleName()).concat(": case ID: ").concat(caseId).concat(", process instance ID: ")
-				.concat(String.valueOf(processInstanceId)) + ",\n";
-		string = string + "----------------------------------VALUES------------------------------------\n";
-		for (Entry<String, String> variable : getValues().entrySet()) {
+				.concat(String.valueOf(processInstanceId)) + ", identifier: " + getCaseIdentifier() + "\n";
+		string = string + "----------------------------------------------------------------------\n";
+		for (Entry<String, String> variable : values.entrySet()) {
 			string = string + variable.getKey() + ": " + variable.getValue() + "\n";
 		}
 
 		string = string + "--------------------------FINANCING VALUES---------------------------\n";
-		
+
 		for (Map<String, String> task : getFinancingOfTheTasks()) {
 			for (Entry<String, String> variable : task.entrySet()) {
 				string = string + variable.getKey() + ": " + variable.getValue() + "\n";
 			}
 		}
-		
+
+		string = string + "--------------------------Grading sums---------------------------\n";
+		string += "Total grade: " + getGradingSum() + "\n";
+		string += "Negtative grade: " + getNegativeGradingSum() + "\n";
+
 		string = string + "---------------------------------------------------------------------------------";
 		return string;
 	}
 
 	public String getNegativeGradingSum(){
-		return getValue(CASE_SUM_OF_NEGATIVE_GRADES);
+		String value = getValue(CASE_SUM_OF_NEGATIVE_GRADES);
+		if (StringUtil.isEmpty(value)) {
+			return getNegativeGrade();
+		}
+		return value;
 	}
 
 	public List<Map<String, String>> getFinancingOfTheTasks() {
@@ -312,4 +315,21 @@ public class CaseBoardBean {
 	public void setLinkToCase(String linkToCase) {
 		this.linkToCase = linkToCase;
 	}
+
+	private String getGrade() {
+		return grade;
+	}
+
+	private void setGrade(String grade) {
+		this.grade = grade;
+	}
+
+	private String getNegativeGrade() {
+		return negativeGrade;
+	}
+
+	private void setNegativeGrade(String negativeGrade) {
+		this.negativeGrade = negativeGrade;
+	}
+
 }

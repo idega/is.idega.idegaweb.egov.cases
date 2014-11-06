@@ -98,29 +98,29 @@ public class CasesBoardViewer extends IWBaseComponent {
 								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
 
 	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_FULL_NAME, "Applicant"),									//	0
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GENDER, "Gender"),
-		new AdvancedProperty("string_ownerKennitala", "Personal ID"),								//	1
-		new AdvancedProperty("string_ownerAddress", "Address"),										//	2
-		new AdvancedProperty("string_ownerPostCode", "Zip"),										//	3
-		new AdvancedProperty("string_ownerMunicipality", "Municipality"),							//	4
-		new AdvancedProperty(ProcessConstants.CASE_IDENTIFIER, "Case nr."),							//	5
-		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),						//	6
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_FULL_NAME, "Applicant"),						//	0
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GENDER, "Gender"),							//	1
+		new AdvancedProperty("string_ownerKennitala", "Personal ID"),								//	2
+		new AdvancedProperty("string_ownerAddress", "Address"),										//	3
+		new AdvancedProperty("string_ownerPostCode", "Zip"),										//	4
+		new AdvancedProperty("string_ownerMunicipality", "Municipality"),							//	5
+		new AdvancedProperty(ProcessConstants.CASE_IDENTIFIER, "Case nr."),							//	6
+		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),						//	7
 
-		new AdvancedProperty("string_ownerTotalCost", "Total cost"),								//	7
-		new AdvancedProperty(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE, "Applied amount"),		//	8
+		new AdvancedProperty("string_ownerTotalCost", "Total cost"),								//	8
+		new AdvancedProperty(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE, "Applied amount"),		//	9
 
-		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),						//	9
+		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),						//	10
 
-		new AdvancedProperty("sum_all_negative_grades", "Negative grade"),							//	10
-		new AdvancedProperty("sum_all_grades", "Grade"),											//	11
+		new AdvancedProperty(CaseBoardBean.CASE_SUM_OF_NEGATIVE_GRADES, "Negative grade"),			//	11
+		new AdvancedProperty(CaseBoardBean.CASE_SUM_ALL_GRADES, "Grade"),							//	12
 
-		new AdvancedProperty(CaseBoardBean.CASE_CATEGORY, "Category"),								//	12,	EDITABLE, select
+		new AdvancedProperty(CaseBoardBean.CASE_CATEGORY, "Category"),								//	13,	EDITABLE, select
 
-		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	13, table of 4 columns
+		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	14, table of 4 columns
 
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GRADE, "Comment"),										//	14
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_ANSWER, "Restrictions")									//	15, EDITABLE, text area
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GRADE, "Comment"),							//	15
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_ANSWER, "Restrictions")						//	16, EDITABLE, text area
 	));
 
 	private static Map<String, String> EDITABLE_FIELDS;
