@@ -66,6 +66,7 @@ import com.idega.user.business.UserBusiness;
 import com.idega.user.business.UserSession;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.EmailValidator;
 import com.idega.util.ListUtil;
 import com.idega.util.PersonalIDFormatter;
@@ -558,23 +559,30 @@ public class CaseCreator extends ApplicationForm {
 		List<String> scripts = new ArrayList<String>();
 
 		Web2Business web2 = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
-		try{
-				JQuery  jQuery = web2.getJQuery();
-				scripts.add(jQuery.getBundleURIToJQueryLib());
-				scripts.add(jQuery.getBundleURIToJQueryUILib(Web2BusinessBean.JQUERY_UI_LATEST_VERSION,"jquery-ui.custom.min.js"));
-				scripts.addAll(web2.getBundleUrisToBlueimpFileUploadBasicScriptFiles());
-		}
-		catch (Exception e) {
-			getLogger().log(Level.WARNING, "Failed adding scripts no jQuery and it's plugins files were added");
+		try {
+			JQuery jQuery = web2.getJQuery();
+			scripts.add(jQuery.getBundleURIToJQueryLib());
+			scripts.add(jQuery.getBundleURIToJQueryUILib(Web2BusinessBean.JQUERY_UI_LATEST_VERSION,"jquery-ui.custom.min.js"));
+			scripts.addAll(web2.getBundleUrisToBlueimpFileUploadBasicScriptFiles());
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed adding scripts no jQuery and it's plugins files were added", e);
 		}
 		IWBundle iwb = getBundle(iwc);
 		scripts.add(iwb.getVirtualPathWithFileNameString("javascript/multiple_ic_files_uploader.js"));
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 
-		FaceletComponent facelet = (FaceletComponent)iwc.getApplication().createComponent(FaceletComponent.COMPONENT_TYPE);
+		FaceletComponent facelet = (FaceletComponent) iwc.getApplication().createComponent(FaceletComponent.COMPONENT_TYPE);
 		formItem.add(facelet);
 		facelet.setFaceletURI(iwb.getFaceletURI("multiple_ic_files_uploader.xhtml"));
 		formItem.add(getAttachmentsScript(iwc));
+
+		IWResourceBundle iwrb = iwb.getResourceBundle(iwc);
+		String action = "jQuery.fn.multipleICFilesUploader.locale = {loading: '" + iwrb.getLocalizedString("loading", "Loading...") + "', fileIsTooLarge: '" +
+				iwrb.getLocalizedString("file_is_too_large", "File is too large") + "', error: '" + iwrb.getLocalizedString("error", "Error") + "'}";
+		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+			action = "jQuery(window).load(function() {" + action + "});";
+		}
+		PresentationUtil.addJavaScriptActionToBody(iwc, action);
 
 		return formItem;
 	}
