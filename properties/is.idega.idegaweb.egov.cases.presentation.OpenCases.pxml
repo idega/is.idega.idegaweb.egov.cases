@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <pxml>
   <map>
     <key>
@@ -2210,6 +2209,72 @@
                   <name>iw_method_identifier</name>
                   <type>java.lang.String</type>
                   <value>:method:1:implied:void:setCommaSeparatedVariablesForExport:java.lang.String:</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+              </map>
+            </value>
+            <type>map</type>
+          </key>
+          <key>
+            <name>:method:1:implied:void:setCommaSeparatedExcludedHandlersIds:java.lang.String:</name>
+            <value>
+              <map>
+                <key>
+                  <name>iw_method_params</name>
+                  <value>
+                    <map>
+                      <key>
+                        <name>0</name>
+                        <value>
+                          <map>
+                            <key>
+                              <name>iw_method_param_handler</name>
+                              <type>java.lang.String</type>
+                              <value></value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                            <key>
+                              <name>iw_method_param_prim_key</name>
+                              <type>java.lang.Boolean</type>
+                              <value>false</value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                            <key>
+                              <name>iw_method_param_desc</name>
+                              <type>java.lang.String</type>
+                              <value>Excluded handlers id's</value>
+                              <simple>false</simple>
+                              <reload>false</reload>
+                            </key>
+                          </map>
+                        </value>
+                        <type>map</type>
+                      </key>
+                    </map>
+                  </value>
+                  <type>map</type>
+                </key>
+                <key>
+                  <name>iw_method_option_multiv</name>
+                  <type>java.lang.Boolean</type>
+                  <value>false</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+                <key>
+                  <name>iw_method_description</name>
+                  <type>java.lang.String</type>
+                  <value>Excluded handlers id's</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
+                </key>
+                <key>
+                  <name>iw_method_identifier</name>
+                  <type>java.lang.String</type>
+                  <value>:method:1:implied:void:setCommaSeparatedExcludedHandlersIds:java.lang.String:</value>
                   <simple>false</simple>
                   <reload>false</reload>
                 </key>

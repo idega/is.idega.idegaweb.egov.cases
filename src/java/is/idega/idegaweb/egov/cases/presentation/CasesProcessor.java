@@ -184,7 +184,8 @@ public abstract class CasesProcessor extends CasesBlock {
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
-			Logger.getLogger(getClassName()).log(Level.SEVERE, "Exception while displaying CasesProcessor", e);
+			Logger.getLogger(getClassName()).log(Level.SEVERE, 
+					"Exception while displaying CasesProcessor", e);
 		}
 	}
 
@@ -220,6 +221,9 @@ public abstract class CasesProcessor extends CasesBlock {
 		Layer topLayer = new Layer();
 		Form form = new Form();
 		form.addParameter(UserCases.PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
+		form.addParameter(
+				"commaSeparatedExcludedHandlersIdsProperty", 
+				getCommaSeparatedExcludedHandlersIds());
 		topLayer.add(form);
 		boolean showCheckBoxes = showCheckBoxes();
 		add(topLayer);
