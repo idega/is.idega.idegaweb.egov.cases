@@ -725,7 +725,7 @@ public class CaseCreator extends ApplicationForm {
 		if (!this.iShowSenderInputs && !iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
 		}
-		if(!StringUtil.isEmpty(message) && (message.length() > 400)){
+		if(!StringUtil.isEmpty(message) && (message.length() > 4000)){
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_too_long", "Message can not be longer than 4000 symbols"));
 		}
 
