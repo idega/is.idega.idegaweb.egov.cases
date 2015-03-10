@@ -11,35 +11,34 @@ import java.util.Map;
 
 import com.idega.block.process.data.Case;
 import com.idega.builder.bean.AdvancedProperty;
-import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.User;
 
 public interface BoardCasesManager {
-	
+
 	public static final String BEAN_NAME = "boardCasesManager";
 
 	/**
-	 * 
+	 *
 	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
-	 * @param dateFrom is floor of {@link Case#getCreated()}, 
+	 * @param dateFrom is floor of {@link Case#getCreated()},
 	 * skipped if <code>null</code>;
 	 * @param dateTo is ceiling of {@link Case#getCreated()},
 	 * skipped if <code>null</code>;
 	 */
 	public List<CaseBoardBean> getAllSortedCases(
-			Collection<String> caseStatus, 
-			String processName, 
-			String uuid, 
+			Collection<String> caseStatus,
+			String processName,
+			String uuid,
 			boolean isSubscribedOnly,
 			boolean backPage,
 			String taskName, Date dateFrom, Date dateTo);
 
 	/**
-	 * 
+	 *
 	 * <p>Construcs data for table to be shown.</p>
 	 * @param iwc - application context;
-	 * @param caseStatus of cases to add to table, for example: 
+	 * @param caseStatus of cases to add to table, for example:
 	 * "BVJD, INPR, FINI, ...";
 	 * @param processName is name of ProcessDefinition object;
 	 * @param customColumns - variable names, which should be shown as columns,
@@ -49,25 +48,25 @@ public interface BoardCasesManager {
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
 	public CaseBoardTableBean getTableData(
-			Collection<String> caseStatus, 
-			String processName, 
+			Collection<String> caseStatus,
+			String processName,
 			String uuid,
 			boolean isSubscribedOnly,
-			boolean useBasePage, 
+			boolean useBasePage,
 			String taskName);
 
 	/**
-	 * @param dateFrom is floor of {@link Case#getCreated()}, 
+	 * @param dateFrom is floor of {@link Case#getCreated()},
 	 * skipped if <code>null</code>;
 	 * @param dateTo is ceiling of {@link Case#getCreated()},
 	 * skipped if <code>null</code>;
 	 */
 	public CaseBoardTableBean getTableData(
-			Date dateFrom, 
+			Date dateFrom,
 			Date dateTo,
 			Collection<String> caseStatus,
-			String processName, 
-			String uuid, 
+			String processName,
+			String uuid,
 			boolean isSubscribedOnly,
 			boolean useBasePage,
 			String taskName);
