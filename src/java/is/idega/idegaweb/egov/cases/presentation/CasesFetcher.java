@@ -122,15 +122,6 @@ public class CasesFetcher extends CasesBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SHOW_RESULTS)) {
 			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
-			if (ListUtil.isEmpty(cases)) {
-				getLogger().warning("Did not find cases by parameters: parent category: " + parentCategory + ", category: " + category + ", type: " + type + ", status: " + status
-						+ ", from date: " + fromDate + ", to date: " +  toDate + ", anonymous: " + anonymous);
-			} else {
-				getLogger().info("Found cases: " + cases + " (total: " + cases.size() + ") by parameters: parent category: " + parentCategory + ", category: " + category + ", type: " + type + ", status: " + status
-						+ ", from date: " + fromDate + ", to date: " +  toDate + ", anonymous: " + anonymous);
-			}
-		} else {
-			getLogger().warning("No cases to show: parameter to show results is not set");
 		}
 	}
 
@@ -290,11 +281,8 @@ public class CasesFetcher extends CasesBlock {
 			section.add(clearLayer);
 
 			if (cases != null) {
-				getLogger().info("Have to print cases: " + cases);
 				form.add(getPrintouts(iwc));
 				form.add(getFileTable(iwc));
-			} else {
-				getLogger().warning("No printing cases");
 			}
 
 			add(form);
