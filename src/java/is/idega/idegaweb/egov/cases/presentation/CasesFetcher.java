@@ -7,6 +7,7 @@ import is.idega.idegaweb.egov.cases.business.CasesWriter;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 
 import java.rmi.RemoteException;
 import java.sql.Date;
@@ -21,6 +22,7 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.builder.data.ICPage;
+import com.idega.data.IDOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -120,6 +122,15 @@ public class CasesFetcher extends CasesBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SHOW_RESULTS)) {
 			cases = getCasesBusiness(iwc).getCasesByCriteria(parentCategory, category, type, status, fromDate, toDate, anonymous);
+			if (ListUtil.isEmpty(cases)) {
+				getLogger().warning("Did not find cases by parameters: parent category: " + parentCategory + ", category: " + category + ", type: " + type + ", status: " + status
+						+ ", from date: " + fromDate + ", to date: " +  toDate + ", anonymous: " + anonymous);
+			} else {
+				getLogger().info("Found cases: " + cases + " (total: " + cases.size() + ") by parameters: parent category: " + parentCategory + ", category: " + category + ", type: " + type + ", status: " + status
+						+ ", from date: " + fromDate + ", to date: " +  toDate + ", anonymous: " + anonymous);
+			}
+		} else {
+			getLogger().warning("No cases to show: parameter to show results is not set");
 		}
 	}
 
@@ -279,8 +290,11 @@ public class CasesFetcher extends CasesBlock {
 			section.add(clearLayer);
 
 			if (cases != null) {
+				getLogger().info("Have to print cases: " + cases);
 				form.add(getPrintouts(iwc));
 				form.add(getFileTable(iwc));
+			} else {
+				getLogger().warning("No printing cases");
 			}
 
 			add(form);
@@ -345,31 +359,57 @@ public class CasesFetcher extends CasesBlock {
 		group = table.createBodyRowGroup();
 		int iRow = 1;
 
-		User currentUser = iwc.getCurrentUser();
-
-		if (ListUtil.isEmpty(cases)) {
+		User currentUser = iwc.isLoggedOn() ? iwc.getCurrentUser() : null;
+		if (currentUser == null) {
+			getLogger().warning("User must be logged on");
 			return table;
 		}
 
+		boolean superAdmin = iwc.isSuperAdmin();
+
+		if (ListUtil.isEmpty(cases)) {
+			getLogger().info("No cases to show");
+			return table;
+		}
+
+		GeneralCaseHome generalCaseHome = (GeneralCaseHome) IDOLookup.getHome(GeneralCase.class);
 		for (Iterator<Case> iter = cases.iterator(); iter.hasNext();) {
 			Case object = iter.next();
-			if (!(object instanceof GeneralCase)) {
+			if (object == null) {
 				continue;
 			}
 
-			GeneralCase theCase = (GeneralCase) object;
+			GeneralCase theCase = null;
+			if (object instanceof GeneralCase) {
+				theCase = (GeneralCase) object;
+			} else {
+				try {
+					theCase = generalCaseHome.findByPrimaryKey(object.getId());
+				} catch (FinderException e) {}
+			}
+
+			if (theCase == null) {
+				getLogger().warning("Failed to resolve general case by ID: " + object.getId());
+				continue;
+			}
+
 			CaseCategory category = theCase.getCaseCategory();
-			if (category != null) {
+			if (!superAdmin && category != null) {
 				Group handlerGroup = category.getHandlerGroup();
 				if (handlerGroup != null && !currentUser.hasRelationTo(handlerGroup)) {
+					getLogger().warning(currentUser + " (ID: " + currentUser.getId() + ") can not see case (ID: " + theCase.getId() + ") from category " + category.getName() + " (ID: " + category.getPrimaryKey() + ")");
 					continue;
 				}
 			}
+
 			CaseType type = theCase.getCaseType();
+
 			CaseStatus status = theCase.getCaseStatus();
 			if (status.equals(getCasesBusiness().getCaseStatusDeleted())) {
+				getLogger().info("Case (ID: " + theCase.getId() + ") is deleted, skipping it");
 				continue;
 			}
+
 			User user = theCase.getOwner();
 			IWTimestamp created = new IWTimestamp(theCase.getCreated());
 			row = group.createRow();
