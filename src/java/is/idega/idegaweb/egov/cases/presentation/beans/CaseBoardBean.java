@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.user.data.User;
+import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
 
@@ -271,16 +272,20 @@ public class CaseBoardBean {
 	public String toString() {
 		String string = "\n".concat(this.getClass().getSimpleName()).concat(": case ID: ").concat(caseId).concat(", process instance ID: ")
 				.concat(String.valueOf(processInstanceId)) + ", identifier: " + getCaseIdentifier() + "\n";
-		string = string + "----------------------------------------------------------------------\n";
-		for (Entry<String, String> variable : values.entrySet()) {
-			string = string + variable.getKey() + ": " + variable.getValue() + "\n";
+
+		if (!MapUtil.isEmpty(values)) {
+			string = string + "----------------------------------------------------------------------\n";
+			for (Entry<String, String> variable : values.entrySet()) {
+				string = string + variable.getKey() + ": " + variable.getValue() + "\n";
+			}
 		}
 
-		string = string + "--------------------------FINANCING VALUES---------------------------\n";
-
-		for (Map<String, String> task : getFinancingOfTheTasks()) {
-			for (Entry<String, String> variable : task.entrySet()) {
-				string = string + variable.getKey() + ": " + variable.getValue() + "\n";
+		if (!ListUtil.isEmpty(getFinancingOfTheTasks())) {
+			string = string + "--------------------------FINANCING VALUES---------------------------\n";
+			for (Map<String, String> task : getFinancingOfTheTasks()) {
+				for (Entry<String, String> variable : task.entrySet()) {
+					string = string + variable.getKey() + ": " + variable.getValue() + "\n";
+				}
 			}
 		}
 
