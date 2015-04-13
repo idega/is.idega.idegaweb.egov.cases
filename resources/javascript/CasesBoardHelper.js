@@ -64,7 +64,6 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 			});
 			jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput', line), function() {
 				CasesBoardHelper.initializeEditableCell(jQuery(this), {
-					type:		'textinput',
 					rerender:	false,
 					recount:	true
 				}, 'textinput');
