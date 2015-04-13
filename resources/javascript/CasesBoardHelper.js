@@ -51,27 +51,24 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 		});
 	});
 
-	jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect'), function() {
-		jQuery(this).mouseover(function() {
+	jQuery('tr', 'tbody.casesBoardViewerBodyRows').mouseover(function() {
+		var line = jQuery(this);
+		
+		jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect', line), function() {
 			CasesBoardHelper.initializeEditableCell(jQuery(this), {
 				data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
 				type:		'select',
 				rerender:	false
 			}, 'select');
 		});
-	});
-	
-	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput'), function() {
-		jQuery(this).mouseover(function() {
+		jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput', line), function() {
 			CasesBoardHelper.initializeEditableCell(jQuery(this), {
-				rerender:	false,
-				recount:	true
-			}, 'textinput');
+				data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
+				type:		'select',
+				rerender:	false
+			}, 'select');
 		});
-	});
-	
-	jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextarea'), function() {
-		jQuery(this).mouseover(function() {
+		jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextarea', line), function() {
 			CasesBoardHelper.initializeEditableCell(jQuery(this), {
 				type:		'textarea',
 				rerender:	false
