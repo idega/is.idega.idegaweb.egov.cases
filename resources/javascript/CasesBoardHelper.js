@@ -51,29 +51,33 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 		});
 	});
 
-	jQuery('tr', 'tbody.casesBoardViewerBodyRows').mouseover(function() {
+	jQuery('tr', 'table.casesBoardViewerTable').mouseover(function() {
 		var line = jQuery(this);
-		
-		jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect', line), function() {
-			CasesBoardHelper.initializeEditableCell(jQuery(this), {
-				data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
-				type:		'select',
-				rerender:	false
-			}, 'select');
-		});
-		jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput', line), function() {
-			CasesBoardHelper.initializeEditableCell(jQuery(this), {
-				data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
-				type:		'select',
-				rerender:	false
-			}, 'select');
-		});
-		jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextarea', line), function() {
-			CasesBoardHelper.initializeEditableCell(jQuery(this), {
-				type:		'textarea',
-				rerender:	false
-			}, 'textarea');
-		});
+		var inlineEditInitialized = 'inline-edit-initialized';
+		if (!line.hasClass(inlineEditInitialized)) {
+			jQuery.each(jQuery('td.casesBoardViewerTableEditableCellselect', line), function() {
+				CasesBoardHelper.initializeEditableCell(jQuery(this), {
+					data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
+					type:		'select',
+					rerender:	false
+				}, 'select');
+			});
+			jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextinput', line), function() {
+				CasesBoardHelper.initializeEditableCell(jQuery(this), {
+					data:		"{'no_value': '"+CasesBoardHelper.localizations.remove+"', 'A-': 'A-', 'A': 'A', 'A+': 'A+', 'B': 'B', 'C': 'C'}",
+					type:		'select',
+					rerender:	false
+				}, 'select');
+			});
+			jQuery.each(jQuery('td.casesBoardViewerTableEditableCelltextarea', line), function() {
+				CasesBoardHelper.initializeEditableCell(jQuery(this), {
+					type:		'textarea',
+					rerender:	false
+				}, 'textarea');
+			});
+			
+			line.addClass(inlineEditInitialized);
+		}
 	});
 	
 	jQuery('a.casesBoardViewCustomizer').each(function() {
