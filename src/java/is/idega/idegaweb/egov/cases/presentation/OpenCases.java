@@ -112,7 +112,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		}
 
 		Layer caseType = new Layer(Layer.SPAN);
-		caseType.add(new Text(type.getName()));
+		caseType.add(new Text(type == null ? CoreConstants.MINUS : type.getName()));
 
 		Layer caseCategory = new Layer(Layer.SPAN);
 		caseCategory.add(new Text(category == null ? CoreConstants.MINUS : category.getLocalizedCategoryName(iwc.getCurrentLocale())));
