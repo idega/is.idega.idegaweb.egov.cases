@@ -34,6 +34,7 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
+import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 
@@ -89,7 +90,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
-		CaseCategory parentCategory = category.getParent();
+		CaseCategory parentCategory = category == null ? null : category.getParent();
 		CaseType type = theCase.getCaseType();
 		Collection<ICFile> files = theCase.getAttachments();
 		User owner = theCase.getOwner();
@@ -114,7 +115,7 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		caseType.add(new Text(type.getName()));
 
 		Layer caseCategory = new Layer(Layer.SPAN);
-		caseCategory.add(new Text(category.getLocalizedCategoryName(iwc.getCurrentLocale())));
+		caseCategory.add(new Text(category == null ? CoreConstants.MINUS : category.getLocalizedCategoryName(iwc.getCurrentLocale())));
 
 		Layer message = new Layer(Layer.SPAN);
 		message.add(new Text(theCase.getMessage()));
@@ -183,10 +184,10 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 				Link link = new Link(new Text(attachment.getName()));
 				link.setFile(attachment);
 				link.setTarget(Link.TARGET_BLANK_WINDOW);
-	
+
 				Layer attachmentSpan = new Layer(Layer.SPAN);
 				attachmentSpan.add(link);
-	
+
 				element = new Layer(Layer.DIV);
 				element.setStyleClass("formItem");
 				label = new Label();
