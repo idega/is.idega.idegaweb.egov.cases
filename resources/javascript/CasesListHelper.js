@@ -472,6 +472,7 @@ function searchForCases(parameters) {
 	var onlySubscribedCases = false;
 	var casesListCustomizer = null;
 	var customColumns = null;
+	var customColumnsForExport = null;
 	var showLoadingMessageAttr = true;
 	var showAttachmentStatistics = false;
 	var showUserProfilePicture = true;
@@ -492,6 +493,7 @@ function searchForCases(parameters) {
 		casesListCustomizer = gridOpener.attr('caseslistcustomizer');
 		
 		customColumns = gridOpener.attr('customcolumns');
+		customColumnsForExport = gridOpener.attr('customcolumnsforexport');
 		
 		showAttachmentStatistics = gridOpener.attr('showAttachmentStatistics');
 		showUserProfilePicture = gridOpener.attr('showUserProfilePicture');
@@ -500,6 +502,9 @@ function searchForCases(parameters) {
 		
 		if (customColumns != null)
 			customColumns = customColumns.split(',');
+		if (customColumnsForExport != null) {
+			customColumnsForExport = customColumnsForExport.split(',');
+		}
 			
 		caseCodes = gridOpener.attr('casecodes');
 	}
@@ -516,8 +521,8 @@ function searchForCases(parameters) {
 		dateRangeValue, caseListType, contact, usePDFDownloadColumn, allowPDFSigning, showStatistics, CasesListHelper.processVariables,
 		hideEmptySection, showCaseNumberColumn,	showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1,
 		dwr.util.getValue(jQuery('select.listPagerSize').attr('id')), jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'),
-		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId,showAttachmentStatistics,
-		showUserProfilePicture,addExportContacts,showUserCompany,caseCodes
+		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId, showAttachmentStatistics,
+		showUserProfilePicture, addExportContacts, showUserCompany, caseCodes, customColumnsForExport
 	);
 	criterias.clearResults = true;
 	criterias.address = addressValue;
@@ -684,7 +689,7 @@ CasesListHelper.getStatusesToHide = function() {
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact,
 	usePDFDownloadColumn, allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
 	instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns,
-	showLoadingMessageAttr, groupId,showAttachmentStatistics,showUserProfilePicture,addExportContacts,showUserCompany,caseCodes) {
+	showLoadingMessageAttr, groupId, showAttachmentStatistics, showUserProfilePicture, addExportContacts, showUserCompany, caseCodes, customColumnsForExport) {
 	
 	this.subscribersGroupId = groupId;
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
@@ -727,6 +732,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	
 	this.casesListCustomizer = casesListCustomizer;
 	this.customColumns = customColumns;
+	this.exportColumns = customColumnsForExport;
 	
 	this.showLoadingMessage = showLoadingMessageAttr;
 	this.showAttachmentStatistics = showAttachmentStatistics;

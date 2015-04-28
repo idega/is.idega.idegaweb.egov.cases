@@ -628,26 +628,29 @@ public class CasesBoardViewer extends IWBaseComponent {
 			index++;
 		}
 
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN)
-				.append("VariableName").toString(), CaseBoardBean.CASE_CATEGORY));
-
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT)
-				.append(ProcessConstants.BOARD_FINANCING_SUGGESTION).toString(), ProcessConstants.BOARD_FINANCING_SUGGESTION));
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT)
-				.append(ProcessConstants.BOARD_FINANCING_DECISION).toString(),	ProcessConstants.BOARD_FINANCING_DECISION));
-
-		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA)
-				.append("VariableName").toString(), CaseBoardBean.CASE_OWNER_ANSWER));
+		container.add(
+				new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_DROPDOWN).append("VariableName").toString(), CaseBoardBean.CASE_CATEGORY)
+		);
+		container.add(
+				new HiddenInput(
+						new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append(ProcessConstants.BOARD_FINANCING_SUGGESTION).toString(),
+						ProcessConstants.BOARD_FINANCING_SUGGESTION)
+		);
+		container.add(
+				new HiddenInput(
+						new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_INPUT).append(ProcessConstants.BOARD_FINANCING_DECISION).toString(),
+						ProcessConstants.BOARD_FINANCING_DECISION)
+		);
+		container.add(new HiddenInput(new StringBuilder("casesBoardViewerTableEditableCell").append(EDITABLE_FIELD_TYPE_TEXT_AREA).append("VariableName").toString(), CaseBoardBean.CASE_OWNER_ANSWER));
 
 		container.add(new HiddenInput("casesBoardViewerTableRoleKey", StringUtil.isEmpty(roleKey) ? CoreConstants.EMPTY : roleKey));
-
 		container.add(new HiddenInput("casesBoardViewerTableUniqueIdKey", getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this)));
 		container.add(new HiddenInput("casesBoardViewerTableContainerKey", container.getId()));
 		container.add(new HiddenInput("casesBoardViewerTableTotalBoardSuggestionCellIdKey", boardSuggestionTotalCellId));
 		container.add(new HiddenInput("casesBoardViewerTableTotalBoardAmountCellIdKey", boardDecisionTotalCellId));
-		if (useCurrentPageAsBackPageFromTaskViewer)
+		if (useCurrentPageAsBackPageFromTaskViewer) {
 			container.add(new HiddenInput("casesBoardViewerTableSpecialBackPageFromTaskViewer", getCurrentPageUri(iwc)));
-
+		}
 		String initAction = new StringBuilder("jQuery('#").append(table.getId()).append("').tablesorter({cssChildRow: 'childRow'});").toString();
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc))
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();

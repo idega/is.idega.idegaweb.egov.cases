@@ -249,8 +249,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute(usePDFDownloadColumnParName, String.valueOf(properties.isUsePDFDownloadColumn()));
 		layer.setMarkupAttribute(allowPDFSigningParName, String.valueOf(properties.isAllowPDFSigning()));
 		layer.setMarkupAttribute("hideemptysection", String.valueOf(properties.isHideEmptySection()));
-		if (!StringUtil.isEmpty(properties.getCommentsManagerIdentifier()))
+		if (!StringUtil.isEmpty(properties.getCommentsManagerIdentifier())) {
 			layer.setMarkupAttribute("commentsmanageridentifier", properties.getCommentsManagerIdentifier());
+		}
 		layer.setMarkupAttribute("showattachmentstatistics", properties.isShowAttachmentStatistics());
 		layer.setMarkupAttribute("showonlycreatorincontacts", properties.isShowOnlyCreatorInContacts());
 		layer.setMarkupAttribute("namefromexternalentity", properties.isNameFromExternalEntity());
@@ -262,12 +263,18 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		layer.setMarkupAttribute("addExportContacts", properties.isAddExportContacts());
 		layer.setMarkupAttribute("showUserCompany", properties.isShowUserCompany());
 		layer.setMarkupAttribute("showLastLoginDate", properties.isShowLastLoginDate());
-		if (!StringUtil.isEmpty(properties.getSpecialBackPage()))
+		if (!StringUtil.isEmpty(properties.getSpecialBackPage())) {
 			layer.setMarkupAttribute("specialbackpage", properties.getSpecialBackPage());
-		if (!StringUtil.isEmpty(properties.getCasesListCustomizer()))
+		}
+		if (!StringUtil.isEmpty(properties.getCasesListCustomizer())) {
 			layer.setMarkupAttribute("caseslistcustomizer", properties.getCasesListCustomizer());
-		if (!ListUtil.isEmpty(properties.getCustomColumns()))
+		}
+		if (!ListUtil.isEmpty(properties.getCustomColumns())) {
 			layer.setMarkupAttribute("customcolumns", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCustomColumns()));
+		}
+		if (!ListUtil.isEmpty(properties.getCustomColumnsForExport())) {
+			layer.setMarkupAttribute("customcolumnsforexport", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCustomColumnsForExport()));
+		}
 		layer.setMarkupAttribute("casecodes", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCaseCodes()));
 	}
 
