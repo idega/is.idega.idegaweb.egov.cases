@@ -117,7 +117,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		super.initializeAttributes();
 	}
-	
+
 	@Override
 	public void removeAllAttachments(){
 		try{
@@ -142,7 +142,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			getLogger().log(Level.WARNING, "Failed adding file " + file + " to case " + getPrimaryKey(), e);
 		}
 	}
-	
+
 	@Override
 	public Collection<ICFile> getAttachments(){
 		try {
@@ -492,8 +492,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			return idoFindPKsByQuery(query);
 		} finally {
 			if (measureSQL) {
-				java.util.logging.Logger.getLogger(getClass().getName()).info("Query '" + query.toString() + "' was executed in " +
-						(System.currentTimeMillis() - start) + " ms");
+				CoreUtil.doDebugSQL(start, System.currentTimeMillis(), query.toString());
 			}
 		}
 	}
@@ -648,8 +647,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			return idoFindPKsByQuery(query);
 		} finally {
 			if (measureSQL) {
-				java.util.logging.Logger.getLogger(getClass().getName()).info("Query '" + query.toString() + "' was executed in " +
-						(System.currentTimeMillis() - start) + " ms");
+				CoreUtil.doDebugSQL(start, System.currentTimeMillis(), query.toString());
 			}
 		}
 	}
