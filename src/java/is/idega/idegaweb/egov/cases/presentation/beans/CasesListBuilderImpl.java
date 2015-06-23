@@ -276,6 +276,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			layer.setMarkupAttribute("customcolumnsforexport", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCustomColumnsForExport()));
 		}
 		layer.setMarkupAttribute("casecodes", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCaseCodes()));
+		layer.setMarkupAttribute("useXMLDataProvider", properties.isUseXMLDataProvider());
 	}
 
 	private Serializable getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
@@ -685,6 +686,11 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
 
+			String navigatorPosition = properties.getCaseNavigationBlockPosition() == null ? "top" : properties.getCaseNavigationBlockPosition();
+			
+			if (!navigatorPosition.equals("top") && !navigatorPosition.equals("bottom"))
+				navigatorPosition = "top";
+			
 			String emailAddress = getDefaultEmail();
 
 			boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
@@ -696,7 +702,8 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			int totalCases = getTotalCases(cases, searchResults, properties);
 
-			addNavigator(iwc, container, cases, properties, totalCases, searchResults);
+			if (navigatorPosition.equals("top"))
+				addNavigator(iwc, container, cases, properties, totalCases, searchResults);
 
 			IWResourceBundle iwrb = getResourceBundle(iwc);
 			CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -752,6 +759,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			if (showStatistics)
 				addStatistics(iwc, container, casesInList);
+
+			if (navigatorPosition.equals("bottom"))
+				addNavigator(iwc, container, cases, properties, totalCases, searchResults);
 
 			return container;
 		} finally {
@@ -883,9 +893,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
 		int totalCases = getTotalCases(cases, searchResults, properties);
 
+		String navigatorPosition = properties.getCaseNavigationBlockPosition() == null ? "top" : properties.getCaseNavigationBlockPosition();
+		
+		if (!navigatorPosition.equals("top") && !navigatorPosition.equals("bottom"))
+			navigatorPosition = "top";
+				
 		addProperties(container, properties);
 
-		addNavigator(iwc, container, cases,	properties, totalCases, searchResults);
+		if (navigatorPosition.equals("top"))
+			addNavigator(iwc, container, cases, properties, totalCases, searchResults);
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		CasesBusiness casesBusiness = getCasesBusiness(iwc);
@@ -939,7 +955,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		if (showStatistics)
 			addStatistics(iwc, container, casesInList);
-
+		
+		if (navigatorPosition.equals("bottom"))
+			addNavigator(iwc, container, cases, properties, totalCases, searchResults);
+		
 		return container;
 	}
 

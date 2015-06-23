@@ -147,7 +147,7 @@ function registerGridExpanderActionsForElement(event, element) {
 	}
 	
 	if (event) {
-		if (event.target != element) {
+		if ((event.target != element) && (event.target != element.firstChild)){
 			if (event.stopPropagation) {
 				event.stopPropagation();
 			}
@@ -223,13 +223,14 @@ function registerGridExpanderActionsForElement(event, element) {
 		var addExportContacts = caseToExpand.attr('addExportContacts') == 'true';
 		var showUserCompany = caseToExpand.attr('showUserCompany') == 'true';
 		var showLastLoginDate = caseToExpand.attr('showLastLoginDate') == 'true';
+		var usexmldataprovider = caseToExpand.attr('usexmldataprovider') == 'true';
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, 
 				CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, 
 				allowPDFSigning, hideEmptySection, commentsManagerIdentifier, 
 				showAttachmentStatistics, showOnlyCreatorInContacts, 
 				showLogExportButton, showComments, showContacts, specialBackPage,
 				nameFromExternalEntity, showUserProfilePicture,addExportContacts,
-				showUserCompany,showLastLoginDate), {
+				showUserCompany,showLastLoginDate,usexmldataprovider), {
 			callback: function(component) {
 				if (component == null) {
 					closeAllLoadingMessages();
@@ -256,7 +257,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 		showAttachmentStatistics, showOnlyCreatorInContacts, 
 		showLogExportButton, showComments, showContacts, 
 		specialBackPage, nameFromExternalEntity, showUserProfilePicture,addExportContacts,
-		showUserCompany,showLastLoginDate) {
+		showUserCompany,showLastLoginDate,usexmldataprovider) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -280,6 +281,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 	this.addExportContacts = addExportContacts;
 	this.showUserCompany = showUserCompany;
 	this.showLastLoginDate = showLastLoginDate;
+	this.usexmldataprovider = usexmldataprovider;
 }
 
 CasesListHelper.getPager = function(fromPager, page) {
