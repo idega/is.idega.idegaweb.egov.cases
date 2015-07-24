@@ -26,6 +26,7 @@ import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.JQueryPlugin;
+import com.idega.block.web2.business.JQueryUIType;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.AdvancedPropertyComparator;
@@ -146,10 +147,14 @@ public class CasesSearcher extends CasesBlock {
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 				getJQuery().getBundleURIToJQueryLib(),
 				getWeb2Business().getBundleUriToHumanizedMessagesScript(),
-				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.core.js"),
-				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.widget.js"),
-				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.mouse.js"),
-				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.sortable.js"),
+				getJQuery().getBundleURIToJQueryUILib(JQueryUIType.UI_CORE),
+				getJQuery().getBundleURIToJQueryUILib(JQueryUIType.UI_WIDGET),
+				getJQuery().getBundleURIToJQueryUILib(JQueryUIType.UI_MOUSE),
+				getJQuery().getBundleURIToJQueryUILib(JQueryUIType.UI_SORTABLE),
+//				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.core.js"),
+//				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.widget.js"),
+//				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.mouse.js"),
+//				getJQuery().getBundleURIToJQueryUILib("1.8.17", "ui.sortable.js"),
 				getJQuery().getBundleURIToJQueryPlugin(JQueryPlugin.URL_PARSER),
 				bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE),
 				CoreConstants.DWR_ENGINE_SCRIPT,
