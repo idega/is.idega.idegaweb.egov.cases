@@ -725,6 +725,9 @@ public class CaseCreator extends ApplicationForm {
 		if (!this.iShowSenderInputs && !iwc.isParameterSet(PARAMETER_MESSAGE)) {
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
 		}
+		if (StringUtil.isEmpty(message)) {
+			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_empty", "You must enter a message"));
+		}
 		if(!StringUtil.isEmpty(message) && (message.length() > 4000)){
 			setError(PARAMETER_MESSAGE, this.iwrb.getLocalizedString(getPrefix() + "case_creator.message_too_long", "Message can not be longer than 4000 symbols"));
 		}
@@ -974,6 +977,10 @@ public class CaseCreator extends ApplicationForm {
 		String regarding = iwc.getParameter(PARAMETER_REGARDING);
 		String message = getMessageParameterValue(iwc);
 		iwc.removeSessionAttribute(PARAMETER_MESSAGE);
+		if (StringUtil.isEmpty(message)) {
+			showOverview(iwc);
+			return;
+		}
 
 		Object caseCategoryPK = iwc.getParameter(PARAMETER_CASE_CATEGORY_PK);
 		Object subCaseCategoryPK = iwc.getParameter(PARAMETER_SUB_CASE_CATEGORY_PK);
