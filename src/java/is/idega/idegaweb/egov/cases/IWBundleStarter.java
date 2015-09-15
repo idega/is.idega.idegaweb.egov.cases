@@ -9,12 +9,6 @@
  */
 package is.idega.idegaweb.egov.cases;
 
-import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean;
-import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +21,12 @@ import com.idega.idegaweb.IWBundleStartable;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.util.ListUtil;
+
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.data.GeneralCaseBMPBean;
+import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 
 public class IWBundleStarter implements IWBundleStartable {
@@ -41,7 +41,7 @@ public class IWBundleStarter implements IWBundleStartable {
 	@Override
 	public void stop(IWBundle starterBundle) {
 	}
-	
+
 	private void registerCaseChangeListener(IWBundle starterBundle) {
 	}
 	private Logger getLogger(){
@@ -70,7 +70,7 @@ public class IWBundleStarter implements IWBundleStartable {
 				count = count + max;
 				getLogger().info("Refactored " + count + " cases");
 			}
-			settings.setProperty("refactored_cases_files_many_to_many", "true");
+			settings.setProperty("refactored_cases_mtm", "true");
 			getLogger().info("Refactored generalCases for many to many relation");
 		}catch (Exception e) {
 			getLogger().log(Level.WARNING, "Failed refactoring database for many to many case attachments", e);
