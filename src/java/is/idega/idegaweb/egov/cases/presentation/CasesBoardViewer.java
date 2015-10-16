@@ -1,12 +1,5 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
-import is.idega.idegaweb.egov.cases.media.CasesBoardViewerExporter;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +28,7 @@ import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.core.idgenerator.business.UUIDGenerator;
+import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
@@ -73,6 +67,13 @@ import com.idega.util.StringUtil;
 import com.idega.util.URIUtil;
 import com.idega.util.WebUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
+import is.idega.idegaweb.egov.cases.media.CasesBoardViewerExporter;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class CasesBoardViewer extends IWBaseComponent {
 
@@ -117,15 +118,15 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 		new AdvancedProperty(CaseBoardBean.CASE_CATEGORY, "Category"),								//	13,	EDITABLE, select
 
-		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	14, table of 4 columns
+		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	14, table of 5 columns
 
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GRADE, "Comment"),							//	15
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_ANSWER, "Restrictions")						//	16, EDITABLE, text area
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GRADE, "Comment"),							//	19
+		new AdvancedProperty(CaseBoardBean.CASE_OWNER_ANSWER, "Restrictions")						//	20, EDITABLE, text area
+																									//	21 is handler by default (if no custom columns provided)
 	));
 
 	private static Map<String, String> EDITABLE_FIELDS;
 	static {
-//		CaseBoardBean.CASE_OWNER_GRADE;
 		EDITABLE_FIELDS = new HashMap<String, String>();
 		EDITABLE_FIELDS.put(CaseBoardBean.CASE_CATEGORY, EDITABLE_FIELD_TYPE_DROPDOWN);
 
@@ -155,11 +156,11 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private boolean onlySubscribedCases = Boolean.FALSE;
 
 	protected String	caseStatus,
-					roleKey,
-					processName,
-					taskName = "Grading",
-					currentPageUri,
-					uuid;
+						roleKey,
+						processName,
+						taskName = "Grading",
+						currentPageUri,
+						uuid;
 
 	private boolean useCurrentPageAsBackPageFromTaskViewer = Boolean.TRUE;
 
@@ -306,12 +307,12 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	@Override
 	protected void initializeComponent(FacesContext context) {
-
-//		TODO: this is for testing with default theme
-//		Layer style = new Layer();
-//		add(style);
-//		style.add("<style>div{overflow:auto;}</style>");
-///////////////////////////////////////////////////////////
+		if (!DefaultIWBundle.isProductionEnvironment()) {
+			//	This is for testing with default theme
+			Layer style = new Layer();
+			add(style);
+			style.add("<style>div{overflow:auto;}</style>");
+		}
 
 		IWContext iwc = IWContext.getIWContext(context);
 
@@ -325,8 +326,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 		}
 
 		uuid = getBuilderLogicWrapper().getBuilderService(iwc).getInstanceId(this);
-		if (StringUtil.isEmpty(uuid))
+		if (StringUtil.isEmpty(uuid)) {
 			uuid = CoreConstants.MINUS;
+		}
 
 		IWBundle bundle = getBundle(context, CasesConstants.IW_BUNDLE_IDENTIFIER);
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
@@ -402,7 +404,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 				uuid,
 				isOnlySubscribedCases(),
 				useCurrentPageAsBackPageFromTaskViewer,
-				getTaskName());
+				getTaskName()
+		);
 
 		if (data == null || !data.isFilledWithData()) {
 			getChildren().add(new Heading3(data.getErrorMessage()));
@@ -446,8 +449,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
 				List<AdvancedProperty> entries = values.get(key);
-				if (ListUtil.isEmpty(entries))
+				if (ListUtil.isEmpty(entries)) {
 					continue;
+				}
 
 				if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(entries.get(0).getId())) {
 					//	Financing table
@@ -494,7 +498,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 						suggestionTotal += sugg;
 						suggestionCell.add(new Text(String.valueOf(sugg)));
 						makeCellEditable(suggestionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-
 						suggestionCell.setStyleClass(BOARD_SUGGESTION);
 						suggestionCell.setMarkupAttribute("task_index", index);
 						suggestionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -506,7 +509,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 						decisionTotal += dec;
 						decisionCell.add(new Text(String.valueOf(dec)));
 						makeCellEditable(decisionCell, EDITABLE_FIELD_TYPE_TEXT_INPUT);
-
 						decisionCell.setStyleClass(BOARD_DECISION);
 						decisionCell.setMarkupAttribute("task_index", index);
 						decisionCell.setMarkupAttribute("total_values", financingInfo.size());
@@ -530,20 +532,19 @@ public class CasesBoardViewer extends IWBaseComponent {
 					financingTableRow.createCell().add(new Text(iwrb.getLocalizedString("total", "Total")));
 					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
 
-
 					TableCell2 estimateCell = financingTableRow.createCell();
 					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
 					estimateCell.add(new Text(String.valueOf(estimationTotal)));
 					finalEstimate += estimationTotal;
-
 
 					TableCell2 localProposalTotalCell = financingTableRow.createCell();
 					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
 					localProposalTotalCell.add(new Text(String.valueOf(proposalTotal)));
 					finalProposed += proposalTotal;
 					String proposalTotalCellId  = localProposalTotalCell.getId();
-					for (TableCell2 suggestionCell: suggestionCells)
+					for (TableCell2 suggestionCell: suggestionCells) {
 						suggestionCell.setMarkupAttribute("local_total", proposalTotalCellId);
+					}
 
 					TableCell2 localSuggestionTotalCell = financingTableRow.createCell();
 					TableCell2 emptyCell = emptyRow.createCell();
@@ -552,43 +553,59 @@ public class CasesBoardViewer extends IWBaseComponent {
 					localSuggestionTotalCell.setStyleClass(BOARD_SUGGESTION);
 					localSuggestionTotalCell.add(new Text(String.valueOf(suggestionTotal)));
 					String suggestionTotalCellId  = localSuggestionTotalCell.getId();
-					for (TableCell2 suggestionCell: suggestionCells)
+					for (TableCell2 suggestionCell: suggestionCells) {
 						suggestionCell.setMarkupAttribute("local_total", suggestionTotalCellId);
+					}
 
 					TableCell2 localDecisionTotalCell = financingTableRow.createCell();
 					emptyRow.createCell().add(new Text(CoreConstants.SPACE));
 					localDecisionTotalCell.add(new Text(String.valueOf(decisionTotal)));
 					String decisionTotalCellId = localDecisionTotalCell.getId();
-					for (TableCell2 decisionCell: decisionCells)
+					for (TableCell2 decisionCell: decisionCells) {
 						decisionCell.setMarkupAttribute("local_total", decisionTotalCellId);
+					}
 
 				//	"Simple" values
 				} else {
-					TableCell2 bodyRowCell = row.createCell();
-					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
-					int rowSpan = getRowSpan(financingInfo);
-					bodyRowCell.setRowSpan(rowSpan);
-					for (AdvancedProperty entry: entries) {
-						if (getBoardCasesManager().isEqual(entry.getId(), ProcessConstants.CASE_IDENTIFIER)) {
-							//	Link to grading task
-							linkToTask = new Link(rowBean.getCaseIdentifier(), rowBean.getLinkToCase());
-							linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
-							linkToTask.getId();
-							bodyRowCell.add(linkToTask);
-						} else if (getBoardCasesManager().isEqual(entry.getId(), ProcessConstants.HANDLER_IDENTIFIER)) {
-							//	E-mail link to handler
-							bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
-						} else if (!StringUtil.isEmpty(entry.getValue())) {
-							bodyRowCell.setStyleClass(entry.getId());
-							bodyRowCell.add(new Text(entry.getValue()));
-						} else {
-							bodyRowCell.add(new Text(CoreConstants.MINUS));
-						}
+					boolean canSkip = !getBoardCasesManager().hasCustomColumns(uuid);
+					if (canSkip) {
+						String tmpId = entries.iterator().next().getId();
+						canSkip = tmpId.equals(ProcessConstants.BOARD_FINANCING_SUGGESTION) || tmpId.equals(ProcessConstants.BOARD_FINANCING_DECISION);
+					}
 
-						//	Editable fields
-						String editableType = EDITABLE_FIELDS.get(entry.getId());
-						if (!StringUtil.isEmpty(editableType))
-							makeCellEditable(bodyRowCell, editableType);
+					if (canSkip) {
+						//	Do nothing - it was added already with financing table
+						getLogger().info("Skipping cell(s) " + entries);
+
+					} else {
+						TableCell2 bodyRowCell = row.createCell();
+						List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
+						int rowSpan = getRowSpan(financingInfo);
+						bodyRowCell.setRowSpan(rowSpan);
+						for (AdvancedProperty entry: entries) {
+							String id = entry.getId();
+							if (getBoardCasesManager().isEqual(id, ProcessConstants.CASE_IDENTIFIER)) {
+								//	Link to grading task
+								linkToTask = new Link(rowBean.getCaseIdentifier(), rowBean.getLinkToCase());
+								linkToTask.setStyleClass("casesBoardViewerTableLinkToTaskStyle");
+								linkToTask.getId();
+								bodyRowCell.add(linkToTask);
+							} else if (getBoardCasesManager().isEqual(id, ProcessConstants.HANDLER_IDENTIFIER)) {
+								//	E-mail link to handler
+								bodyRowCell.add(getHandlerInfo(iwc, rowBean.getHandler()));
+							} else if (!StringUtil.isEmpty(entry.getValue())) {
+								bodyRowCell.setStyleClass(id);
+								bodyRowCell.add(new Text(entry.getValue()));
+							} else {
+								bodyRowCell.add(new Text(CoreConstants.MINUS));
+							}
+
+							//	Editable fields
+							String editableType = EDITABLE_FIELDS.get(id);
+							if (!StringUtil.isEmpty(editableType)) {
+								makeCellEditable(bodyRowCell, editableType);
+							}
+						}
 					}
 				}
 			}
@@ -687,18 +704,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 		mailTo.setSessionId(false);
 		return mailTo;
 	}
-
-//	private String getLinkToTheTask(IWContext iwc, CaseBoardTableBodyRowBean rowBean) {
-//		String uri = null;
-//		try {
-//			String basePage = getCurrentPageUri(iwc);
-//			uri = getBoardCasesManager().getLinkToTheTaskRedirector(iwc, basePage, rowBean.getCaseId(), rowBean.getProcessInstanceId(),
-//					useCurrentPageAsBackPageFromTaskViewer ? basePage : null, getTaskName());
-//		} catch(Exception e) {
-//			LOGGER.log(Level.WARNING, "Error getting uri to the task for process: " + rowBean.getProcessInstanceId());
-//		}
-//		return StringUtil.isEmpty(uri) ? iwc.getRequestURI() : uri;
-//	}
 
 	protected CaseBusiness getCaseBusiness() {
 		try {

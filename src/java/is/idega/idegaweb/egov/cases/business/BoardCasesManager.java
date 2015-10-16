@@ -1,9 +1,5 @@
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +9,10 @@ import com.idega.block.process.data.Case;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.User;
+
+import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
 
 public interface BoardCasesManager {
 
@@ -86,5 +86,7 @@ public interface BoardCasesManager {
 	public int getIndexOfColumn(String column, String uuid);
 
 	public Long getNumberValue(String value);
+
+	public boolean hasCustomColumns(String uuid);
 
 }
