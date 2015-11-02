@@ -13,6 +13,18 @@ CasesBoardHelper.linkInAction = null;
 CasesBoardHelper.pressedKeyboardButton = null;
 CasesBoardHelper.pressedMouseRightClickButton = false;
 
+CasesBoardHelper.sortings = [];
+
+jQuery(window).load(function() {
+	jQuery('th', 'table.casesBoardViewerTable').click(function() {
+		var header = jQuery(this);
+		var variable = header.attr('class').split(' ')[0];
+		if (!IWCORE.existElementInArray(CasesBoardHelper.sortings, variable)) {
+			CasesBoardHelper.sortings.push(variable);
+		}
+	});
+});
+
 CasesBoardHelper.initializeBoardCases = function(localizations) {
 	CasesBoardHelper.linkInAction = null;
 	CasesBoardHelper.localizations = localizations;
@@ -86,6 +98,20 @@ CasesBoardHelper.initializeBoardCases = function(localizations) {
 	});
 }
 
+CasesBoardHelper.doExport = function(link) {
+	var exportLink = link;
+	if (CasesBoardHelper.sortings != null && CasesBoardHelper.sortings.length > 0) {
+		exportLink += '&sorting=';
+		for (var i = 0; i < CasesBoardHelper.sortings.length; i++) {
+			exportLink += CasesBoardHelper.sortings[i];
+			if (i + 1 < CasesBoardHelper.sortings.length) {
+				exportLink += '#';
+			}
+		}
+	}
+	window.location.href = exportLink;
+}
+	
 CasesBoardHelper.openCustomizeWindow = function(linkId, link) {
 	jQuery('#' + linkId).attr('href', link).trigger('click');
 }

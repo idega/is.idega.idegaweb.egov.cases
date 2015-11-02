@@ -731,7 +731,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		buttonsContainer.add(exportToExcel);
 		exportToExcel.setOnClick(new StringBuilder("humanMsg.displayMsg('")
 			.append(iwrb.getLocalizedString("cases_board_viewer.exporting_cases_list_to_excel",	"Exporting to Excel"))
-			.append("');window.location.href='").append(getUriToExcelExporter(iwc)).append("';").toString());
+			.append("');CasesBoardHelper.doExport('").append(getUriToExcelExporter(iwc)).append("');").toString());
 
 		//	Print
 		PrintButton printList = new PrintButton(iwrb.getLocalizedString("cases_board_viewer.print_list", "Print"));
