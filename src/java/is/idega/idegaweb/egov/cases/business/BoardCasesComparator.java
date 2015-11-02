@@ -7,11 +7,11 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import com.idega.block.process.business.ProcessConstants;
-import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
 import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardBean;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 
@@ -38,21 +38,83 @@ public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 	}
 
 	private String getExpression(CaseBoardBean bean) {
+		String category = StringUtil.isEmpty(bean.getCategory()) ? "z" : bean.getCategory();
+
 		if (ListUtil.isEmpty(sortingPreferences)) {
 			//	Using default sorting: category + applicant name
-			String category = StringUtil.isEmpty(bean.getCategory()) ? "z" : bean.getCategory();
 			return category + bean.getApplicantName();
-		} else {
-			for (String key: sortingPreferences) {
-				if (key.equals(ProcessConstants.HANDLER_IDENTIFIER)) {
-					return ((bean.getHandler() == null ? "z" : bean.getHandler().getName())).concat(String.valueOf(Integer.MAX_VALUE - Integer.valueOf(bean.getGradingSum())));
-				} else {
-					Logger.getLogger(getClass().getName()).warning("Do not know how to handle sorting preference " + key);
-				}
+		}
+
+		StringBuilder expression = new StringBuilder();
+		boolean categoryFirst = true;
+		for (String key: sortingPreferences) {
+			if (key.equals(CaseBoardBean.CASE_OWNER_FULL_NAME)) {
+				expression.append(bean.getApplicantName());
+
+			} else if (key.equals(CaseBoardBean.CASE_OWNER_GENDER)) {
+				expression.append(bean.getValue(CaseBoardBean.CASE_OWNER_GENDER));
+
+			} else if (key.equals("string_ownerKennitala")) {
+				expression.append(bean.getPersonalID());
+
+			} else if (key.equals("string_ownerAddress")) {
+				expression.append(bean.getAddress());
+
+			} else if (key.equals("string_ownerPostCode")) {
+				expression.append(bean.getPostalCode());
+
+			} else if (key.equals("string_ownerMunicipality")) {
+				expression.append(bean.getMunicipality());
+
+			} else if (key.equals(ProcessConstants.CASE_IDENTIFIER)) {
+				expression.append(bean.getCaseIdentifier());
+
+			} else if (key.equals(ProcessConstants.CASE_DESCRIPTION)) {
+				expression.append(bean.getCaseDescription());
+
+			} else if (key.equals("string_ownerTotalCost")) {
+				expression.append(bean.getValue("string_ownerTotalCost"));
+
+			} else if (key.equals(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE)) {
+				expression.append(bean.getValue(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE));
+
+			} else if (key.equals("string_ownerBusinessConcept")) {
+				expression.append(bean.getValue("string_ownerBusinessConcept"));
+
+			} else if (key.equals(CaseBoardBean.CASE_SUM_OF_NEGATIVE_GRADES)) {
+				expression.append(bean.getNegativeGradingSum());
+
+			} else if (key.equals(CaseBoardBean.CASE_SUM_ALL_GRADES)) {
+				categoryFirst = false;
+
+			} else if (key.equals(CaseBoardBean.CASE_CATEGORY)) {
+				categoryFirst = true;
+
+			} else if (key.equals(CaseBoardBean.CASE_OWNER_GRADE)) {
+				expression.append(bean.getValue(CaseBoardBean.CASE_OWNER_GRADE));
+
+			} else if (key.equals(CaseBoardBean.CASE_OWNER_ANSWER)) {
+				expression.append(bean.getValue(CaseBoardBean.CASE_OWNER_ANSWER));
+
+			} else if (key.equals(ProcessConstants.HANDLER_IDENTIFIER)) {
+				expression.append(bean.getHandler() == null ? "z" : bean.getHandler().getName());
+
+			} else {
+				Logger.getLogger(getClass().getName()).warning("Do not know how to handle sorting preference " + key);
 			}
 		}
 
-		return CoreConstants.EMPTY;
+		if (categoryFirst) {
+			expression.append(category);
+		}
+
+		expression.append(String.valueOf(Integer.MAX_VALUE - Integer.valueOf(bean.getGradingSum())));
+
+		if (!categoryFirst) {
+			expression.append(category);
+		}
+
+		return expression.toString();
 	}
 
 }
