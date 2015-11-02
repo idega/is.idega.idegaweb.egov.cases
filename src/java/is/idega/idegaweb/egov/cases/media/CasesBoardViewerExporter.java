@@ -1,11 +1,5 @@
 package is.idega.idegaweb.egov.cases.media;
 
-import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
-import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
-import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +52,12 @@ import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.TextSoap;
 
+import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
+import is.idega.idegaweb.egov.cases.presentation.CasesBoardViewer;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBean;
+import is.idega.idegaweb.egov.cases.presentation.beans.CaseBoardTableBodyRowBean;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
+
 public class CasesBoardViewerExporter extends DownloadWriter implements MediaWritable {
 
 	private MemoryFileBuffer memory;
@@ -82,8 +82,11 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
 		CaseBoardTableBean data = getTableData(iwc);
-		if (data == null || !data.isFilledWithData())
+		if (data == null || !data.isFilledWithData()) {
 			return;
+		}
+
+		BoardCasesManager manager = getBoardCasesManager();
 
 		HSSFWorkbook workBook = new HSSFWorkbook();
 		HSSFSheet sheet = createSheet(workBook, data.getHeaderLabels(), iwc);
@@ -96,8 +99,9 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 			Map<Integer, List<AdvancedProperty>> values = rowBean.getValues();
 			for (Integer key: values.keySet()) {
 				List<AdvancedProperty> entries = values.get(key);
-				if (ListUtil.isEmpty(entries))
+				if (ListUtil.isEmpty(entries)) {
 					continue;
+				}
 
 				if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(entries.get(0).getId())) {
 					//	Financing table
@@ -109,13 +113,15 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						emptyValues.put(CasesBoardViewer.ESTIMATED_COST, CoreConstants.MINUS);
 						emptyValues.put(CasesBoardViewer.BOARD_SUGGESTION, CoreConstants.MINUS);
 						emptyValues.put(CasesBoardViewer.BOARD_DECISION, CoreConstants.MINUS);
+						emptyValues.put(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT, CoreConstants.MINUS);
 						financingInfo.add(emptyValues);
 						rowBean.setFinancingInfo(financingInfo);
 					}
 
-					cellIndex += 4;
+					cellIndex += 5;
 					long estimationTotal = 0;
 					long suggestionTotal = 0;
+					long proposalTotal = 0;
 					long decisionTotal = 0;
 					HSSFRow financingTableRow = row;
 					for (Iterator<Map<String, String>> infoIter = financingInfo.iterator(); infoIter.hasNext();) {
@@ -127,24 +133,31 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String estimation = info.get(CasesBoardViewer.ESTIMATED_COST);
-						Long estimationNumber = getBoardCasesManager().getNumberValue(estimation);
+						Long estimationNumber = manager.getNumberValue(estimation);
 						estimationTotal += estimationNumber;
 						cell.setCellValue(estimationNumber);
 
 						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+						String proposalForGrant = info.get(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT);
+						long proposal = manager.getNumberValue(proposalForGrant);
+						proposalTotal += proposal;
+						cell.setCellValue(proposal);
+
+						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 						String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
-						long sugg = getBoardCasesManager().getNumberValue(suggestion);
+						long sugg = manager.getNumberValue(suggestion);
 						suggestionTotal += sugg;
 						cell.setCellValue(sugg);
 
 						cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
 						String decision = info.get(CasesBoardViewer.BOARD_DECISION);
-						long dec = getBoardCasesManager().getNumberValue(decision);
+						long dec = manager.getNumberValue(decision);
 						decisionTotal += dec;
 						cell.setCellValue(dec);
 
-						if (infoIter.hasNext())
+						if (infoIter.hasNext()) {
 							financingTableRow = sheet.createRow(rowNumber++);
+						}
 					}
 
 					//	Empty row
@@ -162,38 +175,54 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					cell.setCellValue(estimationTotal);
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+					cell.setCellValue(proposalTotal);
+
+					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 					cell.setCellValue(suggestionTotal);
 
 					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
 					cell.setCellValue(decisionTotal);
 				} else {
-					//	Simple values
-					HSSFCell bodyRowCell = row.createCell(cellIndex);
-
-					for (AdvancedProperty entry: entries) {
-						String varName = entry.getId();
-
-						if (getBoardCasesManager().isEqual(varName, ProcessConstants.CASE_IDENTIFIER)) {
-							bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
-
-						} else if (getBoardCasesManager().isEqual(varName, ProcessConstants.HANDLER_IDENTIFIER)) {
-							bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
-
-						} else if (getBoardCasesManager().isEqual(varName, CasesBoardViewer.BOARD_SUGGESTION) ||
-								getBoardCasesManager().isEqual(varName, CasesBoardViewer.BOARD_DECISION)) {
-
-							String boardValue = entry.getValue();
-							Logger.getLogger(getClass().getName()).info("Handling board value '" + boardValue + "' for variable '" + varName + "'");
-							bodyRowCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-							Long numberValue = getBoardCasesManager().getNumberValue(boardValue);
-							bodyRowCell.setCellValue(numberValue);
-
-						} else {
-							bodyRowCell.setCellValue(entry.getValue());
-						}
+					boolean canSkip = !getBoardCasesManager().hasCustomColumns(uuid);
+					if (canSkip) {
+						String tmpId = entries.iterator().next().getId();
+						canSkip = tmpId.equals(ProcessConstants.BOARD_FINANCING_SUGGESTION) || tmpId.equals(ProcessConstants.BOARD_FINANCING_DECISION);
 					}
 
-					cellIndex++;
+					if (canSkip) {
+						//	Do nothing - it was added already with financing table
+
+					} else {
+						//	Simple values
+						HSSFCell bodyRowCell = row.createCell(cellIndex);
+
+						for (AdvancedProperty entry: entries) {
+							String varName = entry.getId();
+
+							if (manager.isEqual(varName, ProcessConstants.CASE_IDENTIFIER)) {
+								bodyRowCell.setCellValue(rowBean.getCaseIdentifier());
+
+							} else if (manager.isEqual(varName, ProcessConstants.HANDLER_IDENTIFIER)) {
+								bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
+
+//							} else if (
+//									manager.isEqual(varName, CasesBoardViewer.BOARD_SUGGESTION) ||
+//									manager.isEqual(varName, CasesBoardViewer.BOARD_DECISION) ||
+//									manager.isEqual(varName, CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT)
+//							) {
+//
+//								String boardValue = entry.getValue();
+//								bodyRowCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+//								Long numberValue = manager.getNumberValue(boardValue);
+//								bodyRowCell.setCellValue(numberValue);
+
+							} else {
+								bodyRowCell.setCellValue(entry.getValue());
+							}
+						}
+
+						cellIndex++;
+					}
 				}
 			}
 		}
@@ -232,8 +261,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 	}
 
-	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle,
-			Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
+	protected void createHeaders(HSSFSheet sheet, HSSFCellStyle cellStyle, Map<Integer, List<AdvancedProperty>> headers, int rowNumber) {
 		HSSFRow row = sheet.createRow(rowNumber);
 
 		int cellIndex = 0;
@@ -243,8 +271,9 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				HSSFCell cell = row.createCell(cellIndex++);
 				cell.setCellValue(label.getValue());
 
-				if (cellStyle != null)
+				if (cellStyle != null) {
 					cell.setCellStyle(cellStyle);
+				}
 			}
 		}
 	}
@@ -289,8 +318,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		if (StringUtil.isEmpty(uuid))
 			return Boolean.FALSE;
 
-		Object subscribed = iwc.getSessionAttribute(
-				CasesBoardViewer.PARAMETER_SHOW_ONLY_SUBSCRIBED + uuid);
+		Object subscribed = iwc.getSessionAttribute(CasesBoardViewer.PARAMETER_SHOW_ONLY_SUBSCRIBED + uuid);
 		Boolean value = null;
 		if (subscribed instanceof Boolean) {
 			value = (Boolean) subscribed;
@@ -309,10 +337,12 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		datePicker.setVersion(IWDatePicker.VERSION_1_8_17);
 		datePicker.keepStatusOnAction(true);
 
-		if (from != null)
+		if (from != null) {
 			datePicker.setDate(from);
-		if (to != null)
+		}
+		if (to != null) {
 			datePicker.setDateTo(to);
+		}
 		datePicker.setDateRange(true);
 		datePicker.setUseCurrentDateIfNotSet(false);
 
@@ -379,20 +409,25 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				Boolean.FALSE);
 	}
 
+	private String uuid = null;
+
 	protected CaseBoardTableBean getTableData(IWContext iwc) {
 		if (iwc == null) {
 			return null;
 		}
+
+		uuid = iwc.getParameter(CasesBoardViewer.PARAMETER_UUID);
 
 		return getBoardCasesManager().getTableData(
 				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
 				doFilterByDate(iwc) ? getDateTo(iwc) : null,
 				Arrays.asList(iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER).split(CoreConstants.COMMA)),
 				iwc.getParameter(CasesBoardViewer.CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER),
-				iwc.getParameter(CasesBoardViewer.PARAMETER_UUID),
+				uuid,
 				isSubscribedOnly(iwc.getParameter(CasesBoardViewer.PARAMETER_UUID), iwc),
 				Boolean.FALSE,
-				null);
+				null
+		);
 	}
 
 	protected OutputStream createOutputStream() {
@@ -425,8 +460,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		return bigStyle;
 	}
 
-	protected HSSFSheet createSheet(HSSFWorkbook workBook,
-			Map<Integer, List<AdvancedProperty>> headers, IWContext iwc) {
+	protected HSSFSheet createSheet(HSSFWorkbook workBook, Map<Integer, List<AdvancedProperty>> headers, IWContext iwc) {
 		if (workBook == null || iwc == null) {
 			return null;
 		}
