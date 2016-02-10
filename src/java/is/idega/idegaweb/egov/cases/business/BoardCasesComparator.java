@@ -72,8 +72,8 @@ public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 			} else if (key.equals(ProcessConstants.CASE_DESCRIPTION)) {
 				expression.append(bean.getCaseDescription());
 
-			} else if (key.equals("string_ownerTotalCost")) {
-				expression.append(bean.getValue("string_ownerTotalCost"));
+			} else if (key.equals(CaseBoardBean.CASE_OWNER_TOTAL_COST)) {
+				expression.append(bean.getValue(CaseBoardBean.CASE_OWNER_TOTAL_COST));
 
 			} else if (key.equals(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE)) {
 				expression.append(bean.getValue(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE));
