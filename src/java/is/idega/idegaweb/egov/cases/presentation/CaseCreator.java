@@ -7,13 +7,6 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
-import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,6 +68,13 @@ import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
 import com.idega.util.text.SocialSecurityNumber;
 import com.idega.webface.WFUtil;
+
+import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class CaseCreator extends ApplicationForm {
 
@@ -595,9 +595,7 @@ public class CaseCreator extends ApplicationForm {
 		return Collections.emptyList();
 	}
 	private List<String> getAttachmenstPks(IWContext iwc){
-		String[] fileIds =
-//			{"66","67"};
-			iwc.getParameterValues(PARAMETER_FILE);
+		String[] fileIds = iwc.getParameterValues(PARAMETER_FILE);
 		if((fileIds == null) || (fileIds.length < 1)){
 			return Collections.emptyList();
 		}
@@ -645,38 +643,6 @@ public class CaseCreator extends ApplicationForm {
 		String message = getMessageParameterValue(iwc);
 
 		Collection<ICFile> attachments = getAttachments(iwc);
-//		ICFile attachment = null;
-//		UploadFile uploadFile = iwc.getUploadedFile();
-//		if (uploadFile != null && uploadFile.getName() != null && uploadFile.getName().length() > 0) {
-//			try {
-//				FileInputStream input = new FileInputStream(uploadFile.getRealPath());
-//
-//				attachment = ((ICFileHome) IDOLookup.getHome(ICFile.class)).create();
-//				attachment.setName(uploadFile.getName());
-//				attachment.setMimeType(uploadFile.getMimeType());
-//				attachment.setFileValue(input);
-//				attachment.setFileSize((int) uploadFile.getSize());
-//				attachment.store();
-//
-//				uploadFile.setId(((Integer) attachment.getPrimaryKey()).intValue());
-//				try {
-//					FileUtil.delete(uploadFile);
-//				}
-//				catch (Exception ex) {
-//					System.err.println("MediaBusiness: deleting the temporary file at " + uploadFile.getRealPath() + " failed.");
-//				}
-//			}
-//			catch (RemoteException e) {
-//				e.printStackTrace(System.err);
-//				uploadFile.setId(-1);
-//			}
-//			catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//			catch (CreateException ce) {
-//				ce.printStackTrace();
-//			}
-//		}
 
 		CaseCategory category = null;
 		if (caseCategoryPK != null && !"".equals(caseCategoryPK)) {
@@ -847,8 +813,8 @@ public class CaseCreator extends ApplicationForm {
 			section.add(formItem);
 		}
 
-		if(!ListUtil.isEmpty(attachments)){
-			for(ICFile attachment : attachments){
+		if (!ListUtil.isEmpty(attachments)) {
+			for (ICFile attachment: attachments) {
 				Link link = new Link(new Text(attachment.getName()));
 				link.setFile(attachment);
 				link.setTarget(Link.TARGET_BLANK_WINDOW);
@@ -1170,4 +1136,5 @@ public class CaseCreator extends ApplicationForm {
 		}
 		iCategories.add(categoryPK);
 	}
+
 }
