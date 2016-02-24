@@ -29,8 +29,13 @@ function initializeCasesList(caseToOpenId, localizations, debug) {
 				jQuery(loadingLabels[i]).css('display', 'none');
 			}
 		}
+		
+		var exceptionMessage = exception == null ? '' : exception.message;
+		if (exceptionMessage.indexOf('Incomplete reply') != -1) {
+			return true;
+		}
 
-		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exception.message + '\n' +
+		var text = exception == null ? CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE : exceptionMessage + '\n' +
 																							CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE;
 		if (window.confirm(debug ? text : CASE_GRID_STRING_ERROR_OCCURRED_CONFIRM_RELOAD_PAGE)) {
 			reloadPage();
