@@ -7,15 +7,6 @@
  */
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseCategoryHome;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
-
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -72,6 +63,15 @@ import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
+
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseCategoryHome;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
+import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness, CasesBusiness {
 
@@ -567,7 +567,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, CaseBMPBean.CASE_STATUS_OPEN_KEY, created);
 	}
 
-	
+
 	@Override
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
 		Collection<Object> attachmentPKs;
@@ -608,7 +608,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setHandler(handlerGroup);
 		theCase.setSubject(regarding);
 		theCase.setMessage(message);
-		
+
 		if (setType) {
 			theCase.setType(type);
 		}
@@ -665,10 +665,10 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
 				}
 
-				Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
-				Iterator iter = handlers.iterator();
+				Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+				Iterator<User> iter = handlers.iterator();
 				while (iter.hasNext()) {
-					User handler = (User) iter.next();
+					User handler = iter.next();
 					sendMessage(theCase, handler, sender, subject, body);
 				}
 
@@ -688,7 +688,6 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return theCase;
 	}
 
-	
 	@Override
 	public void allocateCase(GeneralCase theCase, Object caseCategoryPK, Object caseTypePK, User user, String message, User performer, IWContext iwc) {
 		boolean hasChanges = false;
