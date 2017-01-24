@@ -229,13 +229,14 @@ function registerGridExpanderActionsForElement(event, element) {
 		var showUserCompany = caseToExpand.attr('showUserCompany') == 'true';
 		var showLastLoginDate = caseToExpand.attr('showLastLoginDate') == 'true';
 		var usexmldataprovider = caseToExpand.attr('usexmldataprovider') == 'true';
+		var inactiveTasksToShow = caseToExpand.attr('inactiveTasksToShow');
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, 
 				CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, 
 				allowPDFSigning, hideEmptySection, commentsManagerIdentifier, 
 				showAttachmentStatistics, showOnlyCreatorInContacts, 
 				showLogExportButton, showComments, showContacts, specialBackPage,
 				nameFromExternalEntity, showUserProfilePicture,addExportContacts,
-				showUserCompany,showLastLoginDate,usexmldataprovider), {
+				showUserCompany,showLastLoginDate,usexmldataprovider, inactiveTasksToShow), {
 			callback: function(component) {
 				if (component == null) {
 					closeAllLoadingMessages();
@@ -262,7 +263,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 		showAttachmentStatistics, showOnlyCreatorInContacts, 
 		showLogExportButton, showComments, showContacts, 
 		specialBackPage, nameFromExternalEntity, showUserProfilePicture,addExportContacts,
-		showUserCompany,showLastLoginDate,usexmldataprovider) {
+		showUserCompany,showLastLoginDate,usexmldataprovider, inactiveTasksToShow) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -287,6 +288,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 	this.showUserCompany = showUserCompany;
 	this.showLastLoginDate = showLastLoginDate;
 	this.usexmldataprovider = usexmldataprovider;
+	this.inactiveTasksToShow = inactiveTasksToShow;
 }
 
 CasesListHelper.getPager = function(fromPager, page) {

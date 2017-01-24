@@ -1,11 +1,5 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
-import is.idega.idegaweb.egov.cases.business.CaseArtifactsProvider;
-import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
-import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
@@ -77,6 +71,12 @@ import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
+
+import is.idega.idegaweb.egov.cases.business.CaseArtifactsProvider;
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
+import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(GeneralCasesListBuilder.SPRING_BEAN_IDENTIFIER)
@@ -277,6 +277,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 		layer.setMarkupAttribute("casecodes", ListUtil.convertListOfStringsToCommaseparatedString(properties.getCaseCodes()));
 		layer.setMarkupAttribute("useXMLDataProvider", properties.isUseXMLDataProvider());
+		if (!StringUtil.isEmpty(properties.getInactiveTasksToShow())) {
+			layer.setMarkupAttribute("inactiveTasksToShow", properties.getInactiveTasksToShow());
+		}
+
 	}
 
 	private Serializable getCaseCreatedValue(CasePresentation theCase, CaseListPropertiesBean properties) {
@@ -687,10 +691,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			Collection<CasePresentation> casesInList = cases == null ? null : cases.getCollection();
 
 			String navigatorPosition = properties.getCaseNavigationBlockPosition() == null ? "top" : properties.getCaseNavigationBlockPosition();
-			
+
 			if (!navigatorPosition.equals("top") && !navigatorPosition.equals("bottom"))
 				navigatorPosition = "top";
-			
+
 			String emailAddress = getDefaultEmail();
 
 			boolean descriptionIsEditable = isDescriptionEditable(type, iwc.isSuperAdmin());
@@ -894,10 +898,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		int totalCases = getTotalCases(cases, searchResults, properties);
 
 		String navigatorPosition = properties.getCaseNavigationBlockPosition() == null ? "top" : properties.getCaseNavigationBlockPosition();
-		
+
 		if (!navigatorPosition.equals("top") && !navigatorPosition.equals("bottom"))
 			navigatorPosition = "top";
-				
+
 		addProperties(container, properties);
 
 		if (navigatorPosition.equals("top"))
@@ -955,10 +959,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		if (showStatistics)
 			addStatistics(iwc, container, casesInList);
-		
+
 		if (navigatorPosition.equals("bottom"))
 			addNavigator(iwc, container, cases, properties, totalCases, searchResults);
-		
+
 		return container;
 	}
 
