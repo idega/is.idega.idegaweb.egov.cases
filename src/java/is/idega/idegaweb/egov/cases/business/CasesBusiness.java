@@ -1,11 +1,6 @@
 package is.idega.idegaweb.egov.cases.business;
 
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
-
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -32,6 +27,11 @@ import com.idega.presentation.IWContext;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
 
 public interface CasesBusiness extends IBOService, CaseBusiness {
 
@@ -171,7 +171,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getCaseCategories
 	 */
 	public Collection<CaseCategory> getCaseCategories() throws RemoteException;
-	
+
 	public Collection<CaseCategory> getCaseCategoriesForAdmins();
 
 	/**

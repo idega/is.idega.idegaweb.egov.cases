@@ -1,7 +1,5 @@
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.bean.CasesExportParams;
-
 import java.util.List;
 
 import org.jdom2.Document;
@@ -14,6 +12,8 @@ import com.idega.core.business.DefaultSpringBean;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.paging.PagedDataCollection;
 import com.idega.user.data.User;
+
+import is.idega.idegaweb.egov.cases.bean.CasesExportParams;
 
 public interface CasesEngine {
 
@@ -65,4 +65,7 @@ public interface CasesEngine {
 	public AdvancedProperty getStatusOfExport(String id);
 	public AdvancedProperty getLinkForZippedCases(String id, List<String> casesIdentifiers);
 
+	public Boolean stopWorkingOnCase(Integer caseId);
+
+	public Boolean startWorkingOnCase(Integer caseId);
 }

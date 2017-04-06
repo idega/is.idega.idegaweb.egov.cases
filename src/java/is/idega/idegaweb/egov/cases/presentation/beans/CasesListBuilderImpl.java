@@ -74,6 +74,8 @@ import com.idega.util.text.Name;
 
 import is.idega.idegaweb.egov.cases.business.CaseArtifactsProvider;
 import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.business.TSOCManager;
+import is.idega.idegaweb.egov.cases.business.TimeSpentOnCaseManager;
 import is.idega.idegaweb.egov.cases.presentation.CasesProcessor;
 import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
@@ -217,12 +219,18 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			statusLayer.setStyleClass(VARIABLE_STATUS);
 		}
 
+		//Time spent on case
+		if (properties.isShowTimeSpentOnCase())
+			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("timeSpentOnCase", "Time spent on case")), headerItem, "TimeSpentOnCase");
+
 		//	Toggler - controller
 		addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("view", "View")), headerItem, "Toggler");
+
 
 		//	Handle case
 		if (properties.isShowCheckBoxes())
 			addLayerToCasesList(headers, Text.getNonBrakingSpace(), headerItem, "MultiHandle");
+
 
 		headers.add(new CSSSpacer());
 
@@ -496,6 +504,24 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				prepareCellToBeGridExpander(statusContainer, caseId, gridViewerId, properties);
 			if (!StringUtil.isEmpty(caseStatusCode))
 				statusContainer.setStyleClass(caseStatusCode);
+		}
+
+
+		if (properties.isShowTimeSpentOnCase()){
+			TSOCManager tsocManager = ELUtil.getInstance().getBean(TimeSpentOnCaseManager.BEAN_NAME);
+			AdvancedProperty ap = tsocManager.getCurrentState(iwc.getUserId(), Integer.parseInt(caseId));
+			String styleClass = Boolean.TRUE.toString().equals(ap.getValue()) ? "workingOnCase" : "notWorkingOnCase";
+			Layer childItem = new Layer();
+			Layer time = new Layer();
+			time.add(new Text(ap.getId()));
+			time.setStyleClass("timeSpent");
+			childItem.add(time);
+			Layer startStopButton = new Layer();
+			startStopButton.setStyleClass(styleClass);
+			startStopButton.setMarkupAttribute("caseid", caseId);
+			startStopButton.setOnClick("CasesListHelper.toggleWorkingOnCase(this);");
+			childItem.add(startStopButton);
+			Layer timeSpentOnCaseContainer = addLayerToCasesList(caseContainer, childItem, bodyItem, "TimeSpentOnCase");
 		}
 
 		//	Controller

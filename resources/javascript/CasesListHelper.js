@@ -1214,3 +1214,28 @@ CasesListHelper.getSortedSortingOptions = function() {
 	
 	return options;
 }
+
+CasesListHelper.toggleWorkingOnCase = function(e){
+	var caseid = jQuery(e).attr("caseid");
+	if (jQuery(e).hasClass("workingOnCase")){
+		CasesEngine.stopWorkingOnCase(caseid, {
+			callback: function(result) {
+				if (!result) {
+					return;
+				}
+				jQuery(e).removeClass("workingOnCase");
+				jQuery(e).addClass("notWorkingOnCase");
+			}
+		});
+	} else if (jQuery(e).hasClass("notWorkingOnCase")) {
+		CasesEngine.startWorkingOnCase(caseid, {
+			callback: function(result) {
+				if (!result) {
+					return;
+				}
+				jQuery(e).removeClass("notWorkingOnCase");
+				jQuery(e).addClass("workingOnCase");
+			}
+		});
+	}
+}
