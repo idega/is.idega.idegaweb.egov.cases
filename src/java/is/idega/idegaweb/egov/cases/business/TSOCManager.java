@@ -4,7 +4,7 @@ import com.idega.builder.bean.AdvancedProperty;
 
 public interface TSOCManager {
 
-	void startWorkingOnCase(Integer userId, Integer caseId);
+	Long startWorkingOnCase(Integer userId, Integer caseId);
 
 	void stopWorkingOnCase(Integer userId, Integer caseId);
 

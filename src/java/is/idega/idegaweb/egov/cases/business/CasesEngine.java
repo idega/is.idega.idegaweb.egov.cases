@@ -67,5 +67,5 @@ public interface CasesEngine {
 
 	public Boolean stopWorkingOnCase(Integer caseId);
 
-	public Boolean startWorkingOnCase(Integer caseId);
+	public Long startWorkingOnCase(Integer caseId);
 }

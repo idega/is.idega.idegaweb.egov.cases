@@ -1235,7 +1235,57 @@ CasesListHelper.toggleWorkingOnCase = function(e){
 				}
 				jQuery(e).removeClass("notWorkingOnCase");
 				jQuery(e).addClass("workingOnCase");
+				
+				var time = Number(result);
+				var sTime = Date.now();
+				function getdate(){
+					if (jQuery(e).hasClass("notWorkingOnCase")) return;
+					var now = Date.now();
+					var et = time+(now - sTime);
+					var h = Math.floor(Math.floor(Math.floor(et / 1000) / 60) / 60);
+					var m = Math.floor( Math.floor( Math.floor(et / 1000) / 60) % 60);
+					var s = Math.floor(Math.floor(et / 1000) % 60);
+					if(s<10){
+						s = "0"+s;
+					}
+					if(m<10){
+						m = "0"+m;
+					}
+					if(h<10){
+						h = "0"+h;
+					}
+					jQuery(e).prev().text(h+":"+m+":"+s);
+					setTimeout(function(){getdate()}, 500);
+				}
+				getdate();
 			}
 		});
 	}
 }
+
+jQuery(document).ready(function(){
+	jQuery('.workingOnCase').each(function(i, e){
+		var time = Number(jQuery(e).attr('tsoc'));
+		var sTime = Date.now();
+		function getdate(){
+			if (jQuery(e).hasClass("notWorkingOnCase")) return;
+			var now = Date.now();
+			var et = time+(now - sTime);
+			var h = Math.floor(Math.floor(Math.floor(et / 1000) / 60) / 60);
+			var m = Math.floor( Math.floor( Math.floor(et / 1000) / 60) % 60);
+			var s = Math.floor(Math.floor(et / 1000) % 60);
+			if(s<10){
+				s = "0"+s;
+			}
+			if(m<10){
+				m = "0"+m;
+			}
+			if(h<10){
+				h = "0"+h;
+			}
+			jQuery(e).prev().text(h+":"+m+":"+s);
+			setTimeout(function(){getdate()}, 500);
+		}
+		getdate();
+	})
+});

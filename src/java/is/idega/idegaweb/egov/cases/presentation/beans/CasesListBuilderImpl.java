@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.ejb.EJBException;
 import javax.faces.component.UIComponent;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -513,12 +514,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			String styleClass = Boolean.TRUE.toString().equals(ap.getValue()) ? "workingOnCase" : "notWorkingOnCase";
 			Layer childItem = new Layer();
 			Layer time = new Layer();
-			time.add(new Text(ap.getId()));
+			time.add(new Text(DurationFormatUtils.formatDuration(Long.parseLong(ap.getId()), "HH:mm:ss")));
 			time.setStyleClass("timeSpent");
 			childItem.add(time);
 			Layer startStopButton = new Layer();
 			startStopButton.setStyleClass(styleClass);
 			startStopButton.setMarkupAttribute("caseid", caseId);
+			startStopButton.setMarkupAttribute("tsoc", ap.getId());
 			startStopButton.setOnClick("CasesListHelper.toggleWorkingOnCase(this);");
 			childItem.add(startStopButton);
 			Layer timeSpentOnCaseContainer = addLayerToCasesList(caseContainer, childItem, bodyItem, "TimeSpentOnCase");

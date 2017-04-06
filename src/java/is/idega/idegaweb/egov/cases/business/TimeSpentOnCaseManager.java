@@ -3,7 +3,6 @@ package is.idega.idegaweb.egov.cases.business;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -44,8 +43,9 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 	 * @see is.idega.idegaweb.egov.bpm.business.TSOCManager#startWorkingOnCase(java.lang.Integer, java.lang.Integer)
 	 */
 	@Override
-	public void startWorkingOnCase(Integer userId, Integer caseId) {
+	public Long startWorkingOnCase(Integer userId, Integer caseId) {
 		List<TimeSpentOnCase> tsocList = getTsocdao().getTimeSpentOnCaseList(userId, caseId);
+		Long currentDuration = 0L;
 		if (ListUtil.isEmpty(tsocList)){
 			TimeSpentOnCase tsoc = new TimeSpentOnCase();
 			tsoc.setBpmCase(new Long(caseId.longValue()));
@@ -62,10 +62,11 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 						tsoc.setDuration(tsoc.getEnd().getTime() - tsoc.getStart().getTime());
 						getTsocdao().saveTimeSpentOnCase(tsoc);
 					}
+					currentDuration += tsoc.getDuration();
 				} else {
 					TimeSpentOnCase tsoc = tsocList.get(i);
 					if (tsoc.getEnd()==null){
-
+						currentDuration += (new java.util.Date().getTime()-tsoc.getStart().getTime());
 					} else {
 						tsoc = new TimeSpentOnCase();
 						tsoc.setBpmCase(new Long(caseId.longValue()));
@@ -77,6 +78,7 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 				}
 			}
 		}
+		return currentDuration;
 	}
 
 	/* (non-Javadoc)
@@ -137,7 +139,7 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 				}
 			}
 		}
-		return new AdvancedProperty(DurationFormatUtils.formatDuration(currentDuration, "HH:mm:ss"), isActive);
+		return new AdvancedProperty(currentDuration, isActive);
 	}
 
 }
