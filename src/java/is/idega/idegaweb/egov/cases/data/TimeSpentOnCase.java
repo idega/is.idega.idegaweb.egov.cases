@@ -21,7 +21,8 @@ import com.idega.user.data.bean.User;
 @Table(name = "time_spent_on_case")
 @NamedQueries(
 		{
-			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp+" and tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " ORDER BY tsoc.start")
+			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp+" and tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp + " ORDER BY tsoc.start")
 		}
 )
 public class TimeSpentOnCase implements Serializable{
@@ -29,6 +30,7 @@ public class TimeSpentOnCase implements Serializable{
 	private static final long serialVersionUID = 6008891131179251971L;
 
 	public static final String getByCaseAndUser = "tsoc.getByCaseAndUser";
+	public static final String getByCase = "tsoc.getByCase";
 	public static final String UserIdProp = "userId";
 	public static final String CaseIdProp = "caseId";
 

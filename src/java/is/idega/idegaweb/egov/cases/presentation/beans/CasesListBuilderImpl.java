@@ -511,16 +511,17 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (properties.isShowTimeSpentOnCase()){
 			TSOCManager tsocManager = ELUtil.getInstance().getBean(TimeSpentOnCaseManager.BEAN_NAME);
 			AdvancedProperty ap = tsocManager.getCurrentState(iwc.getUserId(), Integer.parseInt(caseId));
+			Long timeOnCase = tsocManager.getCurrentState(Integer.parseInt(caseId));
 			String styleClass = Boolean.TRUE.toString().equals(ap.getValue()) ? "workingOnCase" : "notWorkingOnCase";
 			Layer childItem = new Layer();
 			Layer time = new Layer();
-			time.add(new Text(DurationFormatUtils.formatDuration(Long.parseLong(ap.getId()), "HH:mm:ss")));
+			time.add(new Text(DurationFormatUtils.formatDuration(timeOnCase, "HH:mm:ss")));
 			time.setStyleClass("timeSpent");
 			childItem.add(time);
 			Layer startStopButton = new Layer();
 			startStopButton.setStyleClass(styleClass);
 			startStopButton.setMarkupAttribute("caseid", caseId);
-			startStopButton.setMarkupAttribute("tsoc", ap.getId());
+			startStopButton.setMarkupAttribute("tsoc", String.valueOf(timeOnCase));
 			startStopButton.setOnClick("CasesListHelper.toggleWorkingOnCase(this);");
 			childItem.add(startStopButton);
 			Layer timeSpentOnCaseContainer = addLayerToCasesList(caseContainer, childItem, bodyItem, "TimeSpentOnCase");

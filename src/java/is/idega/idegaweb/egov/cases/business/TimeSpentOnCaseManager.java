@@ -142,4 +142,23 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 		return new AdvancedProperty(currentDuration, isActive);
 	}
 
+	@Override
+	public Long getCurrentState(Integer caseId){
+		List<TimeSpentOnCase> tsocList = getTsocdao().getTimeSpentOnCaseList(caseId);
+		Long currentDuration = 0L;
+		if (ListUtil.isEmpty(tsocList)){
+
+		} else {
+			for (int i = 0; i < tsocList.size(); i++){
+				TimeSpentOnCase tsoc = tsocList.get(i);
+				if (tsoc.getEnd()==null){
+					currentDuration += (new java.util.Date().getTime() - tsoc.getStart().getTime());
+				} else {
+					currentDuration += tsoc.getDuration();
+				}
+			}
+		}
+		return currentDuration;
+	}
+
 }

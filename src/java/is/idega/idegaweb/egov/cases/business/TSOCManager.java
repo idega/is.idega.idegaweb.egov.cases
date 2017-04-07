@@ -10,4 +10,6 @@ public interface TSOCManager {
 
 	AdvancedProperty getCurrentState(Integer userId, Integer caseId);
 
+	Long getCurrentState(Integer caseId);
+
 }
