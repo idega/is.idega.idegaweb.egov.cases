@@ -1230,7 +1230,7 @@ CasesListHelper.toggleWorkingOnCase = function(e){
 	} else if (jQuery(e).hasClass("notWorkingOnCase")) {
 		CasesEngine.startWorkingOnCase(caseid, {
 			callback: function(result) {
-				if (!result) {
+				if (result < 0) {
 					return;
 				}
 				jQuery(e).removeClass("notWorkingOnCase");

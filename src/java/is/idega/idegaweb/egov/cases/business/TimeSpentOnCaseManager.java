@@ -78,7 +78,8 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 				}
 			}
 		}
-		return currentDuration;
+		return getCurrentState(caseId);
+		//return currentDuration;
 	}
 
 	/* (non-Javadoc)
