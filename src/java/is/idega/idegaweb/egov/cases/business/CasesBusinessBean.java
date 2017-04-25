@@ -60,6 +60,7 @@ import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
@@ -510,7 +511,16 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public CaseType getCaseType(Object caseTypePK) throws FinderException {
-		return getCaseTypeHome().findByPrimaryKey(new Integer(caseTypePK.toString()));
+		Integer id = null;
+		if (caseTypePK instanceof Number) {
+			id = ((Number) caseTypePK).intValue();
+		} else if (caseTypePK != null) {
+			String tmp = caseTypePK.toString();
+			if (StringHandler.isNumeric(tmp)) {
+				id = Integer.valueOf(tmp);
+			}
+		}
+		return id == null ? null : getCaseTypeHome().findByPrimaryKey(id);
 	}
 
 	@Override
@@ -748,15 +758,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) {
 		theCase.setReply(reply);
 
-		boolean isSameCategory = category.equals(theCase.getCaseCategory());
+		boolean isSameCategory = category == null ? false: category.equals(theCase.getCaseCategory());
 		theCase.setCaseCategory(category);
 
-		Group handlerGroup = category.getHandlerGroup();
-		boolean isInGroup = performer.hasRelationTo(handlerGroup);
+		Group handlerGroup = category == null ? null : category.getHandlerGroup();
+		boolean isInGroup = handlerGroup == null ? false: performer.hasRelationTo(handlerGroup);
 		theCase.setHandler(handlerGroup);
 
 		if (!isInGroup) {
-			theCase.setHandledBy(null);
+			theCase.setHandledBy(iwc.isLoggedOn() ? iwc.getCurrentUser() : null);
 			status = getCaseStatusOpen().getStatus();
 		} else {
 			theCase.setHandledBy(performer);
@@ -779,11 +789,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 
 			try {
-				Collection handlers = getUserBusiness().getUsersInGroup(handlerGroup);
-
-				Iterator iter = handlers.iterator();
+				Collection<User> handlers = Collections.emptyList();
+				if (handlerGroup != null) {
+					handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+				}
+				Iterator<User> iter = handlers.iterator();
 				while (iter.hasNext()) {
-					User handler = (User) iter.next();
+					User handler = iter.next();
 					sendMessage(theCase, handler, sender, subject, body);
 				}
 			} catch (RemoteException e) {
