@@ -390,10 +390,12 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness().getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
-		types.setSelectedElement(type.getPrimaryKey().toString());
+		if (type != null) {
+			types.setSelectedElement(type.getPrimaryKey().toString());
+		}
 		types.setStyleClass("caseTypeDropdown");
 
-		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
+		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type == null ? CoreConstants.EMPTY : type.getPrimaryKey().toString());
 
 		Collection<User> handlers = Collections.emptyList();
 		if (handlerGroup != null) {
