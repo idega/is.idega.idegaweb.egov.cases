@@ -82,11 +82,6 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.CaseWriter;
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-
 import java.rmi.RemoteException;
 import java.util.Collection;
 
@@ -119,6 +114,11 @@ import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.TextSoap;
+
+import is.idega.idegaweb.egov.cases.business.CaseWriter;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 /**
  * <p>Cases viewer for current handler only, show cases that only
@@ -195,7 +195,7 @@ public class HandlerCases extends CasesProcessor {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
-		CaseCategory parentCategory = category.getParent();
+		CaseCategory parentCategory = category == null ? null : category.getParent();
 		CaseType type = theCase.getCaseType();
 		Collection<ICFile> attachments = theCase.getAttachments();
 		User owner = theCase.getOwner();
@@ -223,31 +223,41 @@ public class HandlerCases extends CasesProcessor {
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness().getCaseCategories(), "getName");
 		categories.setID("casesParentCategory");
 		categories.keepStatusOnAction(true);
-		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		if (parentCategory != null || category != null) {
+			categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		}
 		categories.setStyleClass("caseCategoryDropdown");
 
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
 		subCategories.setID("casesSubCategory");
 		subCategories.keepStatusOnAction(true);
-		subCategories.setSelectedElement(category.getPrimaryKey().toString());
+		if (category != null) {
+			subCategories.setSelectedElement(category.getPrimaryKey().toString());
+		}
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 
 		if (parentCategory != null) {
 			Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory);
 
-			if (collection.isEmpty())
-				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
-			else
-				for (CaseCategory subCategory : collection)
+			if (collection.isEmpty()) {
+				if (category != null) {
+					subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+				}
+			} else {
+				for (CaseCategory subCategory: collection) {
 					subCategories.addMenuElement(subCategory.getPrimaryKey().toString(), subCategory.getLocalizedCategoryName(iwc.getCurrentLocale()));
+				}
+			}
 		}
 
 		DropdownMenu types = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_TYPE_PK), getCasesBusiness().getCaseTypes(), "getName");
 		types.keepStatusOnAction(true);
-		types.setSelectedElement(type.getPrimaryKey().toString());
+		if (type != null) {
+			types.setSelectedElement(type.getPrimaryKey().toString());
+		}
 		types.setStyleClass("caseTypeDropdown");
 
-		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
+		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type == null ? CoreConstants.EMPTY : type.getPrimaryKey().toString());
 
 		DropdownMenu statuses = new DropdownMenu(PARAMETER_STATUS);
 		statuses.addMenuElement(getCasesBusiness().getCaseStatusPending().getStatus(), getCasesBusiness().getLocalizedCaseStatusDescription(theCase, getCasesBusiness().getCaseStatusPending(), iwc.getCurrentLocale()));
@@ -320,10 +330,10 @@ public class HandlerCases extends CasesProcessor {
 				Link link = new Link(new Text(attachment.getName()));
 				link.setFile(attachment);
 				link.setTarget(Link.TARGET_BLANK_WINDOW);
-	
+
 				Layer attachmentSpan = new Layer(Layer.SPAN);
 				attachmentSpan.add(link);
-	
+
 				element = new Layer(Layer.DIV);
 				element.setStyleClass("formItem");
 				label = new Label();
