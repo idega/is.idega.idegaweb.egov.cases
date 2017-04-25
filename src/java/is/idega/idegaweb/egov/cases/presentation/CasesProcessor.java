@@ -7,13 +7,10 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
@@ -47,9 +44,14 @@ import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
+
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
 
 public abstract class CasesProcessor extends CasesBlock {
 
@@ -184,7 +186,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
-			Logger.getLogger(getClassName()).log(Level.SEVERE, 
+			Logger.getLogger(getClassName()).log(Level.SEVERE,
 					"Exception while displaying CasesProcessor", e);
 		}
 	}
@@ -222,7 +224,7 @@ public abstract class CasesProcessor extends CasesBlock {
 		Form form = new Form();
 		form.addParameter(UserCases.PARAMETER_ACTION, ACTION_MULTI_PROCESS_FORM);
 		form.addParameter(
-				"commaSeparatedExcludedHandlersIdsProperty", 
+				"commaSeparatedExcludedHandlersIdsProperty",
 				getCommaSeparatedExcludedHandlersIds());
 		topLayer.add(form);
 		boolean showCheckBoxes = showCheckBoxes();
@@ -343,14 +345,16 @@ public abstract class CasesProcessor extends CasesBlock {
 			throw new IBORuntimeException(fe);
 		}
 		CaseCategory category = theCase.getCaseCategory();
-		CaseCategory parentCategory = category.getParent();
+		CaseCategory parentCategory = category == null ? null : category.getParent();
 		CaseType type = theCase.getCaseType();
-		Group handlerGroup = category.getHandlerGroup();
+		Group handlerGroup = category == null ? null : category.getHandlerGroup();
 
 		SelectorUtility util = new SelectorUtility();
 		DropdownMenu categories = (DropdownMenu) util.getSelectorFromIDOEntities(new DropdownMenu(PARAMETER_CASE_CATEGORY_PK), getCasesBusiness().getCaseCategories(), "getName");
 		categories.setID(PARAMETER_CASE_CATEGORY_PK);
-		categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		if (parentCategory != null || category != null) {
+			categories.setSelectedElement(parentCategory != null ? parentCategory.getPrimaryKey().toString() : category.getPrimaryKey().toString());
+		}
 		categories.setStyleClass("caseCategoryDropdown");
 		if (useSubCategories) {
 			categories.setOnChange("changeSubCategories('" + PARAMETER_CASE_CATEGORY_PK + "', '" + iwc.getCurrentLocale().getCountry() + "')");
@@ -359,16 +363,24 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		DropdownMenu subCategories = new DropdownMenu(PARAMETER_SUB_CASE_CATEGORY_PK);
 		subCategories.setID(PARAMETER_SUB_CASE_CATEGORY_PK);
-		subCategories.setSelectedElement(category.getPrimaryKey().toString());
+		if (category != null) {
+			subCategories.setSelectedElement(category.getPrimaryKey().toString());
+		}
 		subCategories.setStyleClass("subCaseCategoryDropdown");
 		subCategories.setOnChange("changeUsers('" + PARAMETER_SUB_CASE_CATEGORY_PK + "')");
 
-		Collection<CaseCategory> collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
-		if (collection.isEmpty()) {
-			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+		Collection<CaseCategory> collection = null;
+		if (parentCategory != null || category != null) {
+			collection = getCasesBusiness(iwc).getSubCategories(parentCategory != null ? parentCategory : category);
 		}
-		else {
-			subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
+		if (ListUtil.isEmpty(collection)) {
+			if (category != null) {
+				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.no_sub_category", "no sub category"));
+			}
+		} else {
+			if (category != null) {
+				subCategories.addMenuElement(category.getPrimaryKey().toString(), getResourceBundle().getLocalizedString("case_creator.select_sub_category", "Select sub category"));
+			}
 			Iterator<CaseCategory> iter = collection.iterator();
 			while (iter.hasNext()) {
 				CaseCategory subCategory = iter.next();
@@ -383,12 +395,18 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		HiddenInput hiddenType = new HiddenInput(PARAMETER_CASE_TYPE_PK, type.getPrimaryKey().toString());
 
-		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+		Collection<User> handlers = Collections.emptyList();
+		if (handlerGroup != null) {
+			handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+		}
 		DropdownMenu users = new DropdownMenu(PARAMETER_USER);
 		users.setID(PARAMETER_USER);
 
-		for (User handler : handlers)
-			users.addMenuElement(handler.getPrimaryKey().toString(), handler.getName());
+		if (!ListUtil.isEmpty(handlers)) {
+			for (User handler: handlers) {
+				users.addMenuElement(handler.getPrimaryKey().toString(), handler.getName());
+			}
+		}
 
 		TextArea message = new TextArea(PARAMETER_MESSAGE);
 		message.setStyleClass("textarea");
