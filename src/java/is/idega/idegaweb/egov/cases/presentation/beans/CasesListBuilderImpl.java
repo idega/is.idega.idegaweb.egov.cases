@@ -289,6 +289,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!StringUtil.isEmpty(properties.getInactiveTasksToShow())) {
 			layer.setMarkupAttribute("inactiveTasksToShow", properties.getInactiveTasksToShow());
 		}
+		if (!StringUtil.isEmpty(properties.getCustomView())) {
+			layer.setMarkupAttribute("customView", properties.getCustomView());
+		}
 
 	}
 
