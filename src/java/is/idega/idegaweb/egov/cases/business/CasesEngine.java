@@ -9,6 +9,7 @@ import com.idega.block.process.presentation.beans.CasePresentation;
 import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.business.DefaultSpringBean;
+import com.idega.core.component.bean.RenderedComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.paging.PagedDataCollection;
 import com.idega.user.data.User;
@@ -70,4 +71,7 @@ public interface CasesEngine {
 	public Long startWorkingOnCase(Integer caseId);
 
 	public Document getCaseTaskView(Long taskId);
+
+	public RenderedComponent getRenderedCaseTaskView(Long taskId, List<AdvancedProperty> properties);
+
 }
