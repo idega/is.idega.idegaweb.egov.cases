@@ -292,6 +292,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!StringUtil.isEmpty(properties.getCustomView())) {
 			layer.setMarkupAttribute("customView", properties.getCustomView());
 		}
+		layer.setMarkupAttribute("showTimeSpentOnCase", properties.isShowTimeSpentOnCase());
 
 	}
 
