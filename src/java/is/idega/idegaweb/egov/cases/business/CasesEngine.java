@@ -10,6 +10,7 @@ import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.business.DefaultSpringBean;
 import com.idega.core.component.bean.RenderedComponent;
+import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.paging.PagedDataCollection;
 import com.idega.user.data.User;
@@ -21,6 +22,8 @@ public interface CasesEngine {
 	public abstract boolean clearSearchResults(String id);
 
 	public abstract AdvancedProperty getExportedSearchResults(String id);
+
+	public <T extends MediaWritable> AdvancedProperty getSearchResultsWithExporter(String id, Class<T> exporter);
 
 	public abstract boolean setCaseSubject(String caseId, String subject);
 
