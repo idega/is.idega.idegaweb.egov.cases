@@ -1,10 +1,5 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.application.IWBundleStarter;
-import is.idega.idegaweb.egov.cases.business.CasesEngine;
-import is.idega.idegaweb.egov.cases.business.HandlerCategoryBusiness;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +48,11 @@ import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.idegaweb.egov.application.IWBundleStarter;
+import is.idega.idegaweb.egov.cases.business.CasesEngine;
+import is.idega.idegaweb.egov.cases.business.HandlerCategoryBusiness;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 /**
  * Cases searcher. MUST be included in the same page as CasesList!
@@ -362,6 +362,7 @@ public class CasesSearcher extends CasesBlock {
 
 		if (isShowExportButton()) {
 			GenericButton export = new GenericButton(iwrb.getLocalizedString("export_search_results", "Export"));
+			export.setStyleClass("cases-list-exporter");
 			export.setTitle(iwrb.getLocalizedString("export_search_results_to_excel", "Export search results to Excel"));
 			export.setOnClick(new StringBuilder("CasesListHelper.exportSearchResults('").append(iwrb.getLocalizedString("exporting", "Exporting..."))
 																						.append("');").toString());
