@@ -31,4 +31,9 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 		if (time.getId()!= null) merge(time);
 		else persist(time);
 	}
+
+	@Override
+	public List<TimeSpentOnCase> getActiveTimeSpentOnCaseListForUser(Integer userId) {
+		return getResultList(TimeSpentOnCase.getAllActiveForUser, TimeSpentOnCase.class,  new Param(TimeSpentOnCase.UserIdProp, userId));
+	}
 }

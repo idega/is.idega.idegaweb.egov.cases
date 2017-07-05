@@ -986,7 +986,7 @@ CasesListHelper.addVariables = function() {
 		var input = this;
 		
 		var variableValue = dwr.util.getValue(input.id);
-		if (variableValue != null && variableValue != '') {
+		if (variableValue != null && variableValue != '' && variableValue != '-1' && variableValue != -1) {
 			var nameAttr = input.name.split('@');
 			
 			var multipleValues = false;

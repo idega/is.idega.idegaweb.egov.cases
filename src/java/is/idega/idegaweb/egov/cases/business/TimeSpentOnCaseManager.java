@@ -39,11 +39,19 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 		return tsocdao;
 	}
 
+	private void stopWorkingOnAllCases(Integer userId) {
+		List<TimeSpentOnCase> tsocList = getTsocdao().getActiveTimeSpentOnCaseListForUser(userId);
+		for (TimeSpentOnCase tsoc: tsocList){
+			stopWorkingOnCase(userId, new Integer(tsoc.getBpmCase().toString()));
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see is.idega.idegaweb.egov.bpm.business.TSOCManager#startWorkingOnCase(java.lang.Integer, java.lang.Integer)
 	 */
 	@Override
 	public Long startWorkingOnCase(Integer userId, Integer caseId) {
+		stopWorkingOnAllCases(userId);
 		List<TimeSpentOnCase> tsocList = getTsocdao().getTimeSpentOnCaseList(userId, caseId);
 		Long currentDuration = 0L;
 		if (ListUtil.isEmpty(tsocList)){
