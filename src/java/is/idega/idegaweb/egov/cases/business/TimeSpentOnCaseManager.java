@@ -39,7 +39,8 @@ public class TimeSpentOnCaseManager implements TSOCManager {
 		return tsocdao;
 	}
 
-	private void stopWorkingOnAllCases(Integer userId) {
+	@Override
+	public void stopWorkingOnAllCases(Integer userId) {
 		List<TimeSpentOnCase> tsocList = getTsocdao().getActiveTimeSpentOnCaseListForUser(userId);
 		for (TimeSpentOnCase tsoc: tsocList){
 			stopWorkingOnCase(userId, new Integer(tsoc.getBpmCase().toString()));

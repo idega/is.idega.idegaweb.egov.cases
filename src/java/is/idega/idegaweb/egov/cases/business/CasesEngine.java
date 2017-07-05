@@ -77,4 +77,6 @@ public interface CasesEngine {
 
 	public RenderedComponent getRenderedCaseTaskView(Long taskId, List<AdvancedProperty> properties);
 
+	void stopWorkingOnAllCases(Integer userId);
+
 }

@@ -12,4 +12,6 @@ public interface TSOCManager {
 
 	Long getCurrentState(Integer caseId);
 
+	void stopWorkingOnAllCases(Integer userId);
+
 }
