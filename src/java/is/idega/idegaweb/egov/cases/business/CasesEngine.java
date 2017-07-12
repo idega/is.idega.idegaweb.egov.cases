@@ -79,4 +79,6 @@ public interface CasesEngine {
 
 	void stopWorkingOnAllCases(Integer userId);
 
+	void stopWorkingOnAllCases();
+
 }
