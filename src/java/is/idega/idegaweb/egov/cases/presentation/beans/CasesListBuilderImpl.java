@@ -220,6 +220,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			statusLayer.setStyleClass(VARIABLE_STATUS);
 		}
 
+		if (properties.isShowCaseSubstatus())
+			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("caseSubstatus", "Substatus")), headerItem, "CaseSubstatus");
+
 		//Time spent on case
 		if (properties.isShowTimeSpentOnCase())
 			addLayerToCasesList(headers, new Text(iwrb.getLocalizedString("timeSpentOnCase", "Time spent on case")), headerItem, "TimeSpentOnCase");
@@ -292,6 +295,10 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (!StringUtil.isEmpty(properties.getCustomView())) {
 			layer.setMarkupAttribute("customView", properties.getCustomView());
 		}
+		if (properties.isShowCaseSubstatus()) {
+			layer.setMarkupAttribute("showCaseSubstatus", properties.isShowCaseSubstatus());
+		}
+
 		layer.setMarkupAttribute("showTimeSpentOnCase", properties.isShowTimeSpentOnCase());
 
 	}
@@ -511,6 +518,15 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 				statusContainer.setStyleClass(caseStatusCode);
 		}
 
+		if (properties.isShowCaseSubstatus()) {
+			Map<String, String> caseLabels = labels.get(caseId);
+			String column = "string_caseSubStatus";
+				Layer columnContainer = addLayerToCasesList(caseContainer, new Text(getResourceBundle(iwc).getLocalizedString(caseLabels.get(column), caseLabels.get(column))), bodyItem, "CustomLabel");
+				columnContainer.setStyleClass(column);
+				if (theCase.isBpm()) {
+					prepareCellToBeGridExpander(columnContainer, caseId, gridViewerId, properties);
+				}
+		}
 
 		if (properties.isShowTimeSpentOnCase()){
 			TSOCManager tsocManager = ELUtil.getInstance().getBean(TimeSpentOnCaseManager.BEAN_NAME);
@@ -659,13 +675,24 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 
 	private Map<String, Map<String, String>> getCustomLabels(PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties, Locale locale) {
+		if (properties.isShowCaseSubstatus()){
+			ArrayList<String> tmpList = new ArrayList<>(properties.getCustomColumns());
+			tmpList.add("string_caseSubStatus");
+			properties.setCustomColumns(tmpList);
+		}
 		CasesListCustomizer customizer = getCasesListCustomizer(properties);
 		if (customizer == null) {
+			if (properties.isShowCaseSubstatus()){
+				properties.getCustomColumns().remove("string_caseSubStatus");
+			}
 			return null;
 		}
 
 		Collection<CasePresentation> theCases = cases.getCollection();
 		if (ListUtil.isEmpty(theCases)) {
+			if (properties.isShowCaseSubstatus()){
+				properties.getCustomColumns().remove("string_caseSubStatus");
+			}
 			return null;
 		}
 
@@ -676,6 +703,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 		Map<String, Map<String, String>> customLabels = customizer.getLabelsForHeaders(casesIds, properties.getCustomColumns());
 		if (customLabels == null) {
+			if (properties.isShowCaseSubstatus()){
+				properties.getCustomColumns().remove("string_caseSubStatus");
+			}
 			return null;
 		}
 
@@ -694,6 +724,9 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			}
 		}
 
+		if (properties.isShowCaseSubstatus()){
+			properties.getCustomColumns().remove("string_caseSubStatus");
+		}
 		return customLabels;
 	}
 

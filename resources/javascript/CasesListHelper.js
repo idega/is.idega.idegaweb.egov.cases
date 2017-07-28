@@ -230,6 +230,7 @@ function registerGridExpanderActionsForElement(event, element) {
 		var showLastLoginDate = caseToExpand.attr('showLastLoginDate') == 'true';
 		var usexmldataprovider = caseToExpand.attr('usexmldataprovider') == 'true';
 		var inactiveTasksToShow = caseToExpand.attr('inactiveTasksToShow');
+		var showCaseSubstatus = caseToExpand.attr('showCaseSubstatus') == 'true';
 		var customView = caseToExpand.attr('customView');
 		CasesEngine.getCaseManagerView(new CasesBPMAssetProperties(caseId, 
 				CASE_GRID_CASE_PROCESSOR_TYPE, usePDFDownloadColumn, 
@@ -237,7 +238,7 @@ function registerGridExpanderActionsForElement(event, element) {
 				showAttachmentStatistics, showOnlyCreatorInContacts, 
 				showLogExportButton, showComments, showContacts, specialBackPage,
 				nameFromExternalEntity, showUserProfilePicture,addExportContacts,
-				showUserCompany,showLastLoginDate,usexmldataprovider, inactiveTasksToShow, customView), {
+				showUserCompany,showLastLoginDate,usexmldataprovider, inactiveTasksToShow, customView, showCaseSubstatus), {
 			callback: function(component) {
 				if (component == null) {
 					closeAllLoadingMessages();
@@ -264,7 +265,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 		showAttachmentStatistics, showOnlyCreatorInContacts, 
 		showLogExportButton, showComments, showContacts, 
 		specialBackPage, nameFromExternalEntity, showUserProfilePicture,addExportContacts,
-		showUserCompany,showLastLoginDate,usexmldataprovider, inactiveTasksToShow, customView) {
+		showUserCompany,showLastLoginDate,usexmldataprovider, inactiveTasksToShow, customView, showCaseSubstatus) {
 	this.caseId = caseId;
 	this.processorType = processorType;
 	
@@ -291,6 +292,7 @@ function CasesBPMAssetProperties(caseId, processorType, usePDFDownloadColumn,
 	this.usexmldataprovider = usexmldataprovider;
 	this.inactiveTasksToShow = inactiveTasksToShow;
 	this.customView = customView;
+	this.showCaseSubstatus = showCaseSubstatus;
 }
 
 CasesListHelper.getPager = function(fromPager, page) {
@@ -492,6 +494,7 @@ function searchForCases(parameters) {
 	var caseCodes = null;
 	var customView = null;
 	var showTimeSpentOnCase = false;
+	var showCaseSubstatus = false;
 	if (gridOpeners != null && gridOpeners.length > 0) {
 		var gridOpener = jQuery(gridOpeners[0]);
 		
@@ -513,6 +516,7 @@ function searchForCases(parameters) {
 		addExportContacts = gridOpener.attr('addExportContacts');
 		showUserCompany = gridOpener.attr('showUserCompany');
 		showTimeSpentOnCase = gridOpener.attr('showTimeSpentOnCase') == 'true'; 
+		showCaseSubstatus = gridOpener.attr('showCaseSubstatus') == 'true';
 		customView = gridOpener.attr('customview');
 		if (customColumns != null)
 			customColumns = customColumns.split(',');
@@ -536,7 +540,7 @@ function searchForCases(parameters) {
 		hideEmptySection, showCaseNumberColumn,	showCreationTimeInDateColumn, instanceId, onlySubscribedCases, 1,
 		dwr.util.getValue(jQuery('select.listPagerSize').attr('id')), jQuery('div.mainCasesListContainerStyleClass').parent().parent().attr('id'),
 		criteriasId, showAllCases, casesListCustomizer, customColumns, showLoadingMessageAttr, groupId, showAttachmentStatistics,
-		showUserProfilePicture, addExportContacts, showUserCompany, caseCodes, customColumnsForExport, customView, showTimeSpentOnCase
+		showUserProfilePicture, addExportContacts, showUserCompany, caseCodes, customColumnsForExport, customView, showTimeSpentOnCase, showCaseSubstatus
 	);
 	criterias.clearResults = true;
 	criterias.address = addressValue;
@@ -703,7 +707,7 @@ CasesListHelper.getStatusesToHide = function() {
 function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, processId, statusId, dateRange, caseListType, contact,
 	usePDFDownloadColumn, allowPDFSigning, showStatistics, processVariables, hideEmptySection, showCaseNumberColumn, showCreationTimeInDateColumn,
 	instanceId, onlySubscribedCases, page, pageSize, componentId, criteriasId, showAllCases, casesListCustomizer, customColumns,
-	showLoadingMessageAttr, groupId, showAttachmentStatistics, showUserProfilePicture, addExportContacts, showUserCompany, caseCodes, customColumnsForExport, customView, showTimeSpentOnCase) {
+	showLoadingMessageAttr, groupId, showAttachmentStatistics, showUserProfilePicture, addExportContacts, showUserCompany, caseCodes, customColumnsForExport, customView, showTimeSpentOnCase, showCaseSubstatus) {
 	
 	this.subscribersGroupId = groupId;
 	this.caseNumber = caseNumber == '' ? null : caseNumber;
@@ -757,6 +761,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.caseCodes = caseCodes;
 	this.customView = customView;
 	this.showTimeSpentOnCase = showTimeSpentOnCase;
+	this.showCaseSubstatus = showCaseSubstatus;
 }
 
 function registerCasesSearcherBoxActions(id, parameters) {
