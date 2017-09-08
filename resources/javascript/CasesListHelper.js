@@ -764,7 +764,7 @@ function CasesListSearchCriteriaBean(caseNumber, description, name, personalId, 
 	this.showCaseSubstatus = showCaseSubstatus;
 }
 
-function registerCasesSearcherBoxActions(id, parameters) {
+function registerCasesSearcherBoxActions(id, parameters, searchFunction) {
 	try {
 		if (jQuery.url.param('tiId') != null) {
 			jQuery('.casesSearcherBoxStyleClass').hide('fast', function() {
@@ -793,7 +793,11 @@ function registerCasesSearcherBoxActions(id, parameters) {
 		
 		input.keyup(function(event) {
 			if (isEnterEvent(event)) {
-				searchForCases(parameters);
+				if (searchFunction) {
+					searchFunction(parameters);
+				} else {
+					searchForCases(parameters);
+				}
 			}
 		});
 	}
