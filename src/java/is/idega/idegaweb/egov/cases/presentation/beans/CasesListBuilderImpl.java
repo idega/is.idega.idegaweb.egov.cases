@@ -544,7 +544,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			startStopButton.setMarkupAttribute("tsoc", String.valueOf(timeOnCase));
 			startStopButton.setOnClick("CasesListHelper.toggleWorkingOnCase(this);");
 			childItem.add(startStopButton);
-			Layer timeSpentOnCaseContainer = addLayerToCasesList(caseContainer, childItem, bodyItem, "TimeSpentOnCase");
+			addLayerToCasesList(caseContainer, childItem, bodyItem, "TimeSpentOnCase");
 		}
 
 		//	Controller
