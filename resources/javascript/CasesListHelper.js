@@ -249,10 +249,12 @@ function registerGridExpanderActionsForElement(event, element) {
 					closeAllLoadingMessages();
 				}
 				
-				IWCORE.insertHtml(component, customerView[0]);
-				
-				customerView.addClass(classCaseWithInfo);
-                jQuery(customerView).show('fast');
+				LazyLoader.load('/idegaweb/bundles/is.idega.idegaweb.egov.bpm.bundle/resources/javascript/CasesBPMAssets.js', function() {
+					IWCORE.insertHtml(component, customerView[0]);
+					
+					customerView.addClass(classCaseWithInfo);
+	                jQuery(customerView).show('fast');
+				});
 			}
 		});
 	} else {
