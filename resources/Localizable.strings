@@ -102,6 +102,7 @@ case_status_key.PEND=Pending processing
 case_status_key.PLAC=PLAC
 case_status_key.PREL=PREL
 case_status_key.SHUT=Processed
+case_status_key.SPAM=Spam
 case_status_key.TYST=Processed
 case_status_key.UBEH=Received
 case_status_key.CREA=Created
