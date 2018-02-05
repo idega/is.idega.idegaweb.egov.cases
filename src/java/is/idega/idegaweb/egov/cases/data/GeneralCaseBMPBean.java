@@ -7,8 +7,6 @@
  */
 package is.idega.idegaweb.egov.cases.data;
 
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,11 +38,13 @@ import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
+
 public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, GeneralCase {
 
 	private static final long serialVersionUID = 1213681239602561355L;
 
-	private static final String ENTITY_NAME = "comm_case";
+	public static final String ENTITY_NAME = "comm_case";
 
 	private static final String COLUMN_MESSAGE = "message";
 	private static final String COLUMN_REPLY = "reply";
@@ -53,7 +53,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 	private static final String COLUMN_FILE = "ic_file_id";
 	private static final String RELATION_FILES = ENTITY_NAME + "_ic_file";
 	private static final String COLUMN_TYPE = "type";
-	private static final String COLUMN_HANDLER = "handler";
+	public static final String COLUMN_HANDLER = "handler";
 	private static final String COLUMN_IS_PRIVATE = "is_private";
 	private static final String COLUMN_IS_ANONYMOUS = "is_anonymous";
 	private static final String COLUMN_PRIORITY = "priority";

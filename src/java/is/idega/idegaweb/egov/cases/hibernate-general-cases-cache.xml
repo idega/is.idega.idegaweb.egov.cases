@@ -1,0 +1,10 @@
+<ehcache>
+
+    <cache
+        maxElementsInMemory="500000"
+        name="is.idega.idegaweb.egov.cases.data.bean.GeneralCase"
+        timeToIdleSeconds="86400"
+        timeToLiveSeconds="86400"
+    />
+    
+</ehcache>
