@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.data.bean;
+package com.idega.idegaweb.egov.cases.data;
 
 import java.io.Serializable;
 

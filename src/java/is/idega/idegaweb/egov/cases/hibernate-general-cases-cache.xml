@@ -2,7 +2,7 @@
 
     <cache
         maxElementsInMemory="500000"
-        name="is.idega.idegaweb.egov.cases.data.bean.GeneralCase"
+        name="com.idega.idegaweb.egov.cases.data.GeneralCase"
         timeToIdleSeconds="86400"
         timeToLiveSeconds="86400"
     />
