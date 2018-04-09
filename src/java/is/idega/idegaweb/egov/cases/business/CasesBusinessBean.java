@@ -15,11 +15,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.ejb.CreateException;
@@ -57,6 +59,7 @@ import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
@@ -628,8 +631,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		theCase.setAsPrivate(isPrivate);
 		theCase.setCaseIdentifier(caseIdentifier);
 
-		if (caseManagerType != null)
+		if (caseManagerType != null) {
 			theCase.setCaseManagerType(caseManagerType);
+		}
 
 		changeCaseStatus(theCase, caseStatusKey, sender, (Group) null);
 
@@ -1125,8 +1129,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (caseHandlersGroups == null || caseHandlersGroups.isEmpty()) {
 
 				caseHandlersGroup = groupBusiness.createGroup(caseCategoryHandlersGroupName, caseCategoryHandlersGroupDescription);
-			} else
+			} else {
 				caseHandlersGroup = caseHandlersGroups.iterator().next();
+			}
 
 			int localeId = ICLocaleBusiness.getLocaleId(new Locale("en"));
 			caseCategory = storeCaseCategory(null, null, caseCategoryName, caseCategoryDescription, caseHandlersGroup, localeId, -1);
@@ -1152,10 +1157,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			FacesContext fctx = FacesContext.getCurrentInstance();
 			IWApplicationContext iwac;
 
-			if (fctx == null)
+			if (fctx == null) {
 				iwac = IWMainApplication.getDefaultIWApplicationContext();
-			else
+			} else {
 				iwac = IWMainApplication.getIWMainApplication(fctx).getIWApplicationContext();
+			}
 
 			return IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 		} catch (IBOLookupException ile) {
@@ -1173,7 +1179,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
 		Collection<User> owners = null;
-		if (personalId != null) {
+		if (!StringUtil.isEmpty(personalId)) {
 			Collection<User> caseOwners = null;
 			try {
 				caseOwners = getUserHome().findAllByPersonalID(personalId);
@@ -1186,7 +1192,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 			owners = new ArrayList<User>(caseOwners);
 		}
-		if (name != null) {
+		if (!StringUtil.isEmpty(name)) {
 			Collection<User> usersByName = getUserBusiness().getUsersByName(name);
 			if (ListUtil.isEmpty(usersByName)) {
 				return null;
@@ -1212,6 +1218,17 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			for (User caseOwner : owners) {
 				ownersIds.add(caseOwner.getId());
 			}
+		}
+
+		statuses = ArrayUtil.isEmpty(statuses) ? null : statuses;
+		if (!ArrayUtil.isEmpty(statuses)) {
+			Set<String> validStatuses = new HashSet<>();
+			for (String status: statuses) {
+				if (!StringUtil.isEmpty(status) && !StringUtil.isEmpty(status.trim())) {
+					validStatuses.add(status.trim());
+				}
+			}
+			statuses = ArrayUtil.convertListToArray(validStatuses);
 		}
 
 		if (notGeneralCases) {
@@ -1386,4 +1403,5 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		return filteredIds;
 	}
+
 }
