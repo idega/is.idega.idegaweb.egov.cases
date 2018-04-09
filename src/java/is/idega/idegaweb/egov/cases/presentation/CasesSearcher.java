@@ -1,12 +1,9 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,7 +13,6 @@ import javax.faces.component.UIComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseBusiness;
-import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.presentation.beans.CasesSearchCriteriaBean;
 import com.idega.block.process.presentation.beans.GeneralCasesListBuilder;
 import com.idega.block.web2.business.JQuery;
@@ -47,6 +43,7 @@ import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
 
 import is.idega.idegaweb.egov.application.IWBundleStarter;
@@ -129,14 +126,16 @@ public class CasesSearcher extends CasesBlock {
 	}
 
 	private Web2Business getWeb2Business() {
-		if (web2 == null)
+		if (web2 == null) {
 			ELUtil.getInstance().autowire(this);
+		}
 		return web2;
 	}
 
 	private JQuery getJQuery() {
-		if (jQuery == null)
+		if (jQuery == null) {
 			ELUtil.getInstance().autowire(this);
+		}
 		return jQuery;
 	}
 
@@ -188,8 +187,9 @@ public class CasesSearcher extends CasesBlock {
 
 		CasesSearchCriteriaBean searchSettings = null;
 		Object o = iwc.getSessionAttribute(GeneralCasesListBuilder.USER_CASES_SEARCH_SETTINGS_ATTRIBUTE);
-		if (o instanceof CasesSearchCriteriaBean)
+		if (o instanceof CasesSearchCriteriaBean) {
 			searchSettings = (CasesSearchCriteriaBean) o;
+		}
 
 		container = getContainer("casesSearcherBoxStyleClass");
 		add(container);
@@ -250,8 +250,9 @@ public class CasesSearcher extends CasesBlock {
 			String action = "CasesListHelper.getProcessDefinitionVariablesByProcessID('"+iwrb.getLocalizedString("loading", "Loading")
 					+ "', '"+ this.processProperty +"');";
 
-			if (!CoreUtil.isSingleComponentRenderingProcess(iwc))
+			if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 				action = "jQuery(window).load(function() {" + action + "});";
+			}
 
 			PresentationUtil.addJavaScriptActionOnLoad(iwc, action);
 		}
@@ -379,10 +380,12 @@ public class CasesSearcher extends CasesBlock {
 		TextInput input = new TextInput(name);
 		input.setStyleClass(textInputStyleClass);
 
-		if (!StringUtil.isEmpty(toolTip))
+		if (!StringUtil.isEmpty(toolTip)) {
 			input.setTitle(toolTip);
-		if (!StringUtil.isEmpty(value))
+		}
+		if (!StringUtil.isEmpty(value)) {
 			input.setValue(value);
+		}
 
 		return input;
 	}
@@ -500,65 +503,20 @@ public class CasesSearcher extends CasesBlock {
 			return menu;
 		}
 
-		Collection<CaseStatus> allStatuses = null;
-		try {
-			allStatuses = caseBusiness.getCaseStatuses();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		if (ListUtil.isEmpty(allStatuses)) {
+		Map<String, AdvancedProperty> statuses = caseBusiness.getCaseStatuses(showAllStatuses, getCaseStatusesToShow(), getCaseStatusesToHide());
+		if (MapUtil.isEmpty(statuses)) {
 			getLogger().warning("There are no statuses available");
 			menu.setDisabled(true);
 			return menu;
 		}
 
-		Locale l = iwc.getCurrentLocale();
-		if (l == null)
-			l = Locale.ENGLISH;
-
-		boolean addStatus = true;
-		String localizedStatus = null;
-		Map<String, AdvancedProperty> statuses = new HashMap<String, AdvancedProperty>();
-		for (CaseStatus status: allStatuses) {
-			addStatus = true;
-
-			try {
-				localizedStatus = caseBusiness.getLocalizedCaseStatusDescription(null, status, l);
-				if (!showAllStatuses && localizedStatus.equals(status.getStatus()))
-					addStatus = false;
-
-				if (this.getCaseStatusesToShow() != null) {
-					if (this.getCaseStatusesToShow().indexOf(status.getStatus()) != -1) {
-						addStatus = true;
-					} else if (!showAllStatuses) {
-						addStatus = false;
-					}
-				}
-
-				if (this.getCaseStatusesToHide() != null) {
-					if (this.getCaseStatusesToHide().indexOf(status.getStatus()) != -1) {
-						addStatus = false;
-					} else if (showAllStatuses) {
-						addStatus = true;
-					}
-				}
-
-				if (addStatus) {
-					String statusKey = status.getStatus();
-					if (statuses.containsKey(localizedStatus)) {
-						AdvancedProperty statusItem = statuses.get(localizedStatus);
-						statusItem.setId(statusItem.getId().concat(CoreConstants.COMMA).concat(statusKey));
-					} else {
-						statuses.put(localizedStatus, new AdvancedProperty(statusKey, localizedStatus));
-					}
-				}
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-
-		fillDropdown(l, menu, new ArrayList<AdvancedProperty>(statuses.values()), new AdvancedProperty(String.valueOf(-1),
-				getResourceBundle(iwc).getLocalizedString("select_status", "Select status")), selectedStatus);
+		fillDropdown(
+				iwc.getCurrentLocale(),
+				menu,
+				new ArrayList<AdvancedProperty>(statuses.values()),
+				new AdvancedProperty(String.valueOf(-1), getResourceBundle(iwc).getLocalizedString("select_status", "Select status")),
+				selectedStatus
+		);
 
 		return menu;
 	}
@@ -567,10 +525,12 @@ public class CasesSearcher extends CasesBlock {
 		IWDatePicker datePicker = new IWDatePicker(name);
 		datePicker.setVersion(IWDatePicker.VERSION_1_8_17);
 
-		if (from != null)
+		if (from != null) {
 			datePicker.setDate(from);
-		if (to != null)
+		}
+		if (to != null) {
 			datePicker.setDateTo(to);
+		}
 		datePicker.setDateRange(true);
 		datePicker.setUseCurrentDateIfNotSet(false);
 
@@ -633,8 +593,9 @@ public class CasesSearcher extends CasesBlock {
 	}
 
 	private CasesEngine getCasesEngine() {
-		if (casesEngine == null)
+		if (casesEngine == null) {
 			ELUtil.getInstance().autowire(this);
+		}
 		return casesEngine;
 	}
 
