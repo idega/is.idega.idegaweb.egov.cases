@@ -15,4 +15,8 @@ public interface TSOCDAO extends GenericDao {
 	public List<TimeSpentOnCase> getTimeSpentOnCaseList(Integer caseId);
 
 	public void saveTimeSpentOnCase(TimeSpentOnCase time);
+
+	public void removeTimeSpentOnCase(TimeSpentOnCase time);
+
+	public List<TimeSpentOnCase> getTimeSpentOnCaseList(String caseUuid);
 }

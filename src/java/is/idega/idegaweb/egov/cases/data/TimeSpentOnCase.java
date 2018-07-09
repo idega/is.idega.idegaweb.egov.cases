@@ -23,6 +23,7 @@ import com.idega.user.data.bean.User;
 		{
 			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp+" and tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " ORDER BY tsoc.start"),
 			@NamedQuery(name="tsoc.getByCase", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp + " ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getByCaseUuid", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.caseUuid =:"+TimeSpentOnCase.CaseUuidProp + " ORDER BY tsoc.start"),
 			@NamedQuery(name="tsoc.getAllActiveForUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.end is null ORDER BY tsoc.start")
 		}
 )
@@ -33,8 +34,10 @@ public class TimeSpentOnCase implements Serializable{
 	public static final String getByCaseAndUser = "tsoc.getByCaseAndUser";
 	public static final String getAllActiveForUser = "tsoc.getAllActiveForUser";
 	public static final String getByCase = "tsoc.getByCase";
+	public static final String getByCaseUuid = "tsoc.getByCaseUuid";
 	public static final String UserIdProp = "userId";
 	public static final String CaseIdProp = "caseId";
+	public static final String CaseUuidProp = "caseUuid";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,8 +48,11 @@ public class TimeSpentOnCase implements Serializable{
 	@JoinColumn(name = "ic_user_id", nullable = false)
 	private User user;
 
-	@Column(name ="case_id", nullable = false)
+	@Column(name ="case_id")
 	private Long bpmCase;
+
+	@Column(name ="case_uuid")
+	private String caseUuid;
 
 	@Column(name = "start_time")
 	private Timestamp start;
@@ -56,6 +62,17 @@ public class TimeSpentOnCase implements Serializable{
 
 	@Column(name ="duration")
 	private Long duration;
+
+	@Column(name ="comment")
+	private String comment;
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
 	public Long getId() {
 		return id;
@@ -103,5 +120,13 @@ public class TimeSpentOnCase implements Serializable{
 
 	public void setDuration(Long duration) {
 		this.duration = duration;
+	}
+
+	public String getCaseUuid() {
+		return caseUuid;
+	}
+
+	public void setCaseUuid(String caseUuid) {
+		this.caseUuid = caseUuid;
 	}
 }

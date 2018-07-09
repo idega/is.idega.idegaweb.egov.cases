@@ -25,6 +25,11 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 	}
 
 	@Override
+	public List<TimeSpentOnCase> getTimeSpentOnCaseList(String caseUuid) {
+		return getResultList(TimeSpentOnCase.getByCaseUuid, TimeSpentOnCase.class, new Param(TimeSpentOnCase.CaseIdProp, new String(caseUuid)));
+	}
+
+	@Override
 	@Transactional(readOnly = false)
 	public void saveTimeSpentOnCase(TimeSpentOnCase time){
 		if (time == null) return;
@@ -35,5 +40,12 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 	@Override
 	public List<TimeSpentOnCase> getActiveTimeSpentOnCaseListForUser(Integer userId) {
 		return getResultList(TimeSpentOnCase.getAllActiveForUser, TimeSpentOnCase.class,  new Param(TimeSpentOnCase.UserIdProp, userId));
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void removeTimeSpentOnCase(TimeSpentOnCase time) {
+		if (time == null) return;
+		remove(time);
 	}
 }
