@@ -21,10 +21,10 @@ import com.idega.user.data.bean.User;
 @Table(name = "time_spent_on_case")
 @NamedQueries(
 		{
-			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp+" and tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " ORDER BY tsoc.start"),
-			@NamedQuery(name="tsoc.getByCase", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp + " ORDER BY tsoc.start"),
-			@NamedQuery(name="tsoc.getByCaseUuid", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.caseUuid =:"+TimeSpentOnCase.CaseUuidProp + " ORDER BY tsoc.start"),
-			@NamedQuery(name="tsoc.getAllActiveForUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.end is null ORDER BY tsoc.start")
+			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp+" and tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.removed is null ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getByCase", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp + " and tsoc.removed is null  ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getByCaseUuid", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.caseUuid =:"+TimeSpentOnCase.CaseUuidProp + " and tsoc.removed is null  ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getAllActiveForUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.end is null and tsoc.removed is null ORDER BY tsoc.start")
 		}
 )
 public class TimeSpentOnCase implements Serializable{
@@ -65,6 +65,13 @@ public class TimeSpentOnCase implements Serializable{
 
 	@Column(name ="comment")
 	private String comment;
+
+	@Column(name = "date_removed")
+	private Timestamp removed;
+
+	@ManyToOne
+	@JoinColumn(name = "removedBy", referencedColumnName="ic_user_id")
+	private User removedBy;
 
 	public String getComment() {
 		return comment;
@@ -128,5 +135,21 @@ public class TimeSpentOnCase implements Serializable{
 
 	public void setCaseUuid(String caseUuid) {
 		this.caseUuid = caseUuid;
+	}
+
+	public Timestamp getRemoved() {
+		return removed;
+	}
+
+	public void setRemoved(Timestamp removed) {
+		this.removed = removed;
+	}
+
+	public User getRemovedBy() {
+		return removedBy;
+	}
+
+	public void setRemovedBy(User removedBy) {
+		this.removedBy = removedBy;
 	}
 }
