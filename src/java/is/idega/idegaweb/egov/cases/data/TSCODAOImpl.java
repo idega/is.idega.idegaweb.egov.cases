@@ -48,4 +48,12 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 		if (time == null) return;
 		remove(time);
 	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void removeTimeSpentOnCase(Long id) {
+		TimeSpentOnCase time = getSingleResultByInlineQuery("FROM TimeSpentOnCase tsoc WHERE tsoc.id = :id", TimeSpentOnCase.class, new Param("id", id));
+		if (time == null) return;
+		remove(time);
+	}
 }
