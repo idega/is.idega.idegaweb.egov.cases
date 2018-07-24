@@ -46,6 +46,7 @@ public interface CasesEngine {
 	 * ).
 	 */
 	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc);
+	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc, List<String> appTypeNames);
 
 	/**
 	 * <p>Check if there is Spring bean registered in cache with such name,
