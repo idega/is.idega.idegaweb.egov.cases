@@ -107,6 +107,7 @@ case_status_key.CREA=Skapad
 case_status_key.FINI=F\u00E4rdig
 case_status_key.UPPS=UPPS
 case_status_key.WAIT=V\u00E4ntande
+case_status_key.RECE=Mottagande
 case_taken_body=Ditt \u00E4rende med kategori (0) och typ (1) har lagts in i processen av (2)
 case_taken_subject=Ditt \u00E4rende har tagits
 case_type=\u00C4rende typ
