@@ -33,10 +33,11 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 
 	@Override
 	@Transactional(readOnly = false)
-	public void saveTimeSpentOnCase(TimeSpentOnCase time){
-		if (time == null) return;
-		if (time.getId()!= null) merge(time);
-		else persist(time);
+	public TimeSpentOnCase saveTimeSpentOnCase(TimeSpentOnCase time){
+		if (time == null) {
+			return null;
+		}
+		return merge(time);
 	}
 
 	@Override
