@@ -1,8 +1,10 @@
-package is.idega.idegaweb.egov.cases.data;
+package is.idega.idegaweb.egov.cases.data.dao;
 
 import java.util.List;
 
 import com.idega.core.persistence.GenericDao;
+
+import is.idega.idegaweb.egov.cases.data.bean.TimeSpentOnCase;
 
 public interface TSOCDAO extends GenericDao {
 

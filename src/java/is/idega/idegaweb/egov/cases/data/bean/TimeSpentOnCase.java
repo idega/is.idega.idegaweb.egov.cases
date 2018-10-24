@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.data;
+package is.idega.idegaweb.egov.cases.data.bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
