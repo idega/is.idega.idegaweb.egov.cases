@@ -14,8 +14,8 @@ import com.idega.user.data.bean.User;
 import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
 
-import is.idega.idegaweb.egov.cases.data.TSOCDAO;
-import is.idega.idegaweb.egov.cases.data.TimeSpentOnCase;
+import is.idega.idegaweb.egov.cases.data.bean.TimeSpentOnCase;
+import is.idega.idegaweb.egov.cases.data.dao.TSOCDAO;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(TimeSpentOnCaseManager.BEAN_NAME)

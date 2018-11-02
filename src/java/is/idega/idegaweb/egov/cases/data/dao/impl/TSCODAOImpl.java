@@ -1,4 +1,4 @@
-package is.idega.idegaweb.egov.cases.data;
+package is.idega.idegaweb.egov.cases.data.dao.impl;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.idega.core.persistence.Param;
 import com.idega.core.persistence.impl.GenericDaoImpl;
 import com.idega.presentation.IWContext;
+
+import is.idega.idegaweb.egov.cases.data.bean.TimeSpentOnCase;
+import is.idega.idegaweb.egov.cases.data.dao.TSOCDAO;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Repository(TSOCDAO.BEAN_NAME)
@@ -33,10 +36,17 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 
 	@Override
 	@Transactional(readOnly = false)
-	public void saveTimeSpentOnCase(TimeSpentOnCase time){
-		if (time == null) return;
-		if (time.getId()!= null) merge(time);
-		else persist(time);
+	public TimeSpentOnCase saveTimeSpentOnCase(TimeSpentOnCase time){
+		if (time == null) {
+			return null;
+		}
+
+		if (time.getId() == null) {
+			persist(time);
+		} else {
+			merge(time);
+		}
+		return time.getId() == null ? null : time;
 	}
 
 	@Override
@@ -47,7 +57,9 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 	@Override
 	@Transactional(readOnly = false)
 	public void removeTimeSpentOnCase(TimeSpentOnCase time) {
-		if (time == null) return;
+		if (time == null) {
+			return;
+		}
 		time.setRemovedBy(IWContext.getCurrentInstance().getLoggedInUser());
 		time.setRemoved(new Timestamp(System.currentTimeMillis()));
 		saveTimeSpentOnCase(time);
