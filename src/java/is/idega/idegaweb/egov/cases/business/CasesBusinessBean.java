@@ -1177,6 +1177,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
+		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, null);
+	}
+
+	@Override
+	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
+			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler) {
 
 		Collection<User> owners = null;
 		if (!StringUtil.isEmpty(personalId)) {
@@ -1233,7 +1239,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		if (notGeneralCases) {
 			try {
-				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
+				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
@@ -1256,8 +1262,15 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
 
+		return getCasesByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, null);
+	}
+
+	@Override
+	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
+			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler) {
+
 		Collection<Integer> ids = getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases,
-				notGeneralCases);
+				notGeneralCases, withHandler);
 		try {
 			return getCaseHome().findAllByIds(ids);
 		} catch (Exception e) {
