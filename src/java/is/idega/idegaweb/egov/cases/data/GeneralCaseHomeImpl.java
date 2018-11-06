@@ -163,6 +163,19 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	}
 
 	@Override
+	public Collection<Integer> getCasesIDsByCriteria(String caseNumber,
+			String description, Collection<String> owners, String[] statuses,
+			IWTimestamp dateFrom, IWTimestamp dateTo, User owner,
+			Collection<Group> groups, boolean simpleCases, Boolean withHandler)
+			throws FinderException {
+
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection<Integer> ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler);
+		this.idoCheckInPooledEntity(entity);
+		return ids;
+	}
+
+	@Override
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses,
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases) throws FinderException {
 
@@ -176,7 +189,7 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
-	
+
 	private Logger getLogger(){
 		return Logger.getLogger(GeneralCaseHomeImpl.class.getName());
 	}

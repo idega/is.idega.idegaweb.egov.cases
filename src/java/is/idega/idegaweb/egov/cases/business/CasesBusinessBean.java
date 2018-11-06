@@ -1247,7 +1247,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		} else {
 			try {
-				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases);
+				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
