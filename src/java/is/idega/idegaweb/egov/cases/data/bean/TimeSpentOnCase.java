@@ -24,6 +24,8 @@ import com.idega.user.data.bean.User;
 			@NamedQuery(name="tsoc.getByCaseAndUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp+" and tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.removed is null ORDER BY tsoc.start"),
 			@NamedQuery(name="tsoc.getByCase", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp + " and tsoc.removed is null  ORDER BY tsoc.start"),
 			@NamedQuery(name="tsoc.getByCaseUuid", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.caseUuid =:"+TimeSpentOnCase.CaseUuidProp + " and tsoc.removed is null  ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getByCaseRemoved", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.bpmCase =:"+TimeSpentOnCase.CaseIdProp + " and tsoc.removed is not null  ORDER BY tsoc.start"),
+			@NamedQuery(name="tsoc.getByCaseUuidRemoved", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.caseUuid =:"+TimeSpentOnCase.CaseUuidProp + " and tsoc.removed is not null  ORDER BY tsoc.start"),
 			@NamedQuery(name="tsoc.getAllActiveForUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.end is null and tsoc.removed is null ORDER BY tsoc.start")
 		}
 )
@@ -35,6 +37,8 @@ public class TimeSpentOnCase implements Serializable{
 	public static final String getAllActiveForUser = "tsoc.getAllActiveForUser";
 	public static final String getByCase = "tsoc.getByCase";
 	public static final String getByCaseUuid = "tsoc.getByCaseUuid";
+	public static final String getByCaseRemoved = "tsoc.getByCaseRemoved";
+	public static final String getByCaseUuidRemoved = "tsoc.getByCaseUuidRemoved";
 	public static final String UserIdProp = "userId";
 	public static final String CaseIdProp = "caseId";
 	public static final String CaseUuidProp = "caseUuid";
