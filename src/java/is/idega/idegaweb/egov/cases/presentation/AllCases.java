@@ -2,6 +2,7 @@ package is.idega.idegaweb.egov.cases.presentation;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.ejb.FinderException;
 
@@ -232,7 +233,9 @@ public class AllCases extends CasesProcessor implements IWPageEventListener {
 		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		bottom.add(pdf);
 
-		if (iwc.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
+		boolean superAdmin = iwc.isSuperAdmin();
+		Set<String> userRoles = superAdmin ? null : iwc.getAccessController().getAllRolesForUser(iwc.getLoggedInUser());
+		if (superAdmin || (userRoles != null && (userRoles.contains(CasesConstants.ROLE_CASES_SUPER_ADMIN) || userRoles.contains("cases_allocator")))) {
 			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
 			next.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
 			next.maintainParameter(PARAMETER_CASE_PK, iwc);

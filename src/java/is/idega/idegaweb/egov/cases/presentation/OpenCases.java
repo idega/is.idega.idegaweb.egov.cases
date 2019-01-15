@@ -7,14 +7,9 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.CaseWriter;
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.ejb.FinderException;
 
@@ -37,6 +32,12 @@ import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
+
+import is.idega.idegaweb.egov.cases.business.CaseWriter;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
@@ -240,7 +241,9 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 		pdf.addParameter(getCasesBusiness().getSelectedCaseParameter(), theCase.getPrimaryKey().toString());
 		bottom.add(pdf);
 
-		if (iwc.getAccessController().hasRole(CasesConstants.ROLE_CASES_SUPER_ADMIN, iwc)) {
+		boolean superAdmin = iwc.isSuperAdmin();
+		Set<String> userRoles = superAdmin ? null : iwc.getAccessController().getAllRolesForUser(iwc.getLoggedInUser());
+		if (superAdmin || (userRoles != null && (userRoles.contains(CasesConstants.ROLE_CASES_SUPER_ADMIN) || userRoles.contains("cases_allocator")))) {
 			Link next = getButtonLink(getResourceBundle().getLocalizedString(getPrefix() + "allocate_case", "Allocate case"));
 			next.addParameter(UserCases.PARAMETER_ACTION, String.valueOf(ACTION_ALLOCATION_FORM));
 			next.maintainParameter(PARAMETER_CASE_PK, iwc);
