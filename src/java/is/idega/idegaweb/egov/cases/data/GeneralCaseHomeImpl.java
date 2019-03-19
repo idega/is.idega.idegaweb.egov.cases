@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.cases.data;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -166,11 +167,11 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber,
 			String description, Collection<String> owners, String[] statuses,
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner,
-			Collection<Group> groups, boolean simpleCases, Boolean withHandler)
-			throws FinderException {
-
+			Collection<Group> groups, boolean simpleCases, Boolean withHandler,
+			List<Integer> exceptOwnersIds
+	) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection<Integer> ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler);
+		Collection<Integer> ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds);
 		this.idoCheckInPooledEntity(entity);
 		return ids;
 	}
