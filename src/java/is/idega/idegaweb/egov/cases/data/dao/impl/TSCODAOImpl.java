@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.idega.core.persistence.Param;
 import com.idega.core.persistence.impl.GenericDaoImpl;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
 
 import is.idega.idegaweb.egov.cases.data.bean.TimeSpentOnCase;
 import is.idega.idegaweb.egov.cases.data.dao.TSOCDAO;
@@ -89,4 +90,22 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 		TimeSpentOnCase time = getSingleResultByInlineQuery("FROM TimeSpentOnCase tsoc WHERE tsoc.id = :id", TimeSpentOnCase.class, new Param("id", id));
 		removeTimeSpentOnCase(time);
 	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void changeFlagAddTimeToInvoice(Long id, Boolean add) {
+		if (id == null || add == null) {
+			return;
+		}
+		TimeSpentOnCase time = getSingleResultByInlineQuery("FROM TimeSpentOnCase tsoc WHERE tsoc.id = :id", TimeSpentOnCase.class, new Param("id", id));
+		if (time != null) {
+			if (add.booleanValue() == Boolean.TRUE) {
+				time.setAddedToInvoice(CoreConstants.CHAR_Y);
+			} else {
+				time.setAddedToInvoice(CoreConstants.CHAR_N);
+			}
+		}
+		saveTimeSpentOnCase(time);
+	}
+
 }

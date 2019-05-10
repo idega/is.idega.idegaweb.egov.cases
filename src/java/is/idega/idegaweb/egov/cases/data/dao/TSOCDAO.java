@@ -28,4 +28,6 @@ public interface TSOCDAO extends GenericDao {
 
 	public List<TimeSpentOnCase> getTimeSpentOnCaseList(Integer caseId, boolean removed);
 
+	public void changeFlagAddTimeToInvoice(Long id, Boolean add);
+
 }

@@ -15,6 +15,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import com.idega.user.data.bean.User;
+import com.idega.util.CoreConstants;
 
 
 @Entity
@@ -76,6 +77,10 @@ public class TimeSpentOnCase implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "removedBy", referencedColumnName="ic_user_id")
 	private User removedBy;
+
+	@Column(name = "added_to_invoice", length = 1)
+	private Character addedToInvoice;
+
 
 	public String getComment() {
 		return comment;
@@ -156,4 +161,14 @@ public class TimeSpentOnCase implements Serializable{
 	public void setRemovedBy(User removedBy) {
 		this.removedBy = removedBy;
 	}
+
+	public boolean getAddedToInvoice() {
+		return addedToInvoice == null ? false : addedToInvoice == CoreConstants.CHAR_Y;
+	}
+
+	public void setAddedToInvoice(Character addedToInvoice) {
+		this.addedToInvoice = addedToInvoice;
+	}
+
+
 }
