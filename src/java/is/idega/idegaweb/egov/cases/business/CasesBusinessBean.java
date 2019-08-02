@@ -8,8 +8,11 @@
 package is.idega.idegaweb.egov.cases.business;
 
 import java.rmi.RemoteException;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -65,6 +68,7 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.database.ConnectionBroker;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
 
@@ -74,6 +78,8 @@ import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.CaseTypeHome;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
+import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
+import is.idega.idegaweb.egov.cases.presentation.CasesStatistics.Result;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
@@ -1415,6 +1421,47 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 
 		return filteredIds;
+	}
+
+	@Override
+	public Collection<CasesStatistics.Result> getCasesStatisticsResults(IWContext iwc, CasesStatistics.Handler handler) {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+
+		Collection<Result> results = new ArrayList<Result>();
+		try {
+			//CoreUtil.clearAllCaches();
+
+			conn = ConnectionBroker.getConnection();
+			stmt = conn.createStatement();
+
+			rs = stmt.executeQuery(handler.getSQL());
+
+			results.addAll(handler.getResults(iwc, rs));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (conn != null) {
+				ConnectionBroker.freeConnection(conn);
+			}
+		}
+
+		return results;
 	}
 
 }

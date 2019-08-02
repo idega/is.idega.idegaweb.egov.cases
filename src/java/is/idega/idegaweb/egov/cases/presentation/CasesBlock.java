@@ -1,14 +1,11 @@
 /*
  * $Id$ Created on Oct 30, 2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.cases.presentation;
-
-import is.idega.idegaweb.egov.cases.business.CasesBusiness;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -50,6 +47,10 @@ import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
 
+import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
+
 public abstract class CasesBlock extends CaseBlock {
 
 	private CasesBusiness business;
@@ -65,11 +66,15 @@ public abstract class CasesBlock extends CaseBlock {
 	public void main(IWContext iwc) throws Exception {
 		IWBundle iwb =  iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.bpm");
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, iwb.getVirtualPathWithFileNameString("javascript/CasesBPMAssets.js"));
-		
-		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
-				iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"),
-				iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/case.css")
-		));
+
+		try {
+			PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
+					iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"),
+					iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/case.css")
+			));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		initialize(iwc);
 		present(iwc);
 	}
@@ -104,7 +109,7 @@ public abstract class CasesBlock extends CaseBlock {
 
 		return link;
 	}
-	
+
 	protected Link getDownloadButtonLink(String text, Class<? extends MediaWritable> mediaWriterClass) {
 		Layer all = new Layer(Layer.SPAN);
 		all.setStyleClass("buttonSpan");
@@ -254,7 +259,7 @@ public abstract class CasesBlock extends CaseBlock {
 			formItem.add(new Span(new Text(reply)));
 			section.add(formItem);
 		}
-		
+
 		Layer clear = new Layer(Layer.DIV);
 		clear.setStyleClass("Clear");
 		section.add(clear);
@@ -343,12 +348,22 @@ public abstract class CasesBlock extends CaseBlock {
 		}
 	}
 
+	protected ApplicationBusiness getApplicationBusiness(IWApplicationContext iwac) {
+		try {
+			return IBOLookup.getServiceInstance(iwac, ApplicationBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+
+
 	@Override
 	protected UserBusiness getUserBusiness() {
 		return this.userBusiness;
 	}
 
-	private UserBusiness getUserBusiness(IWApplicationContext iwac) {
+	protected UserBusiness getUserBusiness(IWApplicationContext iwac) {
 		try {
 			return IBOLookup.getServiceInstance(iwac, UserBusiness.class);
 		}

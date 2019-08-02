@@ -32,6 +32,7 @@ import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.data.GeneralCase;
 import is.idega.idegaweb.egov.cases.data.GeneralCaseHome;
+import is.idega.idegaweb.egov.cases.presentation.CasesStatistics;
 
 public interface CasesBusiness extends IBOService, CaseBusiness {
 
@@ -399,5 +400,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getFilteredProcesslessCasesIds
 	 */
 	public List<Integer> getFilteredProcesslessCasesIds(Collection<Integer> ids, boolean notGeneralCases) throws RemoteException;
+
+	public Collection<CasesStatistics.Result> getCasesStatisticsResults(IWContext iwc, CasesStatistics.Handler handler);
 
 }

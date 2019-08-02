@@ -9,15 +9,9 @@
  */
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.rmi.RemoteException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -71,8 +65,15 @@ import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
-import com.idega.util.database.ConnectionBroker;
+import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.expression.ELUtil;
+import com.idega.webface.WFUtil;
+
+import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.application.data.ApplicationHome;
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 
 public class CasesStatistics extends CasesBlock {
@@ -100,7 +101,7 @@ public class CasesStatistics extends CasesBlock {
 	private String categoriesCriteria;
 	private String statusesCriteria;
 
-	@Autowired(required = false)
+	@Autowired(required = true)
 	private CaseManagersProvider caseManagersProvider;
 
 	@Override
@@ -429,7 +430,7 @@ public class CasesStatistics extends CasesBlock {
 			Handler handler = new CategoryHandler(useSubCats, parentID);
 			handler.setDateFrom(dateFrom);
 			handler.setDateTo(dateTo);
-			return getResults(iwc, handler);
+			return getCasesBusiness().getCasesStatisticsResults(iwc, handler);
 		}
 
 		return null;
@@ -439,14 +440,14 @@ public class CasesStatistics extends CasesBlock {
 		Handler handler = new UserHandler(false, -1);
 		handler.setDateFrom(dateFrom);
 		handler.setDateTo(dateTo);
-		return getResults(iwc, handler);
+		return getCasesBusiness().getCasesStatisticsResults(iwc, handler);
 	}
 
 	private Collection<Result> getResultsCode(IWContext iwc, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		Handler handler = new CaseTypeHandler(false, -1);
 		handler.setDateFrom(dateFrom);
 		handler.setDateTo(dateTo);
-		return getResults(iwc, handler);
+		return getCasesBusiness().getCasesStatisticsResults(iwc, handler);
 	}
 
 	public void setVisibleStatuses(String statuses) {
@@ -463,7 +464,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 
 	@SuppressWarnings("unchecked")
-	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId) {
+	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId, Map<String, Integer> statuses, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		if (getCaseManagersProvider() == null) {
 			return null;
 		}
@@ -480,7 +481,11 @@ public class CasesStatistics extends CasesBlock {
 
 		Collection<Case> cases = null;
 		try {
-			cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
+			if (getCasesBusiness() == null) {
+				cases = getCasesBusiness(iwc).getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
+			} else {
+				cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -502,17 +507,84 @@ public class CasesStatistics extends CasesBlock {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
+			//Get localized process name from application
+			if (StringUtil.isEmpty(localizedProcessName)) {
+				try {
+					Collection<Application> apps = null;
+					try {
+						apps = getApplicationBusiness(iwc != null ? iwc : IWMainApplication.getDefaultIWApplicationContext()).getApplicationHome().findAllByApplicationUrl(processName);
+					} catch (Exception e) {}
+
+					if (!ListUtil.isEmpty(apps)) {
+						String unlocalizedName = null;
+						for (Application app: apps) {
+							unlocalizedName = app.getName();
+							String localizedName = app.getLocalizedName(locale);
+							if (!StringUtil.isEmpty(localizedName)) {
+								localizedProcessName = localizedName;
+								break;
+							}
+						}
+						if (StringUtil.isEmpty(localizedProcessName) ) {
+							localizedProcessName = unlocalizedName;
+						}
+					}
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
 			if (StringUtil.isEmpty(localizedProcessName)) {
 				localizedProcessName = unkownProcess;
 			}
 
-			results.add(new Result(-1, localizedProcessName, getStatusesForCases(casesByProcesses.get(processName)), false));
+			results.add(new Result(-1, localizedProcessName, getStatusesForCases(casesByProcesses.get(processName), statuses, dateFrom, dateTo), false));
 		}
 
 		return results;
 	}
 
-	private Map<String, Integer> getStatusesForCases(List<Case> cases) {
+	private Map<String, Integer> getStatusesForCases(List<Case> cases, Map<String, Integer> statusesFromSQL, IWTimestamp dateFrom, IWTimestamp dateTo) {
+		if (ListUtil.isEmpty(cases) || MapUtil.isEmpty(statusesFromSQL)) {
+			return new HashMap<String, Integer>();
+		}
+
+		Map<String, Integer> statuses = new HashMap<String, Integer>();
+
+		String statusId = null;
+		for (Case theCase: cases) {
+			statusId = theCase.getStatus();
+
+			//Do not take into account the case, which status does not exist in the status map from SQL
+			if (!statusesFromSQL.containsKey(statusId)) {
+				continue;
+			}
+			//Do not take into account the case, which dates are not in the given date ranges
+			if (dateFrom != null && theCase.getCreated() != null && dateFrom.isLaterThan(new IWTimestamp(theCase.getCreated()))) {
+				continue;
+			}
+			if (dateTo != null && theCase.getCreated() != null && dateTo.isEarlierThan(new IWTimestamp(theCase.getCreated()))) {
+				continue;
+			}
+
+			if (StringUtil.isEmpty(statusId)) {
+				LOGGER.warning("There is no status set for case: " + theCase);
+			} else {
+				Integer count = statuses.get(statusId);
+				if (count == null) {
+					count = Integer.valueOf(1);
+				}
+				else {
+					count++;
+				}
+				statuses.put(statusId, count);
+			}
+		}
+
+		return statuses;
+	}
+
+
+	private Map<String, Integer> getStatusesForCasesOld(List<Case> cases) {
 		if (ListUtil.isEmpty(cases)) {
 			return new HashMap<String, Integer>();
 		}
@@ -563,7 +635,7 @@ public class CasesStatistics extends CasesBlock {
 
 		String processDefinitionName = null;
 		for (Case theCase: cases) {
-			if (canCaseBeUsedInStatistics(theCase)) {
+			if (theCase != null && canCaseBeUsedInStatistics(theCase)) {
 				processDefinitionName = null;
 				try {
 					processDefinitionName = getCaseManagersProvider().getCaseManager().getProcessDefinitionName(theCase);
@@ -571,10 +643,27 @@ public class CasesStatistics extends CasesBlock {
 					e.printStackTrace();
 				}
 
+				//Searching in another way
+				if (StringUtil.isEmpty(processDefinitionName)) {
+					//By case code
+					String caseCode = theCase.getCaseCode() != null && !StringUtil.isEmpty(theCase.getCaseCode().getCode()) ? theCase.getCaseCode().getCode() : null;
+					if (!StringUtil.isEmpty(caseCode)) {
+						try {
+							ApplicationHome appHome = (ApplicationHome) IDOLookup.getHome(is.idega.idegaweb.egov.application.data.Application.class);
+							Collection<is.idega.idegaweb.egov.application.data.Application> apps = appHome.findAllByCaseCode(caseCode);
+							if (!ListUtil.isEmpty(apps)) {
+								processDefinitionName = apps.iterator().next().getUrl(); //getName();
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+
 				if (StringUtil.isEmpty(processDefinitionName)) {
 					LOGGER.warning("Unable to get process identifier for case: " + theCase);
-				}
-				else {
+				} else {
 					List<Case> casesByProcess = casesByProcesses.get(processDefinitionName);
 					if (ListUtil.isEmpty(casesByProcess)) {
 						casesByProcess = new ArrayList<Case>();
@@ -588,45 +677,8 @@ public class CasesStatistics extends CasesBlock {
 		return casesByProcesses;
 	}
 
-	private Collection<Result> getResults(IWContext iwc, Handler handler) {
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
 
-		Collection<Result> results = new ArrayList<Result>();
-		try {
-			conn = ConnectionBroker.getConnection();
-			stmt = conn.createStatement();
-
-			rs = stmt.executeQuery(handler.getSQL());
-
-			results.addAll(handler.getResults(iwc, rs));
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (conn != null) {
-				ConnectionBroker.freeConnection(conn);
-			}
-		}
-
-		return results;
-	}
-
-	protected class Result {
+	public class Result {
 
 		private int id;
 		private boolean useDefaultHandlerIfNotFoundResultsProvider = true;
@@ -644,24 +696,24 @@ public class CasesStatistics extends CasesBlock {
 			this.useDefaultHandlerIfNotFoundResultsProvider = useDefaultHandlerIfNotFoundResultsProvider;
 		}
 
-		protected String getName() {
+		public String getName() {
 			return name;
 		}
 
-		protected Map<String, Integer> getStatusMap() {
+		public Map<String, Integer> getStatusMap() {
 			return statusMap;
 		}
 
-		protected int getID(){
+		public int getID(){
 			return id;
 		}
 
-		protected boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
+		public boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
 			return useDefaultHandlerIfNotFoundResultsProvider;
 		}
 	}
 
-	protected abstract class Handler {
+	public abstract class Handler {
 		public abstract String getSQL();
 		public abstract Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException;
 		public abstract boolean addResult(IWContext iwc, Collection<Result> results, int prevID, Map<String, Integer> statuses)
@@ -687,19 +739,19 @@ public class CasesStatistics extends CasesBlock {
 		protected IWTimestamp getDateFrom() {
 			return dateFrom;
 		}
-		protected void setDateFrom(IWTimestamp dateFrom) {
+		public void setDateFrom(IWTimestamp dateFrom) {
 			this.dateFrom = dateFrom;
 		}
 		protected IWTimestamp getDateTo() {
 			return dateTo;
 		}
-		protected void setDateTo(IWTimestamp dateTo) {
+		public void setDateTo(IWTimestamp dateTo) {
 			this.dateTo = dateTo;
 		}
 	}
 
 	//	Cases by categories
-	protected class CategoryHandler extends Handler {
+	public class CategoryHandler extends Handler {
 		private List<Integer> addedCategories = new ArrayList<Integer>();
 
 		public CategoryHandler(boolean useSubCats, int parentID) {
@@ -778,7 +830,7 @@ public class CasesStatistics extends CasesBlock {
 
 			if (!addedCategories.contains(caseCategoryId) && isCustomCategory(caseCategoryId)) {
 				addedCategories.add(caseCategoryId);
-				Collection<Result> customCategoryResults = getCustomCategoryResults(iwc, caseCategoryId);
+				Collection<Result> customCategoryResults = getCustomCategoryResults(iwc, caseCategoryId, statuses, getDateFrom(), getDateTo());
 				if (!ListUtil.isEmpty(customCategoryResults)) {
 					results.addAll(customCategoryResults);
 				}
@@ -843,7 +895,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 
 	//	Cases by user
-	protected class UserHandler extends Handler {
+	public class UserHandler extends Handler {
 		public UserHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
@@ -904,7 +956,13 @@ public class CasesStatistics extends CasesBlock {
 		public boolean addResult(IWContext iwc, Collection<Result> results, int userId, Map<String, Integer> statuses) throws RemoteException, FinderException {
 			String resultName = null;
 			if (userId > -1) {
-				User user = getUserBusiness().getUser(userId);
+				User user = null;
+				if (getUserBusiness() == null) {
+					user = getUserBusiness(iwc).getUser(userId);;
+				} else {
+					user = getUserBusiness().getUser(userId);
+				}
+
 				resultName = user.getName();
 			}
 			return addResultToList(resultName, results, userId, statuses);
@@ -913,7 +971,7 @@ public class CasesStatistics extends CasesBlock {
 	}
 
 	//	Cases by type
-	protected class CaseTypeHandler extends Handler {
+	public class CaseTypeHandler extends Handler {
 		public CaseTypeHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
@@ -974,7 +1032,13 @@ public class CasesStatistics extends CasesBlock {
 			throws FinderException, RemoteException {
 			String resultName = null;
 			if (caseTypeId > -1) {
-				CaseType type = getCasesBusiness().getCaseType(caseTypeId);
+				CaseType type = null;
+				if (getCasesBusiness() == null) {
+					type = getCasesBusiness(iwc).getCaseType(caseTypeId);
+				} else {
+					type = getCasesBusiness().getCaseType(caseTypeId);
+				}
+
 				resultName = type.getName();
 			}
 			return addResultToList(resultName, results, caseTypeId, statuses);
@@ -1139,6 +1203,9 @@ public class CasesStatistics extends CasesBlock {
 	}
 
 	public CaseManagersProvider getCaseManagersProvider() {
+		if (caseManagersProvider == null) {
+			caseManagersProvider = WFUtil.getBeanInstance(CaseManagersProvider.beanIdentifier);
+		}
 		return caseManagersProvider;
 	}
 
@@ -1186,5 +1253,8 @@ public class CasesStatistics extends CasesBlock {
 	public void setShowDateRange(Boolean showDateRange) {
 		this.showDateRange = showDateRange;
 	}
+
+
+
 
 }
