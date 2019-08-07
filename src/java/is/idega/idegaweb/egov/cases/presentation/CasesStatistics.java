@@ -31,6 +31,7 @@ import javax.ejb.FinderException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.data.CaseStatusHome;
@@ -636,6 +637,13 @@ public class CasesStatistics extends CasesBlock {
 		String processDefinitionName = null;
 		for (Case theCase: cases) {
 			if (theCase != null && canCaseBeUsedInStatistics(theCase)) {
+
+				//Skip the GENSUPP cases
+				if (theCase.getCaseCode() != null && !StringUtil.isEmpty(theCase.getCaseCode().getCode())
+						&& theCase.getCaseCode().getCode().equalsIgnoreCase(ProcessConstants.GENERAL_SUPPORT_CASE_CODE)) {
+					continue;
+				}
+
 				processDefinitionName = null;
 				try {
 					processDefinitionName = getCaseManagersProvider().getCaseManager().getProcessDefinitionName(theCase);
@@ -723,6 +731,7 @@ public class CasesStatistics extends CasesBlock {
 		private int parentID = -1;
 		private IWTimestamp dateFrom;
 		private IWTimestamp dateTo;
+		private List<String> exceptCaseCodes;
 
 		protected boolean isUseSubCats() {
 			return useSubCats;
@@ -748,6 +757,14 @@ public class CasesStatistics extends CasesBlock {
 		public void setDateTo(IWTimestamp dateTo) {
 			this.dateTo = dateTo;
 		}
+		public List<String> getExceptCaseCodes() {
+			return exceptCaseCodes;
+		}
+		public void setExceptCaseCodes(List<String> exceptCaseCodes) {
+			this.exceptCaseCodes = exceptCaseCodes;
+		}
+
+
 	}
 
 	//	Cases by categories
@@ -765,13 +782,6 @@ public class CasesStatistics extends CasesBlock {
 				.append("from comm_case_category cc left join comm_case c on c.case_category = cc.comm_case_category_id ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
 
-			if (getDateFrom() != null) {
-				query.append(getDateFromCriteria(getDateFrom()));
-			}
-			if (getDateTo() != null) {
-				query.append(getDateToCriteria(getDateTo()));
-			}
-
 			query.append(" where cc.parent_category ");
 
 			if (isUseSubCats() && getParentID() > -1) {
@@ -780,6 +790,17 @@ public class CasesStatistics extends CasesBlock {
 				query.append("is null");							//	We weed ONLY top level categories
 
 				query.append(getCategoriesIdsCriteria());			//	We need the very categories used by PROVIDED cases set
+			}
+
+			if (getDateFrom() != null) {
+				query.append(getDateFromCriteria(getDateFrom()));
+			}
+			if (getDateTo() != null) {
+				query.append(getDateToCriteria(getDateTo()));
+			}
+
+			if (!ListUtil.isEmpty(getExceptCaseCodes())) {
+				query.append(getExceptCaseCodesCriteria(getExceptCaseCodes()));
 			}
 
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
@@ -915,6 +936,11 @@ public class CasesStatistics extends CasesBlock {
 				query.append(getDateToCriteria(getDateTo()));
 			}
 
+
+			if (!ListUtil.isEmpty(getExceptCaseCodes())) {
+				query.append(getExceptCaseCodesCriteria(getExceptCaseCodes()));
+			}
+
 			query.append(" group by c.handler, p.case_status, u.display_name order by u.display_name, p.case_status");
 
 			System.out.println("UserHandler: " + query.toString());
@@ -990,6 +1016,10 @@ public class CasesStatistics extends CasesBlock {
 				query.append(getDateToCriteria(getDateTo()));
 			}
 
+			if (!ListUtil.isEmpty(getExceptCaseCodes())) {
+				query.append(getExceptCaseCodesCriteria(getExceptCaseCodes()));
+			}
+
 			query.append(" group by c.case_type, p.case_status order by case_type");
 
 			System.out.println("CaseTypeHandler: " + query.toString());
@@ -1054,6 +1084,27 @@ public class CasesStatistics extends CasesBlock {
 		results.add(new Result(identifier, resultName, statuses));
 
 		return true;
+	}
+
+	private String getExceptCaseCodesCriteria(List<String> exceptCaseCodes) {
+		String criteriaSQL = CoreConstants.EMPTY;
+
+		if (!ListUtil.isEmpty(exceptCaseCodes)) {
+			StringBuilder caseCodes = new StringBuilder();
+			for (String exc : exceptCaseCodes) {
+				if (caseCodes.length() > 0) {
+					caseCodes.append(CoreConstants.COMMA).append(CoreConstants.SPACE);
+				}
+
+				caseCodes.append(CoreConstants.QOUTE_SINGLE_MARK);
+				caseCodes.append(exc);
+				caseCodes.append(CoreConstants.QOUTE_SINGLE_MARK);
+			}
+
+			criteriaSQL = new StringBuilder(" and p.case_code not in (").append(caseCodes.toString()).append(") ").toString();
+		}
+
+		return criteriaSQL;
 	}
 
 	String getDateFromCriteria(IWTimestamp date) {
