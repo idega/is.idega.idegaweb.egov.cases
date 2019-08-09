@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.idega.block.process.business.CaseManagersProvider;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
+import com.idega.block.process.data.CaseCode;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.data.CaseStatusHome;
 import com.idega.block.process.presentation.beans.CasePresentation;
@@ -584,8 +585,7 @@ public class CasesStatistics extends CasesBlock {
 		return statuses;
 	}
 
-
-	private Map<String, Integer> getStatusesForCasesOld(List<Case> cases) {
+	Map<String, Integer> getStatusesForCasesOld(List<Case> cases) {
 		if (ListUtil.isEmpty(cases)) {
 			return new HashMap<String, Integer>();
 		}
@@ -639,8 +639,9 @@ public class CasesStatistics extends CasesBlock {
 			if (theCase != null && canCaseBeUsedInStatistics(theCase)) {
 
 				//Skip the GENSUPP cases
-				if (theCase.getCaseCode() != null && !StringUtil.isEmpty(theCase.getCaseCode().getCode())
-						&& theCase.getCaseCode().getCode().equalsIgnoreCase(ProcessConstants.GENERAL_SUPPORT_CASE_CODE)) {
+				CaseCode code = theCase.getCaseCode();
+				String caseCode = code == null ? null : code.getCode();
+				if (!StringUtil.isEmpty(caseCode) && caseCode.equalsIgnoreCase(ProcessConstants.GENERAL_SUPPORT_CASE_CODE)) {
 					continue;
 				}
 
@@ -654,7 +655,6 @@ public class CasesStatistics extends CasesBlock {
 				//Searching in another way
 				if (StringUtil.isEmpty(processDefinitionName)) {
 					//By case code
-					String caseCode = theCase.getCaseCode() != null && !StringUtil.isEmpty(theCase.getCaseCode().getCode()) ? theCase.getCaseCode().getCode() : null;
 					if (!StringUtil.isEmpty(caseCode)) {
 						try {
 							ApplicationHome appHome = (ApplicationHome) IDOLookup.getHome(is.idega.idegaweb.egov.application.data.Application.class);
@@ -667,7 +667,6 @@ public class CasesStatistics extends CasesBlock {
 						}
 					}
 				}
-
 
 				if (StringUtil.isEmpty(processDefinitionName)) {
 					LOGGER.warning("Unable to get process identifier for case: " + theCase);
@@ -684,7 +683,6 @@ public class CasesStatistics extends CasesBlock {
 
 		return casesByProcesses;
 	}
-
 
 	public class Result {
 
