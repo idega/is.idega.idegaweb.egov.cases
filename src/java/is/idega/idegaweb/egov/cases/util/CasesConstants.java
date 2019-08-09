@@ -7,11 +7,13 @@
  */
 package is.idega.idegaweb.egov.cases.util;
 
+import com.idega.block.process.business.ProcessConstants;
+
 public class CasesConstants {
 
 	public static final String IW_BUNDLE_IDENTIFIER = "is.idega.idegaweb.egov.cases";
 
-	public static final String CASE_CODE_KEY = "GENCASE";
+	public static final String CASE_CODE_KEY = ProcessConstants.GENERAL_CASE_CODE_KEY;
 
 	public static final String ROLE_CASES_SUPER_ADMIN = "cases_super_admin";
 
