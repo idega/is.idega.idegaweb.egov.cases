@@ -498,43 +498,60 @@ public class CasesStatistics extends CasesBlock {
 			return null;
 		}
 
+		boolean leaveUnlocalizedProcessURL = IWMainApplication.getDefaultIWMainApplication().getSettings().getBoolean("LEAVE_UNLOCALIZED_PROCESS_URL", true);
+//		boolean leaveUnlocalizedProcessURL = false;
+//		try {
+//			String portalUri = IWMainApplication.getDefaultIWMainApplication().getSettings().getProperty("portal.main_portal_url");
+//			if (!StringUtil.isEmpty(portalUri) && portalUri.toLowerCase().contains("cloud4process")) {
+//				leaveUnlocalizedProcessURL = true;
+//			}
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+
 		String localizedProcessName = null;
 		Locale locale = iwc.getCurrentLocale();
 		List<Result> results = new ArrayList<Result>();
 		String unkownProcess = getResourceBundle(iwc).getLocalizedString("case_statistics.unkown_process", "Unkown process");
 		for (String processName: casesByProcesses.keySet()) {
 			localizedProcessName = null;
-			try {
-				localizedProcessName = getCaseManagersProvider().getCaseManager().getProcessName(processName, locale);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-			//Get localized process name from application
-			if (StringUtil.isEmpty(localizedProcessName)) {
-				try {
-					Collection<Application> apps = null;
-					try {
-						apps = getApplicationBusiness(iwc != null ? iwc : IWMainApplication.getDefaultIWApplicationContext()).getApplicationHome().findAllByApplicationUrl(processName);
-					} catch (Exception e) {}
 
-					if (!ListUtil.isEmpty(apps)) {
-						String unlocalizedName = null;
-						for (Application app: apps) {
-							unlocalizedName = app.getName();
-							String localizedName = app.getLocalizedName(locale);
-							if (!StringUtil.isEmpty(localizedName)) {
-								localizedProcessName = localizedName;
-								break;
-							}
-						}
-						if (StringUtil.isEmpty(localizedProcessName) ) {
-							localizedProcessName = unlocalizedName;
-						}
-					}
+			if (leaveUnlocalizedProcessURL) {
+				localizedProcessName = processName;
+			} else {
+				try {
+					localizedProcessName = getCaseManagersProvider().getCaseManager().getProcessName(processName, locale);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
+				//Get localized process name from application
+				if (StringUtil.isEmpty(localizedProcessName)) {
+					try {
+						Collection<Application> apps = null;
+						try {
+							apps = getApplicationBusiness(iwc != null ? iwc : IWMainApplication.getDefaultIWApplicationContext()).getApplicationHome().findAllByApplicationUrl(processName);
+						} catch (Exception e) {}
+
+						if (!ListUtil.isEmpty(apps)) {
+							String unlocalizedName = null;
+							for (Application app: apps) {
+								unlocalizedName = app.getName();
+								String localizedName = app.getLocalizedName(locale);
+								if (!StringUtil.isEmpty(localizedName)) {
+									localizedProcessName = localizedName;
+									break;
+								}
+							}
+							if (StringUtil.isEmpty(localizedProcessName) ) {
+								localizedProcessName = unlocalizedName;
+							}
+						}
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
+
 			if (StringUtil.isEmpty(localizedProcessName)) {
 				localizedProcessName = unkownProcess;
 			}
