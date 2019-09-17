@@ -499,15 +499,6 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		boolean leaveUnlocalizedProcessURL = IWMainApplication.getDefaultIWMainApplication().getSettings().getBoolean("LEAVE_UNLOCALIZED_PROCESS_URL", true);
-//		boolean leaveUnlocalizedProcessURL = false;
-//		try {
-//			String portalUri = IWMainApplication.getDefaultIWMainApplication().getSettings().getProperty("portal.main_portal_url");
-//			if (!StringUtil.isEmpty(portalUri) && portalUri.toLowerCase().contains("cloud4process")) {
-//				leaveUnlocalizedProcessURL = true;
-//			}
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
 
 		String localizedProcessName = null;
 		Locale locale = iwc.getCurrentLocale();
