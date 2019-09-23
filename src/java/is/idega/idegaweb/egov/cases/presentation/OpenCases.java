@@ -23,6 +23,7 @@ import com.idega.event.IWPageEventListener;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
+import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -182,9 +183,9 @@ public class OpenCases extends CasesProcessor implements IWPageEventListener {
 
 		if (!ListUtil.isEmpty(files)) {
 			for(ICFile attachment : files){
-				Link link = new Link(new Text(attachment.getName()));
-				link.setFile(attachment);
-				link.setTarget(Link.TARGET_BLANK_WINDOW);
+				DownloadLink link = new DownloadLink((Integer) attachment.getPrimaryKey());
+				link.setText(new Text(attachment.getName()));
+				link.setAlternativeFileName(attachment.getName());
 
 				Layer attachmentSpan = new Layer(Layer.SPAN);
 				attachmentSpan.add(link);
