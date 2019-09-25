@@ -26,8 +26,10 @@ import com.idega.data.IDORelationshipException;
 import com.idega.data.query.BetweenCriteria;
 import com.idega.data.query.Column;
 import com.idega.data.query.CountColumn;
+import com.idega.data.query.Criteria;
 import com.idega.data.query.InCriteria;
 import com.idega.data.query.MatchCriteria;
+import com.idega.data.query.OR;
 import com.idega.data.query.Order;
 import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
@@ -621,7 +623,9 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 				groupsIds.add(group.getId());
 			}
 
-			query.addCriteria(new InCriteria(casesTable.getColumn(getSQLGeneralCaseHandlerColumnName()), groupsIds));
+			Criteria handlersGroupsCriteria = new InCriteria(casesTable.getColumn(getSQLGeneralCaseHandlerColumnName()), groupsIds);
+			Criteria handlersCriteria = new InCriteria(generalCasesTable.getColumn(COLUMN_HANDLER), groupsIds);
+			query.addCriteria(new OR(handlersGroupsCriteria, handlersCriteria));
 		}
 		if (caseNumber != null) {
 			Column column = new Column(casesTable, casesTable.getColumn(CaseBMPBean.COLUMN_CASE_IDENTIFIER).getName());
