@@ -1080,7 +1080,8 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	private void sendMessage(GeneralCase theCase, User receiver, User sender, String subject, String body) {
 		try {
-			getMessageBusiness().createUserMessage(theCase, receiver, sender, subject, body, false);
+			boolean sendLetter = getIWMainApplication().getSettings().getBoolean("case.send_letter_about_new_case", false);
+			getMessageBusiness().createUserMessage(theCase, receiver, sender, subject, body, sendLetter);
 		} catch (RemoteException re) {
 			throw new IBORuntimeException(re);
 		}
