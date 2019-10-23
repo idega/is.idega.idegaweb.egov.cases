@@ -39,6 +39,7 @@ import com.idega.user.data.User;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
@@ -584,7 +585,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			Collection<Group> groups,
 			boolean simpleCases
 	) throws FinderException {
-		return ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, null, null);
+		return ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, null, null, null);
 	}
 
 	public Collection<Integer> ejbFindByCriteria(
@@ -598,7 +599,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			Collection<Group> groups,
 			boolean simpleCases,
 			Boolean withHandler,
-			List<Integer> exceptOwnersIds
+			List<Integer> exceptOwnersIds,
+			String caseCode
 	) throws FinderException {
 
 		Table generalCasesTable = new Table(this);
@@ -668,6 +670,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		if (!ListUtil.isEmpty(exceptOwnersIds)) {
 			query.addCriteria(new InCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_USER), exceptOwnersIds, true));
+		}
+
+		if (!StringUtil.isEmpty(caseCode)) {
+			query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CASE_CODE), MatchCriteria.EQUALS, caseCode));
 		}
 
 		query.addGroupByColumn(generalCasesTable.getColumn(getIDColumnName()));

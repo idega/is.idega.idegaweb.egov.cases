@@ -1190,7 +1190,26 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler, List<Integer> exceptOwnersIds) {
+		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, null);
+	}
 
+	@Override
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode
+	) {
 		Collection<User> owners = null;
 		if (!StringUtil.isEmpty(personalId)) {
 			Collection<User> caseOwners = null;
@@ -1246,7 +1265,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		if (notGeneralCases) {
 			try {
-				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds);
+				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
@@ -1254,7 +1273,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		} else {
 			try {
-				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds);
+				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
@@ -1275,9 +1294,28 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public Collection<Case> getCasesByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler, List<Integer> exceptOwnersIds) {
+		return getCasesByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, null);
+	}
 
+	@Override
+	public Collection<Case> getCasesByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode
+	) {
 		Collection<Integer> ids = getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases,
-				notGeneralCases, withHandler, exceptOwnersIds);
+				notGeneralCases, withHandler, exceptOwnersIds, caseCode);
 		try {
 			return getCaseHome().findAllByIds(ids);
 		} catch (Exception e) {
