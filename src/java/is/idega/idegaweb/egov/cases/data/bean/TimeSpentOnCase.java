@@ -81,6 +81,10 @@ public class TimeSpentOnCase implements Serializable{
 	@Column(name = "added_to_invoice", length = 1)
 	private Character addedToInvoice;
 
+	@ManyToOne
+	@JoinColumn(name = "timeRegistrationTask", referencedColumnName="time_registration_task_id")
+	private TimeRegistrationTask timeRegistrationTask;
+
 
 	public String getComment() {
 		return comment;
@@ -169,6 +173,15 @@ public class TimeSpentOnCase implements Serializable{
 	public void setAddedToInvoice(Character addedToInvoice) {
 		this.addedToInvoice = addedToInvoice;
 	}
+
+	public TimeRegistrationTask getTimeRegistrationTask() {
+		return timeRegistrationTask;
+	}
+
+	public void setTimeRegistrationTask(TimeRegistrationTask timeRegistrationTask) {
+		this.timeRegistrationTask = timeRegistrationTask;
+	}
+
 
 
 }
