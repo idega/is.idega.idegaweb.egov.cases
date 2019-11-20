@@ -662,50 +662,53 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		}
 		if (sendMessages) {
-
 			try {
-				String prefix = (type != null ? type + "." : "");
-
-				String subject = iwrb.getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
-				String body = null;
-				if (sender != null) {
-					Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
-
-					Object[] arguments = { name.getName(locale), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
-					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
-
-					// sendMessageToUsersAdminAndCompany(sender, subject, body, theCase);
-					User moderator = getUserBusiness().getModeratorForUser(sender);
-					if (moderator != null) {
-						sendMessage(theCase, moderator, sender, subject, body);
-					}
-
-				} else {
-					Object[] arguments = { iwrb.getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
-					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
-				}
-
-				Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
-				Iterator<User> iter = handlers.iterator();
-				while (iter.hasNext()) {
-					User handler = iter.next();
-					sendMessage(theCase, handler, sender, subject, body);
-				}
-
-				if (sender != null) {
-					Object[] arguments2 = { theCase.getCaseCategory().getLocalizedCategoryName(locale) };
-					subject = iwrb.getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
-					body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
-
-					sendMessage(theCase, sender, null, subject, body);
-				}
-
-			} catch (RemoteException e) {
+				sendMessages(theCase, sender, handlerGroup, iwrb, locale, caseManagerType, message);
+			} catch (Exception e) {
 				throw new IBORuntimeException(e);
 			}
 		}
 
 		return theCase;
+	}
+
+	@Override
+	public void sendMessages(GeneralCase theCase, User sender, Group handlerGroup, IWResourceBundle iwrb, Locale locale, String type, String message) throws Exception {
+		String prefix = (type != null ? type + CoreConstants.DOT : CoreConstants.EMPTY);
+
+		String subject = iwrb.getLocalizedString(prefix + "case_sent_subject", "A new case sent in");
+		String body = null;
+		if (sender != null) {
+			Name name = new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName());
+
+			Object[] arguments = { name.getName(locale), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
+			body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_body", "A new case has been sent in by {0} in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+
+			// sendMessageToUsersAdminAndCompany(sender, subject, body, theCase);
+			User moderator = getUserBusiness().getModeratorForUser(sender);
+			if (moderator != null) {
+				sendMessage(theCase, moderator, sender, subject, body);
+			}
+
+		} else {
+			Object[] arguments = { iwrb.getLocalizedString("anonymous", "Anonymous"), theCase.getCaseCategory().getLocalizedCategoryName(locale), message };
+			body = MessageFormat.format(iwrb.getLocalizedString(prefix + "anonymous_case_sent_body", "An anonymous case has been sent in case category {1}. \n\nThe case is as follows:\n{2}"), arguments);
+		}
+
+		Collection<User> handlers = getUserBusiness().getUsersInGroup(handlerGroup);
+		Iterator<User> iter = handlers.iterator();
+		while (iter.hasNext()) {
+			User handler = iter.next();
+			sendMessage(theCase, handler, sender, subject, body);
+		}
+
+		if (sender != null) {
+			Object[] arguments2 = { theCase.getCaseCategory().getLocalizedCategoryName(locale) };
+			subject = iwrb.getLocalizedString(prefix + "case_sent_confirmation_subject", "A new case sent in");
+			body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_sent_confirmation_body", "Your case with case category {0} has been received and will be processed."), arguments2);
+
+			sendMessage(theCase, sender, null, subject, body);
+		}
 	}
 
 	@Override

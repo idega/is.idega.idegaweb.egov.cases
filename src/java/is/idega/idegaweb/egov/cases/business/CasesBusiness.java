@@ -423,4 +423,6 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 
 	public Collection<CasesStatistics.Result> getCasesStatisticsResults(IWContext iwc, CasesStatistics.Handler handler);
 
+	public void sendMessages(GeneralCase theCase, User sender, Group handlerGroup, IWResourceBundle iwrb, Locale locale, String type, String message) throws Exception;
+
 }
