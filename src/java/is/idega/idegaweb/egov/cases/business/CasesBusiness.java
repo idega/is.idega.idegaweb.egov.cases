@@ -257,6 +257,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 */
 	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) throws RemoteException;
 
+	public void handleCase(GeneralCase theCase, CaseCategory category, Group handlerGroup, CaseType type, String status, User performer, String reply, IWContext iwc) throws RemoteException;
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */

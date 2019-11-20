@@ -769,12 +769,21 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) {
+		handleCase(theCase, category, category == null ? null : category.getHandlerGroup(), type, status, performer, reply, iwc);
+	}
+
+	@Override
+	public void handleCase(GeneralCase theCase, CaseCategory category, Group handlerGroup, CaseType type, String status, User performer, String reply, IWContext iwc) {
 		theCase.setReply(reply);
 
 		boolean isSameCategory = category == null ? false: category.equals(theCase.getCaseCategory());
-		theCase.setCaseCategory(category);
+		if (category != null) {
+			theCase.setCaseCategory(category);
+		}
 
-		Group handlerGroup = category == null ? null : category.getHandlerGroup();
+		handlerGroup = handlerGroup == null ?
+				category == null ? null : category.getHandlerGroup() :
+				handlerGroup;
 		boolean isInGroup = handlerGroup == null ? false: performer.hasRelationTo(handlerGroup);
 		theCase.setHandler(handlerGroup);
 
