@@ -769,11 +769,11 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public void handleCase(GeneralCase theCase, CaseCategory category, CaseType type, String status, User performer, String reply, IWContext iwc) {
-		handleCase(theCase, category, category == null ? null : category.getHandlerGroup(), type, status, performer, reply, iwc);
+		handleCase(theCase, category, category == null ? null : category.getHandlerGroup(), type, status, performer, reply, iwc, true);
 	}
 
 	@Override
-	public void handleCase(GeneralCase theCase, CaseCategory category, Group handlerGroup, CaseType type, String status, User performer, String reply, IWContext iwc) {
+	public void handleCase(GeneralCase theCase, CaseCategory category, Group handlerGroup, CaseType type, String status, User performer, String reply, IWContext iwc, boolean changeStatus) {
 		theCase.setReply(reply);
 
 		boolean isSameCategory = category == null ? false: category.equals(theCase.getCaseCategory());
@@ -827,7 +827,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		theCase.setCaseType(type);
 
-		changeCaseStatus(theCase, status, reply, performer, (Group) null, true);
+		if (changeStatus) {
+			changeCaseStatus(theCase, status, reply, performer, (Group) null, true);
+		}
 
 		User owner = theCase.getOwner();
 		if (owner != null && isInGroup) {
@@ -853,9 +855,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 				sendMessage(theCase, moderator, owner, subjectAdmin, bodyAdmin);
 			}
-
 		}
-
 	}
 
 	@Override
