@@ -263,11 +263,21 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
 	public void takeCase(Object casePK, User performer, IWContext iwc) throws FinderException, RemoteException;
+	
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
+	 */
+	public void takeCase(Object casePK, User performer, IWContext iwc, String messageSubject, String messageBody) throws FinderException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) throws RemoteException;
+	
+	/**
+	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
+	 */
+	public void takeCase(GeneralCase theCase, User performer, IWContext iwc, String messageSubject, String messageBody) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase

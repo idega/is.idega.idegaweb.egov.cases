@@ -863,24 +863,40 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		GeneralCase theCase = getGeneralCase(casePK);
 		takeCase(theCase, performer, iwc);
 	}
+	
+	@Override
+	public void takeCase(Object casePK, User performer, IWContext iwc, String messageSubject, String messageBody) throws FinderException,
+			RemoteException {
+		GeneralCase theCase = getGeneralCase(casePK);
+		takeCase(theCase, performer, iwc, messageSubject, messageBody);
+	}
 
 	@Override
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) {
+		takeCase(theCase, performer, iwc, null, null);
+	}
+	
+	@Override
+	public void takeCase(GeneralCase theCase, User performer, IWContext iwc, String messageSubject, String messageBody) {
 		theCase.setHandledBy(performer);
 
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group) null);
 
 		User owner = theCase.getOwner();
 
-		IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
-
 		if (owner != null) {
-			String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
-			Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
-			String subject = iwrb.getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
-			String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
+			if (StringUtil.isEmpty(messageSubject) && StringUtil.isEmpty(messageBody)) {
+				IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
+				
+				String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
+				Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
+				String subject = iwrb.getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");
+				String body = MessageFormat.format(iwrb.getLocalizedString(prefix + "case_taken_body", "Your case with category {0} and type {1} has been put into process by {2}"), arguments);
 
-			sendMessage(theCase, owner, performer, subject, body);
+				sendMessage(theCase, owner, performer, subject, body);
+			} else {
+				sendMessage(theCase, owner, performer, messageSubject, messageBody);
+			}
 		}
 	}
 
