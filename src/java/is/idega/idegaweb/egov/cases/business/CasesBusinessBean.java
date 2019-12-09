@@ -574,8 +574,12 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
+		return storeGeneralCase(sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created, null);
+	}
+	@Override
+	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created, Integer handlerGroupId) throws CreateException, RemoteException {
 		GeneralCase theCase = getGeneralCaseHome().create();
-		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created);
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created, handlerGroupId);
 	}
 
 	/**
@@ -586,40 +590,68 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, CaseBMPBean.CASE_STATUS_OPEN_KEY, created);
 	}
 
-
 	@Override
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPK, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created, null);
+	}
+
+	@Override
+	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created, Integer handlerGroupId) throws CreateException, RemoteException {
 		Collection<Object> attachmentPKs;
-		if(attachmentPK == null){
+		if (attachmentPK == null) {
 			attachmentPKs = Collections.emptyList();
-		}else{
+		} else {
 			attachmentPKs = new ArrayList<Object>(1);
 			attachmentPKs.add(attachmentPK);
 		}
-		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPKs, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created);
+		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPKs, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created, handlerGroupId);
 	}
-	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Collection<Object> attachmentPKs, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException {
+
+	private GeneralCase storeGeneralCase(
+			GeneralCase theCase,
+			User sender,
+			Object caseCategoryPK,
+			Object caseTypePK,
+			Collection<Object> attachmentPKs,
+			String regarding,
+			String message,
+			String type,
+			String caseManagerType,
+			boolean isPrivate,
+			IWResourceBundle iwrb,
+			boolean sendMessages,
+			String caseIdentifier,
+			boolean setType,
+			String caseStatusKey,
+			Timestamp created,
+			Integer handlerGroupId
+	) throws CreateException, RemoteException {
 		Locale locale = iwrb.getLocale();
-		// TODO use users preferred language!!
 
 		if (caseStatusKey == null) {
 			caseStatusKey = getCaseStatusOpenString();
 		}
 
+		Group handlerGroup = null;
+		if (handlerGroupId != null && handlerGroupId > 0) {
+			GroupBusiness groupBusiness = getGroupBusiness();
+			try {
+				handlerGroup = groupBusiness.getGroupByGroupID(handlerGroupId);
+			} catch (Exception e) {}
+		}
 		CaseCategory category = null;
 		try {
 			category = getCaseCategory(caseCategoryPK);
 		} catch (FinderException fe) {
 			throw new CreateException("Trying to store a case with case category that has no relation to a group");
 		}
+		handlerGroup = handlerGroup == null ? category.getHandlerGroup() : handlerGroup;
 		CaseType caseType = null;
 		try {
 			caseType = getCaseType(caseTypePK);
 		} catch (FinderException fe) {
 			throw new CreateException("Trying to store a case with case type that does not exist");
 		}
-
-		Group handlerGroup = category.getHandlerGroup();
 
 		theCase.setCaseCategory(category);
 		theCase.setCaseType(caseType);
@@ -863,7 +895,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		GeneralCase theCase = getGeneralCase(casePK);
 		takeCase(theCase, performer, iwc);
 	}
-	
+
 	@Override
 	public void takeCase(Object casePK, User performer, IWContext iwc, String messageSubject, String messageBody) throws FinderException,
 			RemoteException {
@@ -875,7 +907,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) {
 		takeCase(theCase, performer, iwc, null, null);
 	}
-	
+
 	@Override
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc, String messageSubject, String messageBody) {
 		theCase.setHandledBy(performer);
@@ -887,7 +919,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		if (owner != null) {
 			if (StringUtil.isEmpty(messageSubject) && StringUtil.isEmpty(messageBody)) {
 				IWResourceBundle iwrb = this.getIWResourceBundleForUser(owner, iwc);
-				
+
 				String prefix = theCase.getType() != null ? theCase.getType() + "." : "";
 				Object[] arguments = { theCase.getCaseCategory().getLocalizedCategoryName(iwrb.getLocale()), theCase.getCaseType().getName(), performer.getName() };
 				String subject = iwrb.getLocalizedString(prefix + "case_taken_subject", "Your case has been taken");

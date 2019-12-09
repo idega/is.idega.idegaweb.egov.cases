@@ -226,6 +226,24 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
 	public GeneralCase storeGeneralCase(User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException, RemoteException;
+	public GeneralCase storeGeneralCase(
+			User sender,
+			Object caseCategoryPK,
+			Object caseTypePK,
+			Object attachmentPK,
+			String regarding,
+			String message,
+			String type,
+			String caseManagerType,
+			boolean isPrivate,
+			IWResourceBundle iwrb,
+			boolean sendMessages,
+			String caseIdentifier,
+			boolean setType,
+			String caseStatusKey,
+			Timestamp created,
+			Integer handlerGroupId
+	) throws CreateException, RemoteException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
@@ -236,6 +254,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#storeGeneralCase
 	 */
 	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created) throws CreateException, RemoteException, RemoteException;
+
+	public GeneralCase storeGeneralCase(GeneralCase theCase, User sender, Object caseCategoryPK, Object caseTypePK, Object attachmentPK, String regarding, String message, String type, String caseManagerType, boolean isPrivate, IWResourceBundle iwrb, boolean sendMessages, String caseIdentifier, boolean setType, String caseStatusKey, Timestamp created, Integer handlerGroupId) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#allocateCase
@@ -263,7 +283,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
 	public void takeCase(Object casePK, User performer, IWContext iwc) throws FinderException, RemoteException;
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
@@ -273,7 +293,7 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc) throws RemoteException;
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#takeCase
 	 */
