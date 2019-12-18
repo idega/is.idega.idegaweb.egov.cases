@@ -85,7 +85,6 @@ public class TimeSpentOnCase implements Serializable{
 	@JoinColumn(name = "timeRegistrationTask", referencedColumnName="time_registration_task_id")
 	private TimeRegistrationTask timeRegistrationTask;
 
-
 	public String getComment() {
 		return comment;
 	}
@@ -181,7 +180,5 @@ public class TimeSpentOnCase implements Serializable{
 	public void setTimeRegistrationTask(TimeRegistrationTask timeRegistrationTask) {
 		this.timeRegistrationTask = timeRegistrationTask;
 	}
-
-
 
 }
