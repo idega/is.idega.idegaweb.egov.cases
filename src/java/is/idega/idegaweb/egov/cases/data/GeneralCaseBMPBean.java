@@ -585,7 +585,7 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			Collection<Group> groups,
 			boolean simpleCases
 	) throws FinderException {
-		return ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, null, null, null);
+		return ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, null, null, null, null);
 	}
 
 	public Collection<Integer> ejbFindByCriteria(
@@ -600,7 +600,8 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 			boolean simpleCases,
 			Boolean withHandler,
 			List<Integer> exceptOwnersIds,
-			String caseCode
+			String caseCode,
+			List<String> caseManagerTypes
 	) throws FinderException {
 
 		Table generalCasesTable = new Table(this);
@@ -674,6 +675,10 @@ public class GeneralCaseBMPBean extends AbstractCaseBMPBean implements Case, Gen
 
 		if (!StringUtil.isEmpty(caseCode)) {
 			query.addCriteria(new MatchCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CASE_CODE), MatchCriteria.EQUALS, caseCode));
+		}
+
+		if (!ListUtil.isEmpty(caseManagerTypes)) {
+			query.addCriteria(new InCriteria(casesTable.getColumn(CaseBMPBean.COLUMN_CASE_MANAGER_TYPE), caseManagerTypes));
 		}
 
 		query.addGroupByColumn(generalCasesTable.getColumn(getIDColumnName()));

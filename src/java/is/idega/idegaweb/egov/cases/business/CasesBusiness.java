@@ -418,11 +418,58 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 			String caseCode
 	) throws RemoteException;
 
+	public Collection<Case> getCasesByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode,
+			List<String> caseManagerTypes
+	) throws RemoteException;
+
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases);
 
-	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
-			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler, List<Integer> exceptOwnersIds);
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds
+	);
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			List<String> managerTypes
+	);
 
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler, List<Integer> exceptOwnersIds, String caseCode);

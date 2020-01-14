@@ -170,14 +170,59 @@ public class GeneralCaseHomeImpl extends IDOFactory implements GeneralCaseHome {
 			Collection<Group> groups, boolean simpleCases, Boolean withHandler,
 			List<Integer> exceptOwnersIds
 	) throws FinderException {
-		return getCasesIDsByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, null);
+		return getCasesIDsByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, null, null);
 	}
 
 	@Override
-	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses,
-			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, Boolean withHandler, List<Integer> exceptOwnersIds, String caseCode) throws FinderException {
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			Collection<String> owners,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode
+	) throws FinderException {
+		return getCasesIDsByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode, null);
+	}
+
+	@Override
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			Collection<String> owners,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode,
+			List<String> caseManagerTypes
+	) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
-		Collection<Integer> ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(caseNumber, description, owners, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode);
+		Collection<Integer> ids = ((GeneralCaseBMPBean) entity).ejbFindByCriteria(
+				caseNumber,
+				description,
+				owners,
+				statuses,
+				dateFrom,
+				dateTo,
+				owner,
+				groups,
+				simpleCases,
+				withHandler,
+				exceptOwnersIds,
+				caseCode,
+				caseManagerTypes
+		);
 		this.idoCheckInPooledEntity(entity);
 		return ids;
 	}

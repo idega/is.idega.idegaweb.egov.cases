@@ -74,6 +74,22 @@ public interface GeneralCaseHome extends IDOHome {
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, Collection<String> owners, String[] statuses,
 			IWTimestamp dateFrom, IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, Boolean withHandler, List<Integer> exceptOwnersIds, String caseCode) throws FinderException;
 
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			Collection<String> owners,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode,
+			List<String> caseManagerTypes
+	) throws FinderException;
+
 	public Collection<Case> getCasesByIds(Collection<Integer> ids) throws FinderException;
 
 	/**

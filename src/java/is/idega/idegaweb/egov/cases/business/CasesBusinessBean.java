@@ -1250,7 +1250,27 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
 			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases, Boolean withHandler, List<Integer> exceptOwnersIds) {
-		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, null);
+		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, null, null);
+	}
+
+	@Override
+	public Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			List<String> managerTypes
+	) {
+		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, null, managerTypes);
 	}
 
 	@Override
@@ -1269,6 +1289,26 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			Boolean withHandler,
 			List<Integer> exceptOwnersIds,
 			String caseCode
+	) {
+		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, caseCode, null);
+	}
+
+	private Collection<Integer> getCasesIDsByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode,
+			List<String> caseManagerTypes
 	) {
 		Collection<User> owners = null;
 		if (!StringUtil.isEmpty(personalId)) {
@@ -1325,7 +1365,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 		if (notGeneralCases) {
 			try {
-				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode);
+				return getCaseHome().findIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode, caseManagerTypes);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
@@ -1333,7 +1373,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 		} else {
 			try {
-				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode);
+				return getGeneralCaseHome().getCasesIDsByCriteria(caseNumber, description, ownersIds, statuses, dateFrom, dateTo, owner, groups, simpleCases, withHandler, exceptOwnersIds, caseCode, caseManagerTypes);
 			} catch (Exception e) {
 				log(Level.SEVERE, "Error getting cases by criteria: case number: " + caseNumber + ", description: " + description + ", owners IDs: " +
 						ownersIds + ", statuses: " + statuses + ", date from: " + dateFrom + ", date to: " + dateTo + ", owner: " + owner + ", groups: " +
@@ -1374,12 +1414,48 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			List<Integer> exceptOwnersIds,
 			String caseCode
 	) {
-		Collection<Integer> ids = getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases,
-				notGeneralCases, withHandler, exceptOwnersIds, caseCode);
+		return getCasesByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, withHandler, exceptOwnersIds, caseCode, null);
+	}
+
+	@Override
+	public Collection<Case> getCasesByCriteria(
+			String caseNumber,
+			String description,
+			String name,
+			String personalId,
+			String[] statuses,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			User owner,
+			Collection<Group> groups,
+			boolean simpleCases,
+			boolean notGeneralCases,
+			Boolean withHandler,
+			List<Integer> exceptOwnersIds,
+			String caseCode,
+			List<String> caseManagerTypes
+	) {
+		Collection<Integer> ids = getCasesIDsByCriteria(
+				caseNumber,
+				description,
+				name,
+				personalId,
+				statuses,
+				dateFrom,
+				dateTo,
+				owner,
+				groups,
+				simpleCases,
+				notGeneralCases,
+				withHandler,
+				exceptOwnersIds,
+				caseCode,
+				caseManagerTypes
+		);
 		try {
 			return getCaseHome().findAllByIds(ids);
 		} catch (Exception e) {
-			e.printStackTrace();
+			getLogger().log(Level.WARNING, "Error getting cases by IDs " + ids, e);
 		}
 		return null;
 	}
