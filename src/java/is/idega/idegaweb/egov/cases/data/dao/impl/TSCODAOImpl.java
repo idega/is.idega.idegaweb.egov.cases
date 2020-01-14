@@ -12,6 +12,7 @@ import com.idega.core.persistence.Param;
 import com.idega.core.persistence.impl.GenericDaoImpl;
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
+import com.idega.util.StringUtil;
 
 import is.idega.idegaweb.egov.cases.data.bean.TimeSpentOnCase;
 import is.idega.idegaweb.egov.cases.data.dao.TSOCDAO;
@@ -32,6 +33,9 @@ public class TSCODAOImpl extends GenericDaoImpl implements TSOCDAO {
 
 	@Override
 	public List<TimeSpentOnCase> getTimeSpentOnCaseList(String caseUuid) {
+		if (StringUtil.isEmpty(caseUuid)) {
+			return null;
+		}
 		return getResultList(TimeSpentOnCase.getByCaseUuid, TimeSpentOnCase.class, new Param(TimeSpentOnCase.CaseUuidProp, new String(caseUuid)));
 	}
 

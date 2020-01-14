@@ -17,7 +17,6 @@ import javax.persistence.Table;
 import com.idega.user.data.bean.User;
 import com.idega.util.CoreConstants;
 
-
 @Entity
 @Table(name = "time_spent_on_case")
 @NamedQueries(
@@ -30,7 +29,7 @@ import com.idega.util.CoreConstants;
 			@NamedQuery(name="tsoc.getAllActiveForUser", query = "FROM TimeSpentOnCase tsoc WHERE tsoc.user.userID =:"+TimeSpentOnCase.UserIdProp + " and tsoc.end is null and tsoc.removed is null ORDER BY tsoc.start")
 		}
 )
-public class TimeSpentOnCase implements Serializable{
+public class TimeSpentOnCase implements Serializable {
 
 	private static final long serialVersionUID = 6008891131179251971L;
 
