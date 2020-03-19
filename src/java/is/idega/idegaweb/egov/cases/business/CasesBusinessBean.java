@@ -911,6 +911,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public void takeCase(GeneralCase theCase, User performer, IWContext iwc, String messageSubject, String messageBody) {
 		theCase.setHandledBy(performer);
+		theCase.store();
 
 		changeCaseStatus(theCase, getCaseStatusPending().getStatus(), performer, (Group) null);
 
