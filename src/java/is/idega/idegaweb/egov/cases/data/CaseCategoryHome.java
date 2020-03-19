@@ -18,8 +18,11 @@ public interface CaseCategoryHome extends IDOHome {
 	public Collection findAllTopLevelCategories() throws FinderException;
 
 	public Collection findAllTopLevelCategoriesForAdmins();
-	
+
 	public Collection findAllSubCategories(CaseCategory category) throws FinderException;
-	
+
 	public Collection<CaseCategory> findByName(String typeName) throws FinderException;
+
+	public Collection<CaseCategory> findByGroupId(Integer groupId) throws FinderException;
+
 }

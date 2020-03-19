@@ -57,7 +57,7 @@ public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome
 		}
 		return Collections.EMPTY_LIST;
 	}
-	
+
 	private Logger getLogger(){
 		return Logger.getLogger(CaseCategoryHomeImpl.class.getName());
 	}
@@ -77,4 +77,13 @@ public class CaseCategoryHomeImpl extends IDOFactory implements CaseCategoryHome
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
+
+	@Override
+	public Collection<CaseCategory> findByGroupId(Integer groupId) throws FinderException {
+		IDOEntity entity = this.idoCheckOutPooledEntity();
+		Collection<?> ids = ((CaseCategoryBMPBean) entity).ejbFindByGroupId(groupId);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
+	}
+
 }

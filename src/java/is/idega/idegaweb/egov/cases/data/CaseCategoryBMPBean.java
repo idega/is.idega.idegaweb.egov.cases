@@ -170,6 +170,17 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 		return idoFindPKsByQuery(query);
 	}
 
+	public Collection<?> ejbFindByGroupId(Integer groupId) throws FinderException {
+		Table table = new Table(this);
+
+		SelectQuery query = new SelectQuery(table);
+		query.addColumn(table, getIDColumnName());
+		query.addCriteria(new MatchCriteria(table.getColumn(COLUMN_HANDLER_GROUP), MatchCriteria.EQUALS, groupId));
+		addNotDeletedCriteria(table, query);
+
+		return idoFindPKsByQuery(query);
+	}
+
 	public Collection ejbFindAllSubCategories(CaseCategory category) throws FinderException {
 		Table table = new Table(this);
 
@@ -290,7 +301,7 @@ public class CaseCategoryBMPBean extends GenericEntity implements CaseCategory{
 	public void setDeleted(boolean deleted) {
 		setValue(COLUMN_DELETED, deleted);
 	}
-	
+
 	@Override
 	public boolean isHidden(){
 		return getBooleanColumnValue(COLUMN_HIDDEN);
