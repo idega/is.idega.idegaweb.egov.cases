@@ -481,12 +481,22 @@ public class CasesStatistics extends CasesBlock {
 			return null;
 		}
 
-		Collection<Case> cases = null;
+		Collection<Case> cases = new ArrayList<Case>();
 		try {
+			Collection<Case> casesBPM = null;
+			Collection<Case> casesBPM2 = null;
 			if (getCasesBusiness() == null) {
-				cases = getCasesBusiness(iwc).getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
+				casesBPM = getCasesBusiness(iwc).getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
+				casesBPM2 = getCasesBusiness(iwc).getCasesByCriteria(null, category, null, null, null, ProcessConstants.BPM_2_CASE);
 			} else {
 				cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
+				casesBPM2 = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, ProcessConstants.BPM_2_CASE);
+			}
+			if (!ListUtil.isEmpty(casesBPM)) {
+				cases.addAll(casesBPM);
+			}
+			if (!ListUtil.isEmpty(casesBPM2)) {
+				cases.addAll(casesBPM2);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
