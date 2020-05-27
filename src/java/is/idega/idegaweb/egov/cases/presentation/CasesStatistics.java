@@ -17,11 +17,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,7 @@ import javax.ejb.FinderException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.process.business.CaseManagersProvider;
+import com.idega.block.process.business.CasesRetrievalManager;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseCode;
@@ -73,6 +76,7 @@ import com.idega.webface.WFUtil;
 
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.data.ApplicationHome;
+import is.idega.idegaweb.egov.cases.business.CasesBusiness;
 import is.idega.idegaweb.egov.cases.data.CaseCategory;
 import is.idega.idegaweb.egov.cases.data.CaseType;
 import is.idega.idegaweb.egov.cases.util.CasesConstants;
@@ -481,25 +485,36 @@ public class CasesStatistics extends CasesBlock {
 			return null;
 		}
 
+		Set<String> types = new HashSet<>();
 		Collection<Case> cases = new ArrayList<Case>();
 		try {
-			Collection<Case> casesBPM = null;
-			Collection<Case> casesBPM2 = null;
-			if (getCasesBusiness() == null) {
-				casesBPM = getCasesBusiness(iwc).getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
-				casesBPM2 = getCasesBusiness(iwc).getCasesByCriteria(null, category, null, null, null, ProcessConstants.BPM_2_CASE);
-			} else {
-				cases = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, getCaseManagersProvider().getCaseManager().getType());
-				casesBPM2 = getCasesBusiness().getCasesByCriteria(null, category, null, null, null, ProcessConstants.BPM_2_CASE);
+			CasesBusiness casesBusiness = getCasesBusiness();
+			if (casesBusiness == null) {
+				casesBusiness = getCasesBusiness(iwc);
 			}
-			if (!ListUtil.isEmpty(casesBPM)) {
-				cases.addAll(casesBPM);
+
+			List<CasesRetrievalManager> caseManagers = getCaseManagersProvider().getCaseManagers();
+			if (!ListUtil.isEmpty(caseManagers)) {
+				for (CasesRetrievalManager manager: caseManagers) {
+					String type = manager.getType();
+					if (!StringUtil.isEmpty(type)) {
+						types.add(type);
+					}
+				}
 			}
-			if (!ListUtil.isEmpty(casesBPM2)) {
-				cases.addAll(casesBPM2);
+			if (ListUtil.isEmpty(types)) {
+				types.add(getCaseManagersProvider().getCaseManager().getType());
+			}
+			for (String type: types) {
+				Collection<Case> casesByType = casesBusiness.getCasesByCriteria(null, category, null, null, null, type);
+				if (ListUtil.isEmpty(casesByType)) {
+					getLogger().info("No cases found by manager type " + type + " and category " + category);
+				} else {
+					cases.addAll(casesByType);
+				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			getLogger().log(Level.WARNING, "Error getting cases by manager type(s) " + types + " and category " + category, e);
 		}
 
 		Map<String, List<Case>> casesByProcesses = getCasesByProcesses(cases);
