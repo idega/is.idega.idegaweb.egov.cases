@@ -469,7 +469,6 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId, Map<String, Integer> statuses, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		if (getCaseManagersProvider() == null) {
 			return null;
@@ -481,7 +480,7 @@ public class CasesStatistics extends CasesBlock {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (category == null) {
+		if (category == null || category.isDeleted() || category.isHidden()) {
 			return null;
 		}
 
