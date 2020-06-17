@@ -469,7 +469,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 
-	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId, Map<String, Integer> statuses, IWTimestamp dateFrom, IWTimestamp dateTo) {
+	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds, IWTimestamp dateFrom, IWTimestamp dateTo) {
 		if (getCaseManagersProvider() == null) {
 			return null;
 		}
@@ -571,13 +571,28 @@ public class CasesStatistics extends CasesBlock {
 				localizedProcessName = unkownProcess;
 			}
 
-			results.add(new Result(-1, localizedProcessName, getStatusesForCases(casesByProcesses.get(processName), statuses, dateFrom, dateTo), false));
+			Map<String, List<Integer>> statusesAndIds = new HashMap<>();
+			results.add(
+					new Result(
+							-1,
+							localizedProcessName,
+							getStatusesForCases(
+									casesByProcesses.get(processName),
+									statuses,
+									dateFrom,
+									dateTo,
+									statusesAndIds
+							),
+							statusesAndIds,
+							false
+					)
+			);
 		}
 
 		return results;
 	}
 
-	private Map<String, Integer> getStatusesForCases(List<Case> cases, Map<String, Integer> statusesFromSQL, IWTimestamp dateFrom, IWTimestamp dateTo) {
+	private Map<String, Integer> getStatusesForCases(List<Case> cases, Map<String, Integer> statusesFromSQL, IWTimestamp dateFrom, IWTimestamp dateTo, Map<String, List<Integer>> statusesAndIds) {
 		if (ListUtil.isEmpty(cases) || MapUtil.isEmpty(statusesFromSQL)) {
 			return new HashMap<String, Integer>();
 		}
@@ -611,6 +626,15 @@ public class CasesStatistics extends CasesBlock {
 					count++;
 				}
 				statuses.put(statusId, count);
+
+				if (statusesAndIds != null) {
+					List<Integer> ids = statusesAndIds.get(statusId);
+					if (ids == null) {
+						ids = new ArrayList<>();
+						statusesAndIds.put(statusId, ids);
+					}
+					ids.add((Integer) theCase.getPrimaryKey());
+				}
 			}
 		}
 
@@ -722,16 +746,18 @@ public class CasesStatistics extends CasesBlock {
 		private boolean useDefaultHandlerIfNotFoundResultsProvider = true;
 		private String name = null;
 		private Map<String, Integer> statusMap;
+		private Map<String, List<Integer>> statusAndCasesIds;
 
-		protected Result(int id, String name, Map<String, Integer> statusMap) {
-			this(id, name, statusMap, true);
+		protected Result(int id, String name, Map<String, Integer> statusMap, Map<String, List<Integer>> statusAndCasesIds) {
+			this(id, name, statusMap, statusAndCasesIds, true);
 		}
 
-		protected Result(int id, String name, Map<String, Integer> statusMap, boolean useDefaultHandlerIfNotFoundResultsProvider) {
+		protected Result(int id, String name, Map<String, Integer> statusMap, Map<String, List<Integer>> statusAndCasesIds, boolean useDefaultHandlerIfNotFoundResultsProvider) {
 			this.id = id;
 			this.name = name;
 			this.statusMap = statusMap;
 			this.useDefaultHandlerIfNotFoundResultsProvider = useDefaultHandlerIfNotFoundResultsProvider;
+			this.statusAndCasesIds = statusAndCasesIds;
 		}
 
 		public String getName() {
@@ -749,13 +775,22 @@ public class CasesStatistics extends CasesBlock {
 		public boolean isUseDefaultHandlerIfNotFoundResultsProvider() {
 			return useDefaultHandlerIfNotFoundResultsProvider;
 		}
+
+		public Map<String, List<Integer>> getStatusAndCasesIds() {
+			return statusAndCasesIds;
+		}
+
+		public void setStatusAndCasesIds(Map<String, List<Integer>> statusAndCasesIds) {
+			this.statusAndCasesIds = statusAndCasesIds;
+		}
+
 	}
 
 	public abstract class Handler {
+
 		public abstract String getSQL();
 		public abstract Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException;
-		public abstract boolean addResult(IWContext iwc, Collection<Result> results, int prevID, Map<String, Integer> statuses)
-										throws RemoteException, FinderException;
+		public abstract boolean addResult(IWContext iwc, Collection<Result> results, int prevID, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) throws RemoteException, FinderException;
 
 		private boolean useSubCats = false;
 		private int parentID = -1;
@@ -846,6 +881,7 @@ public class CasesStatistics extends CasesBlock {
 			Collection<Result> results = new ArrayList<Result>();
 			int previousCaseCategoryId = -1;
 			Map<String, Integer> statuses = null;
+			Map<String, List<Integer>> statusesAndCasesIds = null;
 			while (rs.next()) {
 				int categoryId = rs.getInt("comm_case_category_id");
 				int count = rs.getInt("NO_OF_CASES");
@@ -854,11 +890,12 @@ public class CasesStatistics extends CasesBlock {
 				if (previousCaseCategoryId != categoryId) {
 					if (statuses != null) {
 						//	Adding results for previous category
-						addResult(iwc, results, previousCaseCategoryId, statuses);
+						addResult(iwc, results, previousCaseCategoryId, statuses, statusesAndCasesIds);
 					}
 
 					//	New category
 					statuses = new HashMap<String, Integer>();
+					statusesAndCasesIds = new HashMap<>();
 				}
 
 				statuses.put(caseStatus, isValidStatus(caseStatus) ? count : 0);
@@ -866,14 +903,14 @@ public class CasesStatistics extends CasesBlock {
 			}
 			if (statuses != null) {
 				//	Adding results for LAST category
-				addResult(iwc, results, previousCaseCategoryId, statuses);
+				addResult(iwc, results, previousCaseCategoryId, statuses, statusesAndCasesIds);
 			}
 
 			return results;
 		}
 
 		@Override
-		public boolean addResult(IWContext iwc, Collection<Result> results, int caseCategoryId, Map<String, Integer> statuses)
+		public boolean addResult(IWContext iwc, Collection<Result> results, int caseCategoryId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds)
 			throws RemoteException, FinderException {
 			if (caseCategoryId < 0) {
 				return false;
@@ -881,7 +918,7 @@ public class CasesStatistics extends CasesBlock {
 
 			if (!addedCategories.contains(caseCategoryId) && isCustomCategory(caseCategoryId)) {
 				addedCategories.add(caseCategoryId);
-				Collection<Result> customCategoryResults = getCustomCategoryResults(iwc, caseCategoryId, statuses, getDateFrom(), getDateTo());
+				Collection<Result> customCategoryResults = getCustomCategoryResults(iwc, caseCategoryId, statuses, statusesAndCasesIds, getDateFrom(), getDateTo());
 				if (!ListUtil.isEmpty(customCategoryResults)) {
 					results.addAll(customCategoryResults);
 				}
@@ -951,6 +988,7 @@ public class CasesStatistics extends CasesBlock {
 
 	//	Cases by user
 	public class UserHandler extends Handler {
+
 		public UserHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
@@ -986,6 +1024,7 @@ public class CasesStatistics extends CasesBlock {
 			Collection<Result> results = new ArrayList<Result>();
 			int previousUserId = -1;
 			Map<String, Integer> statuses = null;
+			Map<String, List<Integer>> statusesAndCasesIds = null;
 			while (rs.next()) {
 				int handlerId = rs.getInt("handler");
 				int count = rs.getInt("NO_OF_CASES");
@@ -994,11 +1033,12 @@ public class CasesStatistics extends CasesBlock {
 				if (previousUserId != handlerId) {
 					if (statuses != null) {
 						//	Adding results for previous user
-						addResult(iwc, results, previousUserId, statuses);
+						addResult(iwc, results, previousUserId, statuses, statusesAndCasesIds);
 					}
 
 					//	New user
 					statuses = new HashMap<String, Integer>();
+					statusesAndCasesIds = new HashMap<>();
 				}
 
 				statuses.put(caseStatus, count);
@@ -1006,32 +1046,33 @@ public class CasesStatistics extends CasesBlock {
 			}
 			if (statuses != null) {
 				//	Adding results for LAST user
-				addResult(iwc, results, previousUserId, statuses);
+				addResult(iwc, results, previousUserId, statuses, statusesAndCasesIds);
 			}
 
 			return results;
 		}
 
 		@Override
-		public boolean addResult(IWContext iwc, Collection<Result> results, int userId, Map<String, Integer> statuses) throws RemoteException, FinderException {
+		public boolean addResult(IWContext iwc, Collection<Result> results, int userId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) throws RemoteException, FinderException {
 			String resultName = null;
 			if (userId > -1) {
 				User user = null;
 				if (getUserBusiness() == null) {
-					user = getUserBusiness(iwc).getUser(userId);;
+					user = getUserBusiness(iwc).getUser(userId);
 				} else {
 					user = getUserBusiness().getUser(userId);
 				}
 
 				resultName = user.getName();
 			}
-			return addResultToList(resultName, results, userId, statuses);
+			return addResultToList(resultName, results, userId, statuses, statusesAndCasesIds);
 		}
 
 	}
 
 	//	Cases by type
 	public class CaseTypeHandler extends Handler {
+
 		public CaseTypeHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
 			setParentID(parentID);
@@ -1065,6 +1106,7 @@ public class CasesStatistics extends CasesBlock {
 			Collection<Result> results = new ArrayList<Result>();
 			int prevCaseTypeId = -1;
 			Map<String, Integer> statuses = null;
+			Map<String, List<Integer>> statusesAndCasesIds = null;
 			while (rs.next()) {
 				int caseTypeId = rs.getInt("case_type");
 				int count = rs.getInt("NO_OF_CASES");
@@ -1073,11 +1115,12 @@ public class CasesStatistics extends CasesBlock {
 				if (prevCaseTypeId != caseTypeId) {
 					if (statuses != null) {
 						//	Adding results for previous case type
-						addResult(iwc, results, prevCaseTypeId, statuses);
+						addResult(iwc, results, prevCaseTypeId, statuses, statusesAndCasesIds);
 					}
 
 					//	New case type
 					statuses = new HashMap<String, Integer>();
+					statusesAndCasesIds = new HashMap<>();
 				}
 
 				statuses.put(caseStatus, count);
@@ -1085,15 +1128,14 @@ public class CasesStatistics extends CasesBlock {
 			}
 			if (statuses != null) {
 				//	Adding results for LAST case type
-				addResult(iwc, results, prevCaseTypeId, statuses);
+				addResult(iwc, results, prevCaseTypeId, statuses, statusesAndCasesIds);
 			}
 
 			return results;
 		}
 
 		@Override
-		public boolean addResult(IWContext iwc, Collection<Result> results, int caseTypeId, Map<String, Integer> statuses)
-			throws FinderException, RemoteException {
+		public boolean addResult(IWContext iwc, Collection<Result> results, int caseTypeId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) throws FinderException, RemoteException {
 			String resultName = null;
 			if (caseTypeId > -1) {
 				CaseType type = null;
@@ -1105,17 +1147,17 @@ public class CasesStatistics extends CasesBlock {
 
 				resultName = type.getName();
 			}
-			return addResultToList(resultName, results, caseTypeId, statuses);
+			return addResultToList(resultName, results, caseTypeId, statuses, statusesAndCasesIds);
 		}
 
 	}
 
-	boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses) {
+	boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) {
 		if (identifier < 0 || StringUtil.isEmpty(resultName)) {
 			return false;
 		}
 
-		results.add(new Result(identifier, resultName, statuses));
+		results.add(new Result(identifier, resultName, statuses, statusesAndCasesIds));
 
 		return true;
 	}
