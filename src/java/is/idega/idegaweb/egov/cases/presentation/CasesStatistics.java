@@ -888,7 +888,11 @@ public class CasesStatistics extends CasesBlock {
 				return true;
 			}
 
-			return addResultToList(getCategoryName(iwc, getCaseCategory(caseCategoryId)), results, caseCategoryId, statuses);
+			CaseCategory category = getCaseCategory(caseCategoryId);
+			if (category == null || category.isDeleted() || category.isHidden()) {
+				return false;
+			}
+			return addResultToList(getCategoryName(iwc, category), results, caseCategoryId, statuses, statusesAndCasesIds);
 		}
 	}
 
@@ -930,7 +934,7 @@ public class CasesStatistics extends CasesBlock {
 			LOGGER.warning("Unable to get category by: " + categoryId);
 		}
 
-		if (category == null) {
+		if (category == null || category.isDeleted() || category.isHidden()) {
 			return false;
 		}
 
@@ -1194,7 +1198,7 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 
-			if (category != null) {
+			if (category != null && !category.isDeleted() && !category.isHidden()) {
 				topCategory = getTopCategory(category);
 				if (!categoriesToUse.contains(topCategory.getPrimaryKey().toString())) {
 					categoriesToUse.add(topCategory.getPrimaryKey().toString());
