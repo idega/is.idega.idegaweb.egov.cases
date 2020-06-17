@@ -94,7 +94,8 @@ public class CasesStatistics extends CasesBlock {
 	private String visibleStatuses = null;
 
 	private Boolean useStatisticsByCaseType,
-					showDateRange = Boolean.TRUE;
+					showDateRange = Boolean.TRUE,
+					checkIfCustomCategory = Boolean.TRUE;
 
 	private Collection<CasePresentation> cases;
 
@@ -975,6 +976,12 @@ public class CasesStatistics extends CasesBlock {
 			return false;
 		}
 
+		if (!getCheckIfCustomCategory()) {
+			customCategories = customCategories == null ? new ArrayList<>() : customCategories;
+			customCategories.add(Integer.valueOf(categoryId));
+			return true;
+		}
+
 		if (namesOfCustomCategories.contains(category.getName())) {
 			if (ListUtil.isEmpty(customCategories)) {
 				customCategories = new ArrayList<Integer>();
@@ -1381,7 +1388,12 @@ public class CasesStatistics extends CasesBlock {
 		this.showDateRange = showDateRange;
 	}
 
+	public Boolean getCheckIfCustomCategory() {
+		return checkIfCustomCategory == null ? Boolean.TRUE : checkIfCustomCategory;
+	}
 
-
+	public void setCheckIfCustomCategory(Boolean checkIfCustomCategory) {
+		this.checkIfCustomCategory = checkIfCustomCategory;
+	}
 
 }
