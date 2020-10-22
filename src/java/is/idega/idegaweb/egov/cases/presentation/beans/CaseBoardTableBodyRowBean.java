@@ -145,20 +145,30 @@ public class CaseBoardTableBodyRowBean {
 		sb.append("getCaseIdentifier(): ").append(getCaseIdentifier()).append(CoreConstants.NEWLINE);
 		sb.append("getCaseId(): ").append(getCaseId()).append(CoreConstants.NEWLINE);
 		sb.append("getLinkToCase(): ").append(getLinkToCase()).append(CoreConstants.NEWLINE);
-		for (Integer columnNumber : getValues().keySet()) {
-			List<AdvancedProperty> variables = getValues().get(columnNumber);
-			if (!ListUtil.isEmpty(variables)) {
-				for (AdvancedProperty variable: variables) {
-					sb.append(variable.getId()).append(CoreConstants.COLON).append(variable.getValue()).append(CoreConstants.SPACE);
-					sb.append(CoreConstants.NEWLINE);
+		Map<Integer, List<AdvancedProperty>> values = getValues();
+		if (!MapUtil.isEmpty(values)) {
+			for (Integer columnNumber : values.keySet()) {
+				List<AdvancedProperty> variables = values.get(columnNumber);
+				if (!ListUtil.isEmpty(variables)) {
+					for (AdvancedProperty variable: variables) {
+						sb.append(variable.getId()).append(CoreConstants.COLON).append(variable.getValue()).append(CoreConstants.SPACE);
+						sb.append(CoreConstants.NEWLINE);
+					}
 				}
 			}
 		}
 
-		sb.append("Financial: ").append(CoreConstants.NEWLINE);
-		for (Map<String, String> wft : getFinancingInfo()) {
-			for (String string : wft.keySet()) {
-				sb.append(string).append(CoreConstants.COLON).append(wft.get(string)).append(CoreConstants.NEWLINE);
+		List<Map<String, String>> finInfo = getFinancingInfo();
+		sb.append("Financial: ").append(ListUtil.isEmpty(finInfo) ? "not available" : CoreConstants.NEWLINE);
+		if (!ListUtil.isEmpty(finInfo)) {
+			for (Map<String, String> wft : finInfo) {
+				if (MapUtil.isEmpty(wft)) {
+					continue;
+				}
+
+				for (String string : wft.keySet()) {
+					sb.append(string).append(CoreConstants.COLON).append(wft.get(string)).append(CoreConstants.NEWLINE);
+				}
 			}
 		}
 
