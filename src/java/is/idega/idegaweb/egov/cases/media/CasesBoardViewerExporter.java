@@ -23,7 +23,6 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -92,6 +91,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		HSSFSheet sheet = createSheet(workBook, data.getHeaderLabels(), iwc);
 
 		int rowNumber = 1;
+		int maxCells = 0;
 		for (CaseBoardTableBodyRowBean rowBean: data.getBodyBeans()) {
 			HSSFRow row = sheet.createRow(rowNumber++);
 
@@ -225,10 +225,11 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					}
 				}
 			}
+			maxCells = maxCells < cellIndex ? cellIndex : maxCells;
 		}
 
 		createCellsWithValues(sheet, null, data.getFooterValues(), rowNumber);
-		autosizeSheetColumns(sheet);
+		autosizeSheetColumns(sheet, maxCells);
 		write(createOutputStream(), workBook, iwc);
 	}
 
@@ -315,8 +316,9 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	 * @author <a href="mailto:martynas@idega.is">Martynas Stakė</a>
 	 */
 	protected boolean isSubscribedOnly(String uuid, IWContext iwc) {
-		if (StringUtil.isEmpty(uuid))
+		if (StringUtil.isEmpty(uuid)) {
 			return Boolean.FALSE;
+		}
 
 		Object subscribed = iwc.getSessionAttribute(CasesBoardViewer.PARAMETER_SHOW_ONLY_SUBSCRIBED + uuid);
 		Boolean value = null;
@@ -508,21 +510,15 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	 * @return <code>true</code> if formatted, false otherwise;
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
-	protected boolean autosizeSheetColumns(HSSFSheet sheet) {
-		if (sheet == null) {
+	protected boolean autosizeSheetColumns(HSSFSheet sheet, int nrOfCells) {
+		if (sheet == null || nrOfCells <= 0) {
 			return false;
 		}
 
-		for (int i = 0; i < sheet.getLastRowNum(); i++) {
-			HSSFRow row = sheet.getRow(i);
-			int cell = 0;
-			for (Iterator<Cell> cellsIter = row.cellIterator(); cellsIter.hasNext();) {
-				cellsIter.next();
-
-				if (row.getCell(cell) != null)
-					sheet.autoSizeColumn(cell);
-				cell++;
-			}
+		for (int column = 0;  column < nrOfCells; column++) {
+			try {
+				sheet.autoSizeColumn(column);
+			} catch (Exception e) {}
 		}
 
 		return true;
