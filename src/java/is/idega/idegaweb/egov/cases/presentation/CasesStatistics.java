@@ -134,7 +134,7 @@ public class CasesStatistics extends CasesBlock {
 				statuses = getCasesBusiness().getCaseStatuses();
 			} else {
 				//	Will be used statuses provided by cases
-				statuses = new ArrayList<CaseStatus>();
+				statuses = new ArrayList<>();
 				CaseStatus status = null;
 				for (CasePresentation theCase: cases) {
 					status = theCase.getCaseStatus();
@@ -144,7 +144,7 @@ public class CasesStatistics extends CasesBlock {
 				}
 			}
 		} else {
-			statuses = new ArrayList<CaseStatus>();
+			statuses = new ArrayList<>();
 			StringTokenizer tok = new StringTokenizer(visibleStatuses, CoreConstants.COMMA);
 			while (tok.hasMoreTokens()) {
 				String status = tok.nextToken().trim();
@@ -158,7 +158,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		String localizedStatus = null;
-		Collection<CaseStatus> statusesToUse = new ArrayList<CaseStatus>();
+		Collection<CaseStatus> statusesToUse = new ArrayList<>();
 		if (!ListUtil.isEmpty(statuses)) {
 			for (CaseStatus status: statuses) {
 				if (!statusesToUse.contains(status)) {
@@ -271,10 +271,24 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 
-	private int addResults(Map<CaseStatus, Integer> totals, Table2 table, TableRowGroup group, IWContext iwc, IWResourceBundle iwrb, Layer section,
-			Collection<Result> results, Collection<CaseStatus> statuses, String header, boolean useSubCats, boolean isSubCategory, int iRow, IWTimestamp fromDate, IWTimestamp toDate) {
+	private int addResults(
+			Map<CaseStatus, Integer> totals,
+			Table2 table,
+			TableRowGroup group,
+			IWContext iwc,
+			IWResourceBundle iwrb,
+			Layer section,
+			Collection<Result> results,
+			Collection<CaseStatus> statuses,
+			String header,
+			boolean useSubCats,
+			boolean isSubCategory,
+			int iRow,
+			IWTimestamp fromDate,
+			IWTimestamp toDate
+	) {
 		if (totals == null) {
-			totals = new LinkedHashMap<CaseStatus, Integer>();
+			totals = new LinkedHashMap<>();
 
 			for (Iterator<CaseStatus> statIter = statuses.iterator(); statIter.hasNext();) {
 				CaseStatus status = statIter.next();
@@ -376,9 +390,15 @@ public class CasesStatistics extends CasesBlock {
 		return iRow;
 	}
 
-
-	private void addResultToTable(Map<CaseStatus, Integer> totals, Collection<CaseStatus> statuses, TableRowGroup group, int iRow, Result res,
-			boolean isSubCategory, boolean showNumbers) {
+	private void addResultToTable(
+			Map<CaseStatus, Integer> totals,
+			Collection<CaseStatus> statuses,
+			TableRowGroup group,
+			int iRow,
+			Result res,
+			boolean isSubCategory,
+			boolean showNumbers
+	) {
 		TableRow row;
 		TableCell2 cell;
 		CaseStatus status;
@@ -470,7 +490,14 @@ public class CasesStatistics extends CasesBlock {
 		}
 	}
 
-	Collection<Result> getCustomCategoryResults(IWContext iwc, int categoryId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds, IWTimestamp dateFrom, IWTimestamp dateTo) {
+	Collection<Result> getCustomCategoryResults(
+			IWContext iwc,
+			int categoryId,
+			Map<String, Integer> statuses,
+			Map<String, List<Integer>> statusesAndCasesIds,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo
+	) {
 		if (getCaseManagersProvider() == null) {
 			return null;
 		}
@@ -486,7 +513,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		Set<String> types = new HashSet<>();
-		Collection<Case> cases = new ArrayList<Case>();
+		Collection<Case> cases = new ArrayList<>();
 		try {
 			CasesBusiness casesBusiness = getCasesBusiness();
 			if (casesBusiness == null) {
@@ -527,7 +554,7 @@ public class CasesStatistics extends CasesBlock {
 
 		String localizedProcessName = null;
 		Locale locale = iwc.getCurrentLocale();
-		List<Result> results = new ArrayList<Result>();
+		List<Result> results = new ArrayList<>();
 		String unkownProcess = getResourceBundle(iwc).getLocalizedString("case_statistics.unkown_process", "Unkown process");
 		for (String processName: casesByProcesses.keySet()) {
 			localizedProcessName = null;
@@ -585,7 +612,8 @@ public class CasesStatistics extends CasesBlock {
 									statusesAndIds
 							),
 							statusesAndIds,
-							false
+							false,
+							-1
 					)
 			);
 		}
@@ -593,12 +621,18 @@ public class CasesStatistics extends CasesBlock {
 		return results;
 	}
 
-	private Map<String, Integer> getStatusesForCases(List<Case> cases, Map<String, Integer> statusesFromSQL, IWTimestamp dateFrom, IWTimestamp dateTo, Map<String, List<Integer>> statusesAndIds) {
+	private Map<String, Integer> getStatusesForCases(
+			List<Case> cases,
+			Map<String, Integer> statusesFromSQL,
+			IWTimestamp dateFrom,
+			IWTimestamp dateTo,
+			Map<String, List<Integer>> statusesAndIds
+	) {
 		if (ListUtil.isEmpty(cases) || MapUtil.isEmpty(statusesFromSQL)) {
-			return new HashMap<String, Integer>();
+			return new HashMap<>();
 		}
 
-		Map<String, Integer> statuses = new HashMap<String, Integer>();
+		Map<String, Integer> statuses = new HashMap<>();
 
 		String statusId = null;
 		for (Case theCase: cases) {
@@ -644,10 +678,10 @@ public class CasesStatistics extends CasesBlock {
 
 	Map<String, Integer> getStatusesForCasesOld(List<Case> cases) {
 		if (ListUtil.isEmpty(cases)) {
-			return new HashMap<String, Integer>();
+			return new HashMap<>();
 		}
 
-		Map<String, Integer> statuses = new HashMap<String, Integer>();
+		Map<String, Integer> statuses = new HashMap<>();
 
 		String statusId = null;
 		for (Case theCase: cases) {
@@ -689,7 +723,7 @@ public class CasesStatistics extends CasesBlock {
 			return null;
 		}
 
-		Map<String, List<Case>> casesByProcesses = new HashMap<String, List<Case>>();
+		Map<String, List<Case>> casesByProcesses = new HashMap<>();
 
 		String processDefinitionName = null;
 		for (Case theCase: cases) {
@@ -730,7 +764,7 @@ public class CasesStatistics extends CasesBlock {
 				} else {
 					List<Case> casesByProcess = casesByProcesses.get(processDefinitionName);
 					if (ListUtil.isEmpty(casesByProcess)) {
-						casesByProcess = new ArrayList<Case>();
+						casesByProcess = new ArrayList<>();
 					}
 					casesByProcess.add(theCase);
 					casesByProcesses.put(processDefinitionName, casesByProcess);
@@ -748,17 +782,26 @@ public class CasesStatistics extends CasesBlock {
 		private String name = null;
 		private Map<String, Integer> statusMap;
 		private Map<String, List<Integer>> statusAndCasesIds;
+		private int handlerGroupId;
 
-		protected Result(int id, String name, Map<String, Integer> statusMap, Map<String, List<Integer>> statusAndCasesIds) {
-			this(id, name, statusMap, statusAndCasesIds, true);
+		protected Result(int id, String name, Map<String, Integer> statusMap, Map<String, List<Integer>> statusAndCasesIds, int handlerGroupId) {
+			this(id, name, statusMap, statusAndCasesIds, true, handlerGroupId);
 		}
 
-		protected Result(int id, String name, Map<String, Integer> statusMap, Map<String, List<Integer>> statusAndCasesIds, boolean useDefaultHandlerIfNotFoundResultsProvider) {
+		protected Result(
+				int id,
+				String name,
+				Map<String, Integer> statusMap,
+				Map<String, List<Integer>> statusAndCasesIds,
+				boolean useDefaultHandlerIfNotFoundResultsProvider,
+				int handlerGroupId
+		) {
 			this.id = id;
 			this.name = name;
 			this.statusMap = statusMap;
 			this.useDefaultHandlerIfNotFoundResultsProvider = useDefaultHandlerIfNotFoundResultsProvider;
 			this.statusAndCasesIds = statusAndCasesIds;
+			this.handlerGroupId = handlerGroupId;
 		}
 
 		public String getName() {
@@ -785,19 +828,47 @@ public class CasesStatistics extends CasesBlock {
 			this.statusAndCasesIds = statusAndCasesIds;
 		}
 
+		public int getHandlerGroupId() {
+			return handlerGroupId;
+		}
+
+		public void setUseDefaultHandlerIfNotFoundResultsProvider(boolean useDefaultHandlerIfNotFoundResultsProvider) {
+			this.useDefaultHandlerIfNotFoundResultsProvider = useDefaultHandlerIfNotFoundResultsProvider;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public void setStatusMap(Map<String, Integer> statusMap) {
+			this.statusMap = statusMap;
+		}
+
+		public void setHandlerGroupId(int handlerGroupId) {
+			this.handlerGroupId = handlerGroupId;
+		}
+
 	}
 
 	public abstract class Handler {
 
-		public abstract String getSQL();
+		public abstract List<String> getSQL();
 		public abstract Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException;
-		public abstract boolean addResult(IWContext iwc, Collection<Result> results, int prevID, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) throws RemoteException, FinderException;
+		public abstract boolean addResult(
+				IWContext iwc,
+				Collection<Result> results,
+				int prevID,
+				Map<String, Integer> statuses,
+				Map<String, List<Integer>> statusesAndCasesIds,
+				int handlerGroupId
+		) throws RemoteException, FinderException;
 
 		private boolean useSubCats = false;
 		private int parentID = -1;
 		private IWTimestamp dateFrom;
 		private IWTimestamp dateTo;
 		private List<String> exceptCaseCodes;
+		private List<Integer> handlerGroupsIds;
 
 		protected boolean isUseSubCats() {
 			return useSubCats;
@@ -829,13 +900,17 @@ public class CasesStatistics extends CasesBlock {
 		public void setExceptCaseCodes(List<String> exceptCaseCodes) {
 			this.exceptCaseCodes = exceptCaseCodes;
 		}
-
-
+		public List<Integer> getHandlerGroupsIds() {
+			return handlerGroupsIds;
+		}
+		public void setHandlerGroupsIds(List<Integer> handlerGroupsIds) {
+			this.handlerGroupsIds = handlerGroupsIds;
+		}
 	}
 
 	//	Cases by categories
 	public class CategoryHandler extends Handler {
-		private List<Integer> addedCategories = new ArrayList<Integer>();
+		private List<Integer> addedCategories = new ArrayList<>();
 
 		public CategoryHandler(boolean useSubCats, int parentID) {
 			setUseSubCats(useSubCats);
@@ -843,8 +918,8 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		@Override
-		public String getSQL() {
-			StringBuilder query = new StringBuilder("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order ")
+		public List<String> getSQL() {
+			StringBuilder query = new StringBuilder("select cc.comm_case_category_id, count(c.case_category) as NO_OF_CASES, p.case_status, cc.category_order, p.HANDLER_GROUP_ID as HGID ")
 				.append("from comm_case_category cc left join comm_case c on c.case_category = cc.comm_case_category_id ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id ");
 
@@ -857,6 +932,8 @@ public class CasesStatistics extends CasesBlock {
 
 				query.append(getCategoriesIdsCriteria());			//	We need the very categories used by PROVIDED cases set
 			}
+
+			query.append(getHandlerGroupsIdsCriteria(getHandlerGroupsIds()));
 
 			if (getDateFrom() != null) {
 				query.append(getDateFromCriteria(getDateFrom()));
@@ -871,48 +948,56 @@ public class CasesStatistics extends CasesBlock {
 
 			query.append(" group by cc.comm_case_category_id, cc.category_order, p.case_status order by cc.category_order, cc.comm_case_category_id");
 
-			if (getParentID() == -1) {
-				System.out.println("CategoryHandler: " + query.toString());
-			}
-			return query.toString();
+			String result = query.toString();
+			LOGGER.info("Query for cases per e-service: " + result);
+			return Arrays.asList(result);
 		}
 
 		@Override
 		public Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
-			Collection<Result> results = new ArrayList<Result>();
+			Collection<Result> results = new ArrayList<>();
 			int previousCaseCategoryId = -1;
+			int previousHandlerGroupId = -1;
 			Map<String, Integer> statuses = null;
 			Map<String, List<Integer>> statusesAndCasesIds = null;
 			while (rs.next()) {
 				int categoryId = rs.getInt("comm_case_category_id");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("CASE_STATUS");
+				int handlerGroupId = rs.getInt("HGID");
 
 				if (previousCaseCategoryId != categoryId) {
 					if (statuses != null) {
 						//	Adding results for previous category
-						addResult(iwc, results, previousCaseCategoryId, statuses, statusesAndCasesIds);
+						addResult(iwc, results, previousCaseCategoryId, statuses, statusesAndCasesIds, handlerGroupId);
 					}
 
 					//	New category
-					statuses = new HashMap<String, Integer>();
+					statuses = new HashMap<>();
 					statusesAndCasesIds = new HashMap<>();
 				}
 
 				statuses.put(caseStatus, isValidStatus(caseStatus) ? count : 0);
 				previousCaseCategoryId = categoryId;
+				previousHandlerGroupId = handlerGroupId;
 			}
 			if (statuses != null) {
 				//	Adding results for LAST category
-				addResult(iwc, results, previousCaseCategoryId, statuses, statusesAndCasesIds);
+				addResult(iwc, results, previousCaseCategoryId, statuses, statusesAndCasesIds, previousHandlerGroupId);
 			}
 
 			return results;
 		}
 
 		@Override
-		public boolean addResult(IWContext iwc, Collection<Result> results, int caseCategoryId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds)
-			throws RemoteException, FinderException {
+		public boolean addResult(
+				IWContext iwc,
+				Collection<Result> results,
+				int caseCategoryId,
+				Map<String, Integer> statuses,
+				Map<String, List<Integer>> statusesAndCasesIds,
+				int handlerGroupId
+		) throws RemoteException, FinderException {
 			if (caseCategoryId < 0) {
 				return false;
 			}
@@ -930,7 +1015,7 @@ public class CasesStatistics extends CasesBlock {
 			if (category == null || category.isDeleted() || category.isHidden()) {
 				return false;
 			}
-			return addResultToList(getCategoryName(iwc, category), results, caseCategoryId, statuses, statusesAndCasesIds);
+			return addResultToList(getCategoryName(iwc, category), results, caseCategoryId, statuses, statusesAndCasesIds, handlerGroupId);
 		}
 	}
 
@@ -984,7 +1069,7 @@ public class CasesStatistics extends CasesBlock {
 
 		if (namesOfCustomCategories.contains(category.getName())) {
 			if (ListUtil.isEmpty(customCategories)) {
-				customCategories = new ArrayList<Integer>();
+				customCategories = new ArrayList<>();
 			}
 			customCategories.add(Integer.valueOf(categoryId));
 			return true;
@@ -1002,65 +1087,93 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		@Override
-		public String getSQL() {
-			StringBuilder query = new StringBuilder("select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
+		public List<String> getSQL() {
+			List<String> queries = new ArrayList<>();
+
+			StringBuilder query = new StringBuilder("select handler, count(c.comm_case_id) as NO_OF_CASES, p.case_status, p.HANDLER_GROUP_ID as HGID from comm_case c ")
 				.append("left join comm_case_category cc on c.case_category = cc.comm_case_category_id ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id, ic_user u where c.handler = u.ic_user_id and c.handler is not null ").append(getCasesIdsCriteria())
-				.append(getStatusesIdsCriteria());
-
+				.append(getStatusesIdsCriteria())
+				.append(getHandlerGroupsIdsCriteria(getHandlerGroupsIds()));
 			if (getDateFrom() != null) {
 				query.append(getDateFromCriteria(getDateFrom()));
 			}
 			if (getDateTo() != null) {
 				query.append(getDateToCriteria(getDateTo()));
 			}
+			if (!ListUtil.isEmpty(getExceptCaseCodes())) {
+				query.append(getExceptCaseCodesCriteria(getExceptCaseCodes()));
+			}
+			query.append(" group by c.handler, p.case_status, u.display_name order by u.display_name, p.case_status");
+			queries.add(query.toString());
 
-
+			query = new StringBuilder("select l.PERFORMER_USER_ID as handler, count(distinct c.comm_case_id) as NO_OF_CASES, p.case_status, p.HANDLER_GROUP_ID as HGID from comm_case c ")
+					.append("left join comm_case_category cc on c.case_category = cc.comm_case_category_id ")
+					.append("left join proc_case p on p.proc_case_id = c.comm_case_id ")
+					.append(", proc_case_log l, ic_user u where c.handler is null and p.case_status = l.CASE_STATUS_AFTER ")
+					.append("and p.proc_case_id = l.CASE_ID and l.PERFORMER_USER_ID = u.ic_user_id and l.PERFORMER_USER_ID in (select distinct RELATED_IC_GROUP_ID from ic_group_relation ")
+					.append("where ic_group_id in (select IC_GROUP_ID from ic_group where group_type in ('org_organisation', 'org_division', 'org_department', 'org_category', ")
+					.append("'org_sub-category', 'org_committee') or NAME in ('administrator', 'BPM Cases Handlers')) and RELATED_GROUP_TYPE = 'ic_user_representative') ")
+					.append(getCasesIdsCriteria()).append(getStatusesIdsCriteria())
+					.append(getHandlerGroupsIdsCriteria(getHandlerGroupsIds()));
+			if (getDateFrom() != null) {
+				query.append(getDateFromCriteria(getDateFrom()));
+			}
+			if (getDateTo() != null) {
+				query.append(getDateToCriteria(getDateTo()));
+			}
 			if (!ListUtil.isEmpty(getExceptCaseCodes())) {
 				query.append(getExceptCaseCodesCriteria(getExceptCaseCodes()));
 			}
 
-			query.append(" group by c.handler, p.case_status, u.display_name order by u.display_name, p.case_status");
+			query.append(" group by l.PERFORMER_USER_ID, p.case_status, u.display_name order by u.display_name, p.case_status");
+			queries.add(query.toString());
 
-			System.out.println("UserHandler: " + query.toString());
-			return query.toString();
+			LOGGER.info("Queries for cases per user: " + queries);
+			return queries;
 		}
 
 		@Override
 		public Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
-			Collection<Result> results = new ArrayList<Result>();
-			int previousUserId = -1;
-			Map<String, Integer> statuses = null;
-			Map<String, List<Integer>> statusesAndCasesIds = null;
+			Collection<Result> results = new ArrayList<>();
+			Map<Integer, Map<String, Integer>> allStatuses = new HashMap<>();
+			Map<Integer, Map<String, List<Integer>>> allStatusesAndCasesIds = new HashMap<>();
 			while (rs.next()) {
 				int handlerId = rs.getInt("handler");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("case_status");
 
-				if (previousUserId != handlerId) {
-					if (statuses != null) {
-						//	Adding results for previous user
-						addResult(iwc, results, previousUserId, statuses, statusesAndCasesIds);
-					}
-
-					//	New user
-					statuses = new HashMap<String, Integer>();
-					statusesAndCasesIds = new HashMap<>();
+				Map<String, Integer> statuses = allStatuses.get(handlerId);
+				if (statuses == null) {
+					statuses = new HashMap<>();
+					allStatuses.put(handlerId, statuses);
 				}
+				Integer existingCount = statuses.get(caseStatus);
+				Integer newCount = existingCount == null ? count : (existingCount + count);
+				statuses.put(caseStatus, newCount);
 
-				statuses.put(caseStatus, count);
-				previousUserId = handlerId;
+				Map<String, List<Integer>>statusesAndCasesIds = allStatusesAndCasesIds.get(handlerId);
+				if (statusesAndCasesIds == null) {
+					statusesAndCasesIds = new HashMap<>();
+					allStatusesAndCasesIds.put(handlerId, statusesAndCasesIds);
+				}
 			}
-			if (statuses != null) {
-				//	Adding results for LAST user
-				addResult(iwc, results, previousUserId, statuses, statusesAndCasesIds);
+			for (Integer userId: allStatuses.keySet()) {
+				addResult(iwc, results, userId, allStatuses.get(userId), allStatusesAndCasesIds.get(userId), -1);
 			}
 
 			return results;
 		}
 
 		@Override
-		public boolean addResult(IWContext iwc, Collection<Result> results, int userId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) throws RemoteException, FinderException {
+		public boolean addResult(
+				IWContext iwc,
+				Collection<Result> results,
+				int userId,
+				Map<String, Integer> statuses,
+				Map<String, List<Integer>> statusesAndCasesIds,
+				int handlerGroupId
+		) throws RemoteException, FinderException {
 			String resultName = null;
 			if (userId > -1) {
 				User user = null;
@@ -1072,9 +1185,8 @@ public class CasesStatistics extends CasesBlock {
 
 				resultName = user.getName();
 			}
-			return addResultToList(resultName, results, userId, statuses, statusesAndCasesIds);
+			return addResultToList(resultName, results, userId, statuses, statusesAndCasesIds, handlerGroupId);
 		}
-
 	}
 
 	//	Cases by type
@@ -1086,10 +1198,12 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		@Override
-		public String getSQL() {
-			StringBuilder query =  new StringBuilder("select c.case_type, count(c.comm_case_id) as NO_OF_CASES, p.case_status from comm_case c ")
+		public List<String> getSQL() {
+			StringBuilder query =  new StringBuilder("select c.case_type, count(distinct c.comm_case_id) as NO_OF_CASES, p.case_status, p.HANDLER_GROUP_ID as HGID from comm_case c ")
 				.append("left join proc_case p on p.proc_case_id = c.comm_case_id where c.case_type = c.case_type ").append(getCasesIdsCriteria())
 				.append(getStatusesIdsCriteria());
+
+			query.append(getHandlerGroupsIdsCriteria(getHandlerGroupsIds()));
 
 			if (getDateFrom() != null) {
 				query.append(getDateFromCriteria(getDateFrom()));
@@ -1104,45 +1218,56 @@ public class CasesStatistics extends CasesBlock {
 
 			query.append(" group by c.case_type, p.case_status order by case_type");
 
-			System.out.println("CaseTypeHandler: " + query.toString());
-			return query.toString();
+			String result = query.toString();
+			LOGGER.info("Query for cases per e-service: " + result);
+			return Arrays.asList(result);
 		}
 
 		@Override
 		public Collection<Result> getResults(IWContext iwc, ResultSet rs) throws RemoteException, SQLException, FinderException {
-			Collection<Result> results = new ArrayList<Result>();
+			Collection<Result> results = new ArrayList<>();
 			int prevCaseTypeId = -1;
+			int previousHandlerGroupId = -1;
 			Map<String, Integer> statuses = null;
 			Map<String, List<Integer>> statusesAndCasesIds = null;
 			while (rs.next()) {
 				int caseTypeId = rs.getInt("case_type");
 				int count = rs.getInt("NO_OF_CASES");
 				String caseStatus = rs.getString("case_status");
+				int handlerGroupId = rs.getInt("HGID");
 
 				if (prevCaseTypeId != caseTypeId) {
 					if (statuses != null) {
 						//	Adding results for previous case type
-						addResult(iwc, results, prevCaseTypeId, statuses, statusesAndCasesIds);
+						addResult(iwc, results, prevCaseTypeId, statuses, statusesAndCasesIds, handlerGroupId);
 					}
 
 					//	New case type
-					statuses = new HashMap<String, Integer>();
+					statuses = new HashMap<>();
 					statusesAndCasesIds = new HashMap<>();
 				}
 
 				statuses.put(caseStatus, count);
 				prevCaseTypeId = caseTypeId;
+				previousHandlerGroupId = handlerGroupId;
 			}
 			if (statuses != null) {
 				//	Adding results for LAST case type
-				addResult(iwc, results, prevCaseTypeId, statuses, statusesAndCasesIds);
+				addResult(iwc, results, prevCaseTypeId, statuses, statusesAndCasesIds, previousHandlerGroupId);
 			}
 
 			return results;
 		}
 
 		@Override
-		public boolean addResult(IWContext iwc, Collection<Result> results, int caseTypeId, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) throws FinderException, RemoteException {
+		public boolean addResult(
+				IWContext iwc,
+				Collection<Result> results,
+				int caseTypeId,
+				Map<String, Integer> statuses,
+				Map<String, List<Integer>> statusesAndCasesIds,
+				int handlerGroupId
+		) throws FinderException, RemoteException {
 			String resultName = null;
 			if (caseTypeId > -1) {
 				CaseType type = null;
@@ -1154,17 +1279,37 @@ public class CasesStatistics extends CasesBlock {
 
 				resultName = type.getName();
 			}
-			return addResultToList(resultName, results, caseTypeId, statuses, statusesAndCasesIds);
+			return addResultToList(resultName, results, caseTypeId, statuses, statusesAndCasesIds, handlerGroupId);
 		}
-
 	}
 
-	boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds) {
+	boolean addResultToList(String resultName, Collection<Result> results, int identifier, Map<String, Integer> statuses, Map<String, List<Integer>> statusesAndCasesIds, int handlerGroupId) {
 		if (identifier < 0 || StringUtil.isEmpty(resultName)) {
 			return false;
 		}
 
-		results.add(new Result(identifier, resultName, statuses, statusesAndCasesIds));
+		Result result = null;
+		for (Iterator<Result> iter = results.iterator(); (result == null && iter.hasNext());) {
+			Result tmpResult = iter.next();
+			if (tmpResult.id == identifier) {
+				result = tmpResult;
+			}
+		}
+		if (result == null) {
+			results.add(new Result(identifier, resultName, statuses, statusesAndCasesIds, handlerGroupId));
+		} else {
+			result.setName(resultName);
+
+			Map<String, Integer> statusesData = result.getStatusMap();
+			MapUtil.append(statusesData, statuses);
+			result.setStatusMap(statusesData);
+
+			Map<String, List<Integer>> statusesAndIdsData = result.getStatusAndCasesIds();
+			MapUtil.append(statusesAndIdsData, statusesAndCasesIds);
+			result.setStatusAndCasesIds(statusesAndIdsData);
+
+			result.setHandlerGroupId(handlerGroupId);
+		}
 
 		return true;
 	}
@@ -1188,6 +1333,15 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		return criteriaSQL;
+	}
+
+	String getHandlerGroupsIdsCriteria(List<Integer> handlerGroupsIds) {
+		if (ListUtil.isEmpty(handlerGroupsIds)) {
+			return CoreConstants.EMPTY;
+		}
+
+		Collection<String> ids = StringUtil.toStrings(handlerGroupsIds);
+		return " and p.HANDLER_GROUP_ID in (".concat(StringUtil.getValue(ids)).concat(") ");
 	}
 
 	String getDateFromCriteria(IWTimestamp date) {
@@ -1235,7 +1389,7 @@ public class CasesStatistics extends CasesBlock {
 
 		CaseCategory category = null;
 		CaseCategory topCategory = null;
-		List<String> categoriesToUse = new ArrayList<String>();
+		List<String> categoriesToUse = new ArrayList<>();
 		for (CasePresentation theCase: cases) {
 			category = null;
 
@@ -1284,7 +1438,7 @@ public class CasesStatistics extends CasesBlock {
 		}
 
 		String status = null;
-		availableStatuses = new ArrayList<String>();
+		availableStatuses = new ArrayList<>();
 		for (Iterator<CasePresentation> casesIter = cases.iterator(); casesIter.hasNext();) {
 			CaseStatus caseStatus = casesIter.next().getCaseStatus();
 			status = caseStatus == null ? null : caseStatus.getStatus();
