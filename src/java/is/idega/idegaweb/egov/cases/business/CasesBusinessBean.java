@@ -69,6 +69,7 @@ import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.database.ConnectionBroker;
+import com.idega.util.datastructures.map.MapUtil;
 import com.idega.util.text.Name;
 import com.idega.webface.WFUtil;
 
@@ -115,7 +116,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 
 	@Override
 	public Map<String, String> getAllSubCategories(String categoryPK, String country) {
-		Map<String, String> map = new LinkedHashMap<String, String>();
+		Map<String, String> map = new LinkedHashMap<>();
 		Locale locale = new Locale(country, country.toUpperCase());
 
 		if (categoryPK != null && categoryPK.length() > 0 && Integer.parseInt(categoryPK) > -1) {
@@ -148,7 +149,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	@Override
 	public Map<String, String> getUsers(String categoryPK) {
 		try {
-			Map<String, String> map = new LinkedHashMap<String, String>();
+			Map<String, String> map = new LinkedHashMap<>();
 
 			if (categoryPK != null && categoryPK.length() > 0 && Integer.parseInt(categoryPK) > -1) {
 				CaseCategory category = null;
@@ -462,7 +463,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			return getCaseCategoryHome().findByName(name);
 		} catch (FinderException fe) {
 			fe.printStackTrace();
-			return new ArrayList<CaseCategory>(0);
+			return new ArrayList<>(0);
 		}
 	}
 
@@ -472,7 +473,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			return getCaseTypeHome().findByName(name);
 		} catch (FinderException fe) {
 			fe.printStackTrace();
-			return new ArrayList<CaseType>(0);
+			return new ArrayList<>(0);
 		}
 	}
 
@@ -601,7 +602,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		if (attachmentPK == null) {
 			attachmentPKs = Collections.emptyList();
 		} else {
-			attachmentPKs = new ArrayList<Object>(1);
+			attachmentPKs = new ArrayList<>(1);
 			attachmentPKs.add(attachmentPK);
 		}
 		return storeGeneralCase(theCase, sender, caseCategoryPK, caseTypePK, attachmentPKs, regarding, message, type, caseManagerType, isPrivate, iwrb, sendMessages, caseIdentifier, setType, caseStatusKey, created, handlerGroupId);
@@ -1323,7 +1324,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				return null;
 			}
 
-			owners = new ArrayList<User>(caseOwners);
+			owners = new ArrayList<>(caseOwners);
 		}
 		if (!StringUtil.isEmpty(name)) {
 			Collection<User> usersByName = getUserBusiness().getUsersByName(name);
@@ -1332,7 +1333,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			}
 
 			if (ListUtil.isEmpty(owners)) {
-				owners = new ArrayList<User>(usersByName);
+				owners = new ArrayList<>(usersByName);
 			} else {
 				for (User userByName: usersByName) {
 					if (!owners.contains(userByName)) {
@@ -1347,7 +1348,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			if (ListUtil.isEmpty(owners)) {
 				return null;
 			}
-			ownersIds = new ArrayList<String>(owners.size());
+			ownersIds = new ArrayList<>(owners.size());
 			for (User caseOwner : owners) {
 				ownersIds.add(caseOwner.getId());
 			}
@@ -1558,13 +1559,13 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 				return null;
 			}
 
-			cases = new ArrayList<Case>(generalCases);
+			cases = new ArrayList<>(generalCases);
 		}
 		if (ListUtil.isEmpty(cases)) {
 			return null;
 		}
 
-		List<Case> filteredCases = new ArrayList<Case>();
+		List<Case> filteredCases = new ArrayList<>();
 		for (Case casse: cases) {
 			if (StringUtil.isEmpty(casse.getCaseManagerType())) {
 				filteredCases.add(casse);
@@ -1582,7 +1583,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		}
 
 		Integer id = null;
-		List<Integer> filteredIds = new ArrayList<Integer>();
+		List<Integer> filteredIds = new ArrayList<>();
 		for (Case casse: filteredCases) {
 			id = null;
 			try {
@@ -1605,35 +1606,60 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 		Statement stmt = null;
 		ResultSet rs = null;
 
-		Collection<Result> results = new ArrayList<Result>();
-		try {
-			//CoreUtil.clearAllCaches();
+		Collection<CasesStatistics.Result> results = null;
+		for (String sql: handler.getSQL()) {
+			try {
+				conn = ConnectionBroker.getConnection();
+				stmt = conn.createStatement();
 
-			conn = ConnectionBroker.getConnection();
-			stmt = conn.createStatement();
+				rs = stmt.executeQuery(sql);
 
-			rs = stmt.executeQuery(handler.getSQL());
+				Collection<CasesStatistics.Result> newResults = handler.getResults(iwc, rs);
+				if (results == null) {
+					results = new ArrayList<>(newResults);
 
-			results.addAll(handler.getResults(iwc, rs));
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} else if (!ListUtil.isEmpty(newResults)) {
+					for (Result newResult: newResults) {
+						Result result = null;
+						for (Iterator<Result> iter = results.iterator(); (result == null && iter.hasNext());) {
+							Result existingResult = iter.next();
+							if (newResult.getID() == existingResult.getID()) {
+								result = existingResult;
+							}
+						}
+						if (result == null) {
+							results.add(newResult);
+						} else {
+							Map<String, Integer> statusesData = result.getStatusMap();
+							MapUtil.append(statusesData, newResult.getStatusMap());
+							result.setStatusMap(statusesData);
+
+							Map<String, List<Integer>> statusesAndIdsData = result.getStatusAndCasesIds();
+							MapUtil.append(statusesAndIdsData, newResult.getStatusAndCasesIds());
+							result.setStatusAndCasesIds(statusesAndIdsData);
+						}
+					}
 				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (rs != null) {
+					try {
+						rs.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 				}
-			}
-			if (conn != null) {
-				ConnectionBroker.freeConnection(conn);
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+				if (conn != null) {
+					ConnectionBroker.freeConnection(conn);
+				}
 			}
 		}
 
