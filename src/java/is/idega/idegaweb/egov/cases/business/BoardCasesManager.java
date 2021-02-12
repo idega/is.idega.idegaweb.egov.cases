@@ -1,5 +1,6 @@
 package is.idega.idegaweb.egov.cases.business;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -26,13 +27,18 @@ public interface BoardCasesManager {
 	 * @param dateTo is ceiling of {@link Case#getCreated()},
 	 * skipped if <code>null</code>;
 	 */
-	public List<CaseBoardBean> getAllSortedCases(
-			Collection<String> caseStatus,
+	public <K extends Serializable> List<CaseBoardBean> getAllSortedCases(
+			Collection<String> caseStatuses,
 			String processName,
 			String uuid,
 			boolean isSubscribedOnly,
 			boolean backPage,
-			String taskName, Date dateFrom, Date dateTo);
+			String taskName,
+			Date dateFrom,
+			Date dateTo,
+			String casesType,
+			Class<K> type
+	);
 
 	/**
 	 *
@@ -61,7 +67,7 @@ public interface BoardCasesManager {
 	 * @param dateTo is ceiling of {@link Case#getCreated()},
 	 * skipped if <code>null</code>;
 	 */
-	public CaseBoardTableBean getTableData(
+	public <K extends Serializable> CaseBoardTableBean getTableData(
 			Date dateFrom,
 			Date dateTo,
 			Collection<String> caseStatus,
@@ -69,7 +75,10 @@ public interface BoardCasesManager {
 			String uuid,
 			boolean isSubscribedOnly,
 			boolean useBasePage,
-			String taskName);
+			String taskName,
+			String casesType,
+			Class<K> type
+	);
 
 	public AdvancedProperty getHandlerInfo(IWContext iwc, User handler);
 

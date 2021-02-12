@@ -127,7 +127,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	private static Map<String, String> EDITABLE_FIELDS;
 	static {
-		EDITABLE_FIELDS = new HashMap<String, String>();
+		EDITABLE_FIELDS = new HashMap<>();
 		EDITABLE_FIELDS.put(CaseBoardBean.CASE_CATEGORY, EDITABLE_FIELD_TYPE_DROPDOWN);
 
 		EDITABLE_FIELDS.put(ProcessConstants.BOARD_FINANCING_SUGGESTION, EDITABLE_FIELD_TYPE_TEXT_INPUT);
@@ -404,7 +404,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 				uuid,
 				isOnlySubscribedCases(),
 				useCurrentPageAsBackPageFromTaskViewer,
-				getTaskName()
+				getTaskName(),
+				ProcessConstants.BPM_CASE,
+				null
 		);
 
 		if (data == null || !data.isFilledWithData()) {
@@ -419,7 +421,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		TableHeaderRowGroup headerGroup = table.createHeaderRowGroup();
 		TableRow headerRow = headerGroup.createRow();
 		Map<Integer, List<AdvancedProperty>> headers = data.getHeaderLabels();
-		ArrayList<String> ids = new ArrayList<String>(headers.size());
+		ArrayList<String> ids = new ArrayList<>(headers.size());
 		for (Integer key: headers.keySet()) {
 			List<AdvancedProperty> headerLabels = headers.get(key);
 			for (AdvancedProperty header: headerLabels) {
@@ -457,8 +459,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 					//	Financing table
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
-						financingInfo = new ArrayList<Map<String,String>>();
-						Map<String, String> emptyValues = new HashMap<String, String>();
+						financingInfo = new ArrayList<>();
+						Map<String, String> emptyValues = new HashMap<>();
 						emptyValues.put(WORK_ITEM, CoreConstants.MINUS);
 						emptyValues.put(ESTIMATED_COST, CoreConstants.MINUS);
 						emptyValues.put(BOARD_SUGGESTION, CoreConstants.MINUS);
@@ -474,8 +476,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 					long proposalTotal = 0;
 					long decisionTotal = 0;
 					TableRow financingTableRow = row;
-					List<TableCell2> suggestionCells = new ArrayList<TableCell2>();
-					List<TableCell2> decisionCells = new ArrayList<TableCell2>();
+					List<TableCell2> suggestionCells = new ArrayList<>();
+					List<TableCell2> decisionCells = new ArrayList<>();
 					for (Iterator<Map<String, String>> infoIter = financingInfo.iterator(); infoIter.hasNext();) {
 						Map<String, String> info = infoIter.next();
 

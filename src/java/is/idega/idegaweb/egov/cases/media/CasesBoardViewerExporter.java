@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +66,10 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	@Qualifier(BoardCasesManager.BEAN_NAME)
 	private BoardCasesManager boardCasesManager;
 
+	private String casesType;
+
+	private Class<Serializable> type;
+
 	protected BoardCasesManager getBoardCasesManager() {
 		if (this.boardCasesManager == null) {
 			ELUtil.getInstance().autowire(this);
@@ -107,8 +112,8 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					//	Financing table
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
-						financingInfo = new ArrayList<Map<String,String>>();
-						Map<String, String> emptyValues = new HashMap<String, String>();
+						financingInfo = new ArrayList<>();
+						Map<String, String> emptyValues = new HashMap<>();
 						emptyValues.put(CasesBoardViewer.WORK_ITEM, CoreConstants.MINUS);
 						emptyValues.put(CasesBoardViewer.ESTIMATED_COST, CoreConstants.MINUS);
 						emptyValues.put(CasesBoardViewer.BOARD_SUGGESTION, CoreConstants.MINUS);
@@ -420,6 +425,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 		uuid = iwc.getParameter(CasesBoardViewer.PARAMETER_UUID);
 
+		String casesType = getCasesType();
 		return getBoardCasesManager().getTableData(
 				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
 				doFilterByDate(iwc) ? getDateTo(iwc) : null,
@@ -428,7 +434,9 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				uuid,
 				isSubscribedOnly(iwc.getParameter(CasesBoardViewer.PARAMETER_UUID), iwc),
 				Boolean.FALSE,
-				null
+				null,
+				StringUtil.isEmpty(casesType) ? ProcessConstants.BPM_CASE : casesType,
+				getType()
 		);
 	}
 
@@ -523,4 +531,21 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 		return true;
 	}
+
+	public String getCasesType() {
+		return casesType;
+	}
+
+	public void setCasesType(String casesType) {
+		this.casesType = casesType;
+	}
+
+	public Class<Serializable> getType() {
+		return type;
+	}
+
+	public void setType(Class<Serializable> type) {
+		this.type = type;
+	}
+
 }
