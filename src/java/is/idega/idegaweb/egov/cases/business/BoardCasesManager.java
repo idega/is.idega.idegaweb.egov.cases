@@ -59,7 +59,9 @@ public interface BoardCasesManager {
 			String uuid,
 			boolean isSubscribedOnly,
 			boolean useBasePage,
-			String taskName);
+			String taskName,
+			String casesType
+	);
 
 	/**
 	 * @param dateFrom is floor of {@link Case#getCreated()},
@@ -86,13 +88,13 @@ public interface BoardCasesManager {
 
 	public List<AdvancedProperty> getAvailableVariables(String processName);
 
-	public Map<Integer, List<AdvancedProperty>> getColumns(String uuid);
+	public Map<Integer, List<AdvancedProperty>> getColumns(String uuid, String casesType);
 
 	public List<String> getCustomColumns(String uuid);
 
 	public boolean isEqual(String currentColumn, String columnOfDomain);
 
-	public int getIndexOfColumn(String column, String uuid);
+	public int getIndexOfColumn(String column, String uuid, String casesType);
 
 	public Long getNumberValue(String value);
 

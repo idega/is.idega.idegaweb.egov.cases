@@ -23,7 +23,7 @@ public class CaseBoardTableBean {
 
 	public Map<Integer, List<AdvancedProperty>> getHeaderLabels() {
 		if (this.headerLabels == null) {
-			this.headerLabels = new TreeMap<Integer, List<AdvancedProperty>>();
+			this.headerLabels = new TreeMap<>();
 		}
 
 		return headerLabels;
@@ -55,9 +55,9 @@ public class CaseBoardTableBean {
 	}
 	public List<CaseBoardTableBodyRowBean> getBodyBeans() {
 		if (this.bodyBeans == null) {
-			this.bodyBeans = new ArrayList<CaseBoardTableBodyRowBean>();
+			this.bodyBeans = new ArrayList<>();
 		}
-		
+
 		return bodyBeans;
 	}
 	public void setBodyBeans(List<CaseBoardTableBodyRowBean> bodyBeans) {
@@ -80,14 +80,14 @@ public class CaseBoardTableBean {
 
 		return null;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(super.toString());
 		sb.append(CoreConstants.NEWLINE);
 		sb.append("isFilledWithData: ").append(isFilledWithData());
 		sb.append(CoreConstants.NEWLINE);
-		
+
 		/*
 		 * Labels
 		 */
@@ -124,4 +124,5 @@ public class CaseBoardTableBean {
 
 		return sb.toString();
 	}
+
 }

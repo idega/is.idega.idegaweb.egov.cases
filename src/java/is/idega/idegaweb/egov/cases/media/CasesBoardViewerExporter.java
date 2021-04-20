@@ -108,7 +108,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					continue;
 				}
 
-				if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(entries.get(0).getId())) {
+				if (ProcessConstants.FINANCING_OF_THE_TASKS_VARIABLES.contains(entries.get(0).getId())) {
 					//	Financing table
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
@@ -485,7 +485,8 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 					sheet,
 					createBigStyle(workBook, createBigFont(workBook)),
 					headers,
-					0);
+					0
+			);
 		}
 
 		return sheet;

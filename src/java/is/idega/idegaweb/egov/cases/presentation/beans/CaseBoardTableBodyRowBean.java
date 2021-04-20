@@ -28,7 +28,13 @@ public class CaseBoardTableBodyRowBean {
 
 	private List<Map<String, String>> financingInfo;
 
+	public CaseBoardTableBodyRowBean() {
+		super();
+	}
+
 	public CaseBoardTableBodyRowBean(String caseId, Long processInstanceId) {
+		this();
+
 		this.caseId = caseId;
 		this.processInstanceId = processInstanceId;
 	}
@@ -82,7 +88,7 @@ public class CaseBoardTableBodyRowBean {
 
 	public void setFinancingInfo(String variable, String value) {
 		if (this.financingInfo == null) {
-			this.financingInfo = new ArrayList<Map<String,String>>();
+			this.financingInfo = new ArrayList<>();
 		}
 
 		Map<String, String> map = null;
@@ -91,7 +97,7 @@ public class CaseBoardTableBodyRowBean {
 		}
 
 		if (map == null) {
-			map = new HashMap<String, String>();
+			map = new HashMap<>();
 			this.financingInfo.add(map);
 		}
 
@@ -116,7 +122,7 @@ public class CaseBoardTableBodyRowBean {
 							return index;
 						}
 
-						if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(variableInfo.getId())) {
+						if (ProcessConstants.FINANCING_OF_THE_TASKS_VARIABLES.contains(variableInfo.getId())) {
 							for (Map<String, String> financingInfo : getFinancingInfo()) {
 								int i =1;
 								for (Entry<String, String> entry : financingInfo.entrySet()) {

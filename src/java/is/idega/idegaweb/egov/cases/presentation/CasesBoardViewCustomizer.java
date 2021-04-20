@@ -1,8 +1,5 @@
 package is.idega.idegaweb.egov.cases.presentation;
 
-import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.idega.block.process.business.ProcessConstants;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
@@ -23,6 +21,9 @@ import com.idega.presentation.ui.SelectionBox;
 import com.idega.presentation.ui.SelectionDoubleBox;
 import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.idegaweb.egov.cases.business.BoardCasesManager;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class CasesBoardViewCustomizer extends Block {
 
@@ -55,8 +56,8 @@ public class CasesBoardViewCustomizer extends Block {
 		box.setEnableOrdering(true);
 
 		SelectionBox selectedColumns = box.getRightBox();
-		List<String> keys = new ArrayList<String>();
-		Map<Integer, List<AdvancedProperty>> currentColumns = boardCaseManager.getColumns(uuid);
+		List<String> keys = new ArrayList<>();
+		Map<Integer, List<AdvancedProperty>> currentColumns = boardCaseManager.getColumns(uuid, ProcessConstants.BPM_CASE);
 		for (Integer key: currentColumns.keySet()) {
 			List<AdvancedProperty> columns = currentColumns.get(key);
 			for (AdvancedProperty column: columns) {
@@ -74,7 +75,7 @@ public class CasesBoardViewCustomizer extends Block {
 		}
 
 		SelectionBox options = box.getLeftBox();
-		Map<Integer, List<AdvancedProperty>> defaultColumns = boardCaseManager.getColumns(null);
+		Map<Integer, List<AdvancedProperty>> defaultColumns = boardCaseManager.getColumns(null, ProcessConstants.BPM_CASE);
 		for (Integer key: defaultColumns.keySet()) {
 			List<AdvancedProperty> columns = defaultColumns.get(key);
 			for (AdvancedProperty defaultColumn: columns) {

@@ -1,7 +1,5 @@
 package is.idega.idegaweb.egov.cases.presentation.beans;
 
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -17,6 +15,8 @@ import com.idega.user.data.User;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
+
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class CaseBoardBean {
 
@@ -42,7 +42,7 @@ public class CaseBoardBean {
 
 	private List<Map<String, String>> financingOfTheTasks;
 
-	private Map<String, String> values = new HashMap<String, String>();
+	private Map<String, String> values = new HashMap<>();
 
 	private User handler;
 

@@ -3,7 +3,6 @@ package is.idega.idegaweb.egov.cases.presentation;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,33 +96,6 @@ public class CasesBoardViewer extends IWBaseComponent {
 								BOARD_SUGGESTION = ProcessConstants.BOARD_FINANCING_SUGGESTION,
 								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION,
 								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
-
-	public static final List<AdvancedProperty> CASE_FIELDS = Collections.unmodifiableList(Arrays.asList(
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_FULL_NAME, "Applicant"),						//	0
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GENDER, "Gender"),							//	1
-		new AdvancedProperty("string_ownerKennitala", "Personal ID"),								//	2
-		new AdvancedProperty("string_ownerAddress", "Address"),										//	3
-		new AdvancedProperty("string_ownerPostCode", "Zip"),										//	4
-		new AdvancedProperty("string_ownerMunicipality", "Municipality"),							//	5
-		new AdvancedProperty(ProcessConstants.CASE_IDENTIFIER, "Case nr."),							//	6
-		new AdvancedProperty(ProcessConstants.CASE_DESCRIPTION, "Description"),						//	7
-
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_TOTAL_COST, "Total cost"),					//	8
-		new AdvancedProperty(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE, "Applied amount"),		//	9
-
-		new AdvancedProperty("string_ownerBusinessConcept", "In a nutshell"),						//	10
-
-		new AdvancedProperty(CaseBoardBean.CASE_SUM_OF_NEGATIVE_GRADES, "Negative grade"),			//	11
-		new AdvancedProperty(CaseBoardBean.CASE_SUM_ALL_GRADES, "Grade"),							//	12
-
-		new AdvancedProperty(CaseBoardBean.CASE_CATEGORY, "Category"),								//	13,	EDITABLE, select
-
-		new AdvancedProperty(ProcessConstants.FINANCING_OF_THE_TASKS, "Financing of the tasks"),	//	14, table of 5 columns
-
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_GRADE, "Comment"),							//	19
-		new AdvancedProperty(CaseBoardBean.CASE_OWNER_ANSWER, "Restrictions")						//	20, EDITABLE, text area
-																									//	21 is handler by default (if no custom columns provided)
-	));
 
 	private static Map<String, String> EDITABLE_FIELDS;
 	static {
@@ -421,7 +393,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 		TableHeaderRowGroup headerGroup = table.createHeaderRowGroup();
 		TableRow headerRow = headerGroup.createRow();
 		Map<Integer, List<AdvancedProperty>> headers = data.getHeaderLabels();
-		ArrayList<String> ids = new ArrayList<>(headers.size());
+		List<String> ids = new ArrayList<>(headers.size());
 		for (Integer key: headers.keySet()) {
 			List<AdvancedProperty> headerLabels = headers.get(key);
 			for (AdvancedProperty header: headerLabels) {
@@ -455,7 +427,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 					continue;
 				}
 
-				if (ProcessConstants.FINANCING_OF_THE_TASKS.equals(entries.get(0).getId())) {
+				if (ProcessConstants.FINANCING_OF_THE_TASKS_VARIABLES.contains(entries.get(0).getId())) {
 					//	Financing table
 					List<Map<String, String>> financingInfo = rowBean.getFinancingInfo();
 					if (ListUtil.isEmpty(financingInfo)) {
