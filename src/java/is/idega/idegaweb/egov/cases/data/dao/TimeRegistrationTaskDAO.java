@@ -20,5 +20,8 @@ public interface TimeRegistrationTaskDAO extends GenericDao {
 
 	public List<TimeRegistrationTask> getByParent(TimeRegistrationTask parent);
 
+	public List<TimeRegistrationTask> getByName(String name);
+
+	public void delete(Long id);
 
 }

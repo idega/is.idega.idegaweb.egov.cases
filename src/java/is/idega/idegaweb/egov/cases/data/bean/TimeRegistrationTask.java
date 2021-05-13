@@ -21,7 +21,8 @@ import javax.persistence.Table;
 	@NamedQuery(name = TimeRegistrationTask.QUERY_GET_BY_ID, query = "from TimeRegistrationTask trt where trt.id = :" + TimeRegistrationTask.PARAM_ID),
 	@NamedQuery(name = TimeRegistrationTask.QUERY_GET_ALL, query = "from TimeRegistrationTask trt order by trt.ordering"),
 	@NamedQuery(name = TimeRegistrationTask.QUERY_GET_ALL_TOP_LEVEL, query = "from TimeRegistrationTask trt where trt.parentTask is null order by trt.ordering"),
-	@NamedQuery(name = TimeRegistrationTask.QUERY_GET_BY_PARENT_ID, query = "from TimeRegistrationTask trt where trt.parentTask.id = :" + TimeRegistrationTask.PARAM_PARENT_ID + "  order by trt.ordering")
+	@NamedQuery(name = TimeRegistrationTask.QUERY_GET_BY_PARENT_ID, query = "from TimeRegistrationTask trt where trt.parentTask.id = :" + TimeRegistrationTask.PARAM_PARENT_ID + " order by trt.ordering"),
+	@NamedQuery(name = TimeRegistrationTask.QUERY_GET_BY_NAME, query = "from TimeRegistrationTask trt where trt.name = :" + TimeRegistrationTask.PARAM_NAME)
 })
 public class TimeRegistrationTask implements Serializable {
 
@@ -39,10 +40,11 @@ public class TimeRegistrationTask implements Serializable {
 								QUERY_GET_ALL = "timeRegistrationTask.getAll",
 								QUERY_GET_ALL_TOP_LEVEL = "timeRegistrationTask.getAllTopLevel",
 								QUERY_GET_BY_PARENT_ID = "timeRegistrationTask.getByParentId",
+								QUERY_GET_BY_NAME = "timeRegistrationTask.getByName",
 
 								PARAM_ID = "id",
-								PARAM_PARENT_ID = "parentId";
-
+								PARAM_PARENT_ID = "parentId",
+								PARAM_NAME = "name";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -123,6 +125,9 @@ public class TimeRegistrationTask implements Serializable {
 		this.parentTask = parentTask;
 	}
 
-
+	@Override
+	public String toString() {
+		return "ID: " + getId() + ", name: " + getName();
+	}
 
 }

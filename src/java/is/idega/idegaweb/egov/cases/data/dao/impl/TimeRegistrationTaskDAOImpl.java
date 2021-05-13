@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.idega.core.persistence.Param;
 import com.idega.core.persistence.impl.GenericDaoImpl;
+import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 
 import is.idega.idegaweb.egov.cases.data.bean.TimeRegistrationTask;
 import is.idega.idegaweb.egov.cases.data.dao.TimeRegistrationTaskDAO;
@@ -87,5 +89,56 @@ public class TimeRegistrationTaskDAOImpl extends GenericDaoImpl implements TimeR
 		return null;
 	}
 
+	@Override
+	public List<TimeRegistrationTask> getByName(String name) {
+		if (StringUtil.isEmpty(name)) {
+			return null;
+		}
+
+		try {
+			return getResultList(TimeRegistrationTask.QUERY_GET_BY_NAME, TimeRegistrationTask.class, new Param(TimeRegistrationTask.PARAM_NAME, name));
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Error getting time registration tasks by name: " + name, e);
+		}
+
+		return null;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void delete(Long id) {
+		if (id == null) {
+			return;
+		}
+
+		TimeRegistrationTask task = null;
+		try {
+			task = getById(id);
+
+			List<TimeRegistrationTask> children = getByParent(task);
+			if (!ListUtil.isEmpty(children)) {
+				for (TimeRegistrationTask child: children) {
+					remove(child);
+				}
+			}
+
+			remove(task);
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Error deleting task " + task, e);
+		}
+	}
+
+	@Transactional(readOnly = false)
+	private void remove(TimeRegistrationTask task) {
+		if (task == null) {
+			return;
+		}
+
+		try {
+			super.remove(task);
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Error removing task " + task, e);
+		}
+	}
 
 }
