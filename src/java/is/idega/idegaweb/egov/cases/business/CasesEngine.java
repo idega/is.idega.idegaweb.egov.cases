@@ -30,7 +30,7 @@ public interface CasesEngine {
 	public abstract List<AdvancedProperty> getDefaultSortingOptions(IWContext iwc);
 
 	public PagedDataCollection<CasePresentation> getCasesByQuery(CasesSearchCriteriaBean criteriaBean);
-	
+
 	public PagedDataCollection<CasePresentation> getCasesByQuery(CasesSearchCriteriaBean criteriaBean, boolean isFirstPageIndexIsZero);
 
 	public Document getRenderedCasesByQuery(CasesSearchCriteriaBean criteriaBean);
@@ -49,6 +49,7 @@ public interface CasesEngine {
 	 */
 	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc);
 	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc, List<String> appTypeNames);
+	public List<AdvancedProperty> getAvailableProcesses(IWContext iwc, List<String> appTypeNames, List<String> processesNames);
 
 	/**
 	 * <p>Check if there is Spring bean registered in cache with such name,
