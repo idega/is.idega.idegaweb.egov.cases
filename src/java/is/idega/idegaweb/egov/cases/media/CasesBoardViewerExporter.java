@@ -66,6 +66,9 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	@Qualifier(BoardCasesManager.BEAN_NAME)
 	private BoardCasesManager boardCasesManager;
 
+	@Autowired
+	private ExcelExporterService excelExporterService;
+
 	private String casesType;
 
 	private Class<Serializable> type;
@@ -76,6 +79,14 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 
 		return this.boardCasesManager;
+	}
+
+	private ExcelExporterService getExcelExporterService() {
+		if (this.excelExporterService == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+
+		return this.excelExporterService;
 	}
 
 	@Override
@@ -520,17 +531,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
 	protected boolean autosizeSheetColumns(HSSFSheet sheet, int nrOfCells) {
-		if (sheet == null || nrOfCells <= 0) {
-			return false;
-		}
-
-		for (int column = 0;  column < nrOfCells; column++) {
-			try {
-				sheet.autoSizeColumn(column);
-			} catch (Exception e) {}
-		}
-
-		return true;
+		return getExcelExporterService().autosizeSheetColumns(sheet, nrOfCells);
 	}
 
 	public String getCasesType() {
