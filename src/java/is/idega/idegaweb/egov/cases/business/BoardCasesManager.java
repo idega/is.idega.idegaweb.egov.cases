@@ -86,7 +86,7 @@ public interface BoardCasesManager {
 
 	public String getLinkToTheTaskRedirector(IWContext iwc, String basePage, String caseId, Long processInstanceId, String backPage, String taskName);
 
-	public List<AdvancedProperty> getAvailableVariables(String processName);
+	public List<AdvancedProperty> getAvailableVariables(String processName, String casesType);
 
 	public Map<Integer, List<AdvancedProperty>> getColumns(String uuid, String casesType);
 

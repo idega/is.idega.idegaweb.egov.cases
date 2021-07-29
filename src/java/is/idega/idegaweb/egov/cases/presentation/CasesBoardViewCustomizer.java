@@ -88,7 +88,7 @@ public class CasesBoardViewCustomizer extends Block {
 				keys.add(columnKey);
 			}
 		}
-		List<AdvancedProperty> availableColumns = boardCaseManager.getAvailableVariables(processName);
+		List<AdvancedProperty> availableColumns = boardCaseManager.getAvailableVariables(processName, ProcessConstants.BPM_CASE);
 		if (!ListUtil.isEmpty(availableColumns)) {
 			for (AdvancedProperty column: availableColumns) {
 				String variableName = column.getId().split("@")[0];
