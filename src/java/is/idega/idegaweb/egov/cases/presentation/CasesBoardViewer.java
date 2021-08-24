@@ -368,7 +368,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
+		User currentUser = iwc != null && iwc.isLoggedOn() ? iwc.getCurrentUser() : null;
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(
+				currentUser,
 				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
 				doFilterByDate(iwc) ? getDateTo(iwc) : null,
 				getCaseStatuses(),

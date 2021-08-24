@@ -28,6 +28,7 @@ public interface BoardCasesManager {
 	 * skipped if <code>null</code>;
 	 */
 	public <K extends Serializable> List<CaseBoardBean> getAllSortedCases(
+			User currentUser,
 			Collection<String> caseStatuses,
 			String processName,
 			String uuid,
@@ -54,6 +55,7 @@ public interface BoardCasesManager {
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
 	public CaseBoardTableBean getTableData(
+			User currentUser,
 			Collection<String> caseStatus,
 			String processName,
 			String uuid,
@@ -70,6 +72,7 @@ public interface BoardCasesManager {
 	 * skipped if <code>null</code>;
 	 */
 	public <K extends Serializable> CaseBoardTableBean getTableData(
+			User currentUser,
 			Date dateFrom,
 			Date dateTo,
 			Collection<String> caseStatus,
