@@ -112,6 +112,8 @@ public class CasesBoardViewer extends IWBaseComponent {
 	public static final String CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER = "casesBoardViewerProcessNameParameter";
 	public static final String CASES_BOARD_VIEWER_REQUIRED_COLUMNS = "casesBoardViewerRequiredColumns";
 
+	public static final String VARIABLE_PROJECT_NATURE = "string_projectNature";
+
 	@Autowired
 	@Qualifier(BoardCasesManager.BEAN_NAME)
 	private BoardCasesManager boardCasesManager;

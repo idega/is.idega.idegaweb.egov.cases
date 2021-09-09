@@ -33,7 +33,8 @@ public class CaseBoardBean {
 			CASE_OWNER_BUSINESS_CONCEPT = "string_ownerBusinessConcept",
 			CASE_OWNER_GRADE = "string_ownerGrade",
 			CASE_OWNER_ANSWER = "string_ownerAnswer",
-			CASE_OWNER_GENDER = "string_ownerGender";
+			CASE_OWNER_GENDER = "string_ownerGender",
+			PROJECT_NATURE = "string_projectNature";
 
 	private String linkToCase;
 
@@ -210,6 +211,16 @@ public class CaseBoardBean {
 	public void setAddress(String address) {
 		addValue(CASE_OWNER_ADDRESS, address);
 	}
+
+
+	public String getProjectNature() {
+		return getValue(PROJECT_NATURE);
+	}
+
+	public void setProjectNature(String projectNature) {
+		addValue(PROJECT_NATURE, projectNature);
+	}
+
 
 	public void addValue(String name, String value) {
 		if (name != null && value != null) {

@@ -322,3 +322,6 @@ case_creator.message_too_long=Skilaboð geta ekki verið lengri en 4000 táknum
 case_status_key.ASSI=Úthlutað
 case_status_key.HOLD=Á bið
 case_status_key.SPAM=Ruslpóstur
+
+case_board_viewer.string_projectNature=Eðli verkefnis
+case_board_viewer.string_projectNatureName=Eðli verkefnis
