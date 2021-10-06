@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -285,11 +286,50 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		for (Integer key: headers.keySet()) {
 			List<AdvancedProperty> labels = headers.get(key);
 			for (AdvancedProperty label: labels) {
+				if (label.getName() != null && Boolean.TRUE.toString().equals(label.getName())) {
+					cellIndex = key;
+				}
+
 				HSSFCell cell = row.createCell(cellIndex++);
+
+				boolean vertical = false;
+				boolean horizontal = false;
+				Long merge = label.getExternalId();
+				if (merge != null) {
+					int rowFrom = rowNumber;
+					int rowTo = rowNumber;
+					int colFrom = (cellIndex - 1);
+					int colTo = (cellIndex - 1);
+					if (label.isSelected()) {
+						//	Column span
+						colTo = colTo + (merge.intValue() - 1);
+						cellIndex = cellIndex + (merge.intValue() - 1);
+						horizontal = true;
+					} else {
+						//	Row span
+						rowTo = rowTo + (merge.intValue() - 1);
+						vertical = true;
+					}
+					sheet.addMergedRegion(new CellRangeAddress(rowFrom, rowTo, colFrom, colTo));
+				}
+
 				cell.setCellValue(label.getValue());
 
 				if (cellStyle != null) {
 					cell.setCellStyle(cellStyle);
+				}
+
+				if (horizontal) {
+					HSSFCellStyle horizontalAlignmentStyle = sheet.getWorkbook().createCellStyle();
+					horizontalAlignmentStyle.cloneStyleFrom(cellStyle);
+					horizontalAlignmentStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+					cell.setCellStyle(horizontalAlignmentStyle);
+				}
+				if (vertical) {
+					HSSFCellStyle verticalAlignmentStyle = sheet.getWorkbook().createCellStyle();
+					verticalAlignmentStyle.cloneStyleFrom(cellStyle);
+					verticalAlignmentStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+					cell.setCellStyle(verticalAlignmentStyle);
 				}
 			}
 		}
