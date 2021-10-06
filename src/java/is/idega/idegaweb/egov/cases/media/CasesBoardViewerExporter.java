@@ -484,15 +484,28 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		return bigStyle;
 	}
 
+	protected String getSheetName(IWResourceBundle iwrb, String key, String defaultValue) {
+		return TextSoap.encodeToValidExcelSheetName(StringHandler.shortenToLength(
+				iwrb.getLocalizedString(key, defaultValue),
+				30
+			)
+		);
+	}
+
+	protected String getSheetNameKey() {
+		return "cases_board_viewer.cases_board";
+	}
+
+	protected String getSheetDefaultName() {
+		return "Cases board";
+	}
+
 	protected HSSFSheet createSheet(HSSFWorkbook workBook, Map<Integer, List<AdvancedProperty>> headers, IWContext iwc) {
 		if (workBook == null || iwc == null) {
 			return null;
 		}
 
-		HSSFSheet sheet = workBook.createSheet(TextSoap.encodeToValidExcelSheetName(StringHandler.shortenToLength(
-				getIWResourceBundle(iwc).getLocalizedString(
-						"cases_board_viewer.cases_board", "Cases board"),
-				30)));
+		HSSFSheet sheet = workBook.createSheet(getSheetName(getIWResourceBundle(iwc), getSheetNameKey(), getSheetDefaultName()));
 
 		if (!MapUtil.isEmpty(headers)) {
 			createHeaders(
