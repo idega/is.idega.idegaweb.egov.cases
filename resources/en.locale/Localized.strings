@@ -38,3 +38,5 @@ male=Male
 female=Female
 string_ownerGender=Gender
 case_status_key.RECE=Receipt
+
+case_board_viewer.string_appliedAmount=Applied amount

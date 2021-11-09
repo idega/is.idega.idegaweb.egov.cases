@@ -310,3 +310,6 @@ zip_city=City
 zip_code=Postal code
 tender_case.last_date=Last date
 string_ownerGender=Gender
+
+case_board_viewer.string_appliedAmount=Applied amount
+

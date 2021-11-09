@@ -325,3 +325,5 @@ case_status_key.SPAM=Ruslpóstur
 
 case_board_viewer.string_projectNature=Eðli verkefnis
 case_board_viewer.string_projectNatureName=Eðli verkefnis
+
+case_board_viewer.string_appliedAmount=Upphæð sem sótt er um
