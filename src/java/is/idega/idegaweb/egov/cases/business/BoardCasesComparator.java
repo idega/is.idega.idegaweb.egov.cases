@@ -78,8 +78,8 @@ public class BoardCasesComparator implements Comparator<CaseBoardBean> {
 			} else if (key.equals(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE)) {
 				expression.append(bean.getValue(CasesConstants.APPLIED_GRANT_AMOUNT_VARIABLE));
 
-			} else if (key.equals("string_ownerBusinessConcept")) {
-				expression.append(bean.getValue("string_ownerBusinessConcept"));
+			} else if (key.equals(CaseBoardBean.CASE_OWNER_BUSINESS_CONCEPT)) {
+				expression.append(bean.getValue(CaseBoardBean.CASE_OWNER_BUSINESS_CONCEPT));
 
 			} else if (key.equals(CaseBoardBean.CASE_SUM_OF_NEGATIVE_GRADES)) {
 				expression.append(bean.getNegativeGradingSum());
