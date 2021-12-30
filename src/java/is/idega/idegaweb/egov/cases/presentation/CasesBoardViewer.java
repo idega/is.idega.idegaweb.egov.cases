@@ -90,12 +90,13 @@ public class CasesBoardViewer extends IWBaseComponent {
 								EDITABLE_FIELD_TYPE_TEXT_AREA = "textarea",
 								EDITABLE_FIELD_TYPE_DROPDOWN = "select";
 
-
 	public static final String	WORK_ITEM = "work_item",
 								ESTIMATED_COST = "estimated_cost",
 								BOARD_SUGGESTION = ProcessConstants.BOARD_FINANCING_SUGGESTION,
 								BOARD_DECISION = ProcessConstants.BOARD_FINANCING_DECISION,
-								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant";
+								BOARD_PROPOSAL_FOR_GRANT = "proposal_for_grant",
+
+								GRADING_TASK_NAME = "Grading";
 
 	private static Map<String, String> EDITABLE_FIELDS;
 	static {
@@ -132,7 +133,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	protected String	caseStatus,
 						roleKey,
 						processName,
-						taskName = "Grading",
+						taskName = GRADING_TASK_NAME,
 						currentPageUri,
 						uuid;
 
