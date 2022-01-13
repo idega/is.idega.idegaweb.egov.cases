@@ -128,9 +128,15 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						Map<String, String> emptyValues = new HashMap<>();
 						emptyValues.put(CasesBoardViewer.WORK_ITEM, CoreConstants.MINUS);
 						emptyValues.put(CasesBoardViewer.ESTIMATED_COST, CoreConstants.MINUS);
-						emptyValues.put(CasesBoardViewer.BOARD_SUGGESTION, CoreConstants.MINUS);
-						emptyValues.put(CasesBoardViewer.BOARD_DECISION, CoreConstants.MINUS);
-						emptyValues.put(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT, CoreConstants.MINUS);
+						if (getBoardCasesManager().isBoardSuggestionEnabled()) {
+							emptyValues.put(CasesBoardViewer.BOARD_SUGGESTION, CoreConstants.MINUS);
+						}
+						if (getBoardCasesManager().isBoardDecisionEnabled()) {
+							emptyValues.put(CasesBoardViewer.BOARD_DECISION, CoreConstants.MINUS);
+						}
+						if (getBoardCasesManager().isBoardProposalEnabled()) {
+							emptyValues.put(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT, CoreConstants.MINUS);
+						}
 						financingInfo.add(emptyValues);
 						rowBean.setFinancingInfo(financingInfo);
 					}
@@ -154,23 +160,29 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						estimationTotal += estimationNumber;
 						cell.setCellValue(estimationNumber);
 
-						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
-						String proposalForGrant = info.get(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT);
-						long proposal = manager.getNumberValue(proposalForGrant);
-						proposalTotal += proposal;
-						cell.setCellValue(proposal);
+						if (getBoardCasesManager().isBoardProposalEnabled()) {
+							cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+							String proposalForGrant = info.get(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT);
+							long proposal = manager.getNumberValue(proposalForGrant);
+							proposalTotal += proposal;
+							cell.setCellValue(proposal);
+						}
 
-						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
-						String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
-						long sugg = manager.getNumberValue(suggestion);
-						suggestionTotal += sugg;
-						cell.setCellValue(sugg);
+						if (getBoardCasesManager().isBoardSuggestionEnabled()) {
+							cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+							String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
+							long sugg = manager.getNumberValue(suggestion);
+							suggestionTotal += sugg;
+							cell.setCellValue(sugg);
+						}
 
-						cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
-						String decision = info.get(CasesBoardViewer.BOARD_DECISION);
-						long dec = manager.getNumberValue(decision);
-						decisionTotal += dec;
-						cell.setCellValue(dec);
+						if (getBoardCasesManager().isBoardDecisionEnabled()) {
+							cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
+							String decision = info.get(CasesBoardViewer.BOARD_DECISION);
+							long dec = manager.getNumberValue(decision);
+							decisionTotal += dec;
+							cell.setCellValue(dec);
+						}
 
 						if (infoIter.hasNext()) {
 							financingTableRow = sheet.createRow(rowNumber++);
@@ -221,17 +233,6 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 							} else if (manager.isEqual(varName, ProcessConstants.HANDLER_IDENTIFIER)) {
 								bodyRowCell.setCellValue(getHandlerInfo(iwc, rowBean.getHandler()));
-
-//							} else if (
-//									manager.isEqual(varName, CasesBoardViewer.BOARD_SUGGESTION) ||
-//									manager.isEqual(varName, CasesBoardViewer.BOARD_DECISION) ||
-//									manager.isEqual(varName, CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT)
-//							) {
-//
-//								String boardValue = entry.getValue();
-//								bodyRowCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-//								Long numberValue = manager.getNumberValue(boardValue);
-//								bodyRowCell.setCellValue(numberValue);
 
 							} else {
 								bodyRowCell.setCellValue(entry.getValue());

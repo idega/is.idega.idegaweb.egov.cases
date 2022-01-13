@@ -103,4 +103,12 @@ public interface BoardCasesManager {
 
 	public boolean hasCustomColumns(String uuid);
 
+	public boolean isBoardSuggestionEnabled();
+
+	public boolean isBoardProposalEnabled();
+
+	public boolean isBoardDecisionEnabled();
+
+	public boolean isAutomaticBoardDecisionAndSuggestion();
+
 }
