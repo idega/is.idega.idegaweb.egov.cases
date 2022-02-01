@@ -103,7 +103,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 	public static final String VARIABLE_CASE_NR = ProcessConstants.CASE_IDENTIFIER;
 	public static final String VARIABLE_SENDER = "string_ownerFullName";
-	public static final String VARIABLE_DESCRIPTION = "string_caseDescription";
+	public static final String VARIABLE_DESCRIPTION = ProcessConstants.CASE_DESCRIPTION;
 	public static final String VARIABLE_CREATION_DATE = "string_caseCreatedDateString";
 	public static final String VARIABLE_STATUS = "string_caseStatus";
 
@@ -696,7 +696,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			return null;
 		}
 
-		List<String> casesIds = new ArrayList<String>();
+		List<String> casesIds = new ArrayList<>();
 		for (CasePresentation theCase: theCases) {
 			casesIds.add(theCase.getId());
 		}
@@ -739,7 +739,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		if (ListUtil.isEmpty(theCases))
 			return null;
 
-		List<String> casesIds = new ArrayList<String>();
+		List<String> casesIds = new ArrayList<>();
 		for (CasePresentation theCase: theCases)
 			casesIds.add(theCase.getId());
 
@@ -1144,7 +1144,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	}
 
 	private void addResources(String caseId, IWContext iwc, IWBundle bundle, String type) {
-		List<String> scripts = new ArrayList<String>();
+		List<String> scripts = new ArrayList<>();
 		scripts.add(jQuery.getBundleURIToJQueryLib());
 		scripts.add(jQuery.getBundleURIToJQueryPlugin(JQueryPlugin.EDITABLE));
 		scripts.add(bundle.getVirtualPathWithFileNameString(CasesConstants.CASES_LIST_HELPER_JAVA_SCRIPT_FILE));
