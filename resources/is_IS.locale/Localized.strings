@@ -47,6 +47,7 @@ case_board_viewer.total_sum=Samtals
 case_board_viewer.string_ownerAddress=Heimilisfang
 case_board_viewer.handlerUserId=D\u00FDra\u00FEj\u00E1lfari
 case_board_viewer.string_ownerGender=Kyn
+case_board_viewer.string_overallRating=Einkunn
 
 case_category=M\u00E1laflokkur
 case_category.group_not_empty=Vinsamlegast velji\u00F0 h\u00F3p sem \u00E1 a\u00F0 sj\u00E1 um \u00FEessa tegund erinda
