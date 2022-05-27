@@ -34,7 +34,10 @@ public class CaseBoardBean {
 			CASE_OWNER_GRADE = "string_ownerGrade",
 			CASE_OWNER_ANSWER = "string_ownerAnswer",
 			CASE_OWNER_GENDER = "string_ownerGender",
-			PROJECT_NATURE = "string_projectNature";
+			PROJECT_NATURE = "string_projectNature",
+			EXPENSES_ESTIMATED_COST = "string_expensesEstimatedCost",
+			EXPENSES_EXPECTED_GRANT = "string_expensesProposalForAGrant",
+			EXPENSES_PROPOSAL_FOR_A_GRANT = "string_proposalForAGrant";
 
 	private String linkToCase;
 
