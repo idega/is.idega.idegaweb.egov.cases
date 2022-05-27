@@ -10,9 +10,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import com.google.gson.Gson;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.user.data.User;
+import com.idega.util.ArrayUtil;
+import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.datastructures.map.MapUtil;
 
@@ -152,7 +156,11 @@ public class CaseBoardBean {
 	}
 
 	public BigDecimal getGrantAmountSuggestion() {
-		return getNumberValue(ProcessConstants.BOARD_FINANCING_SUGGESTION);
+		return getGrantAmountSuggestion(ProcessConstants.BOARD_FINANCING_SUGGESTION);
+	}
+
+	public BigDecimal getGrantAmountSuggestion(String variableName) {
+		return getNumberValue(variableName);
 	}
 
 	public void setGrantAmountSuggestion(Long grantAmountSuggestion) {
@@ -275,11 +283,46 @@ public class CaseBoardBean {
 
 	public BigDecimal getNumberValue(String name) {
 		String value = getValue(name);
-		if (!StringUtil.isEmpty(value)) {
-			return BigDecimal.valueOf(Long.valueOf(value));
+		if (StringUtil.isEmpty(value)) {
+			return BigDecimal.valueOf(0);
 		}
 
-		return null;
+		String[] values = null;
+		if (value.startsWith(CoreConstants.SQUARE_BRACKET_LEFT) && value.endsWith(CoreConstants.SQUARE_BRACKET_RIGHT)) {
+			try {
+				values = new Gson().fromJson(value, String[].class);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (!ArrayUtil.isEmpty(values)) {
+			BigDecimal total = BigDecimal.valueOf(0);
+			for (String tmpValue: values) {
+				BigDecimal tmp = getNumber(tmpValue);
+				if (tmp != null) {
+					total = total.add(tmp);
+				}
+			}
+			return total;
+		}
+
+		return getNumber(value);
+	}
+
+	private BigDecimal getNumber(String value) {
+		if (StringUtil.isEmpty(value)) {
+			return BigDecimal.valueOf(0);
+		}
+
+		value = StringHandler.replace(value, CoreConstants.DOT, CoreConstants.EMPTY);
+
+		try {
+			return BigDecimal.valueOf(Long.valueOf(value));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return BigDecimal.valueOf(0);
 	}
 
 	@Override
