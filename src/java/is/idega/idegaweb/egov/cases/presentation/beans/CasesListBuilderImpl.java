@@ -105,7 +105,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	public static final String VARIABLE_SENDER = "string_ownerFullName";
 	public static final String VARIABLE_DESCRIPTION = ProcessConstants.CASE_DESCRIPTION;
 	public static final String VARIABLE_CREATION_DATE = "string_caseCreatedDateString";
-	public static final String VARIABLE_STATUS = "string_caseStatus";
+	public static final String VARIABLE_STATUS = ProcessConstants.CASE_STATUS;
 
 	private String resolveCaseId(IWContext iwc) {
 		List<CasesRetrievalManager> managers = null;
