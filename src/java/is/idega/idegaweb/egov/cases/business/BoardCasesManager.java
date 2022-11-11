@@ -28,8 +28,10 @@ public interface BoardCasesManager {
 	 * skipped if <code>null</code>;
 	 */
 	public <K extends Serializable> List<CaseBoardBean> getAllSortedCases(
+			IWContext iwc,
 			User currentUser,
 			Collection<String> caseStatuses,
+			List<String> caseCodes,
 			String processName,
 			String uuid,
 			boolean isSubscribedOnly,
@@ -55,8 +57,10 @@ public interface BoardCasesManager {
 	 * @author <a href="mailto:martynas@idega.com">Martynas Stakė</a>
 	 */
 	public CaseBoardTableBean getTableData(
+			IWContext iwc,
 			User currentUser,
 			Collection<String> caseStatus,
+			List<String> caseCodes,
 			String processName,
 			String uuid,
 			boolean isSubscribedOnly,
@@ -72,10 +76,12 @@ public interface BoardCasesManager {
 	 * skipped if <code>null</code>;
 	 */
 	public <K extends Serializable> CaseBoardTableBean getTableData(
+			IWContext iwc,
 			User currentUser,
 			Date dateFrom,
 			Date dateTo,
 			Collection<String> caseStatus,
+			List<String> caseCodes,
 			String processName,
 			String uuid,
 			boolean isSubscribedOnly,

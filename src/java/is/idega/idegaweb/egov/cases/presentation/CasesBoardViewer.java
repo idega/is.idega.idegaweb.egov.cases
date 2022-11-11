@@ -110,6 +110,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	}
 
 	public static final String CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER = "casesBoardViewerCasesStatusParameter";
+	public static final String CASES_BOARD_VIEWER_CASES_CODES_PARAMETER = "casesBoardViewerCasesCodesParameter";
 	public static final String CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER = "casesBoardViewerProcessNameParameter";
 	public static final String CASES_BOARD_VIEWER_REQUIRED_COLUMNS = "casesBoardViewerRequiredColumns";
 
@@ -131,6 +132,7 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private boolean onlySubscribedCases = Boolean.FALSE;
 
 	protected String	caseStatus,
+						caseCode,
 						roleKey,
 						processName,
 						taskName = GRADING_TASK_NAME,
@@ -373,10 +375,12 @@ public class CasesBoardViewer extends IWBaseComponent {
 	private boolean addCasesTable(Layer container, IWContext iwc, IWResourceBundle iwrb) {
 		User currentUser = iwc != null && iwc.isLoggedOn() ? iwc.getCurrentUser() : null;
 		CaseBoardTableBean data = getBoardCasesManager().getTableData(
+				iwc,
 				currentUser,
 				doFilterByDate(iwc) ? getDateFrom(iwc) : null,
 				doFilterByDate(iwc) ? getDateTo(iwc) : null,
 				getCaseStatuses(),
+				getCaseCodes(),
 				processName,
 				uuid,
 				isOnlySubscribedCases(),
@@ -740,6 +744,9 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 		if (!StringUtil.isEmpty(getCaseStatus()))
 			uri.setParameter(CASES_BOARD_VIEWER_CASES_STATUS_PARAMETER, getCaseStatus());
+		if (!StringUtil.isEmpty(getCaseCode())) {
+			uri.setParameter(CASES_BOARD_VIEWER_CASES_CODES_PARAMETER, getCaseCode());
+		}
 		if (!StringUtil.isEmpty(processName))
 			uri.setParameter(CASES_BOARD_VIEWER_PROCESS_NAME_PARAMETER, processName);
 		uri.setParameter(PARAMETER_UUID, uuid);
@@ -785,6 +792,26 @@ public class CasesBoardViewer extends IWBaseComponent {
 
 	public void setCaseStatus(String caseStatus) {
 		this.caseStatus = caseStatus.replaceAll("\\s", CoreConstants.EMPTY);
+	}
+
+	public List<String> getCaseCodes() {
+		if (StringUtil.isEmpty(getCaseCode())) {
+			return null;
+		}
+
+		return Arrays.asList(getCaseCode().split(CoreConstants.COMMA));
+	}
+
+	public String getCaseCode() {
+		if (this.caseCode == null) {
+			return null;
+		}
+
+		return caseCode.replaceAll("\\s", CoreConstants.EMPTY);
+	}
+
+	public void setCaseCode(String caseCode) {
+		this.caseCode = caseCode.replaceAll("\\s", CoreConstants.EMPTY);
 	}
 
 	public String getRoleKey() {
