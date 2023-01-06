@@ -22,6 +22,7 @@ public interface CasesEngine {
 	public abstract boolean clearSearchResults(String id);
 
 	public abstract AdvancedProperty getExportedSearchResults(String id, boolean exportContacts, boolean showCompany);
+	public abstract AdvancedProperty getExportedSearchResults(String id, boolean exportContacts, boolean showCompany, boolean addDefaultFields);
 
 	public <T extends MediaWritable> AdvancedProperty getSearchResultsWithExporter(String id, Class<T> exporter);
 
