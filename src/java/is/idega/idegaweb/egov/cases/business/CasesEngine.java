@@ -30,9 +30,8 @@ public interface CasesEngine {
 
 	public abstract List<AdvancedProperty> getDefaultSortingOptions(IWContext iwc);
 
-	public PagedDataCollection<CasePresentation> getCasesByQuery(CasesSearchCriteriaBean criteriaBean);
-
-	public PagedDataCollection<CasePresentation> getCasesByQuery(CasesSearchCriteriaBean criteriaBean, boolean isFirstPageIndexIsZero);
+	public PagedDataCollection<CasePresentation> getCasesByQuery(IWContext iwc, CasesSearchCriteriaBean criteriaBean);
+	public PagedDataCollection<CasePresentation> getCasesByQuery(IWContext iwc, CasesSearchCriteriaBean criteriaBean, boolean isFirstPageIndexIsZero);
 
 	public Document getRenderedCasesByQuery(CasesSearchCriteriaBean criteriaBean);
 
