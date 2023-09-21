@@ -842,9 +842,13 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 		}
 	}
 
-	private void addNavigator(IWContext iwc, Layer container, PagedDataCollection<CasePresentation> cases, CaseListPropertiesBean properties,
-			int totalCases, boolean searchResults) {
-
+	private void addNavigator(
+			IWContext iwc,
+			Layer container,
+			PagedDataCollection<CasePresentation> cases,
+			CaseListPropertiesBean properties,
+			int totalCases, boolean searchResults
+	) {
 		int pageSize = properties.getPageSize();
 		int page = properties.getPage();
 
@@ -863,7 +867,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 
 			IWResourceBundle resourceBundle = iwc.getIWMainApplication().getBundle(ProcessConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 
-			String key = "userCases";
+			String key = ProcessConstants.USER_CASES;
 			ListNavigator navigator = new ListNavigator(key, totalCases);
 			navigator.setFirstItemText(resourceBundle.getLocalizedString("page", "Page") + ":");
 			navigator.setDropdownEntryName(resourceBundle.getLocalizedString("cases", "cases"));
