@@ -27,6 +27,7 @@ import com.idega.block.process.presentation.UICasesList;
 import com.idega.block.process.presentation.UserCases;
 import com.idega.block.process.presentation.beans.CaseManagerState;
 import com.idega.block.process.presentation.beans.GeneralCaseManagerViewBuilder;
+import com.idega.block.process.util.CasesPagerUtil;
 import com.idega.block.process.variables.VisibleVariablesBean;
 import com.idega.business.IBORuntimeException;
 import com.idega.idegaweb.IWMainApplication;
@@ -179,6 +180,16 @@ public abstract class CasesProcessor extends CasesBlock {
 
 		try {
 			IWContext iwc = IWContext.getIWContext(fc);
+
+			Integer pageSizeFromSession = CasesPagerUtil.getPageSizeFromSession(iwc);
+			if (pageSizeFromSession != null && pageSizeFromSession > 0) {
+				setPageSize(pageSizeFromSession);
+			}
+			Integer pageFromSession = CasesPagerUtil.getPageFromSession(iwc);
+			if (pageFromSession != null && pageFromSession > 0) {
+				setPage(pageFromSession);
+			}
+
 			int page = getPage();
 			setTotalNumberOfCases(getTotalCountOfCases(iwc, page));
 			doResolveIds(iwc, getPageSize(), page);
