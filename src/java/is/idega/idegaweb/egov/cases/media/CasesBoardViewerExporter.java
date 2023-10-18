@@ -97,6 +97,10 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
+		if (iwc == null || !iwc.isLoggedOn()) {
+			return;
+		}
+
 		CaseBoardTableBean data = getTableData(iwc);
 		if (data == null || !data.isFilledWithData()) {
 			return;
@@ -337,7 +341,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	}
 
 	@Override
-	public void writeTo(OutputStream streamOut) throws IOException {
+	public void writeTo(IWContext iwc, OutputStream streamOut) throws IOException {
 		InputStream streamIn = new ByteArrayInputStream(memory.buffer());
 		FileUtil.streamToOutputStream(streamIn, streamOut);
 

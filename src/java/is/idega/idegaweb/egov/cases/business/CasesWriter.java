@@ -7,11 +7,6 @@
  */
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,11 +43,17 @@ import com.idega.presentation.IWContext;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
+import com.idega.util.IOUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.StringHandler;
 import com.idega.util.text.Name;
 import com.idega.util.text.TextSoap;
+
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
 
 public class CasesWriter extends DownloadWriter implements MediaWritable {
 
@@ -73,6 +74,10 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
+		if (iwc == null || !iwc.isLoggedOn()) {
+			return;
+		}
+
 		try {
 			this.locale = iwc.getApplicationSettings().getApplicationLocale();
 			this.iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(this.locale);
@@ -127,7 +132,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 				toDate = new IWTimestamp(iwc.getParameter(PARAMETER_TO_DATE)).getDate();
 			}
 
-			Collection cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, fromDate, toDate, anonymous);
+			Collection<Case> cases = getBusiness(iwc).getCasesByCriteria(category, subCategory, type, status, fromDate, toDate, anonymous);
 
 			this.buffer = writeXLS(iwc, cases);
 			setAsDownload(iwc, "cases.xls", this.buffer.length());
@@ -146,7 +151,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 	}
 
 	@Override
-	public void writeTo(OutputStream out) throws IOException {
+	public void writeTo(IWContext iwc, OutputStream out) throws IOException {
 		if (this.buffer != null) {
 			MemoryInputStream mis = new MemoryInputStream(this.buffer);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -154,6 +159,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 				baos.write(mis.read());
 			}
 			baos.writeTo(out);
+			IOUtil.close(mis);
 		}
 		else {
 			System.err.println("buffer is null");

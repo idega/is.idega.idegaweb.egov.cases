@@ -9,11 +9,6 @@
  */
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-import is.idega.idegaweb.egov.cases.util.CasesConstants;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,6 +36,7 @@ import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.IOUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
@@ -52,6 +48,11 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+import is.idega.idegaweb.egov.cases.util.CasesConstants;
+
 public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 	private MemoryFileBuffer buffer = null;
@@ -59,7 +60,12 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 	private IWResourceBundle iwrb;
 	private GeneralCase theCase;
 
+	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
+		if (iwc == null || !iwc.isLoggedOn()) {
+			return;
+		}
+
 		try {
 			this.locale = iwc.getApplicationSettings().getApplicationLocale();
 			this.iwrb = iwc.getIWMainApplication().getBundle(CasesConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(this.locale);
@@ -76,6 +82,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 		}
 	}
 
+	@Override
 	public String getMimeType() {
 		if (this.buffer != null) {
 			return this.buffer.getMimeType();
@@ -91,6 +98,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 				baos.write(mis.read());
 			}
 			baos.writeTo(out);
+			IOUtil.close(mis);
 		}
 		else {
 			System.err.println("buffer is null");
@@ -210,7 +218,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 			table.addCell(new Phrase(iwrb.getLocalizedString("message", "Message"), labelFont));
 			table.addCell(new Phrase(theCase.getMessage(), textFont));
-			
+
 			if (theCase.getReference() != null) {
 				table.addCell(new Phrase(iwrb.getLocalizedString("reference", "Reference"), labelFont));
 				table.addCell(new Phrase(theCase.getReference(), textFont));
@@ -240,7 +248,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 	protected CasesBusiness getCasesBusiness(IWApplicationContext iwac) {
 		try {
-			return (CasesBusiness) IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CasesBusiness.class);
 		}
 		catch (RemoteException e) {
 			throw new IBORuntimeException(e.getMessage());
@@ -249,7 +257,7 @@ public class CaseWriter extends DownloadWriter implements MediaWritable {
 
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) {
 		try {
-			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, UserBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
