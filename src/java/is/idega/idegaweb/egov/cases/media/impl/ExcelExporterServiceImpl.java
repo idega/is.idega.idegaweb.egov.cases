@@ -1,6 +1,6 @@
 package is.idega.idegaweb.egov.cases.media.impl;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -15,12 +15,12 @@ import is.idega.idegaweb.egov.cases.media.ExcelExporterService;
 public class ExcelExporterServiceImpl extends DefaultSpringBean implements ExcelExporterService {
 
 	@Override
-	public boolean autosizeSheetColumns(HSSFSheet sheet, int nrOfCells) {
+	public boolean autosizeSheetColumns(Sheet sheet, int nrOfCells) {
 		return ExcelUtil.getInstance().autosizeSheetColumns(sheet, nrOfCells);
 	}
 
 	@Override
-	public boolean autosizeColumns(HSSFSheet sheet) {
+	public boolean autosizeColumns(Sheet sheet) {
 		return ExcelUtil.getInstance().autosizeColumns(sheet);
 	}
 

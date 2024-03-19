@@ -1,11 +1,11 @@
 package is.idega.idegaweb.egov.cases.media;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
 
 public interface ExcelExporterService {
 
-	boolean autosizeColumns(HSSFSheet sheet);
+	boolean autosizeColumns(Sheet sheet);
 
-	boolean autosizeSheetColumns(HSSFSheet sheet, int nrOfCells);
+	boolean autosizeSheetColumns(Sheet sheet, int nrOfCells);
 
 }
