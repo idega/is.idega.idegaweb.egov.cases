@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseLog;
@@ -187,13 +188,13 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		sheet.setColumnWidth(cellColumn++, (short) (50 * 256));
 
 		HSSFFont font = workbook.createFont();
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		font.setFontHeightInPoints((short) 12);
 		HSSFCellStyle style = workbook.createCellStyle();
 		style.setFont(font);
 
 		HSSFCellStyle style2 = workbook.createCellStyle();
-		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);
+		style2.setVerticalAlignment(VerticalAlignment.TOP);
 		style2.setWrapText(true);
 
 		int cellRow = 0;
@@ -340,6 +341,7 @@ public class CasesWriter extends DownloadWriter implements MediaWritable {
 		}
 
 		workbook.write(mos);
+		workbook.close();
 
 		buffer.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
 		return buffer;

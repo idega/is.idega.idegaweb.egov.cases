@@ -9,10 +9,6 @@
  */
 package is.idega.idegaweb.egov.cases.business;
 
-import is.idega.idegaweb.egov.cases.data.CaseCategory;
-import is.idega.idegaweb.egov.cases.data.CaseType;
-import is.idega.idegaweb.egov.cases.data.GeneralCase;
-
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -22,7 +18,10 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.io.MemoryFileBuffer;
@@ -36,10 +35,14 @@ import com.idega.util.StringHandler;
 import com.idega.util.text.Name;
 import com.idega.util.text.TextSoap;
 
+import is.idega.idegaweb.egov.cases.data.CaseCategory;
+import is.idega.idegaweb.egov.cases.data.CaseType;
+import is.idega.idegaweb.egov.cases.data.GeneralCase;
+
 public class CasesWriterExtended extends CasesWriter {
 
 	@Override
-	public MemoryFileBuffer writeXLS(IWContext iwc, Collection cases) throws Exception {
+	public MemoryFileBuffer writeXLS(IWContext iwc, Collection<Case> cases) throws Exception {
 		MemoryFileBuffer buffer = new MemoryFileBuffer();
 		MemoryOutputStream mos = new MemoryOutputStream(buffer);
 
@@ -50,23 +53,23 @@ public class CasesWriterExtended extends CasesWriter {
 		sheet.setColumnWidth((short) 1, (short) (85 * 256));
 
 		HSSFFont font = workbook.createFont();
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		font.setFontHeightInPoints((short) 12);
 
 		HSSFCellStyle style = workbook.createCellStyle();
 		style.setFont(font);
 		HSSFCellStyle style2 = workbook.createCellStyle();
-		style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);
+		style2.setBorderBottom(BorderStyle.THIN);
+		style2.setVerticalAlignment(VerticalAlignment.TOP);
 		style2.setWrapText(true);
 		HSSFCellStyle style3 = workbook.createCellStyle();
-		style3.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+		style3.setBorderBottom(BorderStyle.THIN);
 		style3.setFont(font);
 
 		User currentUser = iwc.getCurrentUser();
 
 		int cellRow = 0;
-		Iterator iter = cases.iterator();
+		Iterator<Case> iter = cases.iterator();
 		while (iter.hasNext()) {
 			GeneralCase element = (GeneralCase) iter.next();
 			CaseCategory category = element.getCaseCategory();
@@ -195,6 +198,7 @@ public class CasesWriterExtended extends CasesWriter {
 		}
 
 		workbook.write(mos);
+		workbook.close();
 
 		buffer.setMimeType(MimeTypeUtil.MIME_TYPE_EXCEL_2);
 		return buffer;

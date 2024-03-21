@@ -24,6 +24,9 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -155,17 +158,17 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						Map<String, String> info = infoIter.next();
 						int financingTableCellIndex = key;
 
-						HSSFCell cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_STRING);
+						HSSFCell cell = financingTableRow.createCell(financingTableCellIndex++, CellType.STRING);
 						cell.setCellValue(info.get(CasesBoardViewer.WORK_ITEM));
 
-						cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+						cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 						String estimation = info.get(CasesBoardViewer.ESTIMATED_COST);
 						Long estimationNumber = manager.getNumberValue(estimation);
 						estimationTotal += estimationNumber;
 						cell.setCellValue(estimationNumber);
 
 						if (getBoardCasesManager().isBoardProposalEnabled()) {
-							cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+							cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 							String proposalForGrant = info.get(CasesBoardViewer.BOARD_PROPOSAL_FOR_GRANT);
 							long proposal = manager.getNumberValue(proposalForGrant);
 							proposalTotal += proposal;
@@ -173,7 +176,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						}
 
 						if (getBoardCasesManager().isBoardSuggestionEnabled()) {
-							cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+							cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 							String suggestion = info.get(CasesBoardViewer.BOARD_SUGGESTION);
 							long sugg = manager.getNumberValue(suggestion);
 							suggestionTotal += sugg;
@@ -181,7 +184,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 						}
 
 						if (getBoardCasesManager().isBoardDecisionEnabled()) {
-							cell = financingTableRow.createCell(financingTableCellIndex, HSSFCell.CELL_TYPE_NUMERIC);
+							cell = financingTableRow.createCell(financingTableCellIndex, CellType.NUMERIC);
 							String decision = info.get(CasesBoardViewer.BOARD_DECISION);
 							long dec = manager.getNumberValue(decision);
 							decisionTotal += dec;
@@ -201,19 +204,19 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 
 					int financingTableCellIndex = key;
 
-					HSSFCell cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_STRING);
+					HSSFCell cell = financingTableRow.createCell(financingTableCellIndex++, CellType.STRING);
 					cell.setCellValue(getIWResourceBundle(iwc).getLocalizedString("total", "Total"));
 
-					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+					cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 					cell.setCellValue(estimationTotal);
 
-					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+					cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 					cell.setCellValue(proposalTotal);
 
-					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+					cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 					cell.setCellValue(suggestionTotal);
 
-					cell = financingTableRow.createCell(financingTableCellIndex++, HSSFCell.CELL_TYPE_NUMERIC);
+					cell = financingTableRow.createCell(financingTableCellIndex++, CellType.NUMERIC);
 					cell.setCellValue(decisionTotal);
 				} else {
 					boolean canSkip = !getBoardCasesManager().hasCustomColumns(uuid);
@@ -327,13 +330,13 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 				if (horizontal) {
 					HSSFCellStyle horizontalAlignmentStyle = sheet.getWorkbook().createCellStyle();
 					horizontalAlignmentStyle.cloneStyleFrom(cellStyle);
-					horizontalAlignmentStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+					horizontalAlignmentStyle.setAlignment(HorizontalAlignment.CENTER);
 					cell.setCellStyle(horizontalAlignmentStyle);
 				}
 				if (vertical) {
 					HSSFCellStyle verticalAlignmentStyle = sheet.getWorkbook().createCellStyle();
 					verticalAlignmentStyle.cloneStyleFrom(cellStyle);
-					verticalAlignmentStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+					verticalAlignmentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 					cell.setCellStyle(verticalAlignmentStyle);
 				}
 			}
@@ -512,7 +515,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 		}
 
 		HSSFFont bigFont = workBook.createFont();
-		bigFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		bigFont.setBold(true);
 		bigFont.setFontHeightInPoints((short) 13);
 		return bigFont;
 	}
@@ -569,6 +572,7 @@ public class CasesBoardViewerExporter extends DownloadWriter implements MediaWri
 	protected boolean write(OutputStream streamOut, HSSFWorkbook workBook, IWContext iwc) {
 		try {
 			workBook.write(streamOut);
+			workBook.close();
 		} catch (Exception e) {
 			Logger.getLogger(CasesBoardViewer.class.getName()).log(Level.SEVERE, "Error writing cases board to Excel!", e);
 			return false;
