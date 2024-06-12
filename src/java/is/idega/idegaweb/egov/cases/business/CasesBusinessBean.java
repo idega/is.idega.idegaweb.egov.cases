@@ -327,9 +327,21 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	@Override
+	public String getLocalizedCaseStatusDescription(Case theCase, String statusKey, Locale locale) {
+		return getLocalizedCaseStatusDescription(theCase, statusKey, locale, getBundleIdentifier());
+	}
+
+	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale, String bundleIdentifier) {
+		return getLocalizedCaseStatusDescription(theCase, status == null ? null : status.getStatus(), locale, bundleIdentifier);
+	}
+
+	private String getLocalizedCaseStatusDescription(Case theCase, String statusKey, Locale locale, String bundleIdentifier) {
+		if (StringUtil.isEmpty(statusKey)) {
+			return null;
+		}
+
 		try {
-			String statusKey = status.getStatus();
 			String key = ProcessConstants.CASE_STATUS_KEY + CoreConstants.DOT + statusKey;
 
 			String typeOrCodeKey = null;
@@ -347,7 +359,7 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 			e.printStackTrace();
 		}
 
-		return theCase.getStatus();
+		return theCase == null ? null : theCase.getStatus();
 	}
 
 	@Override

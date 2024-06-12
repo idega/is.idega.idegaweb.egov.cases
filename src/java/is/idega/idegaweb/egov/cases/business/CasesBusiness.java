@@ -93,6 +93,9 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 	@Override
 	public String getLocalizedCaseStatusDescription(Case theCase, CaseStatus status, Locale locale) throws RemoteException;
 
+	@Override
+	public String getLocalizedCaseStatusDescription(Case theCase, String statusKey, Locale locale) throws RemoteException;
+
 	/**
 	 * @see is.idega.idegaweb.egov.cases.business.CasesBusinessBean#getGeneralCase
 	 */
