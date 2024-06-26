@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.idega.block.process.business.ProcessConstants;
@@ -291,7 +292,7 @@ public class CaseBoardBean {
 			try {
 				values = CoreConstants.GSON.fromJson(value, String[].class);
 			} catch (Exception e) {
-				e.printStackTrace();
+				Logger.getLogger(getClass().getName()).log(Level.WARNING, "Error converting '" + value + "' to array of strings", e);
 			}
 		}
 		if (!ArrayUtil.isEmpty(values)) {
