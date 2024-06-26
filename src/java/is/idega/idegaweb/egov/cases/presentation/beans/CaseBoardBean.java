@@ -158,21 +158,29 @@ public class CaseBoardBean {
 	public BigDecimal getGrantAmountSuggestion() {
 		return getGrantAmountSuggestion(ProcessConstants.BOARD_FINANCING_SUGGESTION);
 	}
-
-	public BigDecimal getGrantAmountSuggestion(String variableName) {
-		return getNumberValue(variableName);
+	public BigDecimal getGrantAmountSuggestion(String variable) {
+		return getNumberValue(StringUtil.isEmpty(variable) ? ProcessConstants.BOARD_FINANCING_SUGGESTION : variable);
 	}
 
 	public void setGrantAmountSuggestion(Long grantAmountSuggestion) {
-		addValue(ProcessConstants.BOARD_FINANCING_SUGGESTION, grantAmountSuggestion);
+		setGrantAmountSuggestion(ProcessConstants.BOARD_FINANCING_SUGGESTION, grantAmountSuggestion);
+	}
+	public void setGrantAmountSuggestion(String variable, Long grantAmountSuggestion) {
+		addValue(StringUtil.isEmpty(variable) ? ProcessConstants.BOARD_FINANCING_SUGGESTION : variable, grantAmountSuggestion);
 	}
 
 	public BigDecimal getBoardAmount() {
-		return getNumberValue(ProcessConstants.BOARD_FINANCING_DECISION);
+		return getBoardAmount(ProcessConstants.BOARD_FINANCING_DECISION);
+	}
+	public BigDecimal getBoardAmount(String variable) {
+		return getNumberValue(StringUtil.isEmpty(variable) ? ProcessConstants.BOARD_FINANCING_DECISION : variable);
 	}
 
 	public void setBoardAmount(Long boardAmount) {
-		addValue(ProcessConstants.BOARD_FINANCING_DECISION, boardAmount);
+		setBoardAmount(ProcessConstants.BOARD_FINANCING_DECISION, boardAmount);
+	}
+	public void setBoardAmount(String variable, Long boardAmount) {
+		addValue(StringUtil.isEmpty(variable) ? ProcessConstants.BOARD_FINANCING_DECISION : variable, boardAmount);
 	}
 
 	public String getCaseId() {
