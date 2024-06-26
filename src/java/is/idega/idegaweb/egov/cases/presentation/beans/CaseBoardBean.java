@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import com.google.gson.Gson;
 import com.idega.block.process.business.ProcessConstants;
 import com.idega.user.data.User;
 import com.idega.util.ArrayUtil;
@@ -290,7 +289,7 @@ public class CaseBoardBean {
 		String[] values = null;
 		if (value.startsWith(CoreConstants.SQUARE_BRACKET_LEFT) && value.endsWith(CoreConstants.SQUARE_BRACKET_RIGHT)) {
 			try {
-				values = new Gson().fromJson(value, String[].class);
+				values = CoreConstants.GSON.fromJson(value, String[].class);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
