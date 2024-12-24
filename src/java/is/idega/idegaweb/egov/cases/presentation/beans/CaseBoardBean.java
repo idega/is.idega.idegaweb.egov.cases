@@ -28,7 +28,7 @@ public class CaseBoardBean {
 			CASE_CATEGORY = "string_ownerProjectLead",
 			CASE_SUM_OF_NEGATIVE_GRADES = "sum_all_negative_grades",
 			CASE_SUM_ALL_GRADES = "sum_all_grades",
-			CASE_OWNER_FULL_NAME = "string_ownerFullName",
+			CASE_OWNER_FULL_NAME = ProcessConstants.CASE_OWNER_FULL_NAME,
 			CASE_OWNER_PERSONAL_ID = "string_ownerKennitala",
 			CASE_OWNER_ADDRESS = "string_ownerAddress",
 			CASE_OWNER_POSTAL_CODE = "string_ownerPostCode",

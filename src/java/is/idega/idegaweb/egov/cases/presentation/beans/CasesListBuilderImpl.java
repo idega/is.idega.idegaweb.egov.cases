@@ -102,7 +102,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 	private String allowPDFSigningParName = "allowpdfsigning";
 
 	public static final String VARIABLE_CASE_NR = ProcessConstants.CASE_IDENTIFIER;
-	public static final String VARIABLE_SENDER = "string_ownerFullName";
+	public static final String VARIABLE_SENDER = ProcessConstants.CASE_OWNER_FULL_NAME;
 	public static final String VARIABLE_DESCRIPTION = ProcessConstants.CASE_DESCRIPTION;
 	public static final String VARIABLE_CREATION_DATE = "string_caseCreatedDateString";
 	public static final String VARIABLE_STATUS = ProcessConstants.CASE_STATUS;
