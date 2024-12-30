@@ -1160,7 +1160,7 @@ public class CasesListBuilderImpl implements GeneralCasesListBuilder {
 			caseId = iwc.getParameter(CasesProcessor.PARAMETER_CASE_PK + "_id");
 		}
 		StringBuilder action = new StringBuilder("initializeCasesList(");
-		if (caseId == null || CoreConstants.EMPTY.equals(action)) {
+		if (caseId == null || CoreConstants.EMPTY.equals(action.toString())) {
 			action.append("null");
 		}
 		else {
