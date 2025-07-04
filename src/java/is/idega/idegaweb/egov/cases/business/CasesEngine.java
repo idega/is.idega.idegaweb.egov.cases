@@ -2,6 +2,10 @@ package is.idega.idegaweb.egov.cases.business;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.jdom2.Document;
 
 import com.idega.block.process.business.CasesRetrievalManager;
@@ -24,6 +28,7 @@ public interface CasesEngine {
 	public abstract AdvancedProperty getExportedSearchResults(String id, boolean exportContacts, boolean showCompany);
 	public abstract AdvancedProperty getExportedSearchResults(String id, boolean exportContacts, boolean showCompany, boolean addDefaultFields);
 	public abstract AdvancedProperty getExportedSearchResults(String id, boolean exportContacts, boolean showCompany, boolean addDefaultFields, String category);
+	public abstract AdvancedProperty getExportedSearchResults(String id, boolean exportContacts, boolean showCompany, boolean addDefaultFields, String category, HttpServletRequest request, HttpServletResponse response, ServletContext context);
 
 	public <T extends MediaWritable> AdvancedProperty getSearchResultsWithExporter(String id, Class<T> exporter);
 
