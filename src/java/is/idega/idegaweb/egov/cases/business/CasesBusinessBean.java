@@ -1256,9 +1256,9 @@ public class CasesBusinessBean extends CaseBusinessBean implements CaseBusiness,
 	}
 
 	@Override
-	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
-			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
-		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom, dateTo, owner, groups, simpleCases, notGeneralCases, null, null);
+	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, java.util.Date dateFrom,
+			java.util.Date dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases) {
+		return getCasesIDsByCriteria(caseNumber, description, name, personalId, statuses, dateFrom == null ? null : new IWTimestamp(dateFrom), dateTo == null ? null : new IWTimestamp(dateTo), owner, groups, simpleCases, notGeneralCases, null, null);
 	}
 
 	@Override

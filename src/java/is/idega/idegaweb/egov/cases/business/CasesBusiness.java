@@ -439,8 +439,8 @@ public interface CasesBusiness extends IBOService, CaseBusiness {
 			List<String> caseManagerTypes
 	) throws RemoteException;
 
-	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, IWTimestamp dateFrom,
-			IWTimestamp dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases);
+	public Collection<Integer> getCasesIDsByCriteria(String caseNumber, String description, String name, String personalId, String[] statuses, java.util.Date dateFrom,
+			java.util.Date dateTo, User owner, Collection<Group> groups, boolean simpleCases, boolean notGeneralCases);
 
 	public Collection<Integer> getCasesIDsByCriteria(
 			String caseNumber,

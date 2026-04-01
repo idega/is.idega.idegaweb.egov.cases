@@ -274,8 +274,8 @@ public class CasesSearcher extends CasesBlock {
 		Date from = null;
 		Date to = null;
 		if (searchSettings != null) {
-			from = searchSettings.getDateFrom() == null ? null : searchSettings.getDateFrom().getDate();
-			to = searchSettings.getDateTo() == null ? null : searchSettings.getDateTo().getDate();
+			from = searchSettings.getDateFrom();
+			to = searchSettings.getDateTo();
 		}
 		IWDatePicker dateRange = getDateRange(iwc, "dateRange", from, to);
 		addFormItem(inputsContainer, "dateRange", iwrb.getLocalizedString("date_range", "Date range"), dateRange);
@@ -513,7 +513,7 @@ public class CasesSearcher extends CasesBlock {
 		fillDropdown(
 				iwc.getCurrentLocale(),
 				menu,
-				new ArrayList<AdvancedProperty>(statuses.values()),
+				new ArrayList<>(statuses.values()),
 				new AdvancedProperty(String.valueOf(-1), getResourceBundle(iwc).getLocalizedString("select_status", "Select status")),
 				selectedStatus
 		);
